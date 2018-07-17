@@ -39,7 +39,7 @@ function PlayerNotify::AtSpawn( %game, %client, %respawn )
 	if( !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled && $Host::EvoNoBaseRapeClassicPlayerCount > $TotalTeamPlayerCount ) {
 		//If on, has the client gotten the notification already
 		if($NoBaseRapeNotifyCount !$= 0) {
-			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c3Enabled.~wfx/misc/nexus_cap.wav');
+			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Enabled.~wfx/misc/nexus_cap.wav');
 			$NoBaseRapeNotifyCount = 0;
 		}
 	}
@@ -47,7 +47,7 @@ function PlayerNotify::AtSpawn( %game, %client, %respawn )
 		//NoBaseRape is off		
 		//Has the client gotten the notification already
 		if($NoBaseRapeNotifyCount !$= 1) {
-			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c3Disabled.~wfx/misc/diagnostic_on.wav');
+			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
 			$NoBaseRapeNotifyCount = 1;
 	}	
 }

@@ -25,7 +25,7 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 				//Has the client gotten the notification already
 				if($TeamBalanceNotifyCount !$= 1) {
 					//If unbalanced, send a notification. Will continue to send notifications until teams are balanced.
-					messageAll('MsgTeamBalanceNotify', 'Teams are unbalanced.');
+					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.');
 				//Only get the notification once per spawn.
 				$TeamBalanceNotifyCount = 1;
 				//Reset Stat
@@ -39,7 +39,7 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 					//Has the client gotten the notification already
 					if($BalancedCount !$= 1) {
 						//If balanced, send a notification.
-						messageAll('MsgTeamBalanceNotify', 'Teams are balanced.');
+						messageAll('MsgTeamBalanceNotify', '\c1Teams are balanced.');
 						//Only get the balance notification once.
 						$BalancedCount = 1;
 						//Reset Unbalanced
@@ -53,7 +53,7 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 		if( ($PlayerCount[1] - $PlayerCount[2]) >= 3 || ($PlayerCount[2] - $PlayerCount[1]) >= 3 ) {
 			//Run it once
 			if($StatsBalanceCount !$= 1) {
-			messageAll('MsgTeamBalanceNotify', 'It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+			messageAll('MsgTeamBalanceNotify', '\c1It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
 			$StatsBalanceCount = 1;
 			}
 		}

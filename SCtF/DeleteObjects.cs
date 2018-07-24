@@ -41,6 +41,7 @@ function deleteObjectsFromMapByType(%type)
 		return;
 	}
 
+	
 	deleteObjectsFromGroupByType(%team1Base0Group, %type);
 	deleteObjectsFromGroupByType(%team2Base0Group, %type);
 }
@@ -76,13 +77,14 @@ function deleteObjectsFromGroupByType(%group, %type)
 }
 
 function deleteNonSCtFObjectsFromMap()
-{
+{   
+   deleteObjectsFromGroupByType(MissionGroup, "PhysicalZone");
    deleteObjectsFromGroupByType(MissionGroup, "Turret");
    deleteObjectsFromGroupByType(MissionGroup, "StaticShape");
-   deleteObjectsFromGroupByType(MissionGroup, "TSStatic");
-   // deleteObjectsFromGroupByType(MissionGroup, "ForceFieldBare");
+   //deleteObjectsFromGroupByType(MissionGroup, "ForceFieldBare");
    deleteObjectsFromGroupByType(MissionGroup, "FlyingVehicle");
    deleteObjectsFromGroupByType(MissionGroup, "WheeledVehicle");
+   deleteObjectsFromGroupByType(MissionGroup, "HoverVehicle");
    deleteObjectsFromGroupByType(MissionGroup, "Waypoint");
+ 
 }
-

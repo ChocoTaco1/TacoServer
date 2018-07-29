@@ -691,17 +691,17 @@ function SCtFGame::flagCap(%game, %player)
    if ($missionRunning)
    {
       if (%game.getTeamName(%client.team) $= 'Inferno')
-         messageAll("", '~wvoice/announcer/ann.infscores.wav');
+         messageAll("", '~wfx/misc/flag_capture.wav');
       else if (%game.getTeamName(%client.team) $= 'Storm')
-         messageAll("", '~wvoice/announcer/ann.stoscores.wav');
+         messageAll("", '~wfx/misc/flag_capture.wav');
       else if (%game.getTeamName(%client.team) $= 'Phoenix')
-         messageAll("", '~wvoice/announcer/ann.pxscore.wav');
+         messageAll("", '~wfx/misc/flag_capture.wav');
       else if (%game.getTeamName(%client.team) $= 'Blood Eagle')
-         messageAll("", '~wvoice/announcer/ann.bescore.wav');
+         messageAll("", '~wfx/misc/flag_capture.wav');
       else if (%game.getTeamName(%client.team) $= 'Diamond Sword')
-         messageAll("", '~wvoice/announcer/ann.dsscore.wav');
+         messageAll("", '~wfx/misc/flag_capture.wav');
       else if (%game.getTeamName(%client.team) $= 'Starwolf')
-         messageAll("", '~wvoice/announcer/ann.swscore.wav');
+         messageAll("", '~wfx/misc/flag_capture.wav');
    }
 }
 

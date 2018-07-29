@@ -56,12 +56,15 @@ function GetTeamCounts( %game, %client, %respawn )
 		if($CurrentMissionType $= "CTF" && $TotalTeamPlayerCount !$= 0 && $countdownStarted $= true && $MatchStarted $= true) {
 		TeamBalanceNotify::AtSpawn( %game, %client, %respawn );
 		}
-		//Start
+		if($CurrentMissionType $= "sctf" && $TotalTeamPlayerCount !$= 0 && $countdownStarted $= true && $MatchStarted $= true) {
+		TeamBalanceNotify::AtSpawn( %game, %client, %respawn );
+		}
+		//Start Base Rape Notify
 		//Make sure it's CTF Mode
 		if($CurrentMissionType $= "CTF" && $countdownStarted $= true && $MatchStarted $= true) {
 		PlayerNotify::AtSpawn( %game, %client, %respawn );
 		}
- 		//AntiCloak Start
+		//AntiCloak Start
 		//if($CurrentMissionType $= "CTF") {
 		//ActivateAntiCloak ();
 		//}

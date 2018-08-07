@@ -15,8 +15,12 @@
 
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
-
-// v3.2 - Chocotaco April 2018
+//
+// v3.3 - July 2018
+// Nerfed Midair Flag grab points since its easier with the flag updater code.
+// Nerfed Shock height points just a tad.
+//
+// v3.2 - April 2018
 // Made spawning closer to the Rabbit 200>150
 // Made Debrief font slightly larger
 // Added flag updater code from CTF
@@ -535,7 +539,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		else if(%damageType == $DamageType::ShockLance)
 		{	
 			%height = getHeight(%sourceObject);
-			%heightBonus = (mPow(%height,1.20)/10)+1;
+			%heightBonus = (mPow(%height,1.20)/12)+1; //was 10
 			%velBonus /= 2;
 			%points = mFloor(%distance/2) + (%heightBonus);
 			
@@ -1620,7 +1624,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
       %ground = ContainerRayCast(%rayStart, %rayEnd, %mask, 0);
       if(!%ground)
       {
-         %points = mFloor((getSpeed(%player)/5.3) + (getHeight(%player)/2.3));
+         %points = mFloor((getSpeed(%player)/7.3) + (getHeight(%player)/3.3)); //was 5.3 - 2.3
          %points = %points > 5 ? %points : 5;
          messageAll('MsgRabbitFlagTaken', '\c4%1 gets %2 points for a Mid-Air flag grab! [Speed:%3] [Height:%4]~wfx/misc/hunters_horde.wav', %player.client.name, %points, getSpeed(%player), getHeight(%player));
 	 %player.client.morepoints += %points;

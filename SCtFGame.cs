@@ -104,8 +104,6 @@ function SCtFGame::initGameVars(%game)
    %game.stalemateTimeMS = 60000;
    %game.stalemateFreqMS = 15000;
    %game.stalemateDurationMS = 6000;
-   
-   %game.NotPure = false;
 }
 
 package SCtFGame
@@ -643,7 +641,7 @@ function SCtFGame::playerDroppedFlag(%game, %player)
    $flagStatus[%flag.team] = "<In the Field>";
    
    %player.unMountImage($FlagSlot);   
-   %flag.hide(false); //Does the throwItem function handle this?   
+   %flag.hide(false); //Does the throwItem function handle this?
 
    %teamName = %game.getTeamName(%flag.team);
    messageTeamExcept(%client, 'MsgCTFFlagDropped', '\c2Teammate %1 dropped the %2 flag. (Held: %4)~wfx/misc/flag_drop.wav', %client.name, %teamName, %flag.team, %held); // z0dd - ZOD, 8/15/02. How long flag was held
@@ -688,21 +686,21 @@ function SCtFGame::flagCap(%game, %player)
    %game.AIflagCap(%player, %flag);
 
    //if this cap didn't end the game, play the announcer...
-   if ($missionRunning)
-   {
-      if (%game.getTeamName(%client.team) $= 'Inferno')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Storm')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Phoenix')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Blood Eagle')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Diamond Sword')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Starwolf')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-   }
+   //if ($missionRunning)
+   //{
+      //if (%game.getTeamName(%client.team) $= 'Inferno')
+         //messageAll("", '~wvoice/announcer/ann.infscores.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Storm')
+         //messageAll("", '~wvoice/announcer/ann.stoscores.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Phoenix')
+         //messageAll("", '~wvoice/announcer/ann.pxscore.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Blood Eagle')
+         //messageAll("", '~wvoice/announcer/ann.bescore.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Diamond Sword')
+         //messageAll("", '~wvoice/announcer/ann.dsscore.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Starwolf')
+         //messageAll("", '~wvoice/announcer/ann.swscore.wav');
+   //}
 }
 
 function SCtFGame::flagReturnFade(%game, %flag)
@@ -1650,7 +1648,7 @@ function SCtFGame::boundaryLoseFlag(%game, %player)
 }
 
 function SCtFGame::dropFlag(%game, %player)
-{
+{   
    if(%player.holdingFlag > 0)
    {
       if (!%player.client.outOfBounds)

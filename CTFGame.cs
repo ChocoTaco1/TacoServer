@@ -87,6 +87,8 @@ function CTFGame::initGameVars(%game)
    %game.stalemateTimeMS = 60000;
    %game.stalemateFreqMS = 15000;
    %game.stalemateDurationMS = 6000;
+   
+   
    // --------------------------------------------------- 
 
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
@@ -550,21 +552,21 @@ function CTFGame::flagCap(%game, %player)
    %game.AIflagCap(%player, %flag);
 
    //if this cap didn't end the game, play the announcer...
-   if ($missionRunning)
-   {
-      if (%game.getTeamName(%client.team) $= 'Inferno')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Storm')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Phoenix')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Blood Eagle')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Diamond Sword')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-      else if (%game.getTeamName(%client.team) $= 'Starwolf')
-         messageAll("", '~wfx/misc/flag_capture.wav');
-   }
+   //if ($missionRunning)
+   //{
+      //if (%game.getTeamName(%client.team) $= 'Inferno')
+         //messageAll("", '~wvoice/announcer/ann.infscores.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Storm')
+         //messageAll("", '~wvoice/announcer/ann.stoscores.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Phoenix')
+         //messageAll("", '~wvoice/announcer/ann.pxscore.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Blood Eagle')
+         //messageAll("", '~wvoice/announcer/ann.bescore.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Diamond Sword')
+         //messageAll("", '~wvoice/announcer/ann.dsscore.wav');
+      //else if (%game.getTeamName(%client.team) $= 'Starwolf')
+         //messageAll("", '~wvoice/announcer/ann.swscore.wav');
+   //}
 }
 
 function CTFGame::flagReturnFade(%game, %flag)
@@ -673,6 +675,7 @@ function CTFGame::hideStalemateTargets(%game)
 function CTFGame::beginStalemate(%game)
 {
    %game.stalemate = true;
+   $stalemate = true;
    %game.showStalemateTargets();
 
    // z0dd - ZOD, 5/27/03. Added anti-turtling, return flags after x minutes
@@ -686,6 +689,7 @@ function CTFGame::beginStalemate(%game)
 function CTFGame::endStalemate(%game)
 {
    %game.stalemate = false;
+   $stalemate = false;
    %game.hideStalemateTargets();
    cancel(%game.stalemateSchedule);
 }
@@ -753,9 +757,9 @@ function CTFGame::flagReset(%game, %flag)
 
 function CTFGame::timeLimitReached(%game)
 {
-   logEcho("game over (timelimit)");
-   %game.gameOver();
-   cycleMissions();
+	logEcho("game over (timelimit)");
+	%game.gameOver();
+	cycleMissions();
 }
 
 function CTFGame::scoreLimitReached(%game)
@@ -838,6 +842,9 @@ function CTFGame::gameOver(%game)
    }
    for(%j = 1; %j <= %game.numTeams; %j++)
       $TeamScore[%j] = 0;
+  
+   ResetNotify::MissionEnd( %game, %client );
+  
 }
 
 function CTFGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc)
@@ -1627,6 +1634,7 @@ function CTFGame::dropFlag(%game, %player)
       else
          %game.boundaryLoseFlag(%player);
    }
+
 }
 
 function CTFGame::applyConcussion(%game, %player)

@@ -78,7 +78,7 @@ function deleteObjectsFromGroupByType(%group, %type)
 
 function deleteNonSCtFObjectsFromMap()
 {   
-   deleteObjectsFromGroupByType(MissionGroup, "PhysicalZone");
+   //deleteObjectsFromGroupByType(MissionGroup, "PhysicalZone");
    deleteObjectsFromGroupByType(MissionGroup, "Turret");
    deleteObjectsFromGroupByType(MissionGroup, "StaticShape");
    //deleteObjectsFromGroupByType(MissionGroup, "ForceFieldBare");
@@ -86,5 +86,5 @@ function deleteNonSCtFObjectsFromMap()
    deleteObjectsFromGroupByType(MissionGroup, "WheeledVehicle");
    deleteObjectsFromGroupByType(MissionGroup, "HoverVehicle");
    deleteObjectsFromGroupByType(MissionGroup, "Waypoint");
- 
+   //deleteObjectsFromGroupByType(MissionGroup, "Item");
 }

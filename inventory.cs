@@ -477,7 +477,10 @@ function ShapeBase::throwObject(%this,%obj)
    //we need to up the %vec so that you can still throw them...
    if (%obj.getDataBlock().getName() $= "Flag")
    {
-      %vec = vectorScale(%vec, (%srcCorpse ? 40 : 75)); // z0dd - ZOD, 4/14/02. Throw flag force. Value was 40
+      if ($CurrentMissionType $= "sctf")
+	  %vec = vectorScale(%vec, (%srcCorpse ? 50 : 95)); // Added so SCtF gets more force for Flag passes
+	  else
+	  %vec = vectorScale(%vec, (%srcCorpse ? 40 : 75)); // z0dd - ZOD, 4/14/02. Throw flag force. Value was 40
       // ------------------------------------------------------------
       // z0dd - ZOD, 9/27/02. Delay on grabbing flag after tossing it
       %this.flagTossWait = true;

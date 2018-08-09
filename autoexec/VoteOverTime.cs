@@ -3,88 +3,61 @@
 
 package VoteOverTime {
 
-//CTF
-function CTFGame::timeLimitReached(%game)
+function DefaultGame::checkTimeLimit(%game, %forced)
 {
-   if( !$VoteInProgress && !$TimeLimitChanged ) {
-		logEcho("game over (timelimit)");
-		%game.gameOver();
-		cycleMissions();
+   // Don't add extra checks:
+   if ( %forced )
+      cancel( %game.timeCheck );
+
+   // if there is no time limit, check back in a minute to see if it's been set
+   if(($Host::TimeLimit $= "") || $Host::TimeLimit == 0)
+   {
+      %game.timeCheck = %game.schedule(20000, "checkTimeLimit");
+      return;
+   }
+   
+   %curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
+
+   if (%curTimeLeftMS <= 0)
+   {
+        //Vote Overtime
+		//Check if Vote is active or if the timelimit has changed.
+		if( !$VoteInProgress && !$TimeLimitChanged ) {
+			// time's up, put down your pencils
+			%game.timeLimitReached();
 		
+		//Reset Everything to do with Vote Overtime
 		$VoteInProgress = false;
 		$TimeLimitChanged = false;
 		$VoteInProgressMessege = false;
 		$VoteSoundInProgress = false;
-   }   
-   else if( $missionRunning && $VoteInProgress && !$TimeLimitChanged ) {
-		schedule(1000, 0, "CTFRestarttimeLimitReached", %game);
+		}   
+		else if( $missionRunning && $VoteInProgress && !$TimeLimitChanged ) {
+			//Restart the function so the map can end if the Vote doesnt pass.
+			schedule(1000, 0, "RestartcheckTimeLimit", %game, %forced);
 		
+			//Messege
 			if( !$VoteInProgressMessege ) {
-			messageAll('', '\c2Vote Overtime Initiated.', %display);
-			$VoteInProgressMessege = true;
+				messageAll('', '\c2Vote Overtime Initiated.', %display);
+				$VoteInProgressMessege = true;
 			}
-	}
+		}
+   }
+   else
+   {
+      if(%curTimeLeftMS >= 20000)
+         %game.timeCheck = %game.schedule(20000, "checkTimeLimit");
+      else
+         %game.timeCheck = %game.schedule(%curTimeLeftMS + 1, "checkTimeLimit");
+
+      //now synchronize everyone's clock
+      messageAll('MsgSystemClock', "", $Host::TimeLimit, %curTimeLeftMS);
+   }
 }
 
-function CTFRestarttimeLimitReached(%game)
+function RestartcheckTimeLimit(%game, %forced)
 {
-	CTFGame::timeLimitReached(%game);
-}
-
-//LakRabbit
-function LakRabbitGame::timeLimitReached(%game)
-{
-   if( !$VoteInProgress && !$TimeLimitChanged ) {
-		logEcho("game over (timelimit)");
-		%game.gameOver();
-		cycleMissions();
-		
-		$VoteInProgress = false;
-		$TimeLimitChanged = false;
-		$VoteInProgressMessege = false;
-		$VoteSoundInProgress = false;
-   }   
-   else if( $missionRunning && $VoteInProgress && !$TimeLimitChanged ) {
-		schedule(1000, 0, "LakRabbitRestarttimeLimitReached", %game);
-		
-			if( !$VoteInProgressMessege ) {
-			messageAll('', '\c2Vote Overtime Initiated.', %display);
-			$VoteInProgressMessege = true;
-			}
-	}
-}
-
-function LakRabbitRestarttimeLimitReached(%game)
-{
-	LakRabbitGame::timeLimitReached(%game);
-}
-
-//SCtF
-function SCtFGame::timeLimitReached(%game)
-{
-   if( !$VoteInProgress && !$TimeLimitChanged ) {
-		logEcho("game over (timelimit)");
-		%game.gameOver();
-		cycleMissions();
-		
-		$VoteInProgress = false;
-		$TimeLimitChanged = false;
-		$VoteInProgressMessege = false;
-		$VoteSoundInProgress = false;
-   }   
-   else if( $missionRunning && $VoteInProgress && !$TimeLimitChanged ) {
-		schedule(1000, 0, "SCtFRestarttimeLimitReached", %game);
-		
-			if( !$VoteInProgressMessege ) {
-			messageAll('', '\c2Vote Overtime Initiated.', %display);
-			$VoteInProgressMessege = true;
-			}
-	}
-}
-
-function SCtFRestarttimeLimitReached(%game)
-{
-	SCtFGame::timeLimitReached(%game);
+	%game.checkTimeLimit(%game, %forced);
 }
 
 };

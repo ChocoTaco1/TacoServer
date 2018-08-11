@@ -118,7 +118,7 @@
 //
 // $Host::EnableLakUnlimitedDJ
 //   0 - Players only get one DiscJump
-//   1 - Show the flag when dropped as a task
+//   1 - Players get 999 or unlimited DiscJumps
 //
 
 

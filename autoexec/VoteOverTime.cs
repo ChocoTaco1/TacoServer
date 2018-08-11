@@ -27,18 +27,15 @@ function DefaultGame::checkTimeLimit(%game, %forced)
 			%game.timeLimitReached();
 		
 		//Reset Everything to do with Vote Overtime
-		$VoteInProgress = false;
-		$TimeLimitChanged = false;
-		$VoteInProgressMessege = false;
-		$VoteSoundInProgress = false;
-		}   
+		//Moved to function DefaultGame::gameOver in DefaultGame.ovl in evo
+		}
 		else if( $missionRunning && $VoteInProgress && !$TimeLimitChanged ) {
 			//Restart the function so the map can end if the Vote doesnt pass.
 			schedule(1000, 0, "RestartcheckTimeLimit", %game, %forced);
 		
 			//Messege
 			if( !$VoteInProgressMessege ) {
-				messageAll('', '\c2Vote Overtime Initiated.', %display);
+				messageAll('', '\c2Vote Overtime Initiated.~wfx/powered/turret_heavy_activate.wav', %display);
 				$VoteInProgressMessege = true;
 			}
 		}

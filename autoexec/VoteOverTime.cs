@@ -31,7 +31,7 @@ function DefaultGame::checkTimeLimit(%game, %forced)
 		}
 		else if( $missionRunning && $VoteInProgress && !$TimeLimitChanged ) {
 			//Restart the function so the map can end if the Vote doesnt pass.
-			schedule(1000, 0, "RestartcheckTimeLimit", %game, %forced);
+			schedule(2000, 0, "RestartcheckTimeLimit", %game, %forced);
 		
 			//Messege
 			if( !$VoteInProgressMessege ) {
@@ -52,12 +52,36 @@ function DefaultGame::checkTimeLimit(%game, %forced)
    }
 }
 
+};
+
 function RestartcheckTimeLimit(%game, %forced)
 {
 	%game.checkTimeLimit(%game, %forced);
 }
 
-};
+function StartVOTimeVote(%game)
+{
+	$VoteSoundInProgress = true;
+	$VoteInProgress = true;
+	$TimeLimitChanged = false;
+}
+
+function ResetVOTimeChanged(%game)
+{
+	$VoteInProgress = false;
+	$TimeLimitChanged = true;
+	$VoteInProgressMessege = false;
+	$VoteSoundInProgress = false;
+}
+
+function ResetVOall(%game)
+{
+	$VoteInProgress = false;
+	$TimeLimitChanged = false;
+	$VoteInProgressMessege = false;
+	$VoteSoundInProgress = false;
+}
+
 
 // Prevent package from being activated if it is already
 if (!isActivePackage(VoteOverTime))

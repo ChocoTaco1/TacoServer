@@ -245,7 +245,7 @@ addRotationMap("LushLak", LakRabbit, 1, 1);
 addRotationMap("PhasmaDustLak", LakRabbit, 1, 1);
 addRotationMap("BoxLak", LakRabbit, 1, 0);
 addRotationMap("DamnnationLak", LakRabbit, 1, 0);
-addRotationMap("TitanLak", LakRabbit, 1, 0);
+addRotationMap("TitaniaLak", LakRabbit, 1, 0);
 addRotationMap("TWL2_MuddySwampLak", LakRabbit, 0, 0);
 addRotationMap("SandStormLak", LakRabbit, 1, 0);
 addRotationMap("BeggarsRunLak", LakRabbit, 1, 0);
@@ -257,6 +257,7 @@ addRotationMap("Arrakis", LakRabbit, 1, 0);
 addRotationMap("EquinoxLak", LakRabbit, 1, 0);
 addRotationMap("FrozenFuryLak", LakRabbit, 1, 0);
 addRotationMap("S8_GeothermalLak", LakRabbit, 1, 1);
+addRotationMap("Sulfide", LakRabbit, 1, 1);
 
 
 

@@ -159,8 +159,6 @@ function DefaultGame::initGameVars(%game)
    %game.SCORE_PER_KILL = 0; 
 
    %game.SCORE_PER_TURRET_KILL = 0;
-   
-   $EndCountdownStart = false;
 }
 
 //-- tracking  ---
@@ -620,8 +618,6 @@ function DefaultGame::gameOver( %game )
 
    // Default game does nothing...  except lets the AI know the mission is over
    AIMissionEnd();
-
-   ResetNotify::MissionEnd( %game, %client );
    
 }
 
@@ -3758,7 +3754,7 @@ function notifyMatchEnd(%time)
    
    if (%seconds > 1) {
       MessageAll('MsgMissionEnd', '\c2Match ends in %1 seconds.~wfx/misc/hunters_%1.wav', %seconds);
-		if (%seconds > 59) {
+		if (%seconds == 60) {
 			MessageAll('MsgNotifyEvoNextMission', '\c2Next Mission: \c3%1', $EvoCachedNextMission);
 		}
    }

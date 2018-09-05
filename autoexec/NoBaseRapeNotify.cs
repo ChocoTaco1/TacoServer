@@ -1,5 +1,5 @@
 //Start and Reset Notify
-package NoRapeNotify {
+//package NoRapeNotify {
 
 //Start Notify
 //function DefaultGame::spawnPlayer( %game, %client, %respawn ) {
@@ -12,19 +12,21 @@ package NoRapeNotify {
 	//}
 //}
 
-//Reset Notify
-function DefaultGame::gameOver( %game ) {
-	//Call default function
-	parent::gameOver( %game );
-	//Reset NoBaseRape Notify
-	ResetNotify::MissionEnd( %game, %client );
-}
+//Moved the DefaultGame::gameOver in evo defaultgame.ovl
 
-};
+//Reset Notify
+//function DefaultGame::gameOver( %game ) {
+	//Call default function
+	//parent::gameOver( %game );
+	//Reset NoBaseRape Notify
+	//ResetNotify::MissionEnd( %game, %client );
+//}
+
+//};
 
 // Prevent package from being activated if it is already
-if (!isActivePackage(NoRapeNotify))
-    activatePackage(NoRapeNotify);
+//if (!isActivePackage(NoRapeNotify))
+    //activatePackage(NoRapeNotify);
 
 
 

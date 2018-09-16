@@ -59,29 +59,19 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 		}
 }
 
-//Called in evo in CTFGame.ovl
+//Called in CTFGame::flagCap in evo CTFGame.ovl
+//Allows for another unbalanced notification everytime the flag is capped.
 function ResetUnbalancedNotifyPerCap()
 {
 	$TeamBalanceNotifyCount = 0;
 	$StatsBalanceCount = 0;
 }
 
-//Start and Reset Notify
-package TeamCountNotify {
-
-//Reset Notify
-function DefaultGame::gameOver( %game ) {
-	//Call default function
-	parent::gameOver( %game );
+//Reset Notify at defaultgame::gameOver in evo defaultgame.ovl
+function ResetTeamBalanceNotifyGameOver( %game ) {
 	//Reset TeamBalance Variables
 	$BalancedCount = -1;
 	$TeamBalanceNotifyCount = -1;
 	$StatsBalanceCount = -1;
 	
 }
-
-};
-
-// Prevent package from being activated if it is already
-if (!isActivePackage(TeamCountNotify))
-    activatePackage(TeamCountNotify);

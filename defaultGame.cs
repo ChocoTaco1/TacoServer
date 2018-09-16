@@ -1,7 +1,5 @@
 //$MissionName is the file name of the mission
 //$MapName is the displayed name(no underscore,spaces)
-//$GameType (CTF,Hunters)
-
 
 function DefaultGame::activatePackages(%game)
 {
@@ -152,7 +150,7 @@ function FlipFlop::playerTouch(%data, %flipflop, %player)
 
 function DefaultGame::initGameVars(%game)
 {
-    %game.SCORE_PER_SUICIDE = 0; 
+   %game.SCORE_PER_SUICIDE = 0; 
    %game.SCORE_PER_TEAMKILL = 0;
    %game.SCORE_PER_DEATH = 0;  
 
@@ -618,7 +616,7 @@ function DefaultGame::gameOver( %game )
 
    // Default game does nothing...  except lets the AI know the mission is over
    AIMissionEnd();
-   
+
 }
 
 //------------------------------------------------------------------------------
@@ -1153,6 +1151,7 @@ function DefaultGame::forceObserver( %game, %client, %reason )
    
    // call the onEvent for this game type
    %game.onClientEnterObserverMode(%client);  //Bounty uses this to remove this client from others' hit lists 
+   
 }
 
 function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageType, %implement)
@@ -1430,6 +1429,8 @@ function DefaultGame::clientJoinTeam( %game, %client, %team, %respawn )
 
    logEcho(%client.nameBase@" (cl "@%client@") joined team "@%client.team);
 
+   //Trigger GetCounts
+   ResetClientChangedTeams();
 }
 
 function DefaultGame::AIHasJoined(%game, %client)
@@ -1483,6 +1484,8 @@ function DefaultGame::AIChangeTeam(%game, %client, %newTeam)
    
    messageAllExcept( %client, -1, 'MsgClientJoinTeam', '\c1bot %1 has switched to team %2.', %client.name, %game.getTeamName(%client.team), %client, %client.team );
 
+   //Trigger GetCounts
+   ResetClientChangedTeams();
 }
 
 function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned) // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
@@ -1558,6 +1561,9 @@ function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawn
    // MES - switch objective hud lines when client switches teams
    messageClient(%client, 'MsgCheckTeamLines', "", %client.team);
    logEcho(%client.nameBase@" (cl "@%client@") switched to team "@%client.team);
+   
+   //Trigger GetCounts
+   ResetClientChangedTeams();
 }
 
 //  missioncleanup and missiongroup are checked prior to entering game code
@@ -1640,6 +1646,9 @@ function DefaultGame::onClientLeaveGame(%game, %client)
    //remove them from the team rank arrays
    %game.removeFromTeamRankArray(%client);
    logEcho(%client.nameBase@" (cl "@%client@") dropped");
+   
+   //Trigger GetCounts
+   ResetClientChangedTeams();
 }
 
 function DefaultGame::clientMissionDropReady(%game, %client)
@@ -1771,6 +1780,10 @@ function DefaultGame::testDrop( %game, %client )
 function DefaultGame::onClientEnterObserverMode( %game, %client )
 {
    // Default game doesn't care...
+   
+   //Trigger GetCounts
+   ResetClientChangedTeams();
+
 }
 
 // from 'item.cs'
@@ -3178,7 +3191,7 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
          %cause = "(vote)";
       }
       else 
-         messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));   
+         messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100)); 
    }
 
    //if the time limit was actually changed...
@@ -3755,7 +3768,7 @@ function notifyMatchEnd(%time)
    if (%seconds > 1) {
       MessageAll('MsgMissionEnd', '\c2Match ends in %1 seconds.~wfx/misc/hunters_%1.wav', %seconds);
 		if (%seconds == 60) {
-			MessageAll('MsgNotifyEvoNextMission', '\c2Next Mission: \c3%1', $EvoCachedNextMission);
+			MessageAll('MsgNotifyEvoNextMission', '\c2Next Mission: \c1%1', $EvoCachedNextMission);
 		}
    }
    else if (%seconds == 1)

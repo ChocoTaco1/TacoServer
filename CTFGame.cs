@@ -28,6 +28,7 @@ function CTFGame::initGameVars(%game)
    %game.SCORE_PER_ESCORT_ASSIST       = 5;
    %game.SCORE_PER_HEADSHOT            = 1;
    %game.SCORE_PER_REARSHOT            = 1; // z0dd - ZOD, 8/25/02. Added Lance rear shot messages
+   %game.SCORE_PER_MIDAIR          	   = 1; // Added Chocotaco. From sctf
 
    %game.SCORE_PER_TURRET_KILL         = 10; // controlled
    %game.SCORE_PER_TURRET_KILL_AUTO    = 5;  // uncontrolled, z0dd - ZOD, 5/27/03. More points, was 3
@@ -254,6 +255,36 @@ function Flag::onLeaveLiquid(%data, %obj, %type)
    if(isEventPending(%obj.lavaEnterThread)) 
       cancel(%obj.lavaEnterThread);
 }
+
+function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
+{
+      if(!isObject(%targetObject) && !isObject(%projectile.sourceObject))
+         return;
+      if(!(%targetObject.getType() & ($TypeMasks::StaticTSObjectType | $TypeMasks::InteriorObjectType | 
+                                      $TypeMasks::TerrainObjectType | $TypeMasks::WaterObjectType)))
+      {
+         if(%projectile.sourceObject.team !$= %targetObject.team)
+         {
+            if(%targetObject.getDataBlock().getClassName() $= "PlayerData" && %data.getName() $= "DiscProjectile")
+            {
+	         %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType; 
+	         %start = %targetObject.getWorldBoxCenter();
+               %distance = mFloor(VectorDist(%start, %projectile.initialPosition));
+	         %end = getWord(%start, 0) SPC getWord(%start, 1) SPC getWord(%start, 2) - 15;
+	         %grounded = ContainerRayCast(%start, %end, %mask, 0);
+               if(!%grounded)
+               {
+                  %projectile.sourceObject.client.scoreMidAir++;
+                  messageClient(%projectile.sourceObject.client, 'MsgMidAir', '\c0You received a %1 point bonus for a successful mid air shot.~wfx/misc/bounty_bonus.wav', Game.SCORE_PER_MIDAIR, %data.radiusDamageType, %distance);
+                  messageTeamExcept(%projectile.sourceObject.client, 'MsgMidAir', '\c5%1 hit a mid air shot.', %projectile.sourceObject.client.name, %data.radiusDamageType, %distance);
+                  Game.recalcScore(%projectile.sourceObject.client);
+               }
+            }
+         }
+         Parent::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal);
+      }
+}
+
 };
 
 //--------------------------------------------------------------------------
@@ -931,6 +962,7 @@ function CTFGame::recalcScore(%game, %cl)
                       %cl.tkDestroys          * %game.SCORE_PER_TK_DESTROY + // z0dd - ZOD, 10/03/02. Penalty for tking equiptment.
                       %cl.scoreHeadshot       * %game.SCORE_PER_HEADSHOT + 
                       %cl.scoreRearshot       * %game.SCORE_PER_REARSHOT + // z0dd - ZOD, 8/25/02. Added Lance rear shot messages
+					  %cl.scoreMidAir         * %game.SCORE_PER_MIDAIR + 
                       %cl.flagCaps            * %game.SCORE_PER_PLYR_FLAG_CAP + 
                       %cl.flagGrabs           * %game.SCORE_PER_PLYR_FLAG_TOUCH + 
                       %cl.genDestroys         * %game.SCORE_PER_DESTROY_GEN + 
@@ -1497,6 +1529,7 @@ function CTFGame::resetScore(%game, %client)
 {
    %client.offenseScore = 0;
    %client.kills = 0;
+   %client.scoreMidAir = 0;
    %client.deaths = 0;
    %client.suicides = 0;
    %client.escortAssists = 0;

@@ -845,9 +845,6 @@ function stationTrigger::onEnterTrigger(%data, %obj, %colObj)
       }
       else if(%obj.disableObj.isDisabled())
       {
-         if ($CurrentMissionType $= "sctf")
-		 DummyFunctionJustNeedsToBeSomethingHere::Station(); //Added so in SCtF, when stations are deleted, the trigger still doesnt messege the client.
-		 else
 		 messageClient(%colObj.client, 'msgStationDisabled', '\c2Station is disabled.');
       }
       else if(!%obj.mainObj.isPowered())

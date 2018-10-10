@@ -583,21 +583,21 @@ function CTFGame::flagCap(%game, %player)
    %game.AIflagCap(%player, %flag);
 
    //if this cap didn't end the game, play the announcer...
-   //if ($missionRunning)
-   //{
-      //if (%game.getTeamName(%client.team) $= 'Inferno')
-         //messageAll("", '~wvoice/announcer/ann.infscores.wav');
-      //else if (%game.getTeamName(%client.team) $= 'Storm')
-         //messageAll("", '~wvoice/announcer/ann.stoscores.wav');
-      //else if (%game.getTeamName(%client.team) $= 'Phoenix')
-         //messageAll("", '~wvoice/announcer/ann.pxscore.wav');
-      //else if (%game.getTeamName(%client.team) $= 'Blood Eagle')
-         //messageAll("", '~wvoice/announcer/ann.bescore.wav');
-      //else if (%game.getTeamName(%client.team) $= 'Diamond Sword')
-         //messageAll("", '~wvoice/announcer/ann.dsscore.wav');
-      //else if (%game.getTeamName(%client.team) $= 'Starwolf')
-         //messageAll("", '~wvoice/announcer/ann.swscore.wav');
-   //}
+   if ($missionRunning)
+   {
+      if (%game.getTeamName(%client.team) $= 'Inferno')
+         messageAll("", '~wvoice/announcer/ann.infscores.wav');
+      else if (%game.getTeamName(%client.team) $= 'Storm')
+         messageAll("", '~wvoice/announcer/ann.stoscores.wav');
+      else if (%game.getTeamName(%client.team) $= 'Phoenix')
+         messageAll("", '~wvoice/announcer/ann.pxscore.wav');
+      else if (%game.getTeamName(%client.team) $= 'Blood Eagle')
+         messageAll("", '~wvoice/announcer/ann.bescore.wav');
+      else if (%game.getTeamName(%client.team) $= 'Diamond Sword')
+         messageAll("", '~wvoice/announcer/ann.dsscore.wav');
+      else if (%game.getTeamName(%client.team) $= 'Starwolf')
+         messageAll("", '~wvoice/announcer/ann.swscore.wav');
+   }
 }
 
 function CTFGame::flagReturnFade(%game, %flag)

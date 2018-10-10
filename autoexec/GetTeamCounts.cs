@@ -76,7 +76,8 @@ function GetTeamCounts( %game, %client, %respawn )
 		
 		}
 		
- 
+		//Check pug pass
+		CheckPUGpassword();
 		//Call itself again. Every 5 seconds.
 		schedule(5000, 0, "GetTeamCounts");
 		

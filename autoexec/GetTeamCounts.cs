@@ -9,8 +9,11 @@ function CreateServer(%mission, %missionType)
 	//Call default function
 	parent::CreateServer(%mission, %missionType);
 	//Start
-	//Call for a GetTeamCount update
+	//Make sure our activation variable is set
 	ResetClientChangedTeams();
+	//Keeps server Auto Reset off
+	$Host::Dedicated = 0;
+	//Call for a GetTeamCount update
 	GetTeamCounts( %game, %client, %respawn );
 
 }

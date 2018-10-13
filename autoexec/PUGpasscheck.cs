@@ -1,4 +1,5 @@
 //To activate a password in certain gamemodes
+//called in Getcounts.cs
 function CheckPUGpassword()
 {	
 	if( $CurrentMissionType !$= "LakRabbit" ) {

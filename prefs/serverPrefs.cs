@@ -1293,3 +1293,6 @@ $Host::VotePassPercent = "60";
 $Host::VoteSpread = 20;
 $Host::VoteTime = "45";
 $Host::warmupTime = "20";
+$Host::HostedBy = "Branzone";
+$Host::Github = "https://github.com/Server/";
+$Host::Discord = "https://www.Discordapp.com/";

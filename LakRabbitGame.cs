@@ -16,6 +16,11 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.31 October 2018
+// Adjusted the flag updater code so its more like the way it was. A little harder to catch. Down from 10 times a second to 3.
+// Fixed a bug that broke weapons cycling. Players just run as if they have ammo packs now.
+// Cleaned up voting language.
+//
 // v3.3 - July 2018
 // Nerfed Midair Flag grab points since its easier with the flag updater code.
 // Nerfed Shock height points just a tad.
@@ -696,8 +701,10 @@ function MineDeployed::onDestroyed(%data, %obj, %lastState)
 
 function Player::maxInventory(%this, %data)
 {
-	%max = ShapeBase::maxInventory(%this,%data) * 2;
-	if (%this.getInventory(AmmoPack))
+	//chocotaco - just runs as an ammo pack cuz messing with the inv max messes up weapons cycling
+	//%max = ShapeBase::maxInventory(%this,%data) * 2;
+	%max = ShapeBase::maxInventory(%this,%data);
+	//if (%this.getInventory(AmmoPack))
 		%max += AmmoPack.max[%data.getName()];
 	return %max;
 }
@@ -883,36 +890,36 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 		if(%isAdmin)
 		{
 			if(!Game.duelMode)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'enable duel mode', 'Duel Mode On' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Turn on Duel Mode' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'disable duel mode', 'Duel Mode Off' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Turn off Duel Mode' );
 
 			if(!Game.noSplashDamage)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'disable splash damage', 'Splash Damage Off' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Turn off Splash Damage' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'enable splash damage', 'Splash Damage On' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Turn on Splash Damage' );
 			// DeVast - PubPro votes
 			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'enable Pro', 'Turn Pro On' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Turn on Pro Mode' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'disable Pro', 'Turn Pro Off' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Turn off Pro Mode' );
 		}
 		else
 		{
 			if(!Game.duelMode)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Duel Mode on', 'Vote to turn on Duel Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to turn on Duel Mode' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Duel Mode off', 'Vote to turn off Duel Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Vote to turn off Duel Mode' );
 
 			if(!Game.noSplashDamage)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Splash Damage Off', 'Vote to turn Splash Damage Off' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Vote to turn off Splash Damage' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Splash Damage On', 'Vote to turn Splash Damage On' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Vote to turn on Splash Damage' );
 			// DeVast - PubPro votes
 			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'enable Pro', 'Turn Pro On' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to turn on Pro Mode' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'disable Pro', 'Turn Pro Off' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to turn off Pro Mode' );
 		}      
 	}
 }
@@ -921,9 +928,9 @@ function LakRabbitGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, 
 {
 	switch$ (%typeName)
 	{
-	case "voteDuelMode":
+	case "VoteDuelMode":
 		%game.voteDuelMode(%admin, %arg1, %arg2, %arg3, %arg4);
-	case "voteSplashDamage":
+	case "VoteSplashDamage":
 		%game.voteSplashDamage(%admin, %arg1, %arg2, %arg3, %arg4);
 	case "VotePro":
 		%game.VotePro(%admin, %arg1, %arg2, %arg3, %arg4);
@@ -1272,7 +1279,8 @@ function LakRabbitGame::playerSpawned(%game, %player)
    }
 
 // borlak -- start with favorites
-   if(!Game.PubPro) buyFavorites(%player.client);
+   if(!Game.PubPro)
+	buyFavorites(%player.client);
 
 	// Zeph - PubPro weapons
 
@@ -1283,12 +1291,13 @@ function LakRabbitGame::playerSpawned(%game, %player)
 	%player.setInventory(Blaster,1);
 	%player.setInventory(Plasma,1);
 	%player.setInventory(DiscAmmo,30);
-	%player.setInventory(PlasmaAmmo,80);
+	%player.setInventory(PlasmaAmmo,40);
 	%player.setInventory(Mine,6);
 	%player.setInventory(RepairKit,1);
 	%player.setInventory(EnergyPack,1);
    	%player.use("Disc");
    }
+   
    %player.schedule(250,"selectWeaponSlot", 0);
    %player.setEnergyLevel(%player.getDatablock().maxEnergy);
    	
@@ -1430,7 +1439,7 @@ function LakRabbitGame::onClientKilled(%game, %clVictim, %clKiller, %damageType,
 function LakRabbitGame::updateFlagTransform(%game, %flag)
 {
    %flag.setTransform(%flag.getTransform());
-   %game.updateFlagThread[%flag] = %game.schedule(100, "updateFlagTransform", %flag);
+   %game.updateFlagThread[%flag] = %game.schedule(300, "updateFlagTransform", %flag);
 }
 
 function LakRabbitGame::playerDroppedFlag(%game, %player)
@@ -1546,7 +1555,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 // borlak - can't pick up flag until 2 ppl are on
 	if(PlayingPlayers() < 2)
 	{
-		//messageClient(%player.client, 'msgNoFlagWarning', "\c2You can't pick up the flag until another person joins." );
+		messageClient(%player.client, 'msgNoFlagWarning', "\c2You can't pick up the flag until another person joins." );
 		return;
 	}
 

@@ -340,6 +340,13 @@ package SCtFGame
 			}
 		}
 	}
+	
+	function deployMineCheck(%mineObj, %player)
+	{
+		// explode it vgc
+		schedule(2000, %mineObj, "explodeMine", %mineObj, true);
+	}
+	
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////

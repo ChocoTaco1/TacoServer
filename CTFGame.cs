@@ -520,7 +520,7 @@ function CTFGame::playerLostFlagTarget(%game, %player)
 function CTFGame::updateFlagTransform(%game, %flag)
 {
    %flag.setTransform(%flag.getTransform());
-   %game.updateFlagThread[%flag] = %game.schedule(100, "updateFlagTransform", %flag);
+   %game.updateFlagThread[%flag] = %game.schedule(50, "updateFlagTransform", %flag);
 }
 //----------------------------------------------------------------------------------------
 

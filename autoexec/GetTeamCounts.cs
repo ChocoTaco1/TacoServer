@@ -30,6 +30,10 @@ function GetTeamCounts( %game, %client, %respawn )
 			deactivatePackage(StartTeamCounts);
 		}
 		
+		//Check pug password
+		CheckPUGpassword();
+		
+		//Get teamcounts
 		if($GetCountsClientTeamChange && $countdownStarted && $MatchStarted) {
 			//Team Count code by Keen
 			$PlayerCount[0] = 0;
@@ -79,8 +83,6 @@ function GetTeamCounts( %game, %client, %respawn )
 		
 		}
 		
-		//Check pug pass
-		CheckPUGpassword();
 		//Call itself again. Every 5 seconds.
 		schedule(5000, 0, "GetTeamCounts");
 		

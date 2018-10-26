@@ -17,9 +17,12 @@
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
 // v3.31 October 2018
-// Adjusted the flag updater code so its more like the way it was. A little harder to catch. Down from 10 times a second to 3.
+// Adjusted the flag updater code so its more like the way it was. A little harder to catch. Down from 10 times a second to 2.
 // Fixed a bug that broke weapons cycling. Players just run as if they have ammo packs now.
 // Cleaned up voting language.
+// Fixed a bug where the player would stay invisible when slapped.
+// Added disc headshot functionality to slap.
+// Fixed a bug where you would get multiple back in bounds messeges even when you were dead after a slap.
 //
 // v3.3 - July 2018
 // Nerfed Midair Flag grab points since its easier with the flag updater code.
@@ -423,12 +426,19 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			}
 
 			// special knockback if you hit too close, max 15% chance (point blank).. 5% at 30meters, 1% chance for any MA
-			%chance = mFloor(15 - %distance/3);
+			%chance = mFloor(25 - %distance/3);
 			if(%chance <= 0) %chance = 1;
-			if(%ma && getRandom(1,100) <= %chance)
+			//if(%ma && getRandom(1,100) <= %chance)
+
+			// Slap based on a Disc headshot
+			if(%ma && getRandom(1,50) <= %chance && %targetObject.client.headshot)
 			{
 				if(%targetObject.holdingFlag)
+				{
 					Game.playerDroppedFlag(%targetObject);
+					//Added so cloak is turned off when slapped.
+					%targetObject.setCloaked(false);
+				}
 				if(%sourceObject.holdingFlag && Game.duelMode)
 				{
 					duelBonus(%sourceObject.client);
@@ -445,6 +455,16 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				%impulseVec = VectorScale(%muzzleVec, 25000);
 				%targetObject.applyImpulse(%p, %impulseVec);
 				%sound = '~wfx/misc/slapshot.wav';
+				
+				%slapmsg = getRandom(1,3);
+				
+				if(%slapmsg == 1)
+				messageAll('msgSlapMessege','\c0%1 wonders what the five fingers said to the face.', %targetObject.client.name );
+				if(%slapmsg == 2)
+				messageAll('msgSlapMessege','\c0%1 gets slapped the heck out!', %targetObject.client.name );
+				if(%slapmsg == 3)				
+				messageAll('msgSlapMessege','\c0%1 is taking a short tour around the map.', %targetObject.client.name );
+				
 			}
 			%weapon = "Disc";
 		}
@@ -544,7 +564,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		else if(%damageType == $DamageType::ShockLance)
 		{	
 			%height = getHeight(%sourceObject);
-			%heightBonus = (mPow(%height,1.20)/12)+1; //was 10
+			%heightBonus = (mPow(%height,1.20)/14)+1; //was 10
 			%velBonus /= 2;
 			%points = mFloor(%distance/2) + (%heightBonus);
 			
@@ -712,6 +732,24 @@ function Player::maxInventory(%this, %data)
 function Player::setKnockback(%this, %val)
 {
 	%this.knockback = %val;
+}
+
+//For headshot detection
+function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
+{
+    %damLoc = firstWord(%targetObject.getDamageLocation(%position));
+    if(%damLoc $= "head")
+    {   
+        %targetObject.getOwnerClient().headShot = 1;
+        //%modifier = %data.rifleHeadMultiplier;
+		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
+    }
+    else
+    {   
+        //%modifier = 1;
+        %targetObject.getOwnerClient().headShot = 0;
+		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
+    }
 }
 
 };
@@ -1439,7 +1477,7 @@ function LakRabbitGame::onClientKilled(%game, %clVictim, %clKiller, %damageType,
 function LakRabbitGame::updateFlagTransform(%game, %flag)
 {
    %flag.setTransform(%flag.getTransform());
-   %game.updateFlagThread[%flag] = %game.schedule(300, "updateFlagTransform", %flag);
+   %game.updateFlagThread[%flag] = %game.schedule(500, "updateFlagTransform", %flag);
 }
 
 function LakRabbitGame::playerDroppedFlag(%game, %player)
@@ -1795,7 +1833,10 @@ function LakRabbitGame::resetScore(%game, %client)
 
 function LakRabbitGame::enterMissionArea(%game, %playerData, %player)
 {
-   %player.client.outOfBounds = false; 
+   if(%player.getState() $= "Dead")
+      return;
+  
+   %player.client.outOfBounds = false;
    messageClient(%player.client, 'EnterMissionArea', '\c1You are back in the mission area.');
    logEcho(%player.client.nameBase@" (pl "@%player@"/cl "@%player.client@") entered mission area");
    cancel(%player.alertThread);

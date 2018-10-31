@@ -1485,7 +1485,6 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
    //set the flag status
    %flag = %player.holdingFlag;
    %player.holdingFlag = "";
-   %game.updateFlagTransform(%flag); // z0dd - ZOD, 8/4/02, Call to KineticPoet's flag updater
    %flag.carrier = "";
    $flagStatus = "<In the Field>";
 
@@ -1548,6 +1547,7 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
    %flag.returnThread = %game.schedule(%game.flagReturnTime, "returnFlag", %flag);
    // z0dd - ZOD - SquirrelOfDeath, 10/02/02. Hack for flag collision bug.
    %flag.searchSchedule = Game.schedule(10, "startFlagCollisionSearch", %flag);
+   %game.updateFlagTransform(%flag); // z0dd - ZOD, 8/4/02, Call to KineticPoet's flag updater
 
 // borlak -- timer fix and re-catch fix
 	%player.client.flagDeny = schedule(2500, 0, setFlagDeny, %player.client, 0);
@@ -1611,7 +1611,6 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 		messageAll('MsgRabbitFlagTaken', '\c4%1 gets %2 points for a capturing the flag!~wfx/misc/flipflop_lost.wav', %player.client.name, %points);
 		%player.client.flagTimeMS += getSimTime() - %player.client.startTime;
 		%game.resetFlag(%player.holdingFlag);
-		cancel(%game.updateFlagThread[%flag]); // z0dd - ZOD, 8/4/02. Cancel this flag's thread to KineticPoet's flag updater
 	}
 
 	// check if someone already has other flag.. only one flag can be in play.. also make sure you can only pick up flag that IS in play
@@ -1643,6 +1642,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
    {
 // borlak cancel flag search and remove free diskjump
       cancel(%flag.searchSchedule);
+	  cancel(%game.updateFlagThread[%flag]); // z0dd - ZOD, 8/4/02. Cancel this flag's thread to KineticPoet's flag updater
       %player.freeDJ = 0;
       %flag.bounced = 0;
 

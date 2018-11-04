@@ -62,22 +62,14 @@ function GetTeamCounts( %game, %client, %respawn )
 			
 		
 			//Start Base Rape Notify
-			//Make sure it's CTF Mode
-			if($CurrentMissionType $= "CTF") {
-				PlayerNotify::AtSpawn( %game, %client, %respawn );
-			}
+			PlayerNotify::AtSpawn( %game, %client, %respawn );
+
 			//Call Team Balance Notify
-			//Make sure it's CTF Mode
-			if($CurrentMissionType $= "CTF" && $TotalTeamPlayerCount !$= 0) {
-				TeamBalanceNotify::AtSpawn( %game, %client, %respawn );
-			}
-			if($CurrentMissionType $= "sctf" && $TotalTeamPlayerCount !$= 0) {
-				TeamBalanceNotify::AtSpawn( %game, %client, %respawn );
-			}
-			//AntiCloak Start
-			//if($CurrentMissionType $= "CTF") {
-			//ActivateAntiCloak ();
-			//}
+			TeamBalanceNotify::AtSpawn( %game, %client, %respawn );
+
+			//AntiCloak Start	
+			ActivateAntiCloak ();
+			
 		
 		$GetCountsClientTeamChange = false;
 		

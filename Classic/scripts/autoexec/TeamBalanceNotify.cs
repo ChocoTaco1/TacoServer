@@ -1,7 +1,12 @@
+//Enable or Disable
+//$Host::EnableTeamBalanceNotify = 1;
+//
 //Give the client a notification on the current state of balancing.
 //This function is in GetTeamCounts( %game, %client, %respawn ) GetTeamCounts.cs
 function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 {	
+	if( $CurrentMissionType !$= "LakRabbit" && $TotalTeamPlayerCount !$= 0 && $Host::EnableTeamBalanceNotify )
+	{
 	//Call for a GetTeamCount update
 	//GetTeamCounts( %game, %client, %respawn );
 	
@@ -57,6 +62,7 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 			$StatsBalanceCount = 1;
 			}
 		}
+	}
 }
 
 //Called in CTFGame::flagCap in evo CTFGame.ovl

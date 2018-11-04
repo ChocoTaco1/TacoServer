@@ -1,10 +1,11 @@
-$TurretPlayerCount = 10; // amount of players needed on server for turrets
+//Amount of players on a team to enable turrets
+//$Host::EnableTurretPlayerCount = 10;
 
 package antiTurret {
 
 function TurretData::selectTarget(%this, %turret)
 {
-   if( !$Host::TournamentMode && $TotalTeamPlayerCount < $TurretPlayerCount) {
+   if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::EnableTurretPlayerCount ) {
       %turret.clearTarget();
    }
    else {

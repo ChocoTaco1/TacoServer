@@ -83,7 +83,6 @@ function CTFGame::initGameVars(%game)
    %game.notifyMineDist = 7.5;
 
    %game.stalemate = false;
-   $stalemate = false;
    %game.stalemateObjsVisible = false;
    %game.stalemateTimeMS = 60000;
    %game.stalemateFreqMS = 15000;
@@ -706,7 +705,6 @@ function CTFGame::hideStalemateTargets(%game)
 function CTFGame::beginStalemate(%game)
 {
    %game.stalemate = true;
-   $stalemate = true;
    %game.showStalemateTargets();
 
    // z0dd - ZOD, 5/27/03. Added anti-turtling, return flags after x minutes
@@ -720,7 +718,6 @@ function CTFGame::beginStalemate(%game)
 function CTFGame::endStalemate(%game)
 {
    %game.stalemate = false;
-   $stalemate = false;
    %game.hideStalemateTargets();
    cancel(%game.stalemateSchedule);
 }

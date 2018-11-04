@@ -8,7 +8,8 @@
 //Called in GetCounts
 function ActivateAntiCloak()
 {
-	if( $Host::AntiCloakEnable && $CurrentMissionType !$= "LakRabbit" )
+	//CTF only
+	if( $Host::AntiCloakEnable && $CurrentMissionType $= "CTF" )
 	{
 		//echo("TotalTeamPlayerCount " @ $TotalTeamPlayerCount);
 		//echo("AntiCloakPlayerCount " @ $AntiCloakPlayerCount);

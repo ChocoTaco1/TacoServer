@@ -4,17 +4,16 @@
 //To control whether the server auto resets when empty
 //$Host::EmptyServerReset = 0;
 
-package StartTeamCounts {
+package StartTeamCounts 
+{
 
-//Start
+
 function CreateServer(%mission, %missionType)
 {
-	//Call default function
 	parent::CreateServer(%mission, %missionType);
-	//Start
-	//Make sure our activation variable is set
+	//Make sure teamchange variable is set
 	ResetClientChangedTeams();
-	//Keeps server Auto Reset off
+	//Whether the server auto restarts when empty or not
 	$Host::Dedicated = $Host::EmptyServerReset;
 	//Call for a GetTeamCount update
 	GetTeamCounts( %game, %client, %respawn );
@@ -29,19 +28,16 @@ if (!isActivePackage(StartTeamCounts))
 
 function GetTeamCounts( %game, %client, %respawn )
 {	
-		if (!isActivePackage(StartTeamCounts)) {
-			deactivatePackage(StartTeamCounts);
-		}
+	//Check pug password
+	CheckPUGpassword();
 		
-		//Check pug password
-		CheckPUGpassword();
-		
-		//Get teamcounts
-		if($GetCountsClientTeamChange && $countdownStarted && $MatchStarted) {
-			//Team Count code by Keen
-			$PlayerCount[0] = 0;
-			$PlayerCount[1] = 0;
-			$PlayerCount[2] = 0;
+	//Get teamcounts
+	if($GetCountsClientTeamChange && $countdownStarted && $MatchStarted) 
+	{
+		//Team Count code by Keen
+		$PlayerCount[0] = 0;
+		$PlayerCount[1] = 0;
+		$PlayerCount[2] = 0;
 
 		for(%i = 0; %i < ClientGroup.getCount(); %i++)
 		{
@@ -58,37 +54,38 @@ function GetTeamCounts( %game, %client, %respawn )
 		//echo ("client.team " @ %client.team);
 		
 		//Other variables
-			//Amount of players on teams
-			$TotalTeamPlayerCount = $PlayerCount[1] + $PlayerCount[2];
-			//Amount of all players including observers
-			$AllPlayerCount = $PlayerCount[1] + $PlayerCount[2] + $PlayerCount[0];
+		//Amount of players on teams
+		$TotalTeamPlayerCount = $PlayerCount[1] + $PlayerCount[2];
+		//Amount of all players including observers
+		$AllPlayerCount = $PlayerCount[1] + $PlayerCount[2] + $PlayerCount[0];
 			
 		
-			//Start Base Rape Notify
-			NBRStatusNotify( %game, %client, %respawn );
+		//Start Base Rape Notify
+		NBRStatusNotify( %game, %client, %respawn );
 
-			//Call Team Balance Notify
-			TeamBalanceNotify::AtSpawn( %game, %client, %respawn );
+		//Call Team Balance Notify
+		TeamBalanceNotify::AtSpawn( %game, %client, %respawn );
 
-			//AntiCloak Start	
-			ActivateAntiCloak ();
+		//AntiCloak Start	
+		ActivateAntiCloak ();
 			
 		
 		$GetCountsClientTeamChange = false;
 		
-		}
+	}
 		
-		//Call itself again. Every 5 seconds.
-		schedule(5000, 0, "GetTeamCounts");
-		
+	//Call itself again. Every 5 seconds.
+	schedule(5000, 0, "GetTeamCounts");	
 }
 
 //Run at DefaultGame::clientJoinTeam, DefaultGame::clientChangeTeam, DefaultGame::assignClientTeam in evo defaultgame.ovl
 //Also Run at DefaultGame::onClientEnterObserverMode, DefaultGame::AIChangeTeam, DefaultGame::onClientLeaveGame, DefaultGame::forceObserver in evo defaultgame.ovl
-//And finally GameConnection::onConnect in evo server.ovl
+//And finally GameConnection::onConnect in evo server.ovl and CTFGame::flagCap in evo CTFGame.ovl
 //Added so the bulk of GetCounts doesnt run when it doesnt need to causing unnecessary latency that may or may not have existed, but probably is good practice.
 //GetCounts still runs every 5 seconds as it did, but whether or not someone has changed teams, joined obs, left, etc etc will decide whether or not the bulk of it runs.
-function ResetClientChangedTeams() {
-   //Let GetTeamCounts run if there is a Teamchange.
+
+//Let GetTeamCounts run if there is a Teamchange.
+function ResetClientChangedTeams() 
+{
    $GetCountsClientTeamChange = true;
 }

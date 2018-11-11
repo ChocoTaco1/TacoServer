@@ -871,8 +871,6 @@ function CTFGame::gameOver(%game)
    for(%j = 1; %j <= %game.numTeams; %j++)
       $TeamScore[%j] = 0;
   
-   ResetNotify::MissionEnd( %game, %client );
-  
 }
 
 function CTFGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc)

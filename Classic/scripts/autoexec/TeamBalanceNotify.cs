@@ -19,36 +19,36 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 		if( $PlayerCount[1] !$= $PlayerCount[2] )
 		{
 			//Uneven. Reset Balanced.
-			$BalancedMsgPlayed = false;
+			$BalancedMsgPlayed = 0;
 				
 			if( %Team1Difference >= 2 || %Team2Difference >= 2 )
 			{
-				if( !$UnbalancedMsgPlayed && %Team2Difference == 2 || %Team1Difference == 2 ) 
+				if( $UnbalancedMsgPlayed !$= 1 && %Team2Difference == 2 || %Team1Difference == 2 ) 
 				{
 					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.');
 					//Once per cycle.
-					$UnbalancedMsgPlayed = true;
+					$UnbalancedMsgPlayed = 1;
 					//Reset Stats.
-					$StatsMsgPlayed = false;
+					$StatsMsgPlayed = 0;
 				}
 				//Stats Aspect. 3 or more difference gets a stats notify. 				
-				else if( !$StatsMsgPlayed )
+				else if( $StatsMsgPlayed !$= 1)
 				{
 				messageAll('MsgTeamBalanceNotify', '\c1It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-				$StatsMsgPlayed = true;
+				$StatsMsgPlayed = 1;
 				}
 			}
 		}
 		//If teams are balanced and teams dont equal 0.		
-		else if( $PlayerCount[1] == $PlayerCount[2] && $TotalTeamPlayerCount !$= 0 && !$BalancedMsgPlayed )
+		else if( $PlayerCount[1] == $PlayerCount[2] && $TotalTeamPlayerCount !$= 0 && $BalancedMsgPlayed !$= 1 )
 		{
 				messageAll('MsgTeamBalanceNotify', '\c1Teams are balanced.');
 				//Once per cycle.
-				$BalancedMsgPlayed = true;
+				$BalancedMsgPlayed = 1;
 				//Reset unbalanced.				
-				$UnbalancedMsgPlayed = false;
+				$UnbalancedMsgPlayed = 0;
 				//Reset Stats.
-				$StatsMsgPlayed = false;
+				$StatsMsgPlayed = 0;
 		}
 	}
 }
@@ -57,8 +57,8 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 //Allows for another unbalanced notification everytime the flag is capped.
 function ResetUnbalancedNotifyPerCap()
 {
-	$UnbalancedMsgPlayed = false;
-	$StatsMsgPlayed = false;
+	$UnbalancedMsgPlayed = 0;
+	$StatsMsgPlayed = 0;
 }
 
 //Reset Notify at defaultgame::gameOver in evo defaultgame.ovl

@@ -4,23 +4,26 @@
 //Notifys the user if NoBase rape is on or off.
 function NBRStatusNotify( %game, %client, %respawn )
 {	
-	if( $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify )
+	if( $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled )
 	{
 		//echo ("%client " @ %client);
 		//echo ("$TeamBalanceClient " @ $TeamBalanceClient);
 		
 		//On
-		if( !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled && $Host::EvoNoBaseRapeClassicPlayerCount > $TotalTeamPlayerCount && $NoBaseRapeNotifyCount ) 
+		if( $Host::EvoNoBaseRapeClassicPlayerCount > $TotalTeamPlayerCount ) 
 		{
+			if( $NoBaseRapeNotifyCount !$= 0 )
+			{
 			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Enabled.~wfx/misc/nexus_cap.wav');
-			$NoBaseRapeNotifyCount = false;
+			$NoBaseRapeNotifyCount = 0;
+			}
 		}
 		//Off
-		else if( !$NoBaseRapeNotifyCount ) 
-		{
-			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
-			$NoBaseRapeNotifyCount = true;
-		}
+		else if( $NoBaseRapeNotifyCount !$= 1 )
+			{
+				messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
+				$NoBaseRapeNotifyCount = 1;
+			}
 	}
 }
 

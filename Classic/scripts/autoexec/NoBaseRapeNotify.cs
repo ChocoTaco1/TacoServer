@@ -20,10 +20,10 @@ function NBRStatusNotify( %game, %client, %respawn )
 		}
 		//Off
 		else if( $NoBaseRapeNotifyCount !$= 1 )
-			{
-				messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
-				$NoBaseRapeNotifyCount = 1;
-			}
+		{
+			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
+			$NoBaseRapeNotifyCount = 1;
+		}
 	}
 }
 

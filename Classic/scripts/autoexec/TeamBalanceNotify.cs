@@ -8,7 +8,6 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 	if( $CurrentMissionType !$= "LakRabbit" && $TotalTeamPlayerCount !$= 0 && $Host::EnableTeamBalanceNotify )
 	{
 		//variables
-
 		%Team1Difference = $PlayerCount[1] - $PlayerCount[2];
 		%Team2Difference = $PlayerCount[2] - $PlayerCount[1];
 

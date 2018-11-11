@@ -69,7 +69,7 @@ function GetTeamCounts( %game, %client, %respawn )
 		//AntiCloak Start	
 		ActivateAntiCloak ();
 			
-		
+		//Set so counter wont run when it doesnt need to.
 		$GetCountsClientTeamChange = false;
 		
 	}

@@ -19,36 +19,36 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 		if( $PlayerCount[1] !$= $PlayerCount[2] )
 		{
 			//Uneven. Reset Balanced.
-			$BalancedMsgPlayed = 0;
+			$BalancedMsgPlayed = false;
 				
 			if( %Team1Difference >= 2 || %Team2Difference >= 2 )
 			{
-				if( $UnbalancedMsgPlayed !$= 1 && %Team2Difference == 2 || %Team1Difference == 2 ) 
+				if( !$UnbalancedMsgPlayed && %Team2Difference == 2 || %Team1Difference == 2 ) 
 				{
 					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.');
-					//Once per cycle
-					$UnbalancedMsgPlayed = 1;
+					//Once per cycle.
+					$UnbalancedMsgPlayed = true;
 					//Reset Stats.
-					$StatsMsgPlayed = 0;
+					$StatsMsgPlayed = false;
 				}
 				//Stats Aspect. 3 or more difference gets a stats notify. 				
-				else if( $StatsMsgPlayed !$= 1 )
+				else if( !$StatsMsgPlayed )
 				{
 				messageAll('MsgTeamBalanceNotify', '\c1It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-				$StatsMsgPlayed = 1;
+				$StatsMsgPlayed = true;
 				}
 			}
 		}
 		//If teams are balanced and teams dont equal 0.		
-		else if( $PlayerCount[1] == $PlayerCount[2] && $TotalTeamPlayerCount !$= 0 && $BalancedMsgPlayed !$= 1 )
+		else if( $PlayerCount[1] == $PlayerCount[2] && $TotalTeamPlayerCount !$= 0 && !$BalancedMsgPlayed )
 		{
 				messageAll('MsgTeamBalanceNotify', '\c1Teams are balanced.');
 				//Once per cycle.
-				$BalancedMsgPlayed = 1;
+				$BalancedMsgPlayed = true;
 				//Reset unbalanced.				
-				$UnbalancedMsgPlayed = 0;
+				$UnbalancedMsgPlayed = false;
 				//Reset Stats.
-				$StatsMsgPlayed = 0;
+				$StatsMsgPlayed = false;
 		}
 	}
 }
@@ -57,8 +57,8 @@ function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
 //Allows for another unbalanced notification everytime the flag is capped.
 function ResetUnbalancedNotifyPerCap()
 {
-	$UnbalancedMsgPlayed = 0;
-	$StatsMsgPlayed = 0;
+	$UnbalancedMsgPlayed = false;
+	$StatsMsgPlayed = false;
 }
 
 //Reset Notify at defaultgame::gameOver in evo defaultgame.ovl

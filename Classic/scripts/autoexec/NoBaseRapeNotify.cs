@@ -10,18 +10,25 @@ function NBRStatusNotify( %game, %client, %respawn )
 		//echo ("$TeamBalanceClient " @ $TeamBalanceClient);
 		
 		//On
-		if( !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled && $Host::EvoNoBaseRapeClassicPlayerCount > $TotalTeamPlayerCount && $NoBaseRapeNotifyCount !$= 0 ) 
+		if( !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled && $Host::EvoNoBaseRapeClassicPlayerCount > $TotalTeamPlayerCount && $NoBaseRapeNotifyCount ) 
 		{
 			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Enabled.~wfx/misc/nexus_cap.wav');
-			$NoBaseRapeNotifyCount = 0;
+			$NoBaseRapeNotifyCount = false;
 		}
 		//Off
-		else if( $NoBaseRapeNotifyCount !$= 1 ) 
+		else if( !$NoBaseRapeNotifyCount ) 
 		{
 			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
-			$NoBaseRapeNotifyCount = 1;
+			$NoBaseRapeNotifyCount = true;
 		}
 	}
+}
+
+//This function is at DefaultGame::gameOver(%game) CTFGame.cs
+//Resets the client NotifyCount when the mission ends
+function ResetNBRNotify()
+{
+	$NoBaseRapeNotifyCount = -1;
 }
 
 //This function is at StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)
@@ -30,13 +37,6 @@ function NBRStatusNotify( %game, %client, %respawn )
 function NBRAssetSound( %game, %sourceObject )
 {
 	messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '~wfx/misc/diagnostic_beep.wav');
-}
-
-//This function is at DefaultGame::gameOver(%game) CTFGame.cs
-//Resets the client NotifyCount when the mission ends
-function ResetNBRNotify()
-{
-	$NoBaseRapeNotifyCount = -1;
 }
 
 

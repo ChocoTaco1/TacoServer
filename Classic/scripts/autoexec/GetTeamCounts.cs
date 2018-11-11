@@ -1,5 +1,8 @@
 //This function is Called at:
 //CreateServer(%mission, %missionType) in Server.cs
+//
+//To control whether the server auto resets when empty
+//$Host::EmptyServerReset = 0;
 
 package StartTeamCounts {
 
@@ -12,7 +15,7 @@ function CreateServer(%mission, %missionType)
 	//Make sure our activation variable is set
 	ResetClientChangedTeams();
 	//Keeps server Auto Reset off
-	$Host::Dedicated = 0;
+	$Host::Dedicated = $Host::EmptyServerReset;
 	//Call for a GetTeamCount update
 	GetTeamCounts( %game, %client, %respawn );
 
@@ -62,7 +65,7 @@ function GetTeamCounts( %game, %client, %respawn )
 			
 		
 			//Start Base Rape Notify
-			PlayerNotify::AtSpawn( %game, %client, %respawn );
+			NBRStatusNotify( %game, %client, %respawn );
 
 			//Call Team Balance Notify
 			TeamBalanceNotify::AtSpawn( %game, %client, %respawn );

@@ -1305,3 +1305,4 @@ $Host::EnableTeamBalanceNotify = 1;
 $Host::EnableTurretPlayerCount = 10;
 $Host::AntiCloakEnable = 1;
 $Host::AntiCloakPlayerCount = 6;
+$Host::EmptyServerReset = 0;

@@ -189,3 +189,4 @@ $Host::Discord = "https://www.Discordapp.com/"; //Your discord
 $Host::PUGautoPassword = 0; 					//Enable or Disable an auto password at a certain amount of players
 $Host::PUGautoPasswordLimit = 10; 				//How many to enable a pug password
 $Host::PUGPassword = "pickup"; 					//pug password
+$Host::EmptyServerReset = 1;					//Whether or not you want the server to reset when its empty

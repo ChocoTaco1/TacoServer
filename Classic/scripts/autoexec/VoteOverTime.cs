@@ -31,12 +31,11 @@ function DefaultGame::checkTimeLimit(%game, %forced)
 		{
 			//Restart the function so the map can end if the Vote doesnt pass.
 			schedule(2000, 0, "RestartcheckTimeLimit", %game, %forced);
-		
-			//Messege
-			if( !$VoteInProgressMessege )
+
+			if( !$VoteInProgressMsg )
 			{
 				messageAll('', '\c2Vote Overtime Initiated.~wfx/powered/turret_heavy_activate.wav', %display);
-				$VoteInProgressMessege = true;
+				$VoteInProgressMsg = true;
 			}
 		}
    }
@@ -70,7 +69,7 @@ function ResetVOTimeChanged(%game)
 {
 	$VoteInProgress = false;
 	$TimeLimitChanged = true;
-	$VoteInProgressMessege = false;
+	$VoteInProgressMsg = false;
 	$VoteSoundInProgress = false;
 }
 
@@ -78,7 +77,7 @@ function ResetVOall(%game)
 {
 	$VoteInProgress = false;
 	$TimeLimitChanged = false;
-	$VoteInProgressMessege = false;
+	$VoteInProgressMsg = false;
 	$VoteSoundInProgress = false;
 }
 

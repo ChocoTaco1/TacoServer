@@ -8,9 +8,9 @@ package StartTeamCounts
 {
 
 
-function CreateServer(%mission, %missionType)
+function CreateServer( %mission, %missionType )
 {
-	parent::CreateServer(%mission, %missionType);
+	parent::CreateServer( %mission, %missionType );
 	//Make sure teamchange variable is set
 	ResetClientChangedTeams();
 	//Whether the server auto restarts when empty or not
@@ -31,7 +31,7 @@ function GetTeamCounts( %game, %client, %respawn )
 	CheckPUGpassword();
 		
 	//Get teamcounts
-	if($GetCountsClientTeamChange && $countdownStarted && $MatchStarted) 
+	if( $GetCountsClientTeamChange && $countdownStarted && $MatchStarted ) 
 	{
 		//Team Count code by Keen
 		$PlayerCount[0] = 0;

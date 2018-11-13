@@ -17,7 +17,6 @@ function CreateServer(%mission, %missionType)
 	$Host::Dedicated = $Host::EmptyServerReset;
 	//Call for a GetTeamCount update
 	GetTeamCounts( %game, %client, %respawn );
-
 }
 
 };
@@ -64,10 +63,10 @@ function GetTeamCounts( %game, %client, %respawn )
 		NBRStatusNotify( %game, %client, %respawn );
 
 		//Call Team Balance Notify
-		TeamBalanceNotify::AtSpawn( %game, %client, %respawn );
+		TeamBalanceNotify( %game, %client, %respawn );
 
 		//AntiCloak Start	
-		ActivateAntiCloak ();
+		ActivateAntiCloak();
 			
 		//Set so counter wont run when it doesnt need to.
 		$GetCountsClientTeamChange = false;

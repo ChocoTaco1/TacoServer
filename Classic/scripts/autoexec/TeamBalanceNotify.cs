@@ -3,7 +3,7 @@
 //
 //Give the client a notification on the current state of balancing.
 //This function is in GetTeamCounts.cs
-function TeamBalanceNotify::AtSpawn( %game, %client, %respawn )
+function TeamBalanceNotify( %game, %client, %respawn )
 {	
 	if( $CurrentMissionType !$= "LakRabbit" && $TotalTeamPlayerCount !$= 0 && $Host::EnableTeamBalanceNotify )
 	{

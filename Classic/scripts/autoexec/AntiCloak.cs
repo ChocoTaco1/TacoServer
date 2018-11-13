@@ -2,10 +2,8 @@
 //
 //$Host::AntiCloakEnable = 1;
 //$Host::AntiCloakPlayerCount = 6;
-//
-//TotalTeamCount based on how many on team, not how many on the server.
 
-//Called in GetCounts
+//Called in GetCounts.cs
 function ActivateAntiCloak()
 {
 	//CTF only
@@ -14,13 +12,12 @@ function ActivateAntiCloak()
 		//echo("TotalTeamPlayerCount " @ $TotalTeamPlayerCount);
 		//echo("AntiCloakPlayerCount " @ $AntiCloakPlayerCount);
 	
-		if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::AntiCloakPlayerCount )
-			//If server is in Tourny mode or if the server population isnt higher than the AntiCloakPlayerCount the CloakPack is not selectable.	
+		//If server is in Tourny mode and the team population is lower than the AntiCloakPlayerCount cloak is not selectable.
+		if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::AntiCloakPlayerCount )	
 			$InvBanList[CTF, "CloakingPack"] = true;
+		//All other cases it is.
 		else
-		//If AntiCloakPlayerCount is lower than server population, CloakPack is enabled and Selectable.
-			$InvBanList[CTF, "CloakingPack"] = false;
-			
+			$InvBanList[CTF, "CloakingPack"] = false;	
 	}
 			
 }

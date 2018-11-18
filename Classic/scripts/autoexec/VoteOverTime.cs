@@ -1,7 +1,8 @@
 //Changes were also made in the Evo Admin.ovl and DefaultGame.ovl
 //DefaultGame::voteChangeMission, DefaultGame::voteChangeTimeLimit, serverCmdStartNewVote
 
-package VoteOverTime {
+package VoteOverTime
+{
 
 function DefaultGame::checkTimeLimit(%game, %forced)
 {

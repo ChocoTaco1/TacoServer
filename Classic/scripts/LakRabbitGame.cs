@@ -16,6 +16,10 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.32 December 2018
+// Fixed an issue with lak vote items in the Evo Admin Votemenu
+// Took out waypoint sound.
+//
 // v3.31 October 2018
 // Adjusted the flag updater code so its more like the way it was. A little harder to catch. Down from 10 times a second to 2.
 // Fixed a bug that broke weapons cycling. Players just run as if they have ammo packs now.
@@ -925,40 +929,58 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 
 	if( %game.scheduleVote $= "" )
 	{
-		if(%isAdmin)
+		if(!%isAdmin)
 		{
 			if(!Game.duelMode)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Turn on Duel Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to enable Duel Mode' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Turn off Duel Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Vote to disable Duel Mode' );
 
 			if(!Game.noSplashDamage)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Turn off Splash Damage' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Vote to disable Splash Damage' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Turn on Splash Damage' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Vote to enable Splash Damage' );
 			// DeVast - PubPro votes
 			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Turn on Pro Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Turn off Pro Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
 		}
+		//Added so lak vote items are properly displayed in evo adminvotemenu
+		else if (%client.ForceVote > 0)
+		{
+			if(!Game.duelMode)
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to enable Duel Mode' );
+			else
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Vote to disable Duel Mode' );
+
+			if(!Game.noSplashDamage)
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Vote to disable Splash Damage' );
+			else
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Vote to enable Splash Damage' );
+			// DeVast - PubPro votes
+			if(!Game.PubPro)
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
+			else
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
+		}     
 		else
 		{
 			if(!Game.duelMode)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to turn on Duel Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Enable Duel Mode' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Vote to turn off Duel Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Disable Duel Mode' );
 
 			if(!Game.noSplashDamage)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Vote to turn off Splash Damage' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Disable Splash Damage' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Vote to turn on Splash Damage' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Enable Splash Damage' );
 			// DeVast - PubPro votes
 			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to turn on Pro Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Enable Pro Mode' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to turn off Pro Mode' );
-		}      
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Disable Pro Mode' );
+		}
 	}
 }
 
@@ -1069,12 +1091,12 @@ function LakRabbitGame::voteDuelMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 			killEveryone();
 			if(%game.duelMode)
 			{
-				messageAll('MsgVotePassed', '\c2Duel Mode Disabled.'); 
+				messageAll('MsgVotePassed', '\c2Duel Mode disabled.'); 
 				%game.duelMode = false;
 			}
 			else
 			{
-				messageAll('MsgVotePassed', '\c2Duel Mode Enabled.'); 
+				messageAll('MsgVotePassed', '\c2Duel Mode enabled.'); 
 				%game.duelMode = true;
 			}
 		}
@@ -1092,12 +1114,12 @@ function LakRabbitGame::voteSplashDamage(%game, %admin, %arg1, %arg2, %arg3, %ar
 	{
 		if(%game.noSplashDamage)
 		{
-			messageAll('MsgAdminForce', '\c2The Admin has turned on Splash Damage.');
+			messageAll('MsgAdminForce', '\c2The Admin has enabled Splash Damage.');
 			%game.noSplashDamage = false;
 		}
 		else
 		{
-			messageAll('MsgAdminForce', '\c2The Admin has turned off Splash Damage.');   
+			messageAll('MsgAdminForce', '\c2The Admin has disabled Splash Damage.');   
 			%game.noSplashDamage = true;
 		}
 	}
@@ -1108,12 +1130,12 @@ function LakRabbitGame::voteSplashDamage(%game, %admin, %arg1, %arg2, %arg3, %ar
 		{
 			if(%game.noSplashDamage)
 			{
-				messageAll('MsgVotePassed', '\c2Splash Damage Turned On.'); 
+				messageAll('MsgVotePassed', '\c2Splash Damage enabled.'); 
 				%game.noSplashDamage = false;
 			}
 			else
 			{
-				messageAll('MsgVotePassed', '\c2Splash Damage Turned Off.'); 
+				messageAll('MsgVotePassed', '\c2Splash Damage disabled.'); 
 				%game.noSplashDamage = true;
 			}
 		}
@@ -2234,7 +2256,8 @@ function LakRabbitGame::showRabbitWaypoint(%game, %clRabbit)
       %cl.sendTargetTo(%cl, true);
 
       //send the "waypoint is here sound"
-      messageClient(%cl, 'MsgRabbitWaypoint', '~wfx/misc/target_waypoint.wav');
+	  //took out -choco
+      //messageClient(%cl, 'MsgRabbitWaypoint', '~wfx/misc/target_waypoint.wav');
    }
 
    //schedule the time to hide the waypoint

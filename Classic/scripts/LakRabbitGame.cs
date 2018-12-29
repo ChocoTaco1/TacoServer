@@ -947,6 +947,8 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
 		}
 		//Added so lak vote items are properly displayed in evo adminvotemenu
+		//A lot of changes were added to admin.ovl in evo
+		//see footnotes below
 		else if (%client.ForceVote > 0)
 		{
 			if(!Game.duelMode)
@@ -2319,3 +2321,97 @@ function LakRabbitGame::applyConcussion(%game, %player)
    // MES -- this won't do anything, the function LakRabbitGame::dropFlag is empty
    %game.dropFlag( %player );
 }
+
+//--------------------------------Footnotes---------------------------------------
+//
+//
+//To make vote options work in evo admin mod, demonstration only below
+//
+//function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %playerVote)
+//{
+//		parent::serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %playerVote);
+//	
+//	    // sonic9k 11/6/2003 - Added support for LakRabbit DuelMode option
+//      //
+//      case "VoteDuelMode":
+//         if( %isAdmin && !%client.ForceVote )
+//         {
+//            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
+//			adminLog(%client, " has toggled " @ %arg1 @ " (" @ %arg2 @ ")");
+//         }
+//         else
+//         {
+//            if(Game.scheduleVote !$= "")
+//            {
+//               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
+//               return;
+//            }
+//			%actionMsg = ($Host::LakRabbitDuelMode ? "disable Duel mode" : "enable Duel mode");
+//            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
+//            {
+//               %cl = ClientGroup.getObject(%idx);
+//               if(!%cl.isAIControlled())
+//               {
+//                  messageClient(%cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg);
+//                  %clientsVoting++;
+//               }
+//            }
+//            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
+//         }
+//      //
+//      // sonic9k 11/6/2003 - Added support for LakRabbit SplashDamage option
+//      //
+//      case "VoteSplashDamage":
+//         if( %isAdmin && !%client.ForceVote )
+//         {
+//            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
+//			adminLog(%client, " has toggled " @ %arg1 @ " (" @ %arg2 @ ")");
+//         }
+//         else
+//         {
+//            if(Game.scheduleVote !$= "")
+//            {
+//               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
+//               return;
+//            }
+//			%actionMsg = ($Host::LakRabbitNoSplashDamage ? "enable SplashDamage" : "disable SplashDamage");
+//            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
+//            {
+//               %cl = ClientGroup.getObject(%idx);
+//               if(!%cl.isAIControlled())
+//               {
+//                  messageClient(%cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg);
+//                  %clientsVoting++;
+//               }
+//            }
+//            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
+//         }
+//	    //
+//      // chocotaco 8/7/2018 - Added support for LakRabbit Pro option
+//      //
+//      case "VotePro":
+//         if( %isAdmin && !%client.ForceVote )
+//         {
+//            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
+//			adminLog(%client, " has toggled " @ %arg1 @ " (" @ %arg2 @ ")");
+//         }
+//         else
+//         {
+//            if(Game.scheduleVote !$= "")
+//            {
+//               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
+//               return;
+//            }
+//			%actionMsg = ($Host::LakRabbitPubPro ? "disable Pro mode" : "enable Pro mode");
+//            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
+//            {
+//               %cl = ClientGroup.getObject(%idx);
+//               if(!%cl.isAIControlled())
+//               {
+//                  messageClient(%cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg);
+//                  %clientsVoting++;
+//               }
+//            }
+//            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
+//         }
+//}

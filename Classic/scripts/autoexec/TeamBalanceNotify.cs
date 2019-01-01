@@ -38,11 +38,11 @@ function TeamBalanceNotify( %game, %client, %respawn )
 				//Stats Aspect. 3 or more difference gets a stats notify. 				
 				else if( $StatsMsgPlayed !$= 1)
 				{
-				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-				//Run once.
-				$StatsMsgPlayed = 1;
-				//Called in 30 secs with sound
-				schedule(30000, 0, "StatsUnbalanceSound");
+					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+					//Run once.
+					$StatsMsgPlayed = 1;
+					//Called in 30 secs with sound
+					schedule(30000, 0, "StatsUnbalanceSound");
 				}
 			}
 		}
@@ -85,9 +85,9 @@ function UnbalancedSound()
 {
 	if( $Team2Difference == 2 || $Team1Difference == 2 )
 		{
-				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.~wfx/misc/bounty_objrem2.wav');
-				//Called in 30 secs with sound
-				schedule(30000, 0, "UnbalancedSound");
+			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.~wfx/misc/bounty_objrem2.wav');
+			//Called in 30 secs with sound
+			schedule(30000, 0, "UnbalancedSound");
 		}
 	else
 		return;
@@ -99,11 +99,11 @@ function UnbalancedSound()
 function StatsUnbalanceSound()
 {
 	if( $Team1Difference >= 3 || $Team2Difference >= 3 )
-			{				
-				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.~wfx/misc/bounty_objrem2.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-				//Called in 30 secs with sound
-				schedule(30000, 0, "StatsUnbalanceSound");
-			}
+		{				
+			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.~wfx/misc/bounty_objrem2.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+			//Called in 30 secs with sound
+			schedule(30000, 0, "StatsUnbalanceSound");
+		}
 	else
 		return;
 }

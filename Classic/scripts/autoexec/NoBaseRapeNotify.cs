@@ -14,14 +14,16 @@ function NBRStatusNotify( %game, %client, %respawn )
 		{
 			if( $NoBaseRapeNotifyCount !$= 0 )
 			{
-			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Enabled.~wfx/misc/nexus_cap.wav');
+			//messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Enabled.~wfx/misc/nexus_cap.wav');
+			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Enabled.');
 			$NoBaseRapeNotifyCount = 0;
 			}
 		}
 		//Off
 		else if( $NoBaseRapeNotifyCount !$= 1 )
 		{
-			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
+			//messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
+			messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.');
 			$NoBaseRapeNotifyCount = 1;
 		}
 	}

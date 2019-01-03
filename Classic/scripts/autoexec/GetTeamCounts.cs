@@ -17,8 +17,6 @@ function CreateServer( %mission, %missionType )
 	$Host::Dedicated = $Host::EmptyServerReset;
 	//Call for a GetTeamCount update
 	GetTeamCounts( %game, %client, %respawn );
-	//Start VoteChaingun
-	VoteChaingunStart();
 }
 
 };

@@ -31,9 +31,7 @@ function TeamBalanceNotify( %game, %client, %respawn )
 					//Once per cycle.
 					$UnbalancedMsgPlayed = 1;
 					//Reset Stats.
-					$StatsMsgPlayed = 0;
-					//Called in 30 secs with sound
-					schedule(30000, 0, "UnbalancedSound");					
+					$StatsMsgPlayed = 0;					
 				}
 				//Stats Aspect. 3 or more difference gets a stats notify. 				
 				else if( $StatsMsgPlayed !$= 1)
@@ -41,8 +39,14 @@ function TeamBalanceNotify( %game, %client, %respawn )
 					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
 					//Run once.
 					$StatsMsgPlayed = 1;
+				}
+				
+				if( $StatsBalancedSoundPlayed !$= 1 )
+				{
 					//Called in 30 secs with sound
 					schedule(30000, 0, "StatsUnbalanceSound");
+					//Once per cycle.
+					$StatsBalancedSoundPlayed = 1;
 				}
 			}
 		}
@@ -56,16 +60,10 @@ function TeamBalanceNotify( %game, %client, %respawn )
 				$UnbalancedMsgPlayed = 0;
 				//Reset Stats.
 				$StatsMsgPlayed = 0;
+				//Reset Stats with sound.
+				$StatsBalancedSoundPlayed = 0;
 		}
 	}
-}
-
-//Called in CTFGame::flagCap in evo CTFGame.ovl
-//Allows for another unbalanced notification everytime the flag is capped.
-function ResetUnbalancedNotifyPerCap()
-{
-	//$UnbalancedMsgPlayed = 0;
-	//$StatsMsgPlayed = 0;
 }
 
 //Reset Notify at defaultgame::gameOver in evo defaultgame.ovl
@@ -75,35 +73,23 @@ function ResetTeamBalanceNotifyGameOver( %game )
 	$BalancedMsgPlayed = -1;
 	$UnbalancedMsgPlayed = -1;
 	$StatsMsgPlayed = -1;
-	
-}
-
-//Unbalance with sound
-//Called every 30 secs
-//2 difference
-function UnbalancedSound()
-{
-	if( $Team2Difference == 2 || $Team1Difference == 2 )
-		{
-			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.~wfx/misc/bounty_objrem2.wav');
-			//Called in 30 secs with sound
-			schedule(30000, 0, "UnbalancedSound");
-		}
-	else
-		return;
+	$StatsBalancedSoundPlayed = -1;
 }
 
 //Stats with Sound
 //Called every 30 seconds
-//3 or more difference
+//2 or more difference
 function StatsUnbalanceSound()
 {
-	if( $Team1Difference >= 3 || $Team2Difference >= 3 )
+	if( $Team1Difference >= 2 || $Team2Difference >= 2 )
 		{				
 			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.~wfx/misc/bounty_objrem2.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
 			//Called in 30 secs with sound
 			schedule(30000, 0, "StatsUnbalanceSound");
 		}
 	else
+	{
+		$StatsBalancedSoundPlayed = 0;
 		return;
+	}
 }

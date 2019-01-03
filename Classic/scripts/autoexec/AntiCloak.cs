@@ -13,24 +13,24 @@ function ActivateAntiCloak()
 		//echo("AntiCloakPlayerCount " @ $AntiCloakPlayerCount);
 	
 		//If server is in Tourny mode and the team population is lower than the AntiCloakPlayerCount cloak is not selectable.
-		if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::AntiCloakPlayerCount && !$CloakpackRunOnce )
+		if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::AntiCloakPlayerCount && $CloakpackRunOnce !$= 0)
 		{
 			$InvBanList[CTF, "CloakingPack"] = true;
 			
 			if(!isActivePackage(DisableCloakPack))
 				activatePackage(DisableCloakPack);
 			
-			$CloakpackRunOnce = false;
+			$CloakpackRunOnce = 0;
 		}
 		//All other cases it is.
-		else if( $CloakpackRunOnce )
+		else if( $CloakpackRunOnce !$= 1 )
 		{
 			$InvBanList[CTF, "CloakingPack"] = false;
 			
 			if(isActivePackage(DisableCloakPack))
 				deactivatePackage(DisableCloakPack);
 			
-			$CloakpackRunOnce = true;
+			$CloakpackRunOnce = 1;
 		}
 	}		
 }

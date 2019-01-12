@@ -45,7 +45,7 @@ function CloakingPackImage::onActivate(%data, %obj, %slot)
    {
       if(%obj.canCloak() $= "true")
       {
-         messageClient(%obj.client, 'MsgCloakingPackOn', '\c2Cloakpack is disabled.');
+         messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloakpack is disabled until %1 players.', $Host::AntiCloakPlayerCount );
       }
       else
       {

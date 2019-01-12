@@ -83,6 +83,7 @@ function StatsUnbalanceSound()
 {
 	if( $Team1Difference >= 2 || $Team2Difference >= 2 )
 		{				
+			//Added so the notification wont sound between the 5 sec interval of get counts and the 30 sec unbalanced notification when someone switches at the last minute before a check.
 			if( !$GetCountsClientTeamChange )
 			{
 				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.~wfx/misc/bounty_objrem2.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );

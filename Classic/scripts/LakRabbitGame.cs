@@ -16,6 +16,10 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.33 January 2019
+// Took out slap headshot.
+// Added footnotes for voting references with evo admin mod.
+//
 // v3.32 December 2018
 // Fixed an issue with lak vote items in the Evo Admin Votemenu
 // Took out waypoint sound.
@@ -430,12 +434,17 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			}
 
 			// special knockback if you hit too close, max 15% chance (point blank).. 5% at 30meters, 1% chance for any MA
-			%chance = mFloor(25 - %distance/3);
-			if(%chance <= 0) %chance = 1;
-			//if(%ma && getRandom(1,100) <= %chance)
 
 			// Slap based on a Disc headshot
-			if(%ma && getRandom(1,50) <= %chance && %targetObject.client.headshot)
+			//%chance = mFloor(25 - %distance/3);
+			//if(%ma && getRandom(1,50) <= %chance && %targetObject.client.headshot)
+
+				
+			//Normal Slap
+			%chance = mFloor(15 - %distance/3);
+            if(%chance <= 0) %chance = 1;
+			
+            if(%ma && getRandom(1,100) <= %chance)
 			{
 				if(%targetObject.holdingFlag)
 				{
@@ -738,23 +747,25 @@ function Player::setKnockback(%this, %val)
 	%this.knockback = %val;
 }
 
-//For headshot detection
-function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
-{
-    %damLoc = firstWord(%targetObject.getDamageLocation(%position));
-    if(%damLoc $= "head")
-    {   
-        %targetObject.getOwnerClient().headShot = 1;
-        //%modifier = %data.rifleHeadMultiplier;
-		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
-    }
-    else
-    {   
-        //%modifier = 1;
-        %targetObject.getOwnerClient().headShot = 0;
-		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
-    }
-}
+//For slap headshot detection
+//Took out
+//
+//function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
+//{
+//    %damLoc = firstWord(%targetObject.getDamageLocation(%position));
+//    if(%damLoc $= "head")
+//    {   
+//        %targetObject.getOwnerClient().headShot = 1;
+//        //%modifier = %data.rifleHeadMultiplier;
+//		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
+//    }
+//    else
+//    {   
+//        //%modifier = 1;
+//        %targetObject.getOwnerClient().headShot = 0;
+//		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
+//    }
+//}
 
 };
 

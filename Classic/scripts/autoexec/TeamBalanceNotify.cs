@@ -90,6 +90,9 @@ function StatsUnbalanceSound()
 				//Called in 30 secs with sound
 				schedule(30000, 0, "StatsUnbalanceSound");
 			}
+			else
+				//In the event that a player switches up instead of down during an interval the function can be called again.
+				schedule(5000, 0, "StatsUnbalanceSound");
 		}
 	else
 	{

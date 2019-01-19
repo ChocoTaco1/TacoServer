@@ -25,29 +25,33 @@ function TeamBalanceNotify( %game, %client, %respawn )
 				
 			if( %Team1Difference >= 2 || %Team2Difference >= 2 )
 			{
-				if( $UnbalancedMsgPlayed !$= 1 && %Team2Difference == 2 || %Team1Difference == 2 ) 
-				{
-					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.');
-					//Once per cycle.
-					$UnbalancedMsgPlayed = 1;
-					//Reset Stats.
-					$StatsMsgPlayed = 0;					
-				}
-				//Stats Aspect. 3 or more difference gets a stats notify. 				
-				else if( $StatsMsgPlayed !$= 1)
-				{
-					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-					//Run once.
-					$StatsMsgPlayed = 1;
-				}
-				
 				if( $StatsBalancedSoundPlayed !$= 1 )
 				{
+					if( $UnbalancedMsgPlayed !$= 1 && %Team2Difference == 2 || %Team1Difference == 2 ) 
+					{
+						messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.');
+						//Once per cycle.
+						$UnbalancedMsgPlayed = 1;
+						//Reset Stats.
+						$StatsMsgPlayed = 0;					
+					}
+					//Stats Aspect. 3 or more difference gets a stats notify. 				
+					else if( $StatsMsgPlayed !$= 1)
+					{
+						messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+						//Run once.
+						$StatsMsgPlayed = 1;
+					}
+
 					//Called in 30 secs with sound
 					schedule(30000, 0, "StatsUnbalanceSound");
 					//Once per cycle.
 					$StatsBalancedSoundPlayed = 1;
 				}
+			}
+			else if( $PlayerCount[1] !$= $PlayerCount[2] )
+			{
+				$StatsBalancedSoundPlayed = 0;
 			}
 		}
 		//If teams are balanced and teams dont equal 0.		

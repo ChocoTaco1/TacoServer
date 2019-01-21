@@ -1,9 +1,9 @@
-//Amount of players needed on server for CloakPack to be banned/unbanned
+// Amount of players needed on server for CloakPack to be banned/unbanned
 //
-//$Host::AntiCloakEnable = 1;
-//$Host::AntiCloakPlayerCount = 6;
+// $Host::AntiCloakEnable = 1;
+// $Host::AntiCloakPlayerCount = 6;
 
-//Called in GetCounts.cs
+// Called in GetCounts.cs
 function ActivateAntiCloak()
 {
 	//CTF only
@@ -13,24 +13,30 @@ function ActivateAntiCloak()
 		//echo("AntiCloakPlayerCount " @ $AntiCloakPlayerCount);
 	
 		//If server is in Tourny mode and the team population is lower than the AntiCloakPlayerCount cloak is not selectable.
-		if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::AntiCloakPlayerCount && $CloakpackRunOnce !$= 0)
+		if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::AntiCloakPlayerCount )
 		{
-			$InvBanList[CTF, "CloakingPack"] = true;
+			if( $AntiCloakRunOnce !$= 0 )
+			{
+				$InvBanList[CTF, "CloakingPack"] = 1;
 			
-			if(!isActivePackage(DisableCloakPack))
-				activatePackage(DisableCloakPack);
+				if(!isActivePackage(DisableCloakPack))
+					activatePackage(DisableCloakPack);
 			
-			$CloakpackRunOnce = 0;
+				$AntiCloakRunOnce = 0;
+			}
 		}
 		//All other cases it is.
-		else if( $CloakpackRunOnce !$= 1 )
+		else
 		{
-			$InvBanList[CTF, "CloakingPack"] = false;
+			if( $AntiCloakRunOnce !$= 1 )
+			{
+				$InvBanList[CTF, "CloakingPack"] = 0;
 			
-			if(isActivePackage(DisableCloakPack))
-				deactivatePackage(DisableCloakPack);
+				if(isActivePackage(DisableCloakPack))
+					deactivatePackage(DisableCloakPack);
 			
-			$CloakpackRunOnce = 1;
+				$AntiCloakRunOnce = 1;
+			}
 		}
 	}		
 }
@@ -44,18 +50,11 @@ function CloakingPackImage::onActivate(%data, %obj, %slot)
    if(%obj.client.armor $= "Light") 
    {
       if(%obj.canCloak() $= "true")
-      {
          messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloakpack is disabled until %1 players.', $Host::AntiCloakPlayerCount );
-      }
-      else
-      {
-		//Nothing
-      }
    }
-   else 
+   else
    {
       messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloaking available for light armors only.');
-
    }
 }
 

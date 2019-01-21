@@ -1924,8 +1924,8 @@ function CTFGame::sendGameVoteMenu(%game, %client, %key)
    DefaultGame::sendGameVoteMenu(%game, %client, %key);
    if ( %game.scheduleVote $= "" )
    {
-      if(%client.isAdmin)
-         messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
+      //if(%client.isAdmin)
+         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
       //else
       //   messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
    }

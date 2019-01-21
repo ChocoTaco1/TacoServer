@@ -1,7 +1,7 @@
-//To activate a password in certain gamemodes
-//called in Getcounts.cs
-//and also other options like distance and speed
-//turn tournament mode off when switched to lak
+// To activate a password in certain gamemodes
+// called in Getcounts.cs
+// and also other options like distance and speed
+// turn tournament mode off when switched to lak
 
 // Variables
 // Add these to ServerPrefs
@@ -12,6 +12,7 @@
 // $Host::PUGautoPasswordLimit = 10;
 // The PUG password you want
 // $Host::PUGPassword = "pickup";
+//
 
 function CheckPUGpassword()
 {	

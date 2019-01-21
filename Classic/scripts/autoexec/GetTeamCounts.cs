@@ -1,22 +1,27 @@
-//This function is Called at:
-//CreateServer(%mission, %missionType) in Server.cs
+// GetCounts was made to accurately keep track of how many players
+// are on teams, on the server, on each team, spectator, etc.
+// It runs every 5 seconds.
+// It has since evolved into the place to inject other services
+// and aspects within the server.
+// 
 //
-//To control whether the server auto resets when empty
-//$Host::EmptyServerReset = 0;
+// To control whether the server auto resets when empty
+// $Host::EmptyServerReset = 0;
 
 package StartTeamCounts 
 {
 
-
 function CreateServer( %mission, %missionType )
 {
 	parent::CreateServer( %mission, %missionType );
+	//Call for a GetTeamCount update
+	GetTeamCounts( %game, %client, %respawn );
+
+
 	//Make sure teamchange variable is set
 	ResetClientChangedTeams();
 	//Whether the server auto restarts when empty or not
 	$Host::Dedicated = $Host::EmptyServerReset;
-	//Call for a GetTeamCount update
-	GetTeamCounts( %game, %client, %respawn );
 }
 
 };

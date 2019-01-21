@@ -456,10 +456,29 @@ function SCtFGame::equip(%game, %player)
    %player.client.clearBackpackIcon();
    if(!%player.client.isAIControlled())
    {
-      %player.setArmor($Sctf::Armor);
-      buyDeployableFavorites(%player.client);
-      %player.setEnergyLevel(%player.getDataBlock().maxEnergy);
-      %player.selectWeaponSlot( 0 );
+      if( !$Host::VoteSCtFProMode )
+	  {
+		%player.setArmor($Sctf::Armor);
+		buyDeployableFavorites(%player.client);
+		%player.setEnergyLevel(%player.getDataBlock().maxEnergy);
+		%player.selectWeaponSlot( 0 );
+	  }
+	  else
+	  {
+		%player.clearInventory();
+		%player.setInventory(Disc,1);
+		%player.setInventory(Blaster,1);
+		%player.setInventory(GrenadeLauncher,1);
+		%player.setInventory(DiscAmmo, %player.getDataBlock().max[DiscAmmo]);
+		%player.setInventory(GrenadeLauncherAmmo, %player.getDataBlock().max[GrenadeLauncherAmmo]);
+	    %player.setInventory(Grenade, %player.getDataBlock().max[Grenade]);		
+	    %player.setInventory(Mine, %player.getDataBlock().max[Mine]);
+		%player.setInventory(RepairKit,1);
+		%player.setInventory(EnergyPack,1);
+        %player.setInventory(TargetingLaser, 1);
+        %player.setInventory(Beacon, %player.getDataBlock().max[Beacon]);
+		%player.use("Disc");
+	  }
    }
    else
    {
@@ -1965,23 +1984,41 @@ function SCtFGame::startFlagCollisionSearch(%game, %flag)
 // VOTING ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
-//function SCtFGame::sendGameVoteMenu(%game, %client, %key)
-//{
-//   DefaultGame::sendGameVoteMenu(%game, %client, %key);
-//   if ( %game.scheduleVote $= "" )
-//   {
-//      if(!%client.isAdmin)
-//     {
-//         messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Vote to change the Armor class' );
-//         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
-//      }
-//      else
-//      {
-//         messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Change the Armor class' );
-//         messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
-//      }
-//   }
-//}
+function SCtFGame::sendGameVoteMenu(%game, %client, %key)
+{
+   	parent::sendGameVoteMenu( %game, %client, %key );
+	
+	%isAdmin = ( %client.isAdmin || %client.isSuperAdmin );
+   
+   if ( %game.scheduleVote $= "" )
+   {
+     if(!%client.isAdmin)
+	 {
+        //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Vote to change the Armor class' );
+        //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
+		if(!$Host::VoteSCtFProMode)
+		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
+		else
+		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
+	 }
+	 else if (%client.ForceVote > 0)
+	 {
+		if(!$Host::VoteSCtFProMode)
+		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
+		else
+		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
+	 }
+     else
+	 {
+		if(!$Host::VoteSCtFProMode)
+		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'change to enable Pro Mode', 'Enable Pro Mode' );
+		else
+		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'change to disable Pro Mode', 'Disable Pro Mode' );
+	 }
+         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Change the Armor class' );
+         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
+   }
+}
 
 //function SCtFGame::sendAntiTurtleTimeList( %game, %client, %key )
 //{
@@ -2008,18 +2045,20 @@ function SCtFGame::startFlagCollisionSearch(%game, %flag)
 //      Game.sendArmorClassList( %client, %key );
 //}
 
-//function SCtFGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4)
-//{
-//   DefaultGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4);
-//   switch$ (%typeName)
-//   {
-//      case "voteAntiTurtleTime":
-//         %game.voteAntiTurtleTime(%admin, %arg1, %arg2, %arg3, %arg4);
-//
-//      case "VoteArmorClass":
-//         %game.VoteArmorClass(%admin, %arg1, %arg2, %arg3, %arg4);
-//   }
-//}
+function SCtFGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4)
+{ 
+   switch$ (%typeName)
+   {
+	  //case "voteAntiTurtleTime":
+         //%game.voteAntiTurtleTime(%admin, %arg1, %arg2, %arg3, %arg4);
+      //case "VoteArmorClass":
+         //%game.VoteArmorClass(%admin, %arg1, %arg2, %arg3, %arg4);
+	  case "VoteSCtFProMode":
+         %game.VoteSCtFProMode(%admin, %arg1, %arg2, %arg3, %arg4);
+   }
+   
+   	parent::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4);
+}
 
 //function SCtFGame::voteAntiTurtleTime(%game, %admin, %newLimit)
 //{
@@ -2095,7 +2134,111 @@ function SCtFGame::startFlagCollisionSearch(%game, %flag)
 //   }
 //}
 
-//DeleteObjects Code
+
+//--------------------------------SCTFProMode--------------------------------
+//
+$VoteMessage["VoteSCtFProMode"] = "turn";
+
+$InvBanList[SCtF, "Chaingun"] = $Host::VoteSCtFProMode;
+$InvBanList[SCtF, "ShockLance"] = $Host::VoteSCtFProMode;
+$InvBanList[SCtF, "Plasma"] = $Host::VoteSCtFProMode;
+
+function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
+{
+	if(	$countdownStarted && $MatchStarted )
+	{
+		if(%admin) 
+		{
+			killeveryone();
+
+			if(%game.VoteSCtFProMode)
+			{
+				messageAll('MsgAdminForce', '\c2The Admin has disabled Pro Mode.');
+	
+				$InvBanList[SCtF, "Chaingun"] = 0;
+				$InvBanList[SCtF, "ShockLance"] = 0;
+				$InvBanList[SCtF, "Plasma"] = 0;
+			
+				%game.VoteSCtFProMode = false;
+			}
+			else
+			{
+				messageAll('MsgAdminForce', '\c2The Admin has enabled Pro Mode.');
+
+				$InvBanList[SCtF, "Chaingun"] = 1;
+				$InvBanList[SCtF, "ShockLance"] = 1;
+				$InvBanList[SCtF, "Plasma"] = 1;
+			
+				%game.VoteSCtFProMode = true;
+			}
+		}
+		else 
+		{
+			%totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+			if(%totalVotes > 0 && (%game.totalVotesFor / ClientGroup.getCount()) > ($Host::VotePasspercent / 100))
+			{
+				killeveryone();
+
+				if(%game.VoteSCtFProMode)
+				{
+					messageAll('MsgVotePassed', '\c2Pro Mode Disabled.');
+
+					$InvBanList[SCtF, "Chaingun"] = 0;
+					$InvBanList[SCtF, "ShockLance"] = 0;
+					$InvBanList[SCtF, "Plasma"] = 0;
+			
+					%game.VoteSCtFProMode = false;
+				}
+				else
+				{
+					messageAll('MsgVotePassed', '\c2Pro Mode Enabled.');
+
+					$InvBanList[SCtF, "Chaingun"] = 1;
+					$InvBanList[SCtF, "ShockLance"] = 1;
+					$InvBanList[SCtF, "Plasma"] = 1;
+			
+					%game.VoteSCtFProMode = true;
+				}
+			}
+			else
+				messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100)); 
+		}
+
+		$Host::VoteSCtFProMode = %game.VoteSCtFProMode;
+	}
+}
+// For voting to work properly - evo admin.ovl
+//
+//	  case "VoteSCtFProMode":
+//         if( %isAdmin && !%client.ForceVote )
+//         {
+//            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
+//			adminLog(%client, " has toggled " @ %arg1 @ " (" @ %arg2 @ ")");
+//         }
+//         else
+//         {
+//            if(Game.scheduleVote !$= "")
+//            {
+//               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
+//               return;
+//            }
+//			%actionMsg = ($Host::VoteSCtFProMode ? "disable Pro mode" : "enable Pro mode");
+//            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
+//            {
+//               %cl = ClientGroup.getObject(%idx);
+//               if(!%cl.isAIControlled())
+//               {
+//                  messageClient(%cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg);
+//                  %clientsVoting++;
+//               }
+//            }
+//            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
+//         }
+
+
+//--------------------------------DeleteObjects Code-------------------------------
+//AutoRemove assets, sensors, and turrets from non-LT maps
+//
 function getGroupObjectByName(%group, %name)
 {
 	%numObjects = %group.getCount();
@@ -2185,3 +2328,4 @@ function deleteNonSCtFObjectsFromMap()
    //deleteObjectsFromGroupByType(MissionGroup, "ForceFieldBare");
    //deleteObjectsFromGroupByType(MissionGroup, "Item");
 }
+

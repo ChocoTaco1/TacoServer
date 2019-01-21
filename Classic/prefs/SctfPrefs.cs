@@ -33,16 +33,13 @@ function setArmorDefaults(%armor)
 		 $InvBanList[SCtF, "TargetingLaser"] = 0;
          // Weapons
          $InvBanList[SCtF, "Blaster"] = 0;
-         $InvBanList[SCtF, "Chaingun"] = 0;
          $InvBanList[SCtF, "Disc"] = 0;
          $InvBanList[SCtF, "ELFGun"] = 1;
          $InvBanList[SCtF, "GrenadeLauncher"] = 0;
          $InvBanList[SCtF, "MissileBarrelPack"] = 1;
          $InvBanList[SCtF, "MissileLauncher"] = 1;
          $InvBanList[SCtF, "Mortar"] = 1;
-         $InvBanList[SCtF, "Plasma"] = 0;
          $InvBanList[SCtF, "SniperRifle"] = 1;
-         $InvBanList[SCtF, "ShockLance"] = 0;
          // Misc
          $InvBanList[SCtF, "Mine"] = 0;
          $InvBanList[SCtF, "ConcussionGrenade"] = 1;
@@ -50,7 +47,11 @@ function setArmorDefaults(%armor)
          $InvBanList[SCtF, "FlareGrenade"] = 1;
          $InvBanList[SCtF, "FlashGrenade"] = 1;
          $InvBanList[SCtF, "Grenade"] = 0;
-
+		 //Pro Mode
+         $InvBanList[SCtF, "ShockLance"] = $Host::SCtFProMode;
+         $InvBanList[SCtF, "Chaingun"] = $Host::SCtFProMode;
+         $InvBanList[SCtF, "Plasma"] = $Host::SCtFProMode;
+		 
       case "Medium": // Set your servers Medium armor bans
          // Packs
          $InvBanList[SCtF, "TurretOutdoorDeployable"] = 1;

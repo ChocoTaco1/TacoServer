@@ -35,8 +35,8 @@ function TurretData::selectTarget(%this, %turret)
 };
 
 // Prevent package from being activated if it is already
-if (!isActivePackage(antiTurret))
-    activatePackage(antiTurret);
+if (!isActivePackage(AntiTurret))
+    activatePackage(AntiTurret);
 
 $InvBanList[CTF, "MortarBarrelPack"] = !$Host::EnableMortarTurret;
 $InvBanList[CnH, "MortarBarrelPack"] = !$Host::EnableMortarTurret;

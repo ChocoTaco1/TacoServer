@@ -456,7 +456,7 @@ function SCtFGame::equip(%game, %player)
    %player.client.clearBackpackIcon();
    if(!%player.client.isAIControlled())
    {
-      if( !$Host::VoteSCtFProMode )
+      if( !$Host::SCtFProMode )
 	  {
 		%player.setArmor($Sctf::Armor);
 		buyDeployableFavorites(%player.client);
@@ -1996,24 +1996,24 @@ function SCtFGame::sendGameVoteMenu(%game, %client, %key)
 	 {
         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Vote to change the Armor class' );
         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
-		if(!$Host::VoteSCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
+		if(!$Host::SCtFProMode)
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
 		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
 	 }
 	 else if (%client.ForceVote > 0)
 	 {
-		if(!$Host::VoteSCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
+		if(!$Host::SCtFProMode)
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
 		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
 	 }
      else
 	 {
-		if(!$Host::VoteSCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'change to enable Pro Mode', 'Enable Pro Mode' );
+		if(!$Host::SCtFProMode)
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'change to enable Pro Mode', 'Enable Pro Mode' );
 		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSCtFProMode', 'change to disable Pro Mode', 'Disable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'change to disable Pro Mode', 'Disable Pro Mode' );
 	 }
          //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Change the Armor class' );
          //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
@@ -2053,8 +2053,8 @@ function SCtFGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4
          //%game.voteAntiTurtleTime(%admin, %arg1, %arg2, %arg3, %arg4);
       //case "VoteArmorClass":
          //%game.VoteArmorClass(%admin, %arg1, %arg2, %arg3, %arg4);
-	  case "VoteSCtFProMode":
-         %game.VoteSCtFProMode(%admin, %arg1, %arg2, %arg3, %arg4);
+	  case "SCtFProMode":
+         %game.SCtFProMode(%admin, %arg1, %arg2, %arg3, %arg4);
    }
    
    	parent::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4);
@@ -2137,13 +2137,13 @@ function SCtFGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4
 
 //--------------------------------SCTFProMode--------------------------------
 //
-$VoteMessage["VoteSCtFProMode"] = "turn";
+$VoteMessage["SCtFProMode"] = "turn";
 
-$InvBanList[SCtF, "Chaingun"] = $Host::VoteSCtFProMode;
-$InvBanList[SCtF, "ShockLance"] = $Host::VoteSCtFProMode;
-$InvBanList[SCtF, "Plasma"] = $Host::VoteSCtFProMode;
+$InvBanList[SCtF, "Chaingun"] = $Host::SCtFProMode;
+$InvBanList[SCtF, "ShockLance"] = $Host::SCtFProMode;
+$InvBanList[SCtF, "Plasma"] = $Host::SCtFProMode;
 
-function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
+function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
 	if(	$countdownStarted && $MatchStarted )
 	{
@@ -2151,7 +2151,7 @@ function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 		{
 			killeveryone();
 
-			if(%game.VoteSCtFProMode)
+			if(%game.SCtFProMode)
 			{
 				messageAll('MsgAdminForce', '\c2The Admin has disabled Pro Mode.');
 	
@@ -2159,7 +2159,7 @@ function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 				$InvBanList[SCtF, "ShockLance"] = 0;
 				$InvBanList[SCtF, "Plasma"] = 0;
 			
-				%game.VoteSCtFProMode = false;
+				%game.SCtFProMode = false;
 			}
 			else
 			{
@@ -2169,7 +2169,7 @@ function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 				$InvBanList[SCtF, "ShockLance"] = 1;
 				$InvBanList[SCtF, "Plasma"] = 1;
 			
-				%game.VoteSCtFProMode = true;
+				%game.SCtFProMode = true;
 			}
 		}
 		else 
@@ -2179,7 +2179,7 @@ function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 			{
 				killeveryone();
 
-				if(%game.VoteSCtFProMode)
+				if(%game.SCtFProMode)
 				{
 					messageAll('MsgVotePassed', '\c2Pro Mode Disabled.');
 
@@ -2187,7 +2187,7 @@ function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 					$InvBanList[SCtF, "ShockLance"] = 0;
 					$InvBanList[SCtF, "Plasma"] = 0;
 			
-					%game.VoteSCtFProMode = false;
+					%game.SCtFProMode = false;
 				}
 				else
 				{
@@ -2197,19 +2197,19 @@ function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 					$InvBanList[SCtF, "ShockLance"] = 1;
 					$InvBanList[SCtF, "Plasma"] = 1;
 			
-					%game.VoteSCtFProMode = true;
+					%game.SCtFProMode = true;
 				}
 			}
 			else
 				messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100)); 
 		}
 
-		$Host::VoteSCtFProMode = %game.VoteSCtFProMode;
+		$Host::SCtFProMode = %game.SCtFProMode;
 	}
 }
 // For voting to work properly - evo admin.ovl
 //
-//	  case "VoteSCtFProMode":
+//	  case "SCtFProMode":
 //         if( %isAdmin && !%client.ForceVote )
 //         {
 //            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
@@ -2222,7 +2222,7 @@ function SCtFGame::VoteSCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 //               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
 //               return;
 //            }
-//			%actionMsg = ($Host::VoteSCtFProMode ? "disable Pro mode" : "enable Pro mode");
+//			%actionMsg = ($Host::SCtFProMode ? "disable Pro mode" : "enable Pro mode");
 //            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
 //            {
 //               %cl = ClientGroup.getObject(%idx);

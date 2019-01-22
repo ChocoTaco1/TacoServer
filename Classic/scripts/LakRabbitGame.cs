@@ -19,6 +19,7 @@
 // v3.33 January 2019
 // Took out slap headshot.
 // Added footnotes for voting references with evo admin mod.
+// An improved Flag-Waypoint
 //
 // v3.32 December 2018
 // Fixed an issue with lak vote items in the Evo Admin Votemenu
@@ -158,14 +159,17 @@ function Flag::objectiveInit(%data, %flag)
    }
    
    // create a waypoint to the flag's starting place
-   %flagWaypoint = new WayPoint()
+   if( $Host::ShowFlagIcon == 0 )
    {
-      position = %flag.position;
-      rotation = "1 0 0 0";
-      name = "Flag Home";
-      dataBlock = "WayPointMarker";
-      team = $NonRabbitTeam;
-   };
+		%flagWaypoint = new WayPoint()
+		{
+			position = %flag.position;
+			rotation = "1 0 0 0";
+			name = "Flag Home";
+			dataBlock = "WayPointMarker";
+			team = $NonRabbitTeam;
+		};
+   }
 
    $AIRabbitFlag = %flag;
 
@@ -1528,7 +1532,7 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
    // ilys -- remove flag icon from player
    if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
    {
-      setTargetSensorGroup(%flag.getTarget(), $NonRabbitTeam);
+      setTargetSensorGroup(%flag.getTarget(), $Observer);
       %player.scopeWhenSensorVisible(false);
       %target = %player.getTarget();
       setTargetRenderMask(%target, getTargetRenderMask(%target) & ~0x2);
@@ -1690,11 +1694,11 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
       // ilys -- add flag icon to player
       if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
       {
-         setTargetSensorGroup(%flag.getTarget(), $RabbitTeam);
-         %player.scopeWhenSensorVisible(true);
-         %target = %player.getTarget();
-         setTargetRenderMask(%target, getTargetRenderMask(%target) | 0x2);
-         setTargetAlwaysVisMask(%target, 0x7);
+         //setTargetSensorGroup(%flag.getTarget(), $RabbitTeam);
+         //%player.scopeWhenSensorVisible(true);
+         //%target = %player.getTarget();
+         //setTargetRenderMask(%target, getTargetRenderMask(%target) | 0x2);
+         //setTargetAlwaysVisMask(%target, 0x7);
       }
       %flag.isHome = false;
       $flagStatus = %client.name;

@@ -1782,6 +1782,11 @@ function LakRabbitGame::resetFlag(%game, %flag)
    %flag.carrier = "";
    $flagStatus = "<At Home>";
    %flag.hide(false);
+   
+	if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
+   {
+      setTargetSensorGroup(%flag.getTarget(), $NonRabbitTeam);
+   }
 
    cancel(%flag.searchSchedule);
    cancel(%game.updateFlagThread[%flag]); // z0dd - ZOD, 8/4/02. Cancel this flag's thread to KineticPoet's flag updater

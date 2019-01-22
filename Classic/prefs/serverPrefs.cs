@@ -1386,4 +1386,4 @@ $Host::useCustomSkins = 1;
 $Host::VotePassPercent = "60";
 $Host::VoteSpread = 20;
 $Host::VoteTime = "45";
-$Host::warmupTime = "20";
+$Host::warmupTime = "15";

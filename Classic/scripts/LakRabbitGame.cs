@@ -11,6 +11,7 @@
 //Sounds for regular & special hits
 //Points based on difficulty, speed, and distance
 //Duel Mode forces rabbit to fight and rewards for killing
+//Stand and fight to get the most points.
 //--- GAME RULES END ---
 
 // Thanks for helping me test!
@@ -19,11 +20,10 @@
 // v3.33 January 2019
 // Took out slap headshot.
 // Added footnotes for voting references with evo admin mod.
-// An improved Flag-Waypoint
+// An improved Flag-Waypoint.
 //
 // v3.32 December 2018
 // Fixed an issue with lak vote items in the Evo Admin Votemenu
-// Took out waypoint sound.
 //
 // v3.31 October 2018
 // Adjusted the flag updater code so its more like the way it was. A little harder to catch. Down from 10 times a second to 2.
@@ -113,9 +113,9 @@
 
 // Vars:
 // $Host::ShowFlagIcon
-//   0 - Don't show
-//   1 - Scope when sensor visible
-//   2 - Do not scope when sensor visible
+//   0 - Don't show any
+//   1 - Show flag icon when flag dropped only
+//   2 - Show flag icon on rabbit
 //
 // $Host::LakRabbitPubPro
 //   0 - Disable LakPro features
@@ -150,9 +150,9 @@ function Flag::objectiveInit(%data, %flag)
    %flag.rotate = true;
 
    // ilys -- add the icon to the flag
-   if($Host::ShowFlagIcon == 1)
+   if( $Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2 )
    {
-      %flag.scopeWhenSensorVisible(false);
+      %flag.scopeWhenSensorVisible(true);
       setTargetSensorGroup(%flag.getTarget(), $NonRabbitTeam);
       setTargetRenderMask(%flag.getTarget(), getTargetRenderMask(%flag.getTarget()) | 0x2);
       setTargetAlwaysVisMask(%flag.getTarget(), 0x7);
@@ -455,6 +455,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 					Game.playerDroppedFlag(%targetObject);
 					//Added so cloak is turned off when slapped.
 					%targetObject.setCloaked(false);
+					%targetObject.freeDJ = 1;
 				}
 				if(%sourceObject.holdingFlag && Game.duelMode)
 				{
@@ -1533,16 +1534,17 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
    if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
    {
       setTargetSensorGroup(%flag.getTarget(), $Observer);
-      %player.scopeWhenSensorVisible(false);
+      %player.scopeWhenSensorVisible(true);
       %target = %player.getTarget();
       setTargetRenderMask(%target, getTargetRenderMask(%target) & ~0x2);
       setTargetAlwaysVisMask(%target, (1 << getTargetSensorGroup(%target)));
    }
 
-   if($Host::ShowFlagIcon == 1)
-      %flag.scopeWhenSensorVisible(true);
-   else if($Host::ShowFlagIcon == 2)
-      %flag.scopeWhenSensorVisible(false);
+   //just always true
+   //if( $Host::ShowFlagIcon == 1 )
+      //%flag.scopeWhenSensorVisible(true);
+   //else if($Host::ShowFlagIcon == 2)
+      //%flag.scopeWhenSensorVisible(false);
 
    // borlak -- throw the flag, don't just drop it like dead weight
    // v3.1 -- in duel mode, make flag bounce up always, even if player isn't moving.. more midair grabs
@@ -1692,13 +1694,13 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
       cancel(%flag.returnThread);
       %flag.hide(true);
       // ilys -- add flag icon to player
-      if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
+      if( $Host::ShowFlagIcon == 2 )
       {
-         //setTargetSensorGroup(%flag.getTarget(), $RabbitTeam);
-         //%player.scopeWhenSensorVisible(true);
-         //%target = %player.getTarget();
-         //setTargetRenderMask(%target, getTargetRenderMask(%target) | 0x2);
-         //setTargetAlwaysVisMask(%target, 0x7);
+         setTargetSensorGroup(%flag.getTarget(), $RabbitTeam);
+         %player.scopeWhenSensorVisible(true);
+         %target = %player.getTarget();
+         setTargetRenderMask(%target, getTargetRenderMask(%target) | 0x2);
+         setTargetAlwaysVisMask(%target, 0x7);
       }
       %flag.isHome = false;
       $flagStatus = %client.name;
@@ -1783,7 +1785,8 @@ function LakRabbitGame::resetFlag(%game, %flag)
    $flagStatus = "<At Home>";
    %flag.hide(false);
    
-	if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
+   //so flag turns back green
+   if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
    {
       setTargetSensorGroup(%flag.getTarget(), $NonRabbitTeam);
    }
@@ -2278,8 +2281,7 @@ function LakRabbitGame::showRabbitWaypoint(%game, %clRabbit)
       %cl.sendTargetTo(%cl, true);
 
       //send the "waypoint is here sound"
-	  //took out -choco
-      //messageClient(%cl, 'MsgRabbitWaypoint', '~wfx/misc/target_waypoint.wav');
+      messageClient(%cl, 'MsgRabbitWaypoint', '~wfx/misc/target_waypoint.wav');
    }
 
    //schedule the time to hide the waypoint

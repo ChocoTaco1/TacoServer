@@ -85,7 +85,7 @@ function ResetTeamBalanceNotifyGameOver( %game )
 //2 or more difference
 function StatsUnbalanceSound()
 {
-	if( $Team1Difference >= 2 || $Team2Difference >= 2 )
+	if( $CurrentMissionType !$= "LakRabbit" && $Team1Difference >= 2 || $Team2Difference >= 2 )
 		{				
 			//Added so the notification wont sound between the 5 sec interval of get counts and the 30 sec unbalanced notification when someone switches at the last minute before a check.
 			if( !$GetCountsClientTeamChange )

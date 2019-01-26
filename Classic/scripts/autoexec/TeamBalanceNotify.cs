@@ -25,33 +25,28 @@ function TeamBalanceNotify( %game, %client, %respawn )
 				
 			if( %Team1Difference >= 2 || %Team2Difference >= 2 )
 			{
+				if( $UnbalancedMsgPlayed !$= 1 && %Team2Difference == 2 || %Team1Difference == 2 ) 
+				{
+					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.');
+					//Once per cycle.
+					$UnbalancedMsgPlayed = 1;
+					//Reset Stats.
+					$StatsMsgPlayed = 0;					
+				}
+				//Stats Aspect. 3 or more difference gets a stats notify. 				
+				else if( $StatsMsgPlayed !$= 1)
+				{
+					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+					//Run once.
+					$StatsMsgPlayed = 1;
+				}
+				//Start Sound Schedule for 30 secs
 				if( $StatsBalancedSoundPlayed !$= 1 )
 				{
-					if( $UnbalancedMsgPlayed !$= 1 && %Team2Difference == 2 || %Team1Difference == 2 ) 
-					{
-						messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.');
-						//Once per cycle.
-						$UnbalancedMsgPlayed = 1;
-						//Reset Stats.
-						$StatsMsgPlayed = 0;					
-					}
-					//Stats Aspect. 3 or more difference gets a stats notify. 				
-					else if( $StatsMsgPlayed !$= 1)
-					{
-						messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-						//Run once.
-						$StatsMsgPlayed = 1;
-					}
-
-					//Called in 30 secs with sound
 					schedule(30000, 0, "StatsUnbalanceSound");
 					//Once per cycle.
 					$StatsBalancedSoundPlayed = 1;
 				}
-			}
-			else if( $PlayerCount[1] !$= $PlayerCount[2] )
-			{
-				$StatsBalancedSoundPlayed = 0;
 			}
 		}
 		//If teams are balanced and teams dont equal 0.		
@@ -85,22 +80,16 @@ function ResetTeamBalanceNotifyGameOver( %game )
 //2 or more difference
 function StatsUnbalanceSound()
 {
-	if( $CurrentMissionType !$= "LakRabbit" && $Team1Difference >= 2 || $Team2Difference >= 2 )
-		{				
-			//Added so the notification wont sound between the 5 sec interval of get counts and the 30 sec unbalanced notification when someone switches at the last minute before a check.
-			if( !$GetCountsClientTeamChange )
-			{
-				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.~wfx/misc/bounty_objrem2.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-				//Called in 30 secs with sound
-				schedule(30000, 0, "StatsUnbalanceSound");
-			}
-			else
-				//In the event that a player switches up instead of down during an interval the function can be called again.
-				schedule(5000, 0, "StatsUnbalanceSound");
-		}
-	else
+	if( $CurrentMissionType !$= "LakRabbit" && $Team1Difference >= 2 || $Team2Difference >= 2 && $Host::EnableTeamBalanceNotify && $StatsBalancedSoundPlayed $= 1 && !$GetCountsClientTeamChange )
+	{				
+		messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.~wfx/misc/bounty_objrem2.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+		schedule(30000, 0, "StatsUnbalanceSound");
+	}
+	else if( $PlayerCount[1] !$= $PlayerCount[2] )
 	{
 		$StatsBalancedSoundPlayed = 0;
-		return;
+		$UnbalancedMsgPlayed = 0;
+		$StatsMsgPlayed = 0;
 	}
+
 }

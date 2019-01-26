@@ -65,17 +65,14 @@ function GetTeamCounts( %game, %client, %respawn )
 			
 		
 		//Start Base Rape Notify
-		NBRStatusNotify( %game, %client, %respawn );
-
+		schedule(1000, 0, "NBRStatusNotify");
 		//Call Team Balance Notify
-		TeamBalanceNotify( %game, %client, %respawn );
-
-		//AntiCloak Start	
-		ActivateAntiCloak();
-			
+		schedule(2000, 0, "TeamBalanceNotify");
+		//AntiCloak Start
+		schedule(3000, 0, "ActivateAntiCloak");
+		
 		//Set so counter wont run when it doesnt need to.
 		$GetCountsClientTeamChange = false;
-		
 	}
 		
 	//Call itself again. Every 5 seconds.
@@ -84,7 +81,7 @@ function GetTeamCounts( %game, %client, %respawn )
 
 //Run at DefaultGame::clientJoinTeam, DefaultGame::clientChangeTeam, DefaultGame::assignClientTeam in evo defaultgame.ovl
 //Also Run at DefaultGame::onClientEnterObserverMode, DefaultGame::AIChangeTeam, DefaultGame::onClientLeaveGame, DefaultGame::forceObserver in evo defaultgame.ovl
-//And finally GameConnection::onConnect in evo server.ovl and CTFGame::flagCap in evo CTFGame.ovl
+//And finally GameConnection::onConnect in evo server.ovl
 //Added so the bulk of GetCounts doesnt run when it doesnt need to causing unnecessary latency that may or may not have existed, but probably is good practice.
 //GetCounts still runs every 5 seconds as it did, but whether or not someone has changed teams, joined obs, left, etc etc will decide whether or not the bulk of it runs.
 

@@ -419,3 +419,15 @@ addRotationMap("Blink", sctf, 1, 1);
 //addRotationMap("Trident", Siege, 1, 1);
 //addRotationMap("Alcatraz", Siege, 1, 1);
 
+
+
+
+// ************************
+// * DM Maps *
+// ************************
+
+addRotationMap("RaspDM", DM, 1, 1);
+//addRotationMap("Mac_FlagArena", DM, 1, 1);
+addRotationMap("ArenaDomeDM", DM, 1, 1);
+//addRotationMap("SmallCrossingLT", DM, 1, 1);
+//addRotationMap("MiniSunDried", DM, 1, 1);

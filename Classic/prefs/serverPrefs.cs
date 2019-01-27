@@ -57,6 +57,7 @@ $Host::DefenseTurret::MaxWptHeight = 10;
 $Host::DefenseTurret::Optional = 0;
 $Host::DefenseTurret::RequiredInTourney = 0;
 $Host::Discord = "https://t2discord.tk";
+$Host::DMSLOnlyMode = 0;
 $Host::EmptyServerReset = 0;
 $Host::EnableLakUnlimitedDJ = 1;
 $Host::EnableMortarTurret = 0;

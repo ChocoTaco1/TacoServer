@@ -19,12 +19,9 @@ $InvBanList[DM, "PlasmaBarrelPack"] = 1;
 $InvBanList[DM, "AABarrelPack"] = 1;
 $InvBanList[DM, "MissileBarrelPack"] = 1;
 $InvBanList[DM, "AmmoPack"] = 1;
-$InvBanList[DM, "CloakingPack"] = 1;
 $InvBanList[DM, "MotionSensorDeployable"] = 1;
 $InvBanList[DM, "PulseSensorDeployable"] = 1;
 $InvBanList[DM, "CameraGrenade"] = 1;
-
-$Host::DMSLOnlyMode = 0;
 
 function DMGame::setUpTeams(%game)
 {  
@@ -481,6 +478,35 @@ function deployMineCheck(%mineObj, %player)
 	schedule(2000, %mineObj, "explodeMine", %mineObj, true);
 }
 
+function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
+{
+      if(!isObject(%targetObject) && !isObject(%projectile.sourceObject))
+         return;
+      if(!(%targetObject.getType() & ($TypeMasks::StaticTSObjectType | $TypeMasks::InteriorObjectType | 
+                                      $TypeMasks::TerrainObjectType | $TypeMasks::WaterObjectType)))
+      {
+         if(%projectile.sourceObject.team !$= %targetObject.team)
+         {
+            if(%targetObject.getDataBlock().getClassName() $= "PlayerData" && %data.getName() $= "DiscProjectile")
+            {
+	         %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType; 
+	         %start = %targetObject.getWorldBoxCenter();
+               %distance = mFloor(VectorDist(%start, %projectile.initialPosition));
+	         %end = getWord(%start, 0) SPC getWord(%start, 1) SPC getWord(%start, 2) - 15;
+	         %grounded = ContainerRayCast(%start, %end, %mask, 0);
+               if(!%grounded)
+               {
+                  //%projectile.sourceObject.client.scoreMidAir++;
+                  messageClient(%projectile.sourceObject.client, 'MsgMidAir', '\c0You hit a successful mid air shot.~wfx/misc/bounty_bonus.wav', %data.radiusDamageType, %distance);
+                  messageTeamExcept(%projectile.sourceObject.client, 'MsgMidAir', '\c5%1 hit a mid air shot.', %projectile.sourceObject.client.name, %data.radiusDamageType, %distance);
+                  //Game.recalcScore(%projectile.sourceObject.client);
+               }
+            }
+         }
+         Parent::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal);
+      }
+}
+
 };
 
 function DMGame::sendGameVoteMenu(%game, %client, %key)
@@ -538,17 +564,17 @@ function DMGame::DMSLOnlyMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 		{
 			killeveryone();
 
-			if(%game.DMSLOnlyMode)
+			if( $Host::DMSLOnlyMode )
 			{
 				messageAll('MsgAdminForce', '\c2The Admin has disabled Shocklance Only Mode.');
-			
-				%game.DMSLOnlyMode = false;
+				
+				$Host::DMSLOnlyMode = false;
 			}
 			else
 			{
 				messageAll('MsgAdminForce', '\c2The Admin has enabled Shocklance Only Mode.');
-			
-				%game.DMSLOnlyMode = true;
+				
+				$Host::DMSLOnlyMode = true;
 			}
 		}
 		else 
@@ -558,24 +584,22 @@ function DMGame::DMSLOnlyMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 			{
 				killeveryone();
 
-				if(%game.DMSLOnlyMode)
+				if( $Host::DMSLOnlyMode )
 				{
 					messageAll('MsgVotePassed', '\c2Shocklance Only Mode Disabled.');
-			
-					%game.DMSLOnlyMode = false;
+					
+					$Host::DMSLOnlyMode = false;
 				}
 				else
 				{
 					messageAll('MsgVotePassed', '\c2Shocklance Only Mode Enabled.');
-			
-					%game.DMSLOnlyMode = true;
+					
+					$Host::DMSLOnlyMode = true;
 				}
 			}
 			else
 				messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100)); 
 		}
-
-		$Host::DMSLOnlyMode = %game.DMSLOnlyMode;
 	}
 }
 // For voting to work properly - evo admin.ovl

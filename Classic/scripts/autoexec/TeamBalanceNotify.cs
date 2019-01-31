@@ -48,6 +48,12 @@ function TeamBalanceNotify( %game, %client, %respawn )
 					$StatsBalancedSoundPlayed = 1;
 				}
 			}
+			else
+			{
+				$UnbalancedMsgPlayed = 0;
+				$StatsMsgPlayed = 0;
+				$StatsBalancedSoundPlayed = 0;
+			}
 		}
 		//If teams are balanced and teams dont equal 0.		
 		else if( $PlayerCount[1] == $PlayerCount[2] && $TotalTeamPlayerCount !$= 0 && $BalancedMsgPlayed !$= 1 )
@@ -85,11 +91,4 @@ function StatsUnbalanceSound()
 		messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.~wfx/misc/bounty_objrem2.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
 		schedule(30000, 0, "StatsUnbalanceSound");
 	}
-	else if( $PlayerCount[1] !$= $PlayerCount[2] )
-	{
-		$StatsBalancedSoundPlayed = 0;
-		$UnbalancedMsgPlayed = 0;
-		$StatsMsgPlayed = 0;
-	}
-
 }

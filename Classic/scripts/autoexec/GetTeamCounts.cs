@@ -1,6 +1,6 @@
 // GetCounts was made to accurately keep track of how many players
 // are on teams, on the server, on each team, spectator, etc.
-// It runs every 5 seconds.
+// It runs every 2.5 seconds.
 // It has since evolved into the place to inject other services
 // and aspects within the server.
 // 
@@ -65,25 +65,25 @@ function GetTeamCounts( %game, %client, %respawn )
 			
 		
 		//Start Base Rape Notify
-		schedule(1000, 0, "NBRStatusNotify");
-		//Call Team Balance Notify
-		schedule(2000, 0, "TeamBalanceNotify");
-		//AntiCloak Start
-		schedule(3000, 0, "ActivateAntiCloak");
+		schedule(500, 0, "NBRStatusNotify");
+		//Start Team Balance Notify
+		schedule(1000, 0, "TeamBalanceNotify");
+		//Start AntiCloak
+		schedule(1500, 0, "ActivateAntiCloak");
 		
 		//Set so counter wont run when it doesnt need to.
 		$GetCountsClientTeamChange = false;
 	}
 		
-	//Call itself again. Every 5 seconds.
-	schedule(5000, 0, "GetTeamCounts");	
+	//Call itself again. Every 2.5 seconds.
+	schedule(2500, 0, "GetTeamCounts");	
 }
 
 //Run at DefaultGame::clientJoinTeam, DefaultGame::clientChangeTeam, DefaultGame::assignClientTeam in evo defaultgame.ovl
 //Also Run at DefaultGame::onClientEnterObserverMode, DefaultGame::AIChangeTeam, DefaultGame::onClientLeaveGame, DefaultGame::forceObserver in evo defaultgame.ovl
 //And finally GameConnection::onConnect in evo server.ovl
 //Added so the bulk of GetCounts doesnt run when it doesnt need to causing unnecessary latency that may or may not have existed, but probably is good practice.
-//GetCounts still runs every 5 seconds as it did, but whether or not someone has changed teams, joined obs, left, etc etc will decide whether or not the bulk of it runs.
+//GetCounts still runs every 2.5 seconds as it did, but whether or not someone has changed teams, joined obs, left, etc etc will decide whether or not the bulk of it runs.
 
 //Let GetTeamCounts run if there is a Teamchange.
 function ResetClientChangedTeams() 

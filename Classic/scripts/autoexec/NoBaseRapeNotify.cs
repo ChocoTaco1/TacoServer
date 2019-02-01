@@ -41,7 +41,24 @@ function ResetNBRNotify()
 //Plays a sound when a player hits a protected asset
 function NBRAssetSound( %game, %sourceObject )
 {
-	messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '~wfx/misc/diagnostic_beep.wav');
+	%client = %sourceObject;
+	
+	//messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '~wfx/misc/diagnostic_beep.wav');
+	if( !%client.NBRAssetSoundMsgPlayed )
+	{
+		messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '\c2No Base Rape is enabled until %1 players.', $Host::EvoNoBaseRapeClassicPlayerCount );
+	
+		%client.NBRAssetSoundMsgPlayed = true;
+		//$NBRAssetSoundMsgPlayed = %sourceObject.client.NBRAssetSoundMsgPlayed;	
+		schedule(5000, 0, "ResetNBRAssetSound", %client );
+	}
+}
+
+//Cool down between messeges
+function ResetNBRAssetSound( %client )
+{
+	//%sourceObject.client.NBRAssetSoundMsgPlayed = $NBRAssetSoundMsgPlayed;
+	%client.NBRAssetSoundMsgPlayed = false;
 }
 
 

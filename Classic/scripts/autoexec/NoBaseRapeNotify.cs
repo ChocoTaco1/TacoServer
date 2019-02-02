@@ -50,7 +50,7 @@ function NBRAssetSound( %game, %sourceObject )
 	
 		%client.NBRAssetSoundMsgPlayed = true;
 		//$NBRAssetSoundMsgPlayed = %sourceObject.client.NBRAssetSoundMsgPlayed;	
-		schedule(5000, 0, "ResetNBRAssetSound", %client );
+		schedule(10000, 0, "ResetNBRAssetSound", %client );
 	}
 }
 

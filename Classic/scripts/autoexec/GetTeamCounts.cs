@@ -20,6 +20,8 @@ function CreateServer( %mission, %missionType )
 
 	//Make sure teamchange variable is set
 	ResetClientChangedTeams();
+	//Set NBR notify varibles
+	ResetNBRNotify();
 	//Whether the server auto restarts when empty or not
 	$Host::Dedicated = $Host::EmptyServerReset;
 }

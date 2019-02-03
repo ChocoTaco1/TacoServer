@@ -3,7 +3,7 @@
 //
 
 //Notifys the user if NoBase rape is on or off.
-function NBRStatusNotify( %game, %client, %respawn )
+function NBRStatusNotify( %game )
 {	
 	if( $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled )
 	{
@@ -15,16 +15,7 @@ function NBRStatusNotify( %game, %client, %respawn )
 		{
 			if( $NoBaseRapeNotifyCount !$= 0 )
 			{
-				//Added so you dont get a sound first time every map.
-				if( $NoBaseRapeNotifyFirst !$= 1)
-				{
-					messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Enabled.');
-					$NoBaseRapeNotifyFirst = 1;
-				}
-				//Each corresponding time per map will get a sound.
-				else
-					messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Enabled.~wfx/misc/nexus_cap.wav');
-				
+				messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Enabled.');
 				$NoBaseRapeNotifyCount = 0;
 			}
 		}
@@ -32,9 +23,7 @@ function NBRStatusNotify( %game, %client, %respawn )
 		else if( $NoBaseRapeNotifyCount !$= 1 )
 		{
 			messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Disabled.~wfx/misc/diagnostic_on.wav');
-			
 			$NoBaseRapeNotifyCount = 1;
-			$NoBaseRapeNotifyFirst = 1;
 		}
 	}
 }
@@ -44,7 +33,6 @@ function NBRStatusNotify( %game, %client, %respawn )
 function ResetNBRNotify()
 {
 	$NoBaseRapeNotifyCount = -1;
-	$NoBaseRapeNotifyFirst = -1;
 }
 
 //This function is at StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)
@@ -54,13 +42,11 @@ function NBRAssetSound( %game, %sourceObject )
 {
 	%client = %sourceObject;
 	
-	//messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '~wfx/misc/diagnostic_beep.wav');
 	if( !%client.NBRAssetSoundMsgPlayed )
 	{
 		messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '\c2No Base Rape is enabled until %1 players.', $Host::EvoNoBaseRapeClassicPlayerCount );
 	
 		%client.NBRAssetSoundMsgPlayed = true;
-		//$NBRAssetSoundMsgPlayed = %sourceObject.client.NBRAssetSoundMsgPlayed;	
 		schedule(10000, 0, "ResetNBRAssetSound", %client );
 	}
 }
@@ -68,7 +54,6 @@ function NBRAssetSound( %game, %sourceObject )
 //Cool down between messeges
 function ResetNBRAssetSound( %client )
 {
-	//%sourceObject.client.NBRAssetSoundMsgPlayed = $NBRAssetSoundMsgPlayed;
 	%client.NBRAssetSoundMsgPlayed = false;
 }
 

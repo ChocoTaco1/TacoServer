@@ -1,6 +1,6 @@
 // GetCounts was made to accurately keep track of how many players
 // are on teams, on the server, on each team, spectator, etc.
-// It runs every 2.5 seconds.
+// It runs every 5 seconds.
 // It has since evolved into the place to inject other services
 // and aspects within the server.
 // 
@@ -20,8 +20,6 @@ function CreateServer( %mission, %missionType )
 
 	//Make sure teamchange variable is set
 	ResetClientChangedTeams();
-	//Set NBR notify varibles
-	ResetNBRNotify();
 	//Whether the server auto restarts when empty or not
 	$Host::Dedicated = $Host::EmptyServerReset;
 }
@@ -64,28 +62,31 @@ function GetTeamCounts( %game, %client, %respawn )
 		$TotalTeamPlayerCount = $PlayerCount[1] + $PlayerCount[2];
 		//Amount of all players including observers
 		$AllPlayerCount = $PlayerCount[1] + $PlayerCount[2] + $PlayerCount[0];
+		//Difference Variables
+		$Team1Difference = $PlayerCount[1] - $PlayerCount[2];
+		$Team2Difference = $PlayerCount[2] - $PlayerCount[1];
 			
 		
 		//Start Base Rape Notify
-		schedule(500, 0, "NBRStatusNotify");
+		schedule(500, 0, "NBRStatusNotify", %game);
 		//Start Team Balance Notify
-		schedule(1000, 0, "TeamBalanceNotify");
+		schedule(1000, 0, "TeamBalanceNotify", %game);
 		//Start AntiCloak
-		schedule(1500, 0, "ActivateAntiCloak");
+		schedule(1500, 0, "ActivateAntiCloak", %game);
 		
 		//Set so counter wont run when it doesnt need to.
 		$GetCountsClientTeamChange = false;
 	}
 		
-	//Call itself again. Every 2.5 seconds.
-	schedule(2500, 0, "GetTeamCounts");	
+	//Call itself again. Every 5 seconds.
+	schedule(5000, 0, "GetTeamCounts");	
 }
 
 //Run at DefaultGame::clientJoinTeam, DefaultGame::clientChangeTeam, DefaultGame::assignClientTeam in evo defaultgame.ovl
 //Also Run at DefaultGame::onClientEnterObserverMode, DefaultGame::AIChangeTeam, DefaultGame::onClientLeaveGame, DefaultGame::forceObserver in evo defaultgame.ovl
 //And finally GameConnection::onConnect in evo server.ovl
 //Added so the bulk of GetCounts doesnt run when it doesnt need to causing unnecessary latency that may or may not have existed, but probably is good practice.
-//GetCounts still runs every 2.5 seconds as it did, but whether or not someone has changed teams, joined obs, left, etc etc will decide whether or not the bulk of it runs.
+//GetCounts still runs every 5 seconds as it did, but whether or not someone has changed teams, joined obs, left, etc etc will decide whether or not the bulk of it runs.
 
 //Let GetTeamCounts run if there is a Teamchange.
 function ResetClientChangedTeams() 

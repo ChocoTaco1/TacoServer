@@ -42,7 +42,7 @@ function NBRAssetSound( %game, %sourceObject )
 {
 	%client = %sourceObject;
 	
-	if( !%client.NBRAssetSoundMsgPlayed )
+	if( !%client.NBRAssetSoundMsgPlayed && $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled )
 	{
 		messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '\c2No Base Rape is enabled until %1 players.', $Host::EvoNoBaseRapeClassicPlayerCount );
 	

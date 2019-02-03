@@ -48,16 +48,13 @@ function GetTeamCounts( %game, %client, %respawn )
 			%client = ClientGroup.getObject(%i);
     
 			//if(!%client.isAIControlled())
-				$PlayerCount[%client.team]++;
+			$PlayerCount[%client.team]++;
 		}
 		
-		//echo ("Clientgroup " @ ClientGroup.getCount());
 		//echo ("$PlayerCount[0] " @  $PlayerCount[0]);
 		//echo ("$PlayerCount[1] " @  $PlayerCount[1]);
 		//echo ("$PlayerCount[2] " @  $PlayerCount[2]);
-		//echo ("client.team " @ %client.team);
-		
-		//Other variables
+
 		//Amount of players on teams
 		$TotalTeamPlayerCount = $PlayerCount[1] + $PlayerCount[2];
 		//Amount of all players including observers
@@ -65,12 +62,11 @@ function GetTeamCounts( %game, %client, %respawn )
 		//Difference Variables
 		$Team1Difference = $PlayerCount[1] - $PlayerCount[2];
 		$Team2Difference = $PlayerCount[2] - $PlayerCount[1];
-			
 		
 		//Start Base Rape Notify
 		schedule(500, 0, "NBRStatusNotify", %game);
 		//Start Team Balance Notify
-		schedule(1000, 0, "TeamBalanceNotify", %game);
+		schedule(1000, 0, "TeamBalanceNotify", %game, %client, %respawn );
 		//Start AntiCloak
 		schedule(1500, 0, "ActivateAntiCloak", %game);
 		

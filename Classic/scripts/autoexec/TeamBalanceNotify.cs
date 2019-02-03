@@ -3,18 +3,10 @@
 //
 //Give the client a notification on the current state of balancing.
 //This function is in GetTeamCounts.cs
-function TeamBalanceNotify( %game, %client, %respawn )
+function TeamBalanceNotify( %game )
 {	
 	if( $CurrentMissionType !$= "LakRabbit" && $TotalTeamPlayerCount !$= 0 && $Host::EnableTeamBalanceNotify )
-	{
-		//variables
-		%Team1Difference = $PlayerCount[1] - $PlayerCount[2];
-		%Team2Difference = $PlayerCount[2] - $PlayerCount[1];
-		//Make Global
-		$Team1Difference = %Team1Difference;
-		$Team2Difference = %Team2Difference;
-
-	
+	{	
 		//echo ("%Team1Difference " @ %Team1Difference);
 		//echo ("%Team2Difference " @ %Team2Difference);
 
@@ -23,36 +15,16 @@ function TeamBalanceNotify( %game, %client, %respawn )
 			//Uneven. Reset Balanced.
 			$BalancedMsgPlayed = 0;
 				
-			if( %Team1Difference >= 2 || %Team2Difference >= 2 )
-			{
-				if( $UnbalancedMsgPlayed !$= 1 && %Team2Difference == 2 || %Team1Difference == 2 ) 
+			if( $Team1Difference >= 2 || $Team2Difference >= 2 )
+			{				
+				if( $StatsMsgPlayed !$= 1)
 				{
-					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced.');
-					//Once per cycle.
-					$UnbalancedMsgPlayed = 1;
-					//Reset Stats.
-					$StatsMsgPlayed = 0;					
-				}
-				//Stats Aspect. 3 or more difference gets a stats notify. 				
-				else if( $StatsMsgPlayed !$= 1)
-				{
-					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
 					//Run once.
 					$StatsMsgPlayed = 1;
+					//Start Sound Schedule for 60 secs
+					schedule(60000, 0, "StatsUnbalanceSound", %game);
 				}
-				//Start Sound Schedule for 30 secs
-				if( $StatsBalancedSoundPlayed !$= 1 )
-				{
-					schedule(30000, 0, "StatsUnbalanceSound");
-					//Once per cycle.
-					$StatsBalancedSoundPlayed = 1;
-				}
-			}
-			else
-			{
-				$UnbalancedMsgPlayed = 0;
-				$StatsMsgPlayed = 0;
-				$StatsBalancedSoundPlayed = 0;
 			}
 		}
 		//If teams are balanced and teams dont equal 0.		
@@ -61,34 +33,35 @@ function TeamBalanceNotify( %game, %client, %respawn )
 				//messageAll('MsgTeamBalanceNotify', '\c1Teams are balanced.');
 				//Once per cycle.
 				$BalancedMsgPlayed = 1;
-				//Reset unbalanced.				
-				$UnbalancedMsgPlayed = 0;
 				//Reset Stats.
 				$StatsMsgPlayed = 0;
-				//Reset Stats with sound.
-				$StatsBalancedSoundPlayed = 0;
 		}
 	}
 }
 
 //Reset Notify at defaultgame::gameOver in evo defaultgame.ovl
-function ResetTeamBalanceNotifyGameOver( %game ) 
+function ResetTeamBalanceNotifyGameOver() 
 {
 	//Reset All TeamBalance Variables
 	$BalancedMsgPlayed = -1;
-	$UnbalancedMsgPlayed = -1;
 	$StatsMsgPlayed = -1;
-	$StatsBalancedSoundPlayed = -1;
 }
 
-//Stats with Sound
 //Called every 30 seconds
 //2 or more difference
-function StatsUnbalanceSound()
+function StatsUnbalanceSound( %game )
 {
-	if( $CurrentMissionType !$= "LakRabbit" && $Team1Difference >= 2 || $Team2Difference >= 2 && $Host::EnableTeamBalanceNotify && $StatsBalancedSoundPlayed $= 1 && !$GetCountsClientTeamChange )
+	if( $CurrentMissionType !$= "LakRabbit" && $Host::EnableTeamBalanceNotify && $StatsMsgPlayed $= 1 )
 	{				
-		messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0It is currently %1 vs %2 with %3 observers.~wfx/misc/bounty_objrem2.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-		schedule(30000, 0, "StatsUnbalanceSound");
+		if( $Team1Difference == 1 || $Team2Difference == 1 || $PlayerCount[1] == $PlayerCount[2] )
+		{
+			$StatsMsgPlayed = 0;
+			return;
+		}
+		else if( $Team1Difference >= 2 || $Team2Difference >= 2 )
+		{
+			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.~wgui/vote_nopass.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+			schedule(30000, 0, "StatsUnbalanceSound", %game);
+		}
 	}
 }

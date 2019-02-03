@@ -3,9 +3,9 @@
 //
 //Give the client a notification on the current state of balancing.
 //This function is in GetTeamCounts.cs
-function TeamBalanceNotify( %game )
+function TeamBalanceNotify( %game, %client, %respawn )
 {	
-	if( $CurrentMissionType !$= "LakRabbit" && $TotalTeamPlayerCount !$= 0 && $Host::EnableTeamBalanceNotify )
+	if( $CurrentMissionType !$= "LakRabbit" && $TotalTeamPlayerCount !$= 0 && $Host::EnableTeamBalanceNotify && !$Host::TournamentMode )
 	{	
 		//echo ("%Team1Difference " @ %Team1Difference);
 		//echo ("%Team2Difference " @ %Team2Difference);
@@ -19,11 +19,10 @@ function TeamBalanceNotify( %game )
 			{				
 				if( $StatsMsgPlayed !$= 1)
 				{
-					messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
 					//Run once.
 					$StatsMsgPlayed = 1;
 					//Start Sound Schedule for 60 secs
-					schedule(60000, 0, "StatsUnbalanceSound", %game);
+					schedule(15000, 0, "StatsUnbalanceSound", %game, %client, %respawn );
 				}
 			}
 		}
@@ -47,11 +46,11 @@ function ResetTeamBalanceNotifyGameOver()
 	$StatsMsgPlayed = -1;
 }
 
-//Called every 30 seconds
-//2 or more difference
-function StatsUnbalanceSound( %game )
+//Check to see if teams are still unbalanced
+//Fire AutoBalance in 30 sec
+function StatsUnbalanceSound( %game, %client, %respawn )
 {
-	if( $CurrentMissionType !$= "LakRabbit" && $Host::EnableTeamBalanceNotify && $StatsMsgPlayed $= 1 )
+	if( $CurrentMissionType !$= "LakRabbit" && $Host::EnableTeamBalanceNotify && $StatsMsgPlayed $= 1 && !$Host::TournamentMode )
 	{				
 		if( $Team1Difference == 1 || $Team2Difference == 1 || $PlayerCount[1] == $PlayerCount[2] )
 		{
@@ -60,8 +59,8 @@ function StatsUnbalanceSound( %game )
 		}
 		else if( $Team1Difference >= 2 || $Team2Difference >= 2 )
 		{
-			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.~wgui/vote_nopass.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-			schedule(30000, 0, "StatsUnbalanceSound", %game);
+			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance Initializing.~wgui/vote_nopass.wav');
+			schedule(30000, 0, "Autobalance", %game, %client, %respawn);
 		}
 	}
 }

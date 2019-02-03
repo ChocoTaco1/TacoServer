@@ -4,7 +4,7 @@
 // $Host::AntiCloakPlayerCount = 6;
 
 // Called in GetCounts.cs
-function ActivateAntiCloak()
+function ActivateAntiCloak( %game )
 {
 	//CTF only
 	if( $Host::AntiCloakEnable && $CurrentMissionType $= "CTF" )

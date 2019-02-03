@@ -2,6 +2,10 @@
 //$Host::EnableNoBaseRapeNotify = 1;
 //
 //Notifys the user if NoBase rape is on or off.
+
+//Set First notify varible
+$NoBaseRapeNotifyFirst = 0;
+
 function NBRStatusNotify( %game, %client, %respawn )
 {	
 	if( $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled )
@@ -14,9 +18,20 @@ function NBRStatusNotify( %game, %client, %respawn )
 		{
 			if( $NoBaseRapeNotifyCount !$= 0 )
 			{
-			//messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Enabled.~wfx/misc/nexus_cap.wav');
-			messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Enabled.');
-			$NoBaseRapeNotifyCount = 0;
+				//Added so you dont get a sound first time every map.
+				if( $NoBaseRapeNotifyFirst !$= 1)
+				{
+					messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Enabled.');
+					$NoBaseRapeNotifyFirst = 1;
+				}
+				//Each corresponding time per map will get a sound.
+				else
+				{
+					messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Enabled.~wfx/misc/nexus_cap.wav');
+					//messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Enabled.');
+				}
+				
+				$NoBaseRapeNotifyCount = 0;
 			}
 		}
 		//Off
@@ -25,6 +40,7 @@ function NBRStatusNotify( %game, %client, %respawn )
 			//messageAll('MsgNoBaseRapeNotify', 'No Base Rape is \c1Disabled.~wfx/misc/diagnostic_on.wav');
 			messageAll('MsgNoBaseRapeNotify', '\c1No Base Rape: \c0Disabled.~wfx/misc/diagnostic_on.wav');
 			$NoBaseRapeNotifyCount = 1;
+			$NoBaseRapeNotifyFirst = 1;
 		}
 	}
 }
@@ -34,6 +50,7 @@ function NBRStatusNotify( %game, %client, %respawn )
 function ResetNBRNotify()
 {
 	$NoBaseRapeNotifyCount = -1;
+	$NoBaseRapeNotifyFirst = 0;
 }
 
 //This function is at StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)

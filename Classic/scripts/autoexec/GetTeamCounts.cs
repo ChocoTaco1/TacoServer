@@ -38,6 +38,13 @@ function GetTeamCounts( %game, %client, %respawn )
 	//Get teamcounts
 	if( $GetCountsClientTeamChange && $countdownStarted && $MatchStarted ) 
 	{
+		//Generate random to get random client for autobalance
+		%team1random = 1;
+		%team2random = 1;
+		
+		%team1random = getRandom(1,$PlayerCount[1]);
+		%team2random = getRandom(1,$PlayerCount[2]);
+		
 		//Team Count code by Keen
 		$PlayerCount[0] = 0;
 		$PlayerCount[1] = 0;
@@ -47,6 +54,16 @@ function GetTeamCounts( %game, %client, %respawn )
 		{
 			%client = ClientGroup.getObject(%i);
     
+			//Pick a random client for autobalance
+			if( %client.team == 1 && %team1random == $PlayerCount[1] )
+				$team1canidate = %client;
+			else if( $team1canidate $= "" && %client.team == 1 )
+				$team1canidate = %client;
+			if( %client.team == 2 && %team2random == $PlayerCount[2] )
+				$team2canidate = %client;
+			else if( $team2canidate $= "" && %client.team == 2 )
+				$team2canidate = %client;
+			
 			//if(!%client.isAIControlled())
 			$PlayerCount[%client.team]++;
 		}

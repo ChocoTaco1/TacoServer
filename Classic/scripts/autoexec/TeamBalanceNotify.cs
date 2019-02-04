@@ -60,6 +60,8 @@ function StatsUnbalanceSound( %game, %client, %respawn )
 		else if( $Team1Difference >= 2 || $Team2Difference >= 2 )
 		{
 			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance Initializing.~wgui/vote_nopass.wav');
+			//Schedule a GetCounts update before the autobalance fire
+			schedule(22000, 0, "ResetClientChangedTeams");
 			schedule(30000, 0, "Autobalance", %game, %client, %respawn);
 		}
 	}

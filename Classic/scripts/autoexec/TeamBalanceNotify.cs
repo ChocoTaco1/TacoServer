@@ -3,7 +3,7 @@
 //
 //Give the client a notification on the current state of balancing.
 //This function is in GetTeamCounts.cs
-function TeamBalanceNotify( %game, %client, %respawn )
+function TeamBalanceNotify( %game )
 {	
 	if( $CurrentMissionType !$= "LakRabbit" && $TotalTeamPlayerCount !$= 0 && $Host::EnableTeamBalanceNotify && !$Host::TournamentMode )
 	{	
@@ -22,7 +22,7 @@ function TeamBalanceNotify( %game, %client, %respawn )
 					//Run once.
 					$StatsMsgPlayed = 1;
 					//Start Sound Schedule for 60 secs
-					schedule(15000, 0, "StatsUnbalanceSound", %game, %client, %respawn );
+					schedule(15000, 0, "StatsUnbalanceSound", %game );
 				}
 			}
 		}
@@ -48,7 +48,7 @@ function ResetTeamBalanceNotifyGameOver()
 
 //Check to see if teams are still unbalanced
 //Fire AutoBalance in 30 sec
-function StatsUnbalanceSound( %game, %client, %respawn )
+function StatsUnbalanceSound( %game )
 {
 	if( $CurrentMissionType !$= "LakRabbit" && $Host::EnableTeamBalanceNotify && $StatsMsgPlayed $= 1 && !$Host::TournamentMode )
 	{				
@@ -62,7 +62,7 @@ function StatsUnbalanceSound( %game, %client, %respawn )
 			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance Initializing.~wgui/vote_nopass.wav');
 			//Schedule a GetCounts update before the autobalance fire
 			schedule(22000, 0, "ResetClientChangedTeams");
-			schedule(30000, 0, "Autobalance", %game, %client, %respawn);
+			schedule(30000, 0, "Autobalance", %game );
 		}
 	}
 }

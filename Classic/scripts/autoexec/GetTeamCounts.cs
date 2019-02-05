@@ -39,11 +39,9 @@ function GetTeamCounts( %game, %client, %respawn )
 	if( $GetCountsClientTeamChange && $countdownStarted && $MatchStarted ) 
 	{
 		//Generate random to get random client for autobalance
-		%team1random = 1;
-		%team2random = 1;
-		
-		%team1random = getRandom(1,$PlayerCount[1]);
-		%team2random = getRandom(1,$PlayerCount[2]);
+		%team1random = getRandom(1,$PlayerCount[1]); if(%team1random $= 0 || %team1random > $PlayerCount[1]) %team1random = 1;
+		%team2random = getRandom(1,$PlayerCount[2]); if(%team2random $= 0 || %team2random > $PlayerCount[2]) %team2random = 1;
+		//echo("team1random " @ %team1random); echo("team2random " @ %team2random);
 		
 		//Team Count code by Keen
 		$PlayerCount[0] = 0;
@@ -55,14 +53,8 @@ function GetTeamCounts( %game, %client, %respawn )
 			%client = ClientGroup.getObject(%i);
     
 			//Pick a random client for autobalance
-			if( %client.team == 1 && %team1random == $PlayerCount[1] )
-				$team1canidate = %client;
-			else if( $team1canidate $= "" && %client.team == 1 )
-				$team1canidate = %client;
-			if( %client.team == 2 && %team2random == $PlayerCount[2] )
-				$team2canidate = %client;
-			else if( $team2canidate $= "" && %client.team == 2 )
-				$team2canidate = %client;
+			if( %client.team == 1 && %team1random == $PlayerCount[1] ) $team1canidate = %client;
+			if( %client.team == 2 && %team2random == $PlayerCount[2] ) $team2canidate = %client;
 			
 			//if(!%client.isAIControlled())
 			$PlayerCount[%client.team]++;
@@ -83,7 +75,7 @@ function GetTeamCounts( %game, %client, %respawn )
 		//Start Base Rape Notify
 		schedule(500, 0, "NBRStatusNotify", %game);
 		//Start Team Balance Notify
-		schedule(1000, 0, "TeamBalanceNotify", %game, %client, %respawn );
+		schedule(1000, 0, "TeamBalanceNotify", %game );
 		//Start AntiCloak
 		schedule(1500, 0, "ActivateAntiCloak", %game);
 		

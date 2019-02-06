@@ -23,6 +23,9 @@ function TeamBalanceNotify( %game )
 					$StatsMsgPlayed = 1;
 					//Start Sound Schedule for 60 secs
 					schedule(15000, 0, "StatsUnbalanceSound", %game );
+					//For accurate msg when autobalance is disabled
+					if( !$Host::EnableAutobalance )
+						schedule(9000, 0, "ResetClientChangedTeams");
 				}
 			}
 		}
@@ -47,7 +50,7 @@ function ResetTeamBalanceNotifyGameOver()
 }
 
 //Check to see if teams are still unbalanced
-//Fire AutoBalance in 30 sec
+//Fire AutoBalance in 30 sec if enabled
 function StatsUnbalanceSound( %game )
 {
 	if( $CurrentMissionType !$= "LakRabbit" && $Host::EnableTeamBalanceNotify && $StatsMsgPlayed $= 1 && !$Host::TournamentMode )
@@ -59,10 +62,20 @@ function StatsUnbalanceSound( %game )
 		}
 		else if( $Team1Difference >= 2 || $Team2Difference >= 2 )
 		{
-			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance Initializing.~wgui/vote_nopass.wav');
-			//Schedule a GetCounts update before the autobalance fire
-			schedule(22000, 0, "ResetClientChangedTeams");
-			schedule(30000, 0, "Autobalance", %game );
+			if( $Host::EnableAutobalance )
+			{
+				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance Initializing.~wgui/vote_nopass.wav');
+				//Schedule a GetCounts update before the autobalance fire
+				schedule(22000, 0, "ResetClientChangedTeams");
+				schedule(30000, 0, "Autobalance", %game );
+			}
+			//Disabled Autobalance messege
+			else
+			{
+				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.~wgui/vote_nopass.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+				schedule(15000, 0, "ResetClientChangedTeams");
+				schedule(13000, 0, "ResetTeamBalanceNotifyGameOver");
+			}
 		}
 	}
 }

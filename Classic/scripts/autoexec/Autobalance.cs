@@ -1,4 +1,10 @@
-//Fire Autobalance
+// Enable or Disable Autobalance
+// $Host::EnableAutobalance = 1;
+//
+// Run from TeamBalanceNotify.cs via StatsUnbalanceSound( %game )
+// Getting random client aspects run in GetTeamCounts.cs
+//
+// Fire Autobalance
 function Autobalance( %game, %AutobalanceSafetynetTrys )
 {
 	if( $CurrentMissionType !$= "LakRabbit" && $Host::EnableTeamBalanceNotify && $StatsMsgPlayed $= 1 && !$Host::TournamentMode )

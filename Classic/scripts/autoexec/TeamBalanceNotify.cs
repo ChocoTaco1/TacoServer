@@ -1,8 +1,11 @@
-//Enable or Disable
-//$Host::EnableTeamBalanceNotify = 1;
+// Enable or Disable
+// $Host::EnableTeamBalanceNotify = 1;
+// Enable or Disable Autobalance
+// $Host::EnableAutobalance = 1;
 //
-//Give the client a notification on the current state of balancing.
-//This function is in GetTeamCounts.cs
+// Give the client a notification on the current state of balancing.
+//
+// This function is in GetTeamCounts.cs
 function TeamBalanceNotify( %game )
 {	
 	if( $CurrentMissionType !$= "LakRabbit" && $TotalTeamPlayerCount !$= 0 && $Host::EnableTeamBalanceNotify && !$Host::TournamentMode )

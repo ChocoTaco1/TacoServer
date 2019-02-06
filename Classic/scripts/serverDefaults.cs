@@ -190,3 +190,10 @@ $Host::PUGautoPassword = 0; 					//Enable or Disable an auto password at a certa
 $Host::PUGautoPasswordLimit = 10; 				//How many to enable a pug password
 $Host::PUGPassword = "pickup"; 					//pug password
 $Host::EmptyServerReset = 1;					//Whether or not you want the server to reset when its empty
+$Host::EnableAutobalance = 1;					//Will autobalance when teams are uneven.
+$Host::DMSLOnlyMode = 0;						//Shocklance Only Mode for Deathmatch
+$Host::SCtFProMode = 0;							//Pro mode for LCTF
+//LakRabbit
+$Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
+$Host::LakRabbitNoSplashDamage = 0;				//Splash Damage enabled or not
+$Host::ShowFlagIcon = 1;						//Show flag Icon in lak

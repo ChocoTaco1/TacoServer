@@ -59,6 +59,7 @@ $Host::DefenseTurret::RequiredInTourney = 0;
 $Host::Discord = "https://t2discord.tk";
 $Host::DMSLOnlyMode = 0;
 $Host::EmptyServerReset = 0;
+$Host::EnableAutobalance = 1;
 $Host::EnableLakUnlimitedDJ = 1;
 $Host::EnableMortarTurret = 0;
 $Host::EnableNoBaseRapeNotify = 1;

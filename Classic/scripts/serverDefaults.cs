@@ -193,6 +193,7 @@ $Host::EmptyServerReset = 1;					//Whether or not you want the server to reset w
 $Host::EnableAutobalance = 1;					//Will autobalance when teams are uneven.
 $Host::DMSLOnlyMode = 0;						//Shocklance Only Mode for Deathmatch
 $Host::SCtFProMode = 0;							//Pro mode for LCTF
+$Host::EnableSetNextMission = 1;				//Let admins set the next mission thru the vote menu
 //LakRabbit
 $Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
 $Host::LakRabbitNoSplashDamage = 0;				//Splash Damage enabled or not

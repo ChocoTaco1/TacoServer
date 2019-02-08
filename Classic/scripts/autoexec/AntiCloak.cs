@@ -25,7 +25,7 @@ function ActivateAntiCloak( %game )
 				$AntiCloakRunOnce = 0;
 			}
 		}
-		//All other cases it is.
+		//Off
 		else
 		{
 			if( $AntiCloakRunOnce !$= 1 )
@@ -38,7 +38,20 @@ function ActivateAntiCloak( %game )
 				$AntiCloakRunOnce = 1;
 			}
 		}
-	}		
+	}
+	//All other cases outside of CTF.
+	else
+	{
+		if( $AntiCloakRunOnce !$= 1 )	
+		{
+			$InvBanList[CTF, "CloakingPack"] = 0;
+			
+			if(isActivePackage(DisableCloakPack))
+				deactivatePackage(DisableCloakPack);
+			
+			$AntiCloakRunOnce = 1;
+		}
+	}	
 }
 
 //So if the player is able to get a cloakpack, he cant use it

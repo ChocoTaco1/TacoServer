@@ -194,6 +194,14 @@ $Host::EnableAutobalance = 1;					//Will autobalance when teams are uneven.
 $Host::DMSLOnlyMode = 0;						//Shocklance Only Mode for Deathmatch
 $Host::SCtFProMode = 0;							//Pro mode for LCTF
 $Host::EnableSetNextMission = 1;				//Let admins set the next mission thru the vote menu
+$Host::SetNextMissionMapSlot1 = "SmallCrossing";	//Set Next Mission for slot 1
+$Host::SetNextMissionMapSlot2 = "HighOctane";		//Set Next Mission for slot 2
+$Host::SetNextMissionMapSlot3 = "TheFray";			//Set Next Mission for slot 3
+$Host::SetNextMissionMapSlot4 = "S5_Massive";		//Set Next Mission for slot 4
+$Host::SetNextMissionMapSlot5 = "S5_Icedance";		//Set Next Mission for slot 5
+$Host::SetNextMissionMapSlot6 = "Logans_Run";		//Set Next Mission for slot 6
+$Host::SetNextMissionMapSlot7 = "Rollercoaster_nef";//Set Next Mission for slot 7
+$Host::SetNextMissionMapSlot8 = "MoonDance";		//Set Next Mission for slot 8
 //LakRabbit
 $Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
 $Host::LakRabbitNoSplashDamage = 0;				//Splash Damage enabled or not

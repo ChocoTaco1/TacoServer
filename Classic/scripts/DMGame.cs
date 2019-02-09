@@ -188,7 +188,12 @@ function DMGame::AIHasJoined(%game, %client)
 
 function DMGame::checkScoreLimit(%game, %client)
 {
-   //there's no score limit in DM
+   %scoreLimit = MissionGroup.DM_scoreLimit;
+
+   if(%scoreLimit $= "")
+      %scoreLimit = 50;
+   if(%client.score >= %scoreLimit) 
+      %game.scoreLimitReached();
 }
 
 function DMGame::createPlayer(%game, %client, %spawnLoc, %respawn)

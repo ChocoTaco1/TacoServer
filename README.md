@@ -1,4 +1,4 @@
-![Tribes 2](https://i.imgur.com/V7lg8M8.jpg)  
+![Tribes 2](http://magaimg.net/img/79hn.png)  
 
 # TacoServer
 ## A Tribes 2 server with competative features that is also open-source.

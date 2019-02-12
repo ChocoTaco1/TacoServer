@@ -6,7 +6,7 @@
 ---
 
 
-Home Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF).
+Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF).
 
 
 ### Features
@@ -48,7 +48,7 @@ Home Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF).
 ### Setup
  - Meant to be installed on top of Classic 1.5.2
  - If the file isnt on this github it is unmodified in Classic 1.5.2
- - Place in Classic folder
+ - Place github server files in Classic folder
  - Place github evo files in Evo admin mod .vl2
  - Place Evo .vl2 in Classic folder
  - Run once

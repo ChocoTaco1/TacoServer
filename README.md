@@ -58,7 +58,7 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF).
 ----
 
 ### Credits & Thanks
- - BattleLore for this template
+ - BattleLore for this template and help
  - The T2 community for the free testing
  - The Radiant Keen
  - The TribesNext community

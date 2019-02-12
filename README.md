@@ -11,7 +11,7 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF).
 
 ### Features
  - A working Evo Anti-Turtle
- - Corrected NoBaseRape assets handling
+ - Improved NoBaseRape assets handling and notifications
  - An independant onboard team population counter and tracker
  - Team-balance notifys
  - No Base Rape notifys

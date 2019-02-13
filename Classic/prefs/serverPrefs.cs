@@ -65,6 +65,7 @@ $Host::EnableNoBaseRapeNotify = 1;
 $Host::EnableSetNextMission = 1;
 $Host::EnableTeamBalanceNotify = 1;
 $Host::EnableTurretPlayerCount = 10;
+$Host::EnableVoteSound = 1;
 $Host::EvoAdminAdmin = 0;
 $Host::EvoAdminBan = 0;
 $Host::EvoAdminClanLock = 0;

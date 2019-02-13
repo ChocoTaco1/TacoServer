@@ -181,6 +181,7 @@ $Host::EnableMortarTurret = 0; 					//Enable or Disable Mortar Turret
 $Host::EnableNoBaseRapeNotify = 1; 				//Get a base rape notification
 $Host::EnableTeamBalanceNotify = 1; 			//Get a teambalance notification
 $Host::EnableTurretPlayerCount = 10; 			//How many to enable turrets
+$Host::EnableVoteSound = 1;						//If you want a sound chime during voting
 $Host::AntiCloakEnable = 1; 					//Enable or disable AntiCloak
 $Host::AntiCloakPlayerCount = 6; 				//How many to enable Cloak
 $Host::PUGautoPassword = 0; 					//Enable or Disable an auto password at a certain amount of players

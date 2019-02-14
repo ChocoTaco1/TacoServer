@@ -14,7 +14,7 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
  - An independant team population counter
  - Team-balance notifys
  - NoBaseRape notifys
- - Autobalancing
+ - Team Autobalancing
  - Minimum Cloakpack Management
  - Minimum Turret Management
  - MortarTurret Management

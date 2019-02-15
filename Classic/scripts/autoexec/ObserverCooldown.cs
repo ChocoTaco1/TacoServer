@@ -14,15 +14,18 @@ function serverCmdClientMakeObserver( %client )
 			Game.forceObserver( %client, "playerChoose" );
 		
 		%client.MakeObserverTimeout = true;
+		%client.ObserverProtectStart = getSimTime();
 		schedule(10000, 0, "ResetMakeObserverTimeout", %client );
    }
 	//5 second cooldown on the notification
 	else if( !%client.ObserverCooldownMsgPlayed )
 	{
-		messageClient(%client, 'MsgObserverCooldown', '\c2Observer is on cooldown.' );
+		%wait = mFloor((10000 - (getSimTime() - %client.ObserverProtectStart)) / 1000);
+		messageClient(%client, 'MsgObserverCooldown', '\c3Observer Cooldown:\cr Please wait another %1 seconds.', %wait );
+		//messageClient(%client, 'MsgObserverCooldown', '\c2Observer is on cooldown.' );
 		
 		%client.ObserverCooldownMsgPlayed = true;
-		schedule(5000, 0, "ResetObserverCooldownMsgPlayed", %client );
+		schedule(2000, 0, "ResetObserverCooldownMsgPlayed", %client );
 	}
 }
 

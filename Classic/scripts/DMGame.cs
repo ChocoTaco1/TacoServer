@@ -9,6 +9,7 @@
 //Kill
 //Don't get killed
 //Points are scored for each kill you make and subtracted each time you die
+//First person to 25 points wins
 //--- GAME RULES END ---
 
 $InvBanList[DM, "TurretOutdoorDeployable"] = 1;
@@ -99,11 +100,12 @@ function DMGame::equip(%game, %player)
 		%player.setInventory(Shocklance, 1);
 		%player.setInventory(RepairKit, 1);
 		%player.setInventory(TargetingLaser, 1);
+		%player.setInventory(Grenade, 5);
 		%player.use("Shocklance");
    }
    else
    {
-		buyDeployableFavorites(%player.client);
+		buyFavorites(%player.client);
 		%player.setEnergyLevel(%player.getDataBlock().maxEnergy);
 		%player.selectWeaponSlot( 0 );
 
@@ -191,7 +193,7 @@ function DMGame::checkScoreLimit(%game, %client)
    %scoreLimit = MissionGroup.DM_scoreLimit;
 
    if(%scoreLimit $= "")
-      %scoreLimit = 50;
+      %scoreLimit = 25;
    if(%client.score >= %scoreLimit) 
       %game.scoreLimitReached();
 }
@@ -510,6 +512,16 @@ function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifie
          }
          Parent::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal);
       }
+}
+
+function Player::maxInventory(%this, %data)
+{
+	//chocotaco - just runs as an ammo pack cuz messing with the inv max messes up weapons cycling
+	//%max = ShapeBase::maxInventory(%this,%data) * 2;
+	%max = ShapeBase::maxInventory(%this,%data);
+	//if (%this.getInventory(AmmoPack))
+		%max += AmmoPack.max[%data.getName()];
+	return %max;
 }
 
 };

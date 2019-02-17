@@ -78,6 +78,8 @@ function GetTeamCounts( %game, %client, %respawn )
 		schedule(1000, 0, "TeamBalanceNotify", %game );
 		//Start AntiCloak
 		schedule(1500, 0, "ActivateAntiCloak", %game);
+		//Start MapRepetitionChecker
+		schedule(2000, 0, "MapRepetitionChecker", %game);
 		
 		//Set so counter wont run when it doesnt need to.
 		$GetCountsClientTeamChange = false;

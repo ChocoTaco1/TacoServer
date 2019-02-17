@@ -252,7 +252,8 @@ addRotationMap("TitaniaLak", LakRabbit, 1, 1);
 //addRotationMap("BeggarsRunLak", LakRabbit, 1, 0);
 //addRotationMap("Tibbaw", LakRabbit, 1, 0);
 //addRotationMap("MagmaticLak", LakRabbit, 1, 0);
-addRotationMap("HillsOfSorrow", LakRabbit, 1, 1);
+//addRotationMap("HillsOfSorrow", LakRabbit, 1, 1);
+addRotationMap("InfernusLak", LakRabbit, 1, 1);
 //addRotationMap("EscaladeLak", LakRabbit, 1, 0);
 addRotationMap("Arrakis", LakRabbit, 1, 1);
 //addRotationMap("EquinoxLak", LakRabbit, 1, 0);
@@ -427,7 +428,10 @@ addRotationMap("Blink", sctf, 1, 1);
 // ************************
 
 addRotationMap("RaspDM", DM, 1, 1);
+addRotationMap("EntombedDM", DM, 1, 1);
+addRotationMap("IceDomeDM", DM, 1, 1);
 //addRotationMap("Mac_FlagArena", DM, 1, 1);
 addRotationMap("ArenaDomeDM", DM, 1, 1);
+addRotationMap("VulcansWrathDM", DM, 1, 1);
 //addRotationMap("SmallCrossingLT", DM, 1, 1);
 //addRotationMap("MiniSunDried", DM, 1, 1);

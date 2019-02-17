@@ -1,15 +1,21 @@
 //To help decrease the chances of a repeated map in the map rotation by correcting repeated maps thru script
-//
+//$EvoCachedNextMission = "RoundTheMountain";
 //
 
-//Run at serverCmdMissionStartPhase3Done(%client, %seq) in server.ovl evo
-function MapRepetitionChecker()
+//Run in GetTeamCounts.cs
+function MapRepetitionChecker( %game )
 {
-	if( $CurrentMissionType $= "CTF" && !$Host::TournamentMode )
+	if( $CurrentMissionType $= "CTF" && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
 	{
 		//CTF Start
 		if($TempMapCheckerPrevious $= "")
-		$TempMapCheckerPrevious = $CurrentMission;
+		{
+			$TempMapCheckerPrevious = $CurrentMission;
+			
+			return;
+		}
+		
+		
 		//1 map back
 		else if($TempMapCheckerPrevious2back $= "")
 		{
@@ -24,6 +30,8 @@ function MapRepetitionChecker()
 			{
 				MapRepetitionCheckerFindRandom();
 			}
+			
+			return;
 		}
 		//2 maps back
 		else if($TempMapCheckerPrevious3back $= "")
@@ -41,9 +49,10 @@ function MapRepetitionChecker()
 			{
 				MapRepetitionCheckerFindRandom();
 			}
+			
+			return;
 		}
 		//3 maps back
-		//This is what is run most of the time.
 		else
 		{
 			$MapCheckerPrevious = $TempMapCheckerPrevious;
@@ -60,7 +69,11 @@ function MapRepetitionChecker()
 			{
 				MapRepetitionCheckerFindRandom();
 			}
+			
+			return;
 		}
+		
+		$MapRepetitionCheckerRunOnce = 1;
 	}
 }
 
@@ -75,6 +88,16 @@ function MapRepetitionCheckerFindRandom()
 	else if(%MapCheckerRandom $= 4) $EvoCachedNextMission = $SetNextMissionMapSlot4;
 	else if(%MapCheckerRandom $= 5) $EvoCachedNextMission = $SetNextMissionMapSlot5;
 	else if(%MapCheckerRandom $= 6) $EvoCachedNextMission = $SetNextMissionMapSlot6;
-			
-	messageAll('MsgNoBaseRapeNotify', '\crMap Repetition Corrected: Next mission set to %1.', $EvoCachedNextMission);
+	
+	if($EvoCachedNextMission $= $TempMapCheckerPrevious || $EvoCachedNextMission $= $TempMapCheckerPrevious2back || $EvoCachedNextMission $= $TempMapCheckerPrevious3back )
+		MapRepetitionCheckerFindRandom();
+	else		
+		messageAll('MsgNoBaseRapeNotify', '\crMap Repetition Corrected: Next mission set to %1.', $EvoCachedNextMission);
+}
+
+//Once per match
+//Called in DefaultGame::gameOver(%game) in defaultGame.ovl evo
+function MapRepetitionCheckerReset( %game )
+{
+	$MapRepetitionCheckerRunOnce = 0;
 }

@@ -36,53 +36,13 @@ function SetNextMapGetRandoms( %client )
 %RandomPick8 = getRandom(36,40);
 
 //Deduction code
-//1-5
-if( %RandomPick1 $= 1) $SetNextMissionMapSlot1 = $RandomMapPick1;
-else if( %RandomPick1 $= 2) $SetNextMissionMapSlot1 = $RandomMapPick2;
-else if( %RandomPick1 $= 3) $SetNextMissionMapSlot1 = $RandomMapPick3;
-else if( %RandomPick1 $= 4) $SetNextMissionMapSlot1 = $RandomMapPick4;
-else if( %RandomPick1 $= 5) $SetNextMissionMapSlot1 = $RandomMapPick5;
-//6-10
-if( %RandomPick2 $= 6) $SetNextMissionMapSlot2 = $RandomMapPick6;
-else if( %RandomPick2 $= 7) $SetNextMissionMapSlot2 = $RandomMapPick7;
-else if( %RandomPick2 $= 8) $SetNextMissionMapSlot2 = $RandomMapPick8;
-else if( %RandomPick2 $= 9) $SetNextMissionMapSlot2 = $RandomMapPick9;
-else if( %RandomPick2 $= 10) $SetNextMissionMapSlot2 = $RandomMapPick10;
-//11-15
-if( %RandomPick3 $= 11) $SetNextMissionMapSlot3 = $RandomMapPick11;
-else if( %RandomPick3 $= 12) $SetNextMissionMapSlot3 = $RandomMapPick12;
-else if( %RandomPick3 $= 13) $SetNextMissionMapSlot3 = $RandomMapPick13;
-else if( %RandomPick3 $= 14) $SetNextMissionMapSlot3 = $RandomMapPick14;
-else if( %RandomPick3 $= 15) $SetNextMissionMapSlot3 = $RandomMapPick15;
-//16-20
-if( %RandomPick4 $= 16) $SetNextMissionMapSlot4 = $RandomMapPick16;
-else if( %RandomPick4 $= 17) $SetNextMissionMapSlot4 = $RandomMapPick17;
-else if( %RandomPick4 $= 18) $SetNextMissionMapSlot4 = $RandomMapPick18;
-else if( %RandomPick4 $= 19) $SetNextMissionMapSlot4 = $RandomMapPick19;
-else if( %RandomPick4 $= 20) $SetNextMissionMapSlot4 = $RandomMapPick20;
-//21-25
-if( %RandomPick5 $= 21) $SetNextMissionMapSlot5 = $RandomMapPick21;
-else if( %RandomPick5 $= 22) $SetNextMissionMapSlot5 = $RandomMapPick22;
-else if( %RandomPick5 $= 23) $SetNextMissionMapSlot5 = $RandomMapPick23;
-else if( %RandomPick5 $= 24) $SetNextMissionMapSlot5 = $RandomMapPick24;
-else if( %RandomPick5 $= 25) $SetNextMissionMapSlot5 = $RandomMapPick25;
-//26-30
-if( %RandomPick6 $= 26) $SetNextMissionMapSlot6 = $RandomMapPick26;
-else if( %RandomPick6 $= 27) $SetNextMissionMapSlot6 = $RandomMapPick27;
-else if( %RandomPick6 $= 28) $SetNextMissionMapSlot6 = $RandomMapPick28;
-else if( %RandomPick6 $= 29) $SetNextMissionMapSlot6 = $RandomMapPick29;
-else if( %RandomPick6 $= 30) $SetNextMissionMapSlot6 = $RandomMapPick30;
-//31-35
-if( %RandomPick7 $= 31) $SetNextMissionMapSlot7 = $RandomMapPick31;
-else if( %RandomPick7 $= 32) $SetNextMissionMapSlot7 = $RandomMapPick32;
-else if( %RandomPick7 $= 33) $SetNextMissionMapSlot7 = $RandomMapPick33;
-else if( %RandomPick7 $= 34) $SetNextMissionMapSlot7 = $RandomMapPick34;
-else if( %RandomPick7 $= 35) $SetNextMissionMapSlot7 = $RandomMapPick35;
-//36-40
-if( %RandomPick8 $= 36) $SetNextMissionMapSlot8 = $RandomMapPick36;
-else if( %RandomPick8 $= 37) $SetNextMissionMapSlot8 = $RandomMapPick37;
-else if( %RandomPick8 $= 38) $SetNextMissionMapSlot8 = $RandomMapPick38;
-else if( %RandomPick8 $= 39) $SetNextMissionMapSlot8 = $RandomMapPick39;
-else if( %RandomPick8 $= 40) $SetNextMissionMapSlot8 = $RandomMapPick40;
+$SetNextMissionMapSlot1 = $RandomMapPick[%RandomPick1];
+$SetNextMissionMapSlot2 = $RandomMapPick[%RandomPick2];
+$SetNextMissionMapSlot3 = $RandomMapPick[%RandomPick3];
+$SetNextMissionMapSlot4 = $RandomMapPick[%RandomPick4];
+$SetNextMissionMapSlot5 = $RandomMapPick[%RandomPick5];
+$SetNextMissionMapSlot6 = $RandomMapPick[%RandomPick6];
+$SetNextMissionMapSlot7 = $RandomMapPick[%RandomPick7];
+$SetNextMissionMapSlot8 = $RandomMapPick[%RandomPick8];
 
 }

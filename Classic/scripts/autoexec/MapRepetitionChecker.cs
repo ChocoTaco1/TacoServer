@@ -10,111 +10,28 @@ function MapRepetitionChecker( %game )
 	
 	if( $CurrentMissionType $= "CTF" && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
 	{
-		//First map
-		if($PreviousMission1back $= "")
-		{
-			//Set vars
-			$PreviousMission1back = $CurrentMission;
-			
-			//Debug
-			if(%MapRepetitionCheckerDebug)
-				echo("PM1: " @ $PreviousMission1back);
-			
-			return;
-		}
-		//1 map back
-		//Second map
-		else if($PreviousMission2back $= "")
-		{		
-			if( $PreviousMission1back $= $EvoCachedNextMission )
-				MapRepetitionCheckerFindRandom();
-			
-			//Set vars
-			$PreviousMission2back = $PreviousMission1back;
-			$PreviousMission1back = $CurrentMission;
-			
-			//Debug
-			if(%MapRepetitionCheckerDebug)	
-			{
-				echo("PM1: " @ $PreviousMission1back);
-				echo("PM2: " @ $PreviousMission2back);
-			}
-			
-			return;
-		}
-		//2 maps back
-		//Third map
-		else if($PreviousMission3back $= "")
-		{		
-			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission )
-				MapRepetitionCheckerFindRandom();
-			
-			//Set vars		
-			$PreviousMission3back = $PreviousMission2back;
-			$PreviousMission2back = $PreviousMission1back;
-			$PreviousMission1back = $CurrentMission;
-			
-			//Debug
-			if(%MapRepetitionCheckerDebug)	
-			{
-				echo("PM1: " @ $PreviousMission1back);
-				echo("PM2: " @ $PreviousMission2back);
-				echo("PM3: " @ $PreviousMission3back);
-			}
-			
-			return;
-		}
-		//3 maps back
-		//Forth map
-		else if($PreviousMission4back $= "")
-		{
-			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission )
-				MapRepetitionCheckerFindRandom();
-			
-			//Set vars
-			$PreviousMission4back = $PreviousMission3back;
-			$PreviousMission3back = $PreviousMission2back;		
-			$PreviousMission2back = $PreviousMission1back;
-			$PreviousMission1back = $CurrentMission;
-			
-			//Debug
-			if(%MapRepetitionCheckerDebug)	
-			{
-				echo("PM1: " @ $PreviousMission1back);
-				echo("PM2: " @ $PreviousMission2back);
-				echo("PM3: " @ $PreviousMission3back);
-				echo("PM4: " @ $PreviousMission4back);
-			}
-			
-			return;
-		}
-		//4 maps back
-		//Fifth map
-		else
-		{
-			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
-				MapRepetitionCheckerFindRandom();
-			
-			//Set vars
-			$PreviousMission4back = $PreviousMission3back;
-			$PreviousMission3back = $PreviousMission2back;		
-			$PreviousMission2back = $PreviousMission1back;
-			$PreviousMission1back = $CurrentMission;
-			
-			//Debug
-			if(%MapRepetitionCheckerDebug)	
-			{
-				echo("PM1: " @ $PreviousMission1back);
-				echo("PM2: " @ $PreviousMission2back);
-				echo("PM3: " @ $PreviousMission3back);
-				echo("PM4: " @ $PreviousMission4back);
-			}
-			
-			return;
-		}
+		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
+			MapRepetitionCheckerFindRandom();
 		
-		$MapRepetitionCheckerRunOnce = 1;
+		//Set vars
+		if($PreviousMission3back !$= "") $PreviousMission4back = $PreviousMission3back;
+		if($PreviousMission2back !$= "") $PreviousMission3back = $PreviousMission2back;		
+		if($PreviousMission1back !$= "") $PreviousMission2back = $PreviousMission1back;
+										 $PreviousMission1back = $CurrentMission;
+			
+		//Debug
+		if(%MapRepetitionCheckerDebug)	
+		{
+			if($PreviousMission1back !$= "") echo("PM1: " @ $PreviousMission1back);
+			if($PreviousMission2back !$= "") echo("PM2: " @ $PreviousMission2back);
+			if($PreviousMission3back !$= "") echo("PM3: " @ $PreviousMission3back);
+			if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
+		}
+			
+		return;
 	}
+		
+	$MapRepetitionCheckerRunOnce = 1;
 }
 
 function MapRepetitionCheckerFindRandom()
@@ -122,12 +39,7 @@ function MapRepetitionCheckerFindRandom()
 	SetNextMapGetRandoms( %client );
 	%MapCheckerRandom = getRandom(1,6);
 			
-	if(%MapCheckerRandom $= 1) $EvoCachedNextMission = $SetNextMissionMapSlot1;
-	else if(%MapCheckerRandom $= 2) $EvoCachedNextMission = $SetNextMissionMapSlot2;
-	else if(%MapCheckerRandom $= 3) $EvoCachedNextMission = $SetNextMissionMapSlot3;
-	else if(%MapCheckerRandom $= 4) $EvoCachedNextMission = $SetNextMissionMapSlot4;
-	else if(%MapCheckerRandom $= 5) $EvoCachedNextMission = $SetNextMissionMapSlot5;
-	else if(%MapCheckerRandom $= 6) $EvoCachedNextMission = $SetNextMissionMapSlot6;
+	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
 	
 	if($EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back)
 		MapRepetitionCheckerFindRandom();

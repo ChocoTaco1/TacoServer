@@ -26,7 +26,8 @@ function MapRepetitionChecker( %game )
 		//Second map
 		else if($PreviousMission2back $= "")
 		{		
-			if( $PreviousMission1back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
+			if( $PreviousMission1back $= $EvoCachedNextMission )
+				MapRepetitionCheckerFindRandom();
 			
 			//Set vars
 			$PreviousMission2back = $PreviousMission1back;
@@ -45,8 +46,8 @@ function MapRepetitionChecker( %game )
 		//Third map
 		else if($PreviousMission3back $= "")
 		{		
-			if( $PreviousMission1back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
-			else if( $PreviousMission2back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
+			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission )
+				MapRepetitionCheckerFindRandom();
 			
 			//Set vars		
 			$PreviousMission3back = $PreviousMission2back;
@@ -67,9 +68,8 @@ function MapRepetitionChecker( %game )
 		//Forth map
 		else if($PreviousMission4back $= "")
 		{
-			if( $PreviousMission1back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
-			else if( $PreviousMission2back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
-			else if( $PreviousMission3back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
+			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission )
+				MapRepetitionCheckerFindRandom();
 			
 			//Set vars
 			$PreviousMission4back = $PreviousMission3back;
@@ -92,10 +92,8 @@ function MapRepetitionChecker( %game )
 		//Fifth map
 		else
 		{
-			if( $PreviousMission1back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
-			else if( $PreviousMission2back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
-			else if( $PreviousMission3back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
-			else if( $PreviousMission4back $= $EvoCachedNextMission ) MapRepetitionCheckerFindRandom();
+			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
+				MapRepetitionCheckerFindRandom();
 			
 			//Set vars
 			$PreviousMission4back = $PreviousMission3back;
@@ -131,9 +129,9 @@ function MapRepetitionCheckerFindRandom()
 	else if(%MapCheckerRandom $= 5) $EvoCachedNextMission = $SetNextMissionMapSlot5;
 	else if(%MapCheckerRandom $= 6) $EvoCachedNextMission = $SetNextMissionMapSlot6;
 	
-	if($EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || $EvoCachedNextMission $= $PreviousMission3back )
+	if($EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back)
 		MapRepetitionCheckerFindRandom();
-	else		
+	else
 		messageAll('MsgNoBaseRapeNotify', '\crMap Repetition Corrected: Next mission set to %1.', $EvoCachedNextMission);
 }
 

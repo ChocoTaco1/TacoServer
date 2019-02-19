@@ -26,6 +26,8 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
  - Simplified player options menu
  - Observer cooldown
  - Set the Next Mission options
+ - Map Repetition Checker
+ - Improved Map Rotation
  - PUG password Management
  - Improved LakRabbit experience
  - Extended LakRabbit debriefing

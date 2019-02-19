@@ -2,6 +2,10 @@
 // 
 //
 
+//This file is present
+//If this isnt present other things will crash
+$GetRandomMapsLoaded = true;
+
 //Map pool
 //
 //1-5

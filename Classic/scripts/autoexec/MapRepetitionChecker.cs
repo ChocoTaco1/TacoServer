@@ -1,6 +1,8 @@
 //To help decrease the chances of a repeated map in the map rotation by correcting repeated maps thru script
 //$EvoCachedNextMission = "RoundTheMountain";
 //
+//$GetRandomMapsLoaded makes sure GetRandomMaps.cs is present
+//MapRepetitionChecker can't funtion without it
 
 //Run in GetTeamCounts.cs
 function MapRepetitionChecker( %game )
@@ -8,7 +10,7 @@ function MapRepetitionChecker( %game )
 	//Debug
 	//%MapRepetitionCheckerDebug = true;
 	
-	if( $CurrentMissionType $= "CTF" && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
+	if( $CurrentMissionType $= "CTF" && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 && $GetRandomMapsLoaded )
 	{
 		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
 			MapRepetitionCheckerFindRandom();

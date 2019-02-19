@@ -2,6 +2,8 @@
 // - To Further Randomize Map Rotation
 // - Keep Track of maps so they arnt chosin again
 //
+// - Set $Host::ClassicRandomMissions to 2 to activate
+// - $Host::ClassicRandomMissions = 2;
 
 package DarkTigerMapRotation
 {
@@ -13,7 +15,7 @@ function getNextMission( %misName, %misType )
    for( %TypeIdx = 0; %TypeIdx < $HostTypeCount; %TypeIdx++ )
    {
       if ($HostTypeName[%TypeIdx] $= %misType)
-	   break;
+		break;
    }
 
    // Mission Type was not found. Return last mission an error message
@@ -22,51 +24,52 @@ function getNextMission( %misName, %misType )
       echo("Error: Could not find matching game type in function " @ "getNextMission( " @ %misName @", " @%misType @ " ).\n");
       return -1;
    }
+   
    %EvoTempMissionListLength = 0;
    %EvoCurrentMissionIndex = -1;
 
    // Build a list of missions that are eligible to be cycled into
-   for ( %MisCounter = 0; %MisCounter < $HostMissionCount[%TypeIdx]; %MisCounter ++ )
+   for( %MisCounter = 0; %MisCounter < $HostMissionCount[%TypeIdx]; %MisCounter ++ )
    {
       %ThisMission = $HostMission[ %TypeIdx, %MisCounter ];
       %ThisMissionName = $HostMissionFile[ %ThisMission ];
 
       if ($Host::EvoCustomMapRotation && !$Host::MapCycle[%ThisMissionName, %misType]) 
-	{
-	  // If mission is not set to cycle, then jump to next
-	  continue;
-	}
+	  {
+		// If mission is not set to cycle, then jump to next
+		continue;
+	  }
       
-      if ($HostGameBotCount && (!$BotEnabled[$HostMission[%TypeIdx, %MisCounter]]))
-	{
-	  // If there are bots present and no bot support is on map, jump
-	  // to next
-	  continue;
-	}
+      if($HostGameBotCount && (!$BotEnabled[$HostMission[%TypeIdx, %MisCounter]]))
+	  {
+		// If there are bots present and no bot support is on map, jump
+		// to next
+		continue;
+	  }
       
       if ( %ThisMissionName $= %misName )
-	// This map is the current mission
-	{
-	  %EvoCurrentMissionIndex = %EvoTempMissionListLength;
-	}
-      %EvoTempMissionList[ %EvoTempMissionListLength ] = %ThisMission;
-      %EvoTempMissionListLength ++;
+	  // This map is the current mission
+	  {
+		%EvoCurrentMissionIndex = %EvoTempMissionListLength;
+	  }
+		%EvoTempMissionList[ %EvoTempMissionListLength ] = %ThisMission;
+		%EvoTempMissionListLength ++;
    }
    // If no maps are found, return last mission with error
-   if (! %EvoTempMissionListLength )
+   if(! %EvoTempMissionListLength )
    {
       echo("Error: No valid maps found in cycle." );
       return -1;
    }
    // Custom Map Rotation counts forwards
-   if ( $Host::EvoCustomMapRotation )
+   if( $Host::EvoCustomMapRotation )
    {
       %NextMissionIndex = %EvoCurrentMissionIndex + 1;
    }
    else
    {
       // Standard Map Rotation counts backwards. For whatever reason
-      if ( %EvoCurrentMissionIndex <= 0 )
+      if( %EvoCurrentMissionIndex <= 0 )
       {
          %NextMissionIndex = %EvoTempMissionListLength - 1;
       }
@@ -76,20 +79,20 @@ function getNextMission( %misName, %misType )
       }
    }
 
-   if (( $Host::ClassicRandomMissions == 1) && ( %EvoTempMissionListLength > 2 ) )
+   if(( $Host::ClassicRandomMissions == 1) && ( %EvoTempMissionListLength > 2 ) )
    {
       %NextMissionIndex = %NextMissionIndex + GetRandom(0, %EvoTempMissionListLength - 2 );
    }
-   else if (( $Host::ClassicRandomMissions  == 2) && ( %EvoTempMissionListLength > 2 ) ){
+   else if(( $Host::ClassicRandomMissions  == 2) && ( %EvoTempMissionListLength > 2 ) ){
       %NextMissionIndex = %NextMissionIndex + getRSGN(0, %EvoTempMissionListLength - 2, "getNextMission1");
    }
 
    // Bring %NextMissionIndex back into the interval
    // between 0 and %Evo...Length
-   if ( %NextMissionIndex < 0 )
+   if( %NextMissionIndex < 0 )
       %NextMissionIndex += %EvoTempMissionListLength;
 
-   if ( %NextMissionIndex >= %EvoTempMissionListLength )
+   if( %NextMissionIndex >= %EvoTempMissionListLength )
       %NextMissionIndex -= %EvoTempMissionListLength;
 
    return %EvoTempMissionList[ %NextMissionIndex ];
@@ -111,15 +114,18 @@ function buildMissionList()
    {
       %search = "missions/*.mis";
       %fobject = new FileObject();
-      for(%file = findFirstFile(%search); %file !$= ""; %file = findNextFile(%search))
+      
+	  for(%file = findFirstFile(%search); %file !$= ""; %file = findNextFile(%search))
       {
          // get the name
          %name = fileBase(%file);
          %idx = $HostMissionCount;
-         $HostMissionCount++;
+         
+		 $HostMissionCount++;
          $HostMissionFile[%idx] = %name;
          $HostMissionName[%idx] = %name;
-         if(!%fobject.openForRead(%file))
+         
+		 if(!%fobject.openForRead(%file))
             continue;
 	  
          %typeList = "None";
@@ -218,6 +224,7 @@ function getRSGN(%min,%max,%id)
    }
    
    %rng = getRandom(%min,%max - $rngCount[%id] ); // find random number - the total number we have done 
+   
    for(%i = %min; %i <= %max; %i++)  // loop cycle though all possable numbers
    {
       if($RngList[%id,%i]) // skip over ones that we have all ready used
@@ -225,17 +232,22 @@ function getRSGN(%min,%max,%id)
          continue;
       }
       %c++; // skip counter
-      if(%rng == %c) // onces the skip counter matches the rng number we have landed on a valid number that we havent used yet
+      
+	  if(%rng == %c) // onces the skip counter matches the rng number we have landed on a valid number that we havent used yet
 	  {
          break;   // kill the loop 
       }
    }
+   
    $rngList[%id,%i] = 1;// this marks said number as used 
    $rngCount[%id]++;// up are total used numbers 
    $rngLast[%id] = %i; // for when the list resets it wont pick the same number twice
-   if(%i > %max || %i < %min){ // fail safe 
+   
+   if(%i > %max || %i < %min)
+   { // fail safe 
       return %max;  
    }
+   
    return %i; // return the one we stoped on 
 }
 
@@ -250,6 +262,7 @@ function addRotationMap(%file, %type, %ffa, %cycle)
    {
       %cycle = %ffa;
    }
+   
    if(isFile("missions/" @ %file @ ".mis"))
    {
       if(%type $= "TR2" && !$Host::ClassicLoadTR2Gametype) // load TR2 gametype?
@@ -258,7 +271,7 @@ function addRotationMap(%file, %type, %ffa, %cycle)
       %fobject = new FileObject();
       
       for(%n = 0; %n < $HostMissionCount; %n++)
-	   if($HostMissionFile[%n] $= %file)
+		if($HostMissionFile[%n] $= %file)
 	      break;
 
       if(%n == $HostMissionCount)

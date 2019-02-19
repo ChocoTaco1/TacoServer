@@ -1,9 +1,14 @@
-//DarkTiger's MapRotation Randomizer
+//----------------DarkTiger's MapRotation----------------
+//
 // - To Further Randomize Map Rotation
 // - Keep Track of maps so they arnt chosin again
 //
+// - Meant to be run with evo admin mod
 // - Set $Host::ClassicRandomMissions to 2 to activate
 // - $Host::ClassicRandomMissions = 2;
+//
+
+
 
 package DarkTigerMapRotation
 {
@@ -129,6 +134,7 @@ function buildMissionList()
             continue;
 	  
          %typeList = "None";
+		 
          while(!%fobject.isEOF())
          {
             %line = %fobject.readLine();
@@ -143,6 +149,7 @@ function buildMissionList()
                break;
             }
          }
+		 
          %fobject.close();
 
          // Don't include single player missions:
@@ -180,6 +187,7 @@ function buildMissionList()
             $HostMissionCount[%i]++;
          }
       }
+	  
       getMissionTypeDisplayNames();
       %fobject.delete();
    }
@@ -213,13 +221,14 @@ function getRSGN(%min,%max,%id)
    //$rngCount[%id] - 1) is to account for 0 
    if(((%max - %min) - ($rngCount[%id] - 1)) < 1) // reset if we cycled though all possable
    {
-      $rngCount[%id] = 1; // we dont reset to 0 becuae of the last number used 
+       $rngCount[%id] = 1; // we dont reset to 0 becuae of the last number used 
        // change these numbers to expand range 
        for(%a = -1000; %a <= 1000; %a++)  // this resets a wide range incase min max change for what ever reasion
 	   { 
          $rngList[%id,%a] = 0; // reset number list back to 0 
        }
-       $rngList[%id,$rngLast[%id]]  = 1;// mark teh last number used as in used after reset
+	   
+       $rngList[%id,$rngLast[%id]]  = 1; // mark teh last number used as in used after reset
        //error("reset"); //debug
    }
    
@@ -266,7 +275,7 @@ function addRotationMap(%file, %type, %ffa, %cycle)
    if(isFile("missions/" @ %file @ ".mis"))
    {
       if(%type $= "TR2" && !$Host::ClassicLoadTR2Gametype) // load TR2 gametype?
-	   return;
+		return;
       
       %fobject = new FileObject();
       
@@ -284,13 +293,14 @@ function addRotationMap(%file, %type, %ffa, %cycle)
 		{
 			while(!%fobject.isEOF())
 			{
-			%line = %fobject.readLine();
+				%line = %fobject.readLine();
 				
-			if(getSubStr(%line, 0, 17) $= "// DisplayName = ")	
-				// Override the mission name:
-				$HostMissionName[%n] = getSubStr(%line, 17, 1000);
+				if(getSubStr(%line, 0, 17) $= "// DisplayName = ")	
+					// Override the mission name:
+					$HostMissionName[%n] = getSubStr(%line, 17, 1000);
 			}
-	      %fobject.close();
+			
+	        %fobject.close();
 	    }
 	  
 	    %navFile = "terrains/" @ %file @ ".nav";
@@ -322,7 +332,6 @@ function addRotationMap(%file, %type, %ffa, %cycle)
       %fobject.delete();
    }
 }
-
 
 
 // Prevent package from being activated if it is already

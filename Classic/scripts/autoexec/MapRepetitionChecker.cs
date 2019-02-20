@@ -2,7 +2,12 @@
 //$EvoCachedNextMission = "RoundTheMountain";
 //
 //$GetRandomMapsLoaded makes sure GetRandomMaps.cs is present
-//MapRepetitionChecker can't funtion without it
+//$SNMPresetsLoaded makes sure if GetRandomMaps.cs isnt present presets are loaded.
+//Presets are in defaultgame.ovl evo
+//
+//Set up to not run if GetRandomMaps.cs not loaded or Presets not loaded.
+//Server can crash if $EvoCachedNextMission = "";
+//
 
 //Run in GetTeamCounts.cs
 function MapRepetitionChecker( %game )
@@ -10,7 +15,7 @@ function MapRepetitionChecker( %game )
 	//Debug
 	//%MapRepetitionCheckerDebug = true;
 	
-	if( $CurrentMissionType $= "CTF" && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 && $GetRandomMapsLoaded )
+	if( $CurrentMissionType $= "CTF" && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 && ($GetRandomMapsLoaded || $SNMPresetsLoaded))
 	{
 		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
 			MapRepetitionCheckerFindRandom();
@@ -38,7 +43,9 @@ function MapRepetitionChecker( %game )
 
 function MapRepetitionCheckerFindRandom()
 {
-	SetNextMapGetRandoms( %client );
+	if($GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
+		SetNextMapGetRandoms( %client ); //Get Random Set Next Mission maps
+	
 	%MapCheckerRandom = getRandom(1,6);
 			
 	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
@@ -46,7 +53,10 @@ function MapRepetitionCheckerFindRandom()
 	if($EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back)
 		MapRepetitionCheckerFindRandom();
 	else
+	{	
+		error(formatTimeString("HH:nn:ss") SPC "Map Repetition Corrected.");
 		messageAll('MsgNoBaseRapeNotify', '\crMap Repetition Corrected: Next mission set to %1.', $EvoCachedNextMission);
+	}
 }
 
 //Once per match

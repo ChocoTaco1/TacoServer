@@ -45,7 +45,7 @@ function CheckVerObserver(%client)
 }
 
 //Added -ChocoTaco
-//Run in PUGpasscheck.cs. Reset when the server leaves ctf and when its disable thru admin options.
+//Run in PUGpasscheck.cs. Reset when the server leaves ctf and when its reenabled thru admin options.
 function CheckVerObserverReset()
 {
 	$CheckVerObserverRunOnce = false;

@@ -65,6 +65,7 @@ $Host::EnableAutobalance = 1;
 $Host::EnableLakUnlimitedDJ = 1;
 $Host::EnableMortarTurret = 0;
 $Host::EnableNoBaseRapeNotify = 1;
+$Host::EnableNetTourneyClient = 0;
 $Host::EnableSetNextMission = 1;
 $Host::EnableTeamBalanceNotify = 1;
 $Host::EnableTurretPlayerCount = 10;

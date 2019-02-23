@@ -8,6 +8,9 @@
 // - $Host::ClassicRandomMissions = 2;
 //
 
+//Deactivate EvoMapRotation
+if(isActivePackage(EvoMapRotation))
+	deactivatePackage(EvoMapRotation);
 
 
 package DarkTigerMapRotation

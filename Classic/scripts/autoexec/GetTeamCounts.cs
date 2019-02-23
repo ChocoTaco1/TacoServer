@@ -57,10 +57,11 @@ function GetTeamCounts( %game, %client, %respawn )
 			if( %client.team == 2 && %team2random == $PlayerCount[2] ) $team2canidate = %client;
 			
 			//Check ver
-			CheckVerObserver(%client);
+			if(!%client.isAIControlled()) //No bots
+				CheckVerObserver(%client);
 				
 			//if(!%client.isAIControlled())
-			$PlayerCount[%client.team]++;
+				$PlayerCount[%client.team]++;
 		}
 		
 		//echo ("$PlayerCount[0] " @  $PlayerCount[0]);

@@ -126,3 +126,37 @@ package checkver
 };
 
 activatePackage(checkver);
+
+
+
+//Added -ChocoTaco
+//Evo options
+//
+//In defaultgame.ovl DefaultGame::sendGameVoteMenu(%game, %client, %key) 
+//		 
+//		//Toggle Tournament Net Client
+//		if(%client.isAdmin && $Host::EnableNetTourneyClient && $CurrentMissionType $= "CTF")
+//			messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
+//		else if(%client.isAdmin && $CurrentMissionType $= "CTF")
+//			messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
+//
+//
+//In admin.ovl serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %playerVote)
+//
+//	  case "ToggleTourneyNetClient":
+//         if (%client.isAdmin)
+//         {
+//            if($Host::EnableNetTourneyClient)
+//			{
+//               $Host::EnableNetTourneyClient = 0;
+//			   messageClient( %client, '', "Tournament Net Client checking has been disabled.~wfx/powered/vehicle_screen_on.wav" );
+//			}
+//            else
+//            {
+//               $Host::EnableNetTourneyClient = 1;
+//			   messageClient( %client, '', "Tournament Net Client checking has been enabled.~wfx/powered/vehicle_screen_on.wav" );
+//			   CheckVerObserverReset();
+//			   ResetClientChangedTeams();
+//            }
+//         }
+		

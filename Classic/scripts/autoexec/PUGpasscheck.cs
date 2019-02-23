@@ -42,6 +42,9 @@ function CheckPUGpassword()
 		
 			$Host::HiVisibility = "1";
 		}
+		//For zCheckVar.cs TournyNetClient
+		if( $CurrentMissionType !$= "CTF" && $CheckVerObserverRunOnce )
+			CheckVerObserverReset();
 		
 		//echo ("PUGpassCheck");
 	}

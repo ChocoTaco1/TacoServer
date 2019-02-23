@@ -45,8 +45,7 @@ function CheckVerObserver(%client)
 }
 
 //Added -ChocoTaco
-//Once per map
-//Run at DefaultGame::gameOver(%game) in defaultGame.ovl evo
+//Run in PUGpasscheck.cs. Reset when the server leaves ctf and when its disable thru admin options.
 function CheckVerObserverReset()
 {
 	$CheckVerObserverRunOnce = false;

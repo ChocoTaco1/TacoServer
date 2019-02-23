@@ -15,7 +15,10 @@ function VoteSound( %game, %typename, %arg1, %arg2, %VoteSoundRandom )
 		else if(%typename $= "VoteSkipMission")
 			messageAll('', '\c1Vote in Progress: \c0To skip the mission to %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', $EvoCachedNextMission );
 	    else if(%typename $= "VoteChangeTimeLimit")
+		{
+			if(%arg1 $= "999") %arg1 = "unlimited";
 			messageAll('', '\c1Vote in Progress: \c0To change the time limit to %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1 );
+		}
 		else if(%typename $= "VoteKickPlayer")
 			messageAll('', '\c1Vote in Progress: \c0To kick player %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1.name );
 		else

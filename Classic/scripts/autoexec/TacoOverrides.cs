@@ -37,9 +37,11 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
     }
     
 	radiusVehicleExplosion(%data, %obj);
+	
    if(%obj.turretObject)
       if(%obj.turretObject.getControllingClient())
          %obj.turretObject.getDataBlock().playerDismount(%obj.turretObject);
+	 
    for(%i = 0; %i < %obj.getDatablock().numMountPoints; %i++)
    {
       if (%obj.getMountNodeObject(%i)) {
@@ -54,16 +56,23 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
          %flingee.damage(0, %obj.getPosition(), 0.4, $DamageType::Crash); 
       }
    }
+   
+   // From AntiLou.vl2
+   // Info: MPB just destroyed. Change the variable
+   if(%data.getName() $= "MobileBaseVehicle") // If the vehicle is the MPB, change %obj.station.isDestroyed to 1
+		%obj.station.isDestroyed = 1;
 
    %data.deleteAllMounted(%obj);
    // -----------------------------------------------------------------------------------------
    // z0dd - ZOD - Czar, 6/24/02. Move this vehicle out of the way so nothing collides with it.
    if(%data.getName() $="BomberFlyer" || %data.getName() $="MobileBaseVehicle" || %data.getName() $="AssaultVehicle")
    {
-     // %obj.setFrozenState(true);
+      // %obj.setFrozenState(true);
       %obj.schedule(2000, "delete");
       //%data.schedule(500, 'onAvoidCollisions', %obj);
-      %obj.schedule(500, "setPosition", vectorAdd(%obj.getPosition(), "40 -27 10000"));
+	  
+	  //Transfer the vehicle far away
+      %obj.schedule(10, "setPosition", vectorAdd(%obj.getPosition(), "40 -27 10000")); //Lowered: was 500
    }
    else
    {

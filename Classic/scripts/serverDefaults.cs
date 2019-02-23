@@ -201,6 +201,7 @@ $Host::loadingmsgline2 = "Server Github: ";										//Loading screen msg line 2
 $Host::loadingmsgline2content = "https://github.com/ChocoTaco1/TacoServer";		//Loading screen msg content 2
 $Host::loadingmsgline3 = "Hosted by: ";											//Loading screen msg line 3
 $Host::loadingmsgline3content = "Branzone";										//Loading screen msg content 3
+$Host::EnableNetTourneyClient = 1; 				//Enable or Disable Tourney Net Client checking
 //LakRabbit
 $Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
 $Host::LakRabbitNoSplashDamage = 0;				//Splash Damage enabled or not

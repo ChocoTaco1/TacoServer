@@ -56,6 +56,9 @@ function GetTeamCounts( %game, %client, %respawn )
 			if( %client.team == 1 && %team1random == $PlayerCount[1] ) $team1canidate = %client;
 			if( %client.team == 2 && %team2random == $PlayerCount[2] ) $team2canidate = %client;
 			
+			//Check ver
+			CheckVerObserver(%client);
+				
 			//if(!%client.isAIControlled())
 			$PlayerCount[%client.team]++;
 		}
@@ -80,6 +83,7 @@ function GetTeamCounts( %game, %client, %respawn )
 		schedule(1500, 0, "ActivateAntiCloak", %game);
 		//Start MapRepetitionChecker
 		schedule(2000, 0, "MapRepetitionChecker", %game);
+		
 		
 		//Set so counter wont run when it doesnt need to.
 		$GetCountsClientTeamChange = false;

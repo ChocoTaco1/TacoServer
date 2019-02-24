@@ -32,8 +32,8 @@ if (!isActivePackage(StartTeamCounts))
 
 function GetTeamCounts( %game, %client, %respawn )
 {	
-	//Check pug password
-	CheckPUGpassword();
+	//Run MissionTypeOptions
+	MissionTypeOptions();
 		
 	//Get teamcounts
 	if( $GetCountsClientTeamChange && $countdownStarted && $MatchStarted ) 

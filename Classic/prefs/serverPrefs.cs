@@ -1376,7 +1376,6 @@ $Host::Password = "pickup";
 $Host::PlayerRespawnTimeout = 60;
 $Host::Port = 28000;
 $Host::PUGautoPassword = 0;
-$Host::PUGautoPasswordLimit = 10;
 $Host::PUGPassword = "pickup";
 $Host::PureServer = 0;
 $Host::SCtFProMode = 0;

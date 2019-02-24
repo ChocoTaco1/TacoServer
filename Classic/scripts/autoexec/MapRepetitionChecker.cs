@@ -1,5 +1,6 @@
 //To help decrease the chances of a repeated map in the map rotation by correcting repeated maps thru script
 //$EvoCachedNextMission = "RoundTheMountain";
+//$EvoCachedNextMission = "Arrakis";
 //
 //$GetRandomMapsLoaded makes sure GetRandomMaps.cs is present
 //$SNMPresetsLoaded makes sure if GetRandomMaps.cs isnt present presets are loaded.
@@ -15,7 +16,7 @@ function MapRepetitionChecker( %game )
 	//Debug
 	//%MapRepetitionCheckerDebug = true;
 	
-	if( $CurrentMissionType $= "CTF" && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 && ($GetRandomMapsLoaded || $SNMPresetsLoaded))
+	if( ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "LakRabbit" ) && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 && ($GetRandomMapsLoaded || $SNMPresetsLoaded))
 	{
 		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
 			MapRepetitionCheckerFindRandom();
@@ -34,8 +35,6 @@ function MapRepetitionChecker( %game )
 			if($PreviousMission3back !$= "") echo("PM3: " @ $PreviousMission3back);
 			if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
 		}
-			
-		return;
 	}
 		
 	$MapRepetitionCheckerRunOnce = 1;
@@ -46,9 +45,18 @@ function MapRepetitionCheckerFindRandom()
 	if($GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
 		SetNextMapGetRandoms( %client ); //Get Random Set Next Mission maps
 	
-	%MapCheckerRandom = getRandom(1,6);
-			
-	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
+	if( $CurrentMissionType $= "CTF" )
+	{
+		%MapCheckerRandom = getRandom(1,6);
+		$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
+	}
+	else if( $CurrentMissionType $= "LakRabbit" && $GetRandomMapsLoaded )
+	{
+		%MapCheckerRandom = getRandom(1,3);
+		$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
+	}
+	else
+		return;
 	
 	if($EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back)
 		MapRepetitionCheckerFindRandom();

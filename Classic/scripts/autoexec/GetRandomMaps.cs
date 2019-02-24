@@ -33,11 +33,11 @@ $RandomMapPick36 = "CircleofStones"; 	$RandomMapPick37 = "TitanV"; 				$RandomMa
 //LakRabbit
 //
 //1-5
-$LakRandomMapPick1 = "VaubanLak"; 		$LakRandomMapPick2 = "MiniSunDried"; 		$LakRandomMapPick3 = "TitaniaLak"; 			$LakRandomMapPick4 = "DesertofDeathLak"; 				$LakRandomMapPick5 = "Sundance";
+$LakRandomMapPick1 = "VaubanLak"; 		$LakRandomMapPick2 = "MiniSunDried"; 		$LakRandomMapPick3 = "TitaniaLak"; 			$LakRandomMapPick4 = "DesertofDeathLak"; 			$LakRandomMapPick5 = "Sundance";
 //6-8
-$LakRandomMapPick6 = "SunDriedLak"; 	$LakRandomMapPick7 = "SkinnyDipLak"; 		$LakRandomMapPick8 = "LushLak";				$LakRandomMapPick9 = "InfernusLak"; 					$LakRandomMapPick10 = "Arrakis"; 
+$LakRandomMapPick6 = "SunDriedLak"; 	$LakRandomMapPick7 = "SkinnyDipLak"; 		$LakRandomMapPick8 = "LushLak";				$LakRandomMapPick9 = "InfernusLak"; 				$LakRandomMapPick10 = "Arrakis"; 
 //11-15
-$LakRandomMapPick11 = "BoxLak"; 		$LakRandomMapPick12 = "TreasureIslandLak"; 	$LakRandomMapPick13 = "Raindance_nefLak"; 	$LakRandomMapPick14 = "SaddiesHill"; 					$LakRandomMapPick15 = "TWL_BeachBlitzLak"; 
+$LakRandomMapPick11 = "BoxLak"; 		$LakRandomMapPick12 = "TreasureIslandLak"; 	$LakRandomMapPick13 = "Raindance_nefLak"; 	$LakRandomMapPick14 = "SaddiesHill"; 				$LakRandomMapPick15 = "TWL_BeachBlitzLak"; 
 
 
 

@@ -95,7 +95,10 @@ package checkver
 			if (!%client.t2csri_sentComCertDone)
 			{
 				if($Host::TournamentMode && %client.team !$= 0) //Added -ChocoTaco
-					serverCmdClientMakeObserver( %client ); 	
+				{	
+					serverCmdClientMakeObserver( %client );
+					messageAll('', '\cr%1 has failed the Tribesnext version check.', %client.name);
+				}
 				checkVer_showBanner(%client);
 				return;
 			}

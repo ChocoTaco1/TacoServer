@@ -31,7 +31,7 @@ $CheckVerObserverTrys = 0;
 //Coming from other modes, checks all %clients and put them into observer with a Version check fail
 function CheckVerObserver(%client)
 {
-	if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient && !$CheckVerObserverRunOnce)
+	if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient && !$CheckVerObserverRunOnce && !$Host::TournamentMode)
 	{
 		if (!%client.t2csri_sentComCertDone)
 		{
@@ -88,15 +88,18 @@ package checkver
 	}
 	function serverCmdClientPickedTeam(%client, %option)
 	{
+		Parent::serverCmdClientPickedTeam(%client, %option); //Put first -ChocoTaco
+		
 		if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient) //Added -ChocoTaco
 		{		
 			if (!%client.t2csri_sentComCertDone)
 			{
+				if($Host::TournamentMode && %client.team !$= 0) //Added -ChocoTaco
+					serverCmdClientMakeObserver( %client ); 	
 				checkVer_showBanner(%client);
 				return;
 			}
 		}
-		Parent::serverCmdClientPickedTeam(%client, %option);
 	}
 	function serverCmdClientTeamChange(%client, %option)
 	{
@@ -111,12 +114,12 @@ package checkver
 		Parent::serverCmdClientTeamChange(%client, %option);
 	}
 	function Observer::onTrigger(%data, %obj, %trigger, %state)
-	{
+	{	
 		if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient) //Added -ChocoTaco
 		{	
 			%client = %obj.getControllingClient();
 			if (!%client.t2csri_sentComCertDone)
-			{
+			{			
 				checkVer_showBanner(%client);
 				return;
 			}

@@ -198,8 +198,10 @@ $Host::loadingmsgline1 = "Join Discord: ";										//Loading screen msg line 1
 $Host::loadingmsgline1content = "https://t2discord.tk";							//Loading screen msg content 1
 $Host::loadingmsgline2 = "Server Github: ";										//Loading screen msg line 2
 $Host::loadingmsgline2content = "https://github.com/ChocoTaco1/TacoServer";		//Loading screen msg content 2
-$Host::loadingmsgline3 = "Hosted by: ";											//Loading screen msg line 3
-$Host::loadingmsgline3content = "Branzone";										//Loading screen msg content 3
+$Host::loadingmsgline3 = "Required Mappacks: ";									//Loading screen msg line 3
+$Host::loadingmsgline3content = "S5 S8 TWL TWL2";								//Loading screen msg content 3
+$Host::loadingmsgline4 = "Hosted by: ";											//Loading screen msg line 4
+$Host::loadingmsgline4content = "Branzone";										//Loading screen msg content 4
 $Host::EnableNetTourneyClient = 1; 				//Enable or Disable Tourney Net Client checking
 //LakRabbit
 $Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled

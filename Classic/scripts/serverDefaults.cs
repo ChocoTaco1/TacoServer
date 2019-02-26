@@ -177,8 +177,11 @@ $Host::MapPlayerLimits["Whiteout", "DM"] = "8 -1";
 $Host::MapPlayerLimits["Whiteout", "Bounty"] = "8 -1";
 
 //Taco Addons
+$Host::EnableAutobalance = 1;					//Will autobalance when teams are uneven.
 $Host::EnableMortarTurret = 0; 					//Enable or Disable Mortar Turret
+$Host::EnableNetTourneyClient = 1; 				//Enable or Disable Tourney Net Client checking
 $Host::EnableNoBaseRapeNotify = 1; 				//Get a base rape notification
+$Host::EnableSetNextMission = 1;				//Let admins set the next mission thru the vote menu
 $Host::EnableTeamBalanceNotify = 1; 			//Get a teambalance notification
 $Host::EnableTurretPlayerCount = 10; 			//How many to enable turrets
 $Host::EnableVoteSound = 1;						//If you want a sound chime during voting
@@ -187,11 +190,9 @@ $Host::AntiCloakPlayerCount = 6; 				//How many to enable Cloak
 $Host::PUGautoPassword = 0; 					//Enable or Disable an auto password at a certain amount of players
 $Host::PUGPassword = "pickup"; 					//PUG password
 $Host::EmptyServerReset = 1;					//Whether or not you want the server to reset when its empty
-$Host::EnableAutobalance = 1;					//Will autobalance when teams are uneven.
 $Host::DMSLOnlyMode = 0;						//Shocklance Only Mode for Deathmatch
 $Host::SCtFProMode = 0;							//Pro mode for LCTF
-$Host::EnableSetNextMission = 1;				//Let admins set the next mission thru the vote menu
-$Host::loadingmsgcolor1 = "ffb734";				//Loading screen color 1
+$Host::loadingmsgcolor1 = "05edad";				//Loading screen color 1
 $Host::loadingmsgcolor2 = "29DEE7";				//Loading screen color 2
 $Host::loadingmsgcolor3 = "33CCCC";				//Loading screen color 3
 $Host::loadingmsgline1 = "Join Discord: ";										//Loading screen msg line 1
@@ -201,8 +202,7 @@ $Host::loadingmsgline2content = "https://github.com/ChocoTaco1/TacoServer";		//L
 $Host::loadingmsgline3 = "Required Mappacks: ";									//Loading screen msg line 3
 $Host::loadingmsgline3content = "S5 S8 TWL TWL2";								//Loading screen msg content 3
 $Host::loadingmsgline4 = "Hosted by: ";											//Loading screen msg line 4
-$Host::loadingmsgline4content = "Branzone";										//Loading screen msg content 4
-$Host::EnableNetTourneyClient = 1; 				//Enable or Disable Tourney Net Client checking
+$Host::loadingmsgline4content = "Branzone";	
 //LakRabbit
 $Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
 $Host::LakRabbitNoSplashDamage = 0;				//Splash Damage enabled or not

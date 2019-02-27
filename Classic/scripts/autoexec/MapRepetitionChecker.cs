@@ -16,7 +16,10 @@ function MapRepetitionChecker( %game )
 	//Debug
 	//%MapRepetitionCheckerDebug = true;
 	
-	if( ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "LakRabbit" ) && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 && ($GetRandomMapsLoaded || $SNMPresetsLoaded))
+	if(!$GetRandomMapsLoaded)
+		return;
+	
+	if( ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "LakRabbit" ) && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
 	{
 		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
 			MapRepetitionCheckerFindRandom();
@@ -44,13 +47,15 @@ function MapRepetitionCheckerFindRandom()
 {
 	if($GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
 		SetNextMapGetRandoms( %client ); //Get Random Set Next Mission maps
+	else
+		return;
 	
 	if( $CurrentMissionType $= "CTF" )
 	{
 		%MapCheckerRandom = getRandom(1,6);
 		$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
 	}
-	else if( $CurrentMissionType $= "LakRabbit" && $GetRandomMapsLoaded )
+	else if( $CurrentMissionType $= "LakRabbit" )
 	{
 		%MapCheckerRandom = getRandom(1,3);
 		$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];

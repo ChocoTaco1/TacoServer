@@ -17,6 +17,9 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.34 Febuary 2019
+// Added SetNextMission support
+//
 // v3.33 January 2019
 // Took out slap headshot.
 // Added footnotes for voting references with evo admin mod.
@@ -611,9 +614,9 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			}
 			if(%ma)
 				%points += 3;
-			%sound = %defaultSound;
-			%sourceObject.client.totalShockHits++;
-			%weapon = "ShockLance";
+				%sound = %defaultSound;
+				%sourceObject.client.totalShockHits++;
+				%weapon = "ShockLance";
 		}
 		else if(%damageType == $DamageType::Blaster)
 		{
@@ -965,7 +968,7 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 		//Added so lak vote items are properly displayed in evo adminvotemenu
 		//A lot of changes were added to admin.ovl in evo
 		//see footnotes below
-		else if (%client.ForceVote > 0)
+		else if (%client.ForceVote > 0 && %client.NextMission !$= 1 ) //Added for SetNextMission
 		{
 			if(!Game.duelMode)
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to enable Duel Mode' );
@@ -981,8 +984,8 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
-		}     
-		else
+		} 
+		else if ( %client.NextMission !$= 1 ) //Added for SetNextMission
 		{
 			if(!Game.duelMode)
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Enable Duel Mode' );

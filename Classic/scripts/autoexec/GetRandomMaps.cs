@@ -1,10 +1,6 @@
 //Random Set Next Mission maps
 //Runs for SetNextMisssion (Random) and Map Repetition Checker
 //
-//If this file isnt present. Presets are found in defaultGame.ovl in evo.vl2
-//Presets are only meant as a fallback.
-//Setting $EvoCachedNextMission = ""; can crash the server.
-//
 
 //This file is present
 $GetRandomMapsLoaded = true;

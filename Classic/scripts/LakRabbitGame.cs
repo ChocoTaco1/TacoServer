@@ -19,6 +19,7 @@
 //
 // v3.34 Febuary 2019
 // Added SetNextMission support
+// Indoor Spawning support
 //
 // v3.33 January 2019
 // Took out slap headshot.
@@ -1393,6 +1394,11 @@ function LakRabbitGame::playerSpawned(%game, %player)
 // modified to spawn you near rabbit or flag
 function LakRabbitGame::pickTeamSpawn(%game, %team) 
 {
+    //Use traditional spawnspheres for indoor maps
+	if($CurrentMission $= "BoxLak")
+	   return parent::pickTeamSpawn(%game, %team);
+
+	
 	//find the rabbit
 	%spawnNear = -1;
 	for (%i = 0; %i < ClientGroup.getCount(); %i++)

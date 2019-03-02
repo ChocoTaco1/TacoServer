@@ -28,12 +28,20 @@ $RandomMapPick36 = "CircleofStones"; 	$RandomMapPick37 = "TitanV"; 				$RandomMa
 //
 //LakRabbit
 //
-//1-5
-$LakRandomMapPick1 = "VaubanLak"; 		$LakRandomMapPick2 = "MiniSunDried"; 		$LakRandomMapPick3 = "TitaniaLak"; 			$LakRandomMapPick4 = "DesertofDeathLak"; 			$LakRandomMapPick5 = "Sundance";
-//6-8
-$LakRandomMapPick6 = "SunDriedLak"; 	$LakRandomMapPick7 = "SkinnyDipLak"; 		$LakRandomMapPick8 = "LushLak";				$LakRandomMapPick9 = "InfernusLak"; 				$LakRandomMapPick10 = "Arrakis"; 
-//11-15
-$LakRandomMapPick11 = "BoxLak"; 		$LakRandomMapPick12 = "TreasureIslandLak"; 	$LakRandomMapPick13 = "Raindance_nefLak"; 	$LakRandomMapPick14 = "SaddiesHill"; 				$LakRandomMapPick15 = "TWL_BeachBlitzLak"; 
+//1-3
+$LakRandomMapPick1 = "VaubanLak"; 			$LakRandomMapPick2 = "MiniSunDried"; 		$LakRandomMapPick3 = "TitaniaLak";
+//4-6
+$LakRandomMapPick4 = "DesertofDeathLak";	$LakRandomMapPick5 = "Sundance";			$LakRandomMapPick6 = "SunDriedLak";
+//7-9
+$LakRandomMapPick7 = "SkinnyDipLak"; 		$LakRandomMapPick8 = "LushLak";				$LakRandomMapPick9 = "InfernusLak";
+//10-12
+$LakRandomMapPick10 = "Arrakis"; 			$LakRandomMapPick11 = "BoxLak"; 			$LakRandomMapPick12 = "TreasureIslandLak";
+//13-15
+$LakRandomMapPick13 = "Raindance_nefLak"; 	$LakRandomMapPick14 = "SaddiesHill"; 		$LakRandomMapPick15 = "TWL_BeachBlitzLak"; 
+//16-18
+$LakRandomMapPick16 = "PhasmaDustLak"; 		$LakRandomMapPick17 = "Sulfide"; 			$LakRandomMapPick18 = "HavenLak"; 
+//19-21
+$LakRandomMapPick19 = "Crater71Lak"; 		$LakRandomMapPick20 = "SolsDescentLak"; 	$LakRandomMapPick21 = "FrozenFuryLak"; 
 
 
 
@@ -65,14 +73,22 @@ function SetNextMapGetRandoms( %client )
 	else if( $CurrentMissionType $= "LakRabbit" )
 	{
 		//Get random numbers		
-		%LakRandomPick1 = getRandom(1,5);
-		%LakRandomPick2 = getRandom(6,10);
-		%LakRandomPick3 = getRandom(11,15);
+		%LakRandomPick1 = getRandom(1,3);
+		%LakRandomPick2 = getRandom(4,6);
+		%LakRandomPick3 = getRandom(7,9);
+		%LakRandomPick4 = getRandom(10,12);
+		%LakRandomPick5 = getRandom(13,15);
+		%LakRandomPick6 = getRandom(16,18);
+		%LakRandomPick7 = getRandom(19,21);
 		
 		//Deduction code		
 		$SetNextMissionMapSlot1 = $LakRandomMapPick[%LakRandomPick1];
 		$SetNextMissionMapSlot2 = $LakRandomMapPick[%LakRandomPick2];
 		$SetNextMissionMapSlot3 = $LakRandomMapPick[%LakRandomPick3];
+		$SetNextMissionMapSlot4 = $LakRandomMapPick[%LakRandomPick4];
+		$SetNextMissionMapSlot5 = $LakRandomMapPick[%LakRandomPick5];
+		$SetNextMissionMapSlot6 = $LakRandomMapPick[%LakRandomPick6];
+		$SetNextMissionMapSlot7 = $LakRandomMapPick[%LakRandomPick7];
 	}
 
 }

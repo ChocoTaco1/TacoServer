@@ -1,5 +1,5 @@
 // To manage options in certain missiontypes
-// called in Getcounts.csk
+// called in Getcounts.cs
 
 // Variables
 // Add these to ServerPrefs

@@ -31,7 +31,7 @@ $CheckVerObserverTrys = 0;
 //Coming from other modes, checks all %clients and put them into observer with a Version check fail
 function CheckVerObserver(%client)
 {
-	if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient && !$CheckVerObserverRunOnce && !$Host::TournamentMode)
+	if($Host::EnableNetTourneyClient && !$CheckVerObserverRunOnce && !$Host::TournamentMode)
 	{
 		if (!%client.t2csri_sentComCertDone)
 		{
@@ -64,7 +64,7 @@ package checkver
 {
 	function serverCmdClientJoinTeam(%client, %team)
 	{
-		if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient) //Added -ChocoTaco
+		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
 		{
 			if (!%client.t2csri_sentComCertDone)
 			{
@@ -76,7 +76,7 @@ package checkver
 	}
 	function serverCmdClientJoinGame(%client)
 	{
-		if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient) //Added -ChocoTaco
+		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
 		{	
 			if (!%client.t2csri_sentComCertDone)
 			{
@@ -90,7 +90,7 @@ package checkver
 	{
 		Parent::serverCmdClientPickedTeam(%client, %option); //Put first -ChocoTaco
 		
-		if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient) //Added -ChocoTaco
+		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
 		{		
 			if (!%client.t2csri_sentComCertDone)
 			{
@@ -98,7 +98,7 @@ package checkver
 				{	
 					serverCmdClientMakeObserver( %client );
 					messageAll('', '\cr%1 has failed the Tribesnext version check.', %client.name);
-				}
+				}	
 				checkVer_showBanner(%client);
 				return;
 			}
@@ -106,7 +106,7 @@ package checkver
 	}
 	function serverCmdClientTeamChange(%client, %option)
 	{
-		if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient) //Added -ChocoTaco
+		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
 		{		
 			if (!%client.t2csri_sentComCertDone)
 			{
@@ -118,7 +118,7 @@ package checkver
 	}
 	function Observer::onTrigger(%data, %obj, %trigger, %state)
 	{	
-		if($CurrentMissionType $= "CTF" && $Host::EnableNetTourneyClient) //Added -ChocoTaco
+		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
 		{	
 			%client = %obj.getControllingClient();
 			if (!%client.t2csri_sentComCertDone)
@@ -141,9 +141,9 @@ activatePackage(checkver);
 //In defaultgame.ovl DefaultGame::sendGameVoteMenu(%game, %client, %key) 
 //		 
 //		//Toggle Tournament Net Client
-//		if(%client.isAdmin && $Host::EnableNetTourneyClient && $CurrentMissionType $= "CTF")
+//		if(%client.isAdmin && $Host::EnableNetTourneyClient)
 //			messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
-//		else if(%client.isAdmin && $CurrentMissionType $= "CTF")
+//		else if(%client.isAdmin)
 //			messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
 //
 //

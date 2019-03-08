@@ -526,8 +526,6 @@ function Player::maxInventory(%this, %data)
 
 function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
 {
-	parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
-
 	//Other armors get more damage
 	if(%targetObject.client.armor $= "Medium")
 	{
@@ -538,6 +536,8 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	{
 		%amount *= 1.5;
 	}
+	
+	parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
 }
 
 };

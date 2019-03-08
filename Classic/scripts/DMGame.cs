@@ -524,6 +524,22 @@ function Player::maxInventory(%this, %data)
 	return %max;
 }
 
+function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
+{
+	parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
+
+	//Other armors get more damage
+	if(%targetObject.client.armor $= "Medium")
+	{
+		%amount *= 1.2;
+	}
+	
+	if(%targetObject.client.armor $= "Heavy")
+	{
+		%amount *= 1.5;
+	}
+}
+
 };
 
 function DMGame::sendGameVoteMenu(%game, %client, %key)

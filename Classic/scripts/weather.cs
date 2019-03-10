@@ -26,6 +26,28 @@ datablock PrecipitationData(Rain)
 
 };
 
+datablock PrecipitationData(RainNoSound)
+{
+   type = 0;
+   //soundProfile = "Universal_Rain_Light_1";
+   materialList = "raindrops.dml";
+   sizeX = 0.2;
+   sizeY = 0.45;
+
+   movingBoxPer = 0.35;
+   divHeightVal = 1.5;
+   sizeBigBox = 1;
+   topBoxSpeed = 20;
+   frontBoxSpeed = 30;
+   topBoxDrawPer = 0.5;
+   bottomDrawHeight = 40;
+   skipIfPer = -0.3;
+   bottomSpeedPer = 1.0;
+   frontSpeedPer = 1.5;
+   frontRadiusPer = 0.5;
+
+};
+
 datablock PrecipitationData(Snow)
 {
    type = 1;

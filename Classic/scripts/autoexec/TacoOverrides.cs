@@ -82,30 +82,6 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
    // -----------------------------------------------------------------------------------------
 }
 
-//Protect the privacy of an observing observer
-//No observing messages
-function DefaultGame::processGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4, %arg5)
-{
-   //the default behavior when clicking on a game link is to start observing that client
-   %targetClient = %arg1;
-   if ((%client.team == 0) && isObject(%targetClient) && (%targetClient.team != 0))
-   {
-      %prevObsClient = %client.observeClient;
-      
-      // update the observer list for this client
-      observerFollowUpdate( %client, %targetClient, %prevObsClient !$= "" );
-
-      serverCmdObserveClient(%client, %targetClient);
-      displayObserverHud(%client, %targetClient);
-
-      if (%targetClient != %prevObsClient)
-      {
-         //messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);  
-         //messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);  
-      }
-   }
-}
-
 };
 
 // Prevent package from being activated if it is already

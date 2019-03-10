@@ -2,13 +2,11 @@
 //$EvoCachedNextMission = "RoundTheMountain";
 //$EvoCachedNextMission = "Arrakis";
 //
-//$GetRandomMapsLoaded makes sure GetRandomMaps.cs is present
-//$SNMPresetsLoaded makes sure if GetRandomMaps.cs isnt present presets are loaded.
-//Presets are in defaultgame.ovl evo
 //
-//Set up to not run if GetRandomMaps.cs not loaded or Presets not loaded.
-//Server can crash if $EvoCachedNextMission = "";
-//
+$PreviousMission4back = "";
+$PreviousMission3back = "";		
+$PreviousMission2back = "";
+$PreviousMission1back = "";
 
 //Run in GetTeamCounts.cs
 function MapRepetitionChecker( %game )

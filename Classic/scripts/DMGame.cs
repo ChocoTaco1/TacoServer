@@ -514,16 +514,6 @@ function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifie
       }
 }
 
-function Player::maxInventory(%this, %data)
-{
-	//chocotaco - just runs as an ammo pack cuz messing with the inv max messes up weapons cycling
-	//%max = ShapeBase::maxInventory(%this,%data) * 2;
-	%max = ShapeBase::maxInventory(%this,%data);
-	//if (%this.getInventory(AmmoPack))
-		%max += AmmoPack.max[%data.getName()];
-	return %max;
-}
-
 function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
 {
 	//Other armors get more damage
@@ -534,7 +524,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	
 	if(%targetObject.client.armor $= "Heavy")
 	{
-		%amount *= 1.5;
+		%amount *= 1.4;
 	}
 	
 	parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);

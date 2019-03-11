@@ -1178,7 +1178,7 @@ function SCtFGame::awardScoreFlagCap(%game, %cl, %flag)
     $TeamScore[%cl.team] += %game.SCORE_PER_TEAM_FLAG_CAP;
     messageAll('MsgTeamScoreIs', "", %cl.team, $TeamScore[%cl.team]);
 
-    %flag.grabber.flagGrabs++;
+    //%flag.grabber.flagGrabs++; //moved to awardScoreFlagTouch
 
     if (%game.SCORE_PER_TEAM_FLAG_CAP > 0)
     {
@@ -1214,6 +1214,7 @@ function SCtFGame::awardScoreFlagTouch(%game, %cl, %flag)
 {
  
     %flag.grabber = %cl;
+	%flag.grabber.flagGrabs++; //moved from awardScoreFlagCap to correctly count flaggrabs
     %team = %cl.team;
 	if( $DontScoreTimer[%team] )
 		return;
@@ -2151,7 +2152,7 @@ function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 		{
 			killeveryone();
 
-			if(%game.SCtFProMode)
+			if($Host::SCtFProMode)
 			{
 				messageAll('MsgAdminForce', '\c2The Admin has disabled Pro Mode.');
 	
@@ -2159,7 +2160,7 @@ function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 				$InvBanList[SCtF, "ShockLance"] = 0;
 				$InvBanList[SCtF, "Plasma"] = 0;
 			
-				%game.SCtFProMode = false;
+				$Host::SCtFProMode = false;
 			}
 			else
 			{
@@ -2169,7 +2170,7 @@ function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 				$InvBanList[SCtF, "ShockLance"] = 1;
 				$InvBanList[SCtF, "Plasma"] = 1;
 			
-				%game.SCtFProMode = true;
+				$Host::SCtFProMode = true;
 			}
 		}
 		else 
@@ -2179,7 +2180,7 @@ function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 			{
 				killeveryone();
 
-				if(%game.SCtFProMode)
+				if($Host::SCtFProMode)
 				{
 					messageAll('MsgVotePassed', '\c2Pro Mode Disabled.');
 
@@ -2187,7 +2188,7 @@ function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 					$InvBanList[SCtF, "ShockLance"] = 0;
 					$InvBanList[SCtF, "Plasma"] = 0;
 			
-					%game.SCtFProMode = false;
+					$Host::SCtFProMode = false;
 				}
 				else
 				{
@@ -2197,14 +2198,12 @@ function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 					$InvBanList[SCtF, "ShockLance"] = 1;
 					$InvBanList[SCtF, "Plasma"] = 1;
 			
-					%game.SCtFProMode = true;
+					$Host::SCtFProMode = true;
 				}
 			}
 			else
 				messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100)); 
 		}
-
-		$Host::SCtFProMode = %game.SCtFProMode;
 	}
 }
 // For voting to work properly - evo admin.ovl

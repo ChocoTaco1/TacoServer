@@ -1095,7 +1095,7 @@ function CTFGame::awardScoreFlagCap(%game, %cl, %flag)
     $TeamScore[%cl.team] += %game.SCORE_PER_TEAM_FLAG_CAP;
     messageAll('MsgTeamScoreIs', "", %cl.team, $TeamScore[%cl.team]);
 
-    %flag.grabber.flagGrabs++;
+    //%flag.grabber.flagGrabs++; //moved to awardScoreFlagTouch
 
     if (%game.SCORE_PER_TEAM_FLAG_CAP > 0)
     {
@@ -1139,6 +1139,7 @@ function CTFGame::awardScoreFlagCap(%game, %cl, %flag)
 function CTFGame::awardScoreFlagTouch(%game, %cl, %flag)
 {
    %flag.grabber = %cl;
+   %flag.grabber.flagGrabs++; //moved from awardScoreFlagCap to correctly count flaggrabs
    %team = %cl.team;
    if( $DontScoreTimer[%team] )
       return;

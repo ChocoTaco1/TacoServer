@@ -1,6 +1,8 @@
 //To help decrease the chances of a repeated map in the map rotation by correcting repeated maps thru script
 //$EvoCachedNextMission = "RoundTheMountain";
 //$EvoCachedNextMission = "Arrakis";
+//$EvoCachedNextMission = "RoundTheMountainLT";
+//$EvoCachedNextMission = "ArenaDomeDM";
 //
 //
 $PreviousMission4back = "";
@@ -17,7 +19,7 @@ function MapRepetitionChecker( %game )
 	if(!$GetRandomMapsLoaded)
 		return;
 	
-	if( ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "LakRabbit" ) && !$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
+	if(!$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
 	{
 		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
 			MapRepetitionCheckerFindRandom();
@@ -48,18 +50,8 @@ function MapRepetitionCheckerFindRandom()
 	else
 		return;
 	
-	if( $CurrentMissionType $= "CTF" )
-	{
-		%MapCheckerRandom = getRandom(1,6);
-		$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
-	}
-	else if( $CurrentMissionType $= "LakRabbit" )
-	{
-		%MapCheckerRandom = getRandom(1,3);
-		$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
-	}
-	else
-		return;
+	%MapCheckerRandom = getRandom(1,6);
+	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
 	
 	if($EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back)
 		MapRepetitionCheckerFindRandom();

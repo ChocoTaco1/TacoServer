@@ -2002,14 +2002,14 @@ function SCtFGame::sendGameVoteMenu(%game, %client, %key)
 		else
 		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
 	 }
-	 else if (%client.ForceVote > 0)
+	 else if (%client.ForceVote > 0 && %client.NextMission !$= 1 ) //Added for SetNextMission
 	 {
 		if(!$Host::SCtFProMode)
 		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
 		else
 		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
 	 }
-     else
+	 else if ( %client.NextMission !$= 1 ) //Added for SetNextMission
 	 {
 		if(!$Host::SCtFProMode)
 		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'change to enable Pro Mode', 'Enable Pro Mode' );

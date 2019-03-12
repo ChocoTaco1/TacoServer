@@ -23,6 +23,8 @@ $InvBanList[DM, "AmmoPack"] = 1;
 $InvBanList[DM, "MotionSensorDeployable"] = 1;
 $InvBanList[DM, "PulseSensorDeployable"] = 1;
 $InvBanList[DM, "CameraGrenade"] = 1;
+$InvBanList[DM, "FlashGrenade"] = 1;
+$InvBanList[DM, "InventoryDeployable"] = 1;
 
 function DMGame::setUpTeams(%game)
 {  
@@ -76,8 +78,9 @@ function DMGame::setUpTeams(%game)
 function DMGame::initGameVars(%game)
 {
    %game.SCORE_PER_KILL = 1; 
-   %game.SCORE_PER_DEATH = -1;
-   %game.SCORE_PER_SUICIDE = -1;
+   %game.SCORE_PER_DEATH = -0.8; //was -1
+   %game.SCORE_PER_SUICIDE = -0.5; //was -1
+   %game.SCORE_PER_MIDAIR = 0.2; // Added Chocotaco. From sctf
 }  
 
 exec("scripts/aiDeathMatch.cs");
@@ -211,6 +214,7 @@ function DMGame::resetScore(%game, %client)
    %client.score = 0;
    %client.efficiency = 0.0;
    %client.suicides = 0;
+   %client.scoreMidAir = 0;
 }
 
 function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc)
@@ -503,10 +507,10 @@ function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifie
 	         %grounded = ContainerRayCast(%start, %end, %mask, 0);
                if(!%grounded)
                {
-                  //%projectile.sourceObject.client.scoreMidAir++;
+                  %projectile.sourceObject.client.scoreMidAir++;
                   messageClient(%projectile.sourceObject.client, 'MsgMidAir', '\c0You hit a successful mid air shot.~wfx/misc/bounty_bonus.wav', %data.radiusDamageType, %distance);
                   messageTeamExcept(%projectile.sourceObject.client, 'MsgMidAir', '\c5%1 hit a mid air shot.', %projectile.sourceObject.client.name, %data.radiusDamageType, %distance);
-                  //Game.recalcScore(%projectile.sourceObject.client);
+                  Game.recalcScore(%projectile.sourceObject.client);
                }
             }
          }
@@ -519,12 +523,12 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	//Other armors get more damage
 	if(%targetObject.client.armor $= "Medium")
 	{
-		%amount *= 1.2;
+		%amount *= 1.3;
 	}
 	
 	if(%targetObject.client.armor $= "Heavy")
 	{
-		%amount *= 1.4;
+		%amount *= 1.5;
 	}
 	
 	parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);

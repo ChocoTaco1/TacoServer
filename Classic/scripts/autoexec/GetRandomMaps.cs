@@ -143,8 +143,8 @@ function SetNextMapGetRandoms( %client )
 		$SetNextMissionMapSlot4 = "HoofToeDM";
 		$SetNextMissionMapSlot5 = "ArenaDomeDM";
 		$SetNextMissionMapSlot6 = "VulcansWrathDM";
-		$SetNextMissionMapSlot7 = "";
-		$SetNextMissionMapSlot8 = "";
+		$SetNextMissionMapSlot7 = "RampartsDM";
+		$SetNextMissionMapSlot8 = "ShrineDM";
 	}
 	else
 		return;

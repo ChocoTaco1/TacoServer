@@ -547,14 +547,14 @@ function DMGame::sendGameVoteMenu(%game, %client, %key)
 		else
 		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to disable Shocklance Only Mode', 'Vote to disable Shocklance Only Mode' );
 	 }
-	 else if (%client.ForceVote > 0)
+	 else if (%client.ForceVote > 0 && %client.NextMission !$= 1 ) //Added for SetNextMission	 
 	 {
 		if(!$Host::DMSLOnlyMode)
 		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to enable Shocklance Only Mode', 'Vote to enable Shocklance Only Mode' );
 		else
 		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to disable Shocklance Only Mode', 'Vote to disable Shocklance Only Mode' );
 	 }
-     else
+     else if ( %client.NextMission !$= 1 ) //Added for SetNextMission
 	 {
 		if(!$Host::DMSLOnlyMode)
 		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'change to enable Shocklance Only Mode', 'Enable Shocklance Only Mode' );

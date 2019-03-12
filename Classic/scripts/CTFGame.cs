@@ -1179,6 +1179,8 @@ function CTFGame::checkScoreLimit(%game, %team)
 
 function CTFGame::awardScoreFlagReturn(%game, %cl, %perc)
 {
+   %cl.flagReturns++; //give flagreturn stat
+   
    // ---------------------------------------------------
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
    if (%game.SCORE_PER_FLAG_RETURN != 0)

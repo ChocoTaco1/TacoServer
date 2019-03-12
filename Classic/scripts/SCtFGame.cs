@@ -1254,6 +1254,8 @@ function SCtFGame::checkScoreLimit(%game, %team)
 
 function SCtFGame::awardScoreFlagReturn(%game, %cl, %perc)
 {
+   %cl.flagReturns++; //give flagreturn stat
+   
    if (%game.SCORE_PER_FLAG_RETURN != 0)
    {
       %pts = mfloor( %game.SCORE_PER_FLAG_RETURN * (%perc/100) );

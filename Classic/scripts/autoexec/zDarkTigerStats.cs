@@ -287,6 +287,8 @@ $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "totalSnipes";
 $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "totalShockHits";
 $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "totalShocks";
 $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "minePlusDisc";
+$dtStats::fieldValue[%lak++,"LakRabbitGame"] = "MidairflagGrabs";
+$dtStats::fieldValue[%lak++,"LakRabbitGame"] = "MidairflagGrabPoints";
 
 //Values in this script
 $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "cgKills";
@@ -1890,7 +1892,7 @@ function incGameStats(%client,%game) {// record that games stats and inc by one
       %val = $dtStats::fieldValue[%i,%game];
       %var = getFieldValue(%client,%val);
       if(%val $= "flagTimeMS"){// convert to min
-         %var = (%var / 1000) / 60;
+         %var = mfloor((%var / 1000) / 60);
       }
       %client.dtStats.gameStats[%val,%c,%game] = %var;
    }
@@ -1918,7 +1920,7 @@ function incBakGameStats(%dtStats,%game) {// record that games stats and inc by 
       %val = $dtStats::fieldValue[%i,%game];
       %var = %dtStats.gameStats[%val,"b",%game];
       if(%val $= "flagTimeMS"){// convert to min
-         %var = (%var / 1000) / 60;
+         %var = mfloor((%var / 1000) / 60);
       }
       %dtStats.gameStats[%val,%c,%game] = %var;
    }
@@ -1932,7 +1934,7 @@ function addGameBakTotal(%dtStats,%game) {// record that games stats and inc by 
       %val = $dtStats::fieldValue[%i,%game];
       %var = %dtStats.gameStats[%val,"b",%game];
       if(%val $= "flagTimeMS"){// convert to min
-         %var = (%var / 1000) / 60;
+         %var = mfloor((%var / 1000) / 60);
       }
       %dtStats.gameStats[%val,"t",%game] += %var;
    }
@@ -1962,7 +1964,7 @@ function addGameTotal(%client,%game) {// record that games stats and inc by one
       %val = $dtStats::fieldValue[%i,%game];
       %var = getFieldValue(%client,%val);
       if(%val $= "flagTimeMS"){// convert to min
-         %var = (%var / 1000) / 60;
+         %var = mfloor((%var / 1000) / 60);
       }
       %client.dtStats.gameStats[%val,"t",%game] += %var;
    }
@@ -2084,6 +2086,7 @@ function resetDtStats(%client){
    %client.laserShotsFired = 0;        %client.mortarShotsFired = 0;       %client.missileShotsFired = 0;
    %client.shockLanceShotsFired = 0;   %client.plasmaShotsFired = 0;       %client.blasterShotsFired = 0;
    %client.elfShotsFired = 0;          %client.minePlusDisc = 0;           %client.unknownShotsFired = 0;
+   %client.MidairflagGrabs = 0;		   %client.MidairflagGrabPoints = 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
 //Stats Collecting
@@ -2515,7 +2518,7 @@ function statsMenu(%client,%game){
          %inc = %client.GlArg4;
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.dtStats.gameStats["map",%inc,%game] SPC %vClient.dtStats.gameStats["timeStamp",%inc,%game]);
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKH\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175>Game Details<lmargin:330>Totals<lmargin:450>TA Per Game";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Avg Per Game";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          %line = '<color:0befe7><lmargin%:0>  Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"score",%inc,%game),getGameTotal(%vClient,"score",%game),mCeil(getGameTotalAvg(%vClient,"score",%game)));
@@ -2525,14 +2528,18 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"deaths",%inc,%game),getGameTotal(%vClient,"deaths",%game),mCeil(getGameTotalAvg(%vClient,"deaths",%game)));
          %line = '<color:0befe7>  Suicides<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"suicides",%inc,%game),getGameTotal(%vClient,"suicides",%game),mCeil(getGameTotalAvg(%vClient,"suicides",%game)));
-         %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Midairs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"mas",%inc,%game),getGameTotal(%vClient,"mas",%game),mCeil(getGameTotalAvg(%vClient,"mas",%game)));         
+		 %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagGrabs",%inc,%game),getGameTotal(%vClient,"flagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"flagGrabs",%game)));
-         %line = '<color:0befe7>  Flag Time Min<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+		 %line = '<color:0befe7>  Midair Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"MidairflagGrabs",%inc,%game),getGameTotal(%vClient,"MidairflagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"MidairflagGrabs",%game)));
+         %line = '<color:0befe7>  Midair Flag Grab Points<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"MidairflagGrabPoints",%inc,%game),getGameTotal(%vClient,"MidairflagGrabPoints",%game),mCeil(getGameTotalAvg(%vClient,"MidairflagGrabPoints",%game)));
+         %line = '<color:0befe7>  Flag Time Minutes<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagTimeMS",%inc,%game),getGameTotal(%vClient,"flagTimeMS",%game),mCeil(getGameTotalAvg(%vClient,"flagTimeMS",%game)));
          %line = '<color:0befe7>  Bonus Points<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"morepoints",%inc,%game),getGameTotal(%vClient,"morepoints",%game),mCeil(getGameTotalAvg(%vClient,"morepoints",%game)));
-         %line = '<color:0befe7>  Mid-Airs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"mas",%inc,%game),getGameTotal(%vClient,"mas",%game),mCeil(getGameTotalAvg(%vClient,"mas",%game)));
          %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"minePlusDisc",%inc,%game),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
          %line = '<color:0befe7>  Total Speed<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2551,7 +2558,8 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"totalShockHits",%inc,%game),getGameTotal(%vClient,"totalShockHits",%game),mCeil(getGameTotalAvg(%vClient,"totalShockHits",%game)));
          %line = '<color:0befe7>  Total Shocks<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"totalShocks",%inc,%game),getGameTotal(%vClient,"totalShocks",%game),mCeil(getGameTotalAvg(%vClient,"totalShocks",%game)));
-      case "LAKW":
+ 
+	  case "LAKW":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Weapon Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
@@ -2617,7 +2625,7 @@ function statsMenu(%client,%game){
       case "Lak":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase @ "'s Match Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175>Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          %line = '<color:0befe7><lmargin%:0>  Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"score",%game)),getGameTotal(%vClient,"score",%game),mCeil(getGameTotalAvg(%vClient,"score",%game)));
@@ -2627,15 +2635,19 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"deaths",%game)),getGameTotal(%vClient,"deaths",%game),mCeil(getGameTotalAvg(%vClient,"deaths",%game)));
          %line = '<color:0befe7>  Suicides<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"suicides",%game)),getGameTotal(%vClient,"suicides",%game),mCeil(getGameTotalAvg(%vClient,"suicides",%game)));
-         %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Midairs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mas",%game)),getGameTotal(%vClient,"mas",%game),mCeil(getGameTotalAvg(%vClient,"mas",%game)));         
+		 %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagGrabs",%game)),getGameTotal(%vClient,"flagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"flagGrabs",%game)));
-         %line = '<color:0befe7>  Flag Time Min<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+		 %line = '<color:0befe7>  Midair Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"MidairflagGrabs",%inc,%game),getGameTotal(%vClient,"MidairflagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"MidairflagGrabs",%game)));
+         %line = '<color:0befe7>  Midair Flag Grab Points<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"MidairflagGrabPoints",%inc,%game),getGameTotal(%vClient,"MidairflagGrabPoints",%game),mCeil(getGameTotalAvg(%vClient,"MidairflagGrabPoints",%game)));         
+         %line = '<color:0befe7>  Flag Time Minutes<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagTimeMS",%game)),getGameTotal(%vClient,"flagTimeMS",%game),mCeil(getGameTotalAvg(%vClient,"flagTimeMS",%game)));
          %line = '<color:0befe7>  Bonus Points<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"morepoints",%game)),getGameTotal(%vClient,"morepoints",%game),mCeil(getGameTotalAvg(%vClient,"morepoints",%game)));
-         %line = '<color:0befe7>  Mid-Airs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mas",%game)),getGameTotal(%vClient,"mas",%game),mCeil(getGameTotalAvg(%vClient,"mas",%game)));
-         %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+		 %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"minedisc",%game)),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
          %line = '<color:0befe7>  Total Speed<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalSpeed",%game)),getGameTotal(%vClient,"totalSpeed",%game),mCeil(getGameTotalAvg(%vClient,"totalSpeed",%game)));
@@ -2653,7 +2665,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalShockHits",%game)),getGameTotal(%vClient,"totalShockHits",%game),mCeil(getGameTotalAvg(%vClient,"totalShockHits",%game)));
          %line = '<color:0befe7>  Total Shocks<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalShocks",%game)),getGameTotal(%vClient,"totalShocks",%game),mCeil(getGameTotalAvg(%vClient,"totalShocks",%game)));
-         
+
       case "CTFA":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase @ "'s Kills/Deaths");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
@@ -2720,7 +2732,7 @@ function statsMenu(%client,%game){
       case "CTF":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase @ "'s Match Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"kills",%game)),getGameTotal(%vClient,"kills",%game),mCeil(getGameTotalAvg(%vClient,"kills",%game)));
@@ -2820,7 +2832,7 @@ function statsMenu(%client,%game){
          %inc = %client.GlArg4;
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.dtStats.gameStats["map",%inc,%game] SPC %vClient.dtStats.gameStats["timeStamp",%inc,%game]);
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFH\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175>Game Details<lmargin:330>Totals<lmargin:450>TA Per Game";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Avg Per Game";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"kills",%inc,%game),getGameTotal(%vClient,"kills",%game),mCeil(getGameTotalAvg(%vClient,"kills",%game)));
@@ -2856,7 +2868,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Blaster Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2875,7 +2887,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Spinfusor Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2903,7 +2915,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Chaingun Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2922,7 +2934,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Grenade Launcher Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2948,7 +2960,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Laser Rifle Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2970,7 +2982,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Fusion Mortar Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2996,7 +3008,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Missile Launcher Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3022,7 +3034,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Shocklance Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3044,7 +3056,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Plasma Rifle Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3070,7 +3082,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>ELF Projector Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"elfShotsFired",%game)),getGameTotal(%vClient,"elfShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"elfShotsFired",%game)));
@@ -3079,7 +3091,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Blaster Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3099,7 +3111,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Spinfusor Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3128,7 +3140,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Chaingun Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3148,7 +3160,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Grenade Launcher Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3175,7 +3187,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Laser Rifle Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3197,7 +3209,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Fusion Mortar Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3224,7 +3236,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Missile Launcher Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3251,7 +3263,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Shocklance Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3274,7 +3286,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Plasma Rifle Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3301,7 +3313,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>ELF Projector Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLAKW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
-         %header = "<color:0befe7><lmargin:0>  Stats<lmargin:175> Running Average<lmargin:330>Totals<lmargin:450>Totals Average";
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';

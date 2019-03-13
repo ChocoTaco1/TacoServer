@@ -1724,7 +1724,9 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
          %points = mFloor((getSpeed(%player)/7.3) + (getHeight(%player)/3.3)); //was 5.3 - 2.3
          %points = %points > 5 ? %points : 5;
          messageAll('MsgRabbitFlagTaken', '\c4%1 gets %2 points for a Mid-Air flag grab! [Speed:%3] [Height:%4]~wfx/misc/hunters_horde.wav', %player.client.name, %points, getSpeed(%player), getHeight(%player));
-	 %player.client.morepoints += %points;
+		 %player.client.morepoints += %points;
+		 %player.client.MidairflagGrabs++; //for stats
+		 %player.client.MidairflagGrabPoints += %points; //for stats
       }
       else
          messageAll('MsgRabbitFlagTaken', '\c2%1 has taken the flag!~wfx/misc/flag_snatch.wav', %player.client.name);

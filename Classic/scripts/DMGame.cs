@@ -78,8 +78,8 @@ function DMGame::setUpTeams(%game)
 function DMGame::initGameVars(%game)
 {
    %game.SCORE_PER_KILL = 1; 
-   %game.SCORE_PER_DEATH = -0.8; //was -1
-   %game.SCORE_PER_SUICIDE = -0.5; //was -1
+   %game.SCORE_PER_DEATH = -1;
+   %game.SCORE_PER_SUICIDE = -1;
    %game.SCORE_PER_MIDAIR = 0.2; // Added Chocotaco. From sctf
 }  
 

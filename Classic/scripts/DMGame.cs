@@ -242,8 +242,18 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
    
    if(%clVictim.isMarked && $DMGame::mode){
       if(%clVictim != %clKiller && %clKiller !$= ""){
-         %clKiller.bigGame++; // stats rename to what ever 
-         messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s kill streak of %3.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+         
+		 if(%clVictim.killCounter < 10) {
+			%clKiller.bigGame++; // stats rename to what ever 
+			%clKiller.scorebigGame++;
+			messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+		 }
+		 else {
+			%clKiller.bigGame++; 		%clKiller.bigGame++;
+			%clKiller.scorebigGame++;   %clKiller.scorebigGame++;
+			messageAll('Msgding', '\c1%1 receives a double bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+		 }
+		 Game.recalcScore(%clKiller);
       }
       for(%a = 0; %a < ClientGroup.getCount(); %a++)
       {
@@ -262,6 +272,7 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
    }
    %clKiller.killCounter++;
    %clVictim.killCounter = 0;
+   
    switch$($DMGame::mode){
       case 1: // player with the highest kill streak if they are above $DMGame::wpKillCount
 		 %bigClient = 0;
@@ -358,9 +369,9 @@ function DMGame::recalcScore(%game, %client)
    if (%killValue - %deathValue == 0)
       %client.efficiency = %suicideValue;
    else
-      %client.efficiency = ((%killValue * %killValue) / (%killValue - %deathValue)) + %suicideValue;
+      %client.efficiency = ((%killValue * %killValue) / (%killValue - %deathValue)) + (%suicideValue + %bigGameValue);
    
-   %client.score = mFloatLength(%client.efficiency, 1) + %bigGameValue;
+   %client.score = mFloatLength(%client.efficiency, 1);
    messageClient(%client, 'MsgYourScoreIs', "", %client.score);
    %game.recalcTeamRanks(%client);
    %game.checkScoreLimit(%client);

@@ -243,7 +243,7 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
    if(%clVictim.isMarked && $DMGame::mode){
       if(%clVictim != %clKiller && %clKiller !$= ""){
          %clKiller.bigGame++; // stats rename to what ever 
-         messageAll('Msgding', '\c1%1 took out %2 ending their kill streak of %3.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+         messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s kill streak of %3.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
       }
       for(%a = 0; %a < ClientGroup.getCount(); %a++)
       {
@@ -275,7 +275,7 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
             for(%i = 0; %i < ClientGroup.getCount(); %i++){
                %cl = ClientGroup.getObject(%i);
                
-			   messageClient(%cl, 'MsgPingWaypoint', '\c2%1 is on a kill streak.',%bigClient.name);
+			   messageClient(%cl, 'MsgPingWaypoint', '\c2%1 is on a kill streak.~wgui/vote_nopass.wav',%bigClient.name);
 				
                hideTargetWaypoint(%cl,%game.lastGuy);
                if(%cl != %bigClient){
@@ -299,7 +299,7 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
             for(%i = 0; %i < ClientGroup.getCount(); %i++){
                %cl = ClientGroup.getObject(%i);
 			   //messageClient(%cl, 'MsgPingWaypoint', '\c2%1 now has the highest score.',%bigClient.name);
-               messageClient(%cl, 'MsgPingWaypoint', '\c2%1 now has the highest score.',%bigClient.name);
+               messageClient(%cl, 'MsgPingWaypoint', '\c2%1 now has the highest score.~wgui/vote_nopass.wav',%bigClient.name);
                hideTargetWaypoint(%cl,%game.lastGuy);
                if(%cl != %bigClient){
                   markTargetDM(%cl,%bigClient);

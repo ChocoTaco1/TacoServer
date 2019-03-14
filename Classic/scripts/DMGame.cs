@@ -10,6 +10,7 @@
 //Don't get killed
 //Points are scored for each kill you make and subtracted each time you die
 //First person to 25 points wins
+//Go after those on kill streaks for a bonus.
 //--- GAME RULES END ---
 
 $InvBanList[DM, "TurretOutdoorDeployable"] = 1;
@@ -27,7 +28,7 @@ $InvBanList[DM, "FlashGrenade"] = 1;
 $InvBanList[DM, "InventoryDeployable"] = 1;
 
 $DMGame::wpKillCount = 5; //person with highest amount of kills above the kill count gets a mark on there head
-$DMGame::wpMessage = "Kill Me";
+$DMGame::wpMessage = "";
 //set 1 only mark the target with highest amount of kills
 //set 2 only mark target with highest score
 $DMGame::mode = 1; // this could be made into a vote command to switch modes
@@ -274,7 +275,7 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
             for(%i = 0; %i < ClientGroup.getCount(); %i++){
                %cl = ClientGroup.getObject(%i);
                
-			   messageClient(%cl, 'MsgPingWaypoint', '\c2%1 is on a kill streak of %2.',%bigClient.name,%bigClient.killCounter);
+			   messageClient(%cl, 'MsgPingWaypoint', '\c2%1 is on a kill streak.',%bigClient.name);
 				
                hideTargetWaypoint(%cl,%game.lastGuy);
                if(%cl != %bigClient){
@@ -767,25 +768,25 @@ function killEveryone(%ignore, %message)
 //	  case "DMSLOnlyMode":
 //         if( %isAdmin && !%client.ForceVote )
 //         {
-   //            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
-   //			adminLog(%client, " has toggled " @ %arg1 @ " (" @ %arg2 @ ")");
+//            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
+//			adminLog(%client, " has toggled " @ %arg1 @ " (" @ %arg2 @ ")");
 //         }
 //         else
 //         {
-   //            if(Game.scheduleVote !$= "")
-   //            {
-      //               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
-      //               return;
-   //            }
-   //			%actionMsg = ($Host::DMSLOnlyMode ? "disable Shocklance Only Mode" : "enable Shocklance Only Mode");
-   //            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
-   //            {
-      //               %cl = ClientGroup.getObject(%idx);
-      //               if(!%cl.isAIControlled())
-      //               {
-         //                  messageClient(%cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg);
-         //                  %clientsVoting++;
-      //               }
-   //            }
-   //            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
+//            if(Game.scheduleVote !$= "")
+//            {
+//               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
+//               return;
+//            }
+//			%actionMsg = ($Host::DMSLOnlyMode ? "disable Shocklance Only Mode" : "enable Shocklance Only Mode");
+//            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
+//            {
+//               %cl = ClientGroup.getObject(%idx);
+//               if(!%cl.isAIControlled())
+//               {
+//                  messageClient(%cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg);
+//                  %clientsVoting++;
+//               }
+//            }
+//            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
 //         }

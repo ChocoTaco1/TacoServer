@@ -26,8 +26,15 @@ $InvBanList[DM, "CameraGrenade"] = 1;
 $InvBanList[DM, "FlashGrenade"] = 1;
 $InvBanList[DM, "InventoryDeployable"] = 1;
 
+$DMGame::wpKillCount = 5; //person with highest amount of kills above the kill count gets a mark on there head
+$DMGame::wpMessage = "Kill Me";
+//set 1 only mark the target with highest amount of kills
+//set 2 only mark target with highest score
+$DMGame::mode = 1; // this could be made into a vote command to switch modes
+
+
 function DMGame::setUpTeams(%game)
-{  
+{
    %group = nameToID("MissionGroup/Teams");
    if(%group == -1)
       return;
@@ -39,7 +46,7 @@ function DMGame::setUpTeams(%game)
       %team = new SimGroup("team0");
       %group.add(%team);
    }
-
+   
    // 'team0' is not counted as a team here
    %game.numTeams = 0;
    while(%team != -1)
@@ -47,7 +54,7 @@ function DMGame::setUpTeams(%game)
       // create drop set and add all spawnsphere objects into it
       %dropSet = new SimSet("TeamDrops" @ %game.numTeams);
       MissionCleanup.add(%dropSet);
-
+      
       %spawns = nameToID("MissionGroup/Teams/team" @ %game.numTeams @ "/SpawnSpheres");
       if(%spawns != -1)
       {
@@ -55,21 +62,21 @@ function DMGame::setUpTeams(%game)
          for(%i = 0; %i < %count; %i++)
             %dropSet.add(%spawns.getObject(%i));
       }
-
+      
       // set the 'team' field for all the objects in this team
       %team.setTeam(0);
-
+      
       clearVehicleCount(%team+1);
       // get next group
       %team = nameToID("MissionGroup/Teams/team" @ %game.numTeams + 1);
       if (%team != -1)
          %game.numTeams++;
    }
-
+   
    // set the number of sensor groups (including team0) that are processed
    setSensorGroupCount(%game.numTeams + 1);
    %game.numTeams = 1;
-
+   
    // allow teams 1->31 to listen to each other (team 0 can only listen to self)
    for(%i = 1; %i < 32; %i++)
       setSensorGroupListenMask(%i, 0xfffffffe);
@@ -77,11 +84,12 @@ function DMGame::setUpTeams(%game)
 
 function DMGame::initGameVars(%game)
 {
-   %game.SCORE_PER_KILL = 1; 
-   %game.SCORE_PER_DEATH = -1;
-   %game.SCORE_PER_SUICIDE = -1;
+   %game.SCORE_PER_KILL = 1;
+   %game.SCORE_PER_DEATH = -1; //was -1
+   %game.SCORE_PER_SUICIDE = -1; //was -1
    %game.SCORE_PER_MIDAIR = 0.2; // Added Chocotaco. From sctf
-}  
+   %game.SCORE_PER_BIGGAME = 1; // taking out a kill streak  
+}
 
 exec("scripts/aiDeathMatch.cs");
 
@@ -95,25 +103,25 @@ function DMGame::equip(%game, %player)
    for(%i =0; %i<$InventoryHudCount; %i++)
       %player.client.setInventoryHudItem($InventoryHudData[%i, itemDataName], 0, 1);
    %player.client.clearBackpackIcon();
-
+   
    if( $Host::DMSLOnlyMode )
-   {		
-		%player.clearInventory();
-		%player.setInventory(EnergyPack, 1);
-		%player.setInventory(Shocklance, 1);
-		%player.setInventory(RepairKit, 1);
-		%player.setInventory(TargetingLaser, 1);
-		%player.setInventory(Grenade, 5);
-		%player.use("Shocklance");
+   {
+      %player.clearInventory();
+      %player.setInventory(EnergyPack, 1);
+      %player.setInventory(Shocklance, 1);
+      %player.setInventory(RepairKit, 1);
+      %player.setInventory(TargetingLaser, 1);
+      %player.setInventory(Grenade, 5);
+      %player.use("Shocklance");
    }
    else
    {
-		buyFavorites(%player.client);
-		%player.setEnergyLevel(%player.getDataBlock().maxEnergy);
-		%player.selectWeaponSlot( 0 );
-
-		// do we want to give players a disc launcher instead? GJL: Yes we do!
-		%player.use("Disc");
+      buyFavorites(%player.client);
+      %player.setEnergyLevel(%player.getDataBlock().maxEnergy);
+      %player.selectWeaponSlot( 0 );
+      
+      // do we want to give players a disc launcher instead? GJL: Yes we do!
+      %player.use("Disc");
    }
 }
 
@@ -135,7 +143,7 @@ function DMGame::assignClientTeam(%game, %client)
 {
    for(%i = 1; %i < 32; %i++)
       $DMTeamArray[%i] = false;
-
+   
    %maxSensorGroup = 0;
    %count = ClientGroup.getCount();
    for(%i = 0; %i < %count; %i++)
@@ -148,7 +156,7 @@ function DMGame::assignClientTeam(%game, %client)
             %maxSensorGroup = %cl.team;
       }
    }
-
+   
    //now loop through the team array, looking for an empty team
    for(%i = 1; %i < 32; %i++)
    {
@@ -160,14 +168,14 @@ function DMGame::assignClientTeam(%game, %client)
          break;
       }
    }
-
+   
    // set player's skin pref here
    setTargetSkin(%client.target, %client.skin);
-
+   
    // Let everybody know you are no longer an observer:
    messageAll( 'MsgClientJoinTeam', '\c1%1 has joined the fray.', %client.name, "", %client, 1 );
    updateCanListenState( %client );
-
+   
    //now set the max number of sensor groups...
    setSensorGroupCount(%maxSensorGroup + 1);
 }
@@ -179,10 +187,10 @@ function DMGame::clientMissionDropReady(%game, %client)
    messageClient(%client, 'MsgDMPlayerDies', "", 0);
    messageClient(%client, 'MsgDMKill', "", 0);
    %game.resetScore(%client);
-
-   messageClient(%client, 'MsgMissionDropInfo', '\c0You are in mission %1 (%2).', $MissionDisplayName, $MissionTypeDisplayName, $ServerName ); 
    
-   DefaultGame::clientMissionDropReady(%game, %client);
+   messageClient(%client, 'MsgMissionDropInfo', '\c0You are in mission %1 (%2).', $MissionDisplayName, $MissionTypeDisplayName, $ServerName );
+   
+DefaultGame::clientMissionDropReady(%game, %client);
 }
 
 function DMGame::AIHasJoined(%game, %client)
@@ -194,17 +202,18 @@ function DMGame::AIHasJoined(%game, %client)
 function DMGame::checkScoreLimit(%game, %client)
 {
    %scoreLimit = MissionGroup.DM_scoreLimit;
-
+   
    if(%scoreLimit $= "")
       %scoreLimit = 25;
-   if(%client.score >= %scoreLimit) 
+   if(%client.score >= %scoreLimit)
       %game.scoreLimitReached();
 }
 
 function DMGame::createPlayer(%game, %client, %spawnLoc, %respawn)
 {
-   DefaultGame::createPlayer(%game, %client, %spawnLoc, %respawn);
+DefaultGame::createPlayer(%game, %client, %spawnLoc, %respawn);
    %client.setSensorGroup(%client.team);
+      %client.isObserver =0;
 }
 
 function DMGame::resetScore(%game, %client)
@@ -215,12 +224,114 @@ function DMGame::resetScore(%game, %client)
    %client.efficiency = 0.0;
    %client.suicides = 0;
    %client.scoreMidAir = 0;
+   %client.bigGame = 0;
+   %client.killCounter = 0;// not a score thing but needs to be reset
+}
+
+function DMGame::forceObserver( %game, %client, %reason ){
+   parent::forceObserver( %game, %client, %reason );
+   %client.isObserver =1;
 }
 
 function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc)
 {
    cancel(%clVictim.player.alertThread);
+   
    DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
+   
+   if(%clVictim.isMarked && $DMGame::mode){
+      if(%clVictim != %clKiller && %clKiller !$= ""){
+         %clKiller.bigGame++; // stats rename to what ever 
+         messageAll('Msgding', '\c1%1 took out %2 ending their kill streak of %3.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+      }
+      for(%a = 0; %a < ClientGroup.getCount(); %a++)
+      {
+         %client = ClientGroup.getObject(%a);
+         if(%client != %clVictim){
+            hideTargetWaypoint(%client,%clVictim);
+         }
+      }
+      %clVictim.isMarked = 0;
+   }
+   else if($DMGame::mode == 2){
+      if(%game.lastGuy != %clKiller && %clVictim == %game.lastGuy){
+         %clKiller.bigGame++;
+          messageClient(%clKiller, 'MsgPingWaypoint', '\c2Big Target Count %1.~wfx/misc/~wfx/misc/flag_lost.wav',%clKiller.bigGame);
+      }
+   }
+   %clKiller.killCounter++;
+   %clVictim.killCounter = 0;
+   switch$($DMGame::mode){
+      case 1: // player with the highest kill streak if they are above $DMGame::wpKillCount
+		 %bigClient = 0;
+         for(%b = 0; %b < ClientGroup.getCount(); %b++){
+            %cl = ClientGroup.getObject(%b);
+            if(%cl.killCounter >= $DMGame::wpKillCount && %cl.killCounter > %bigClient.killCounter && !%cl.isObserver){
+               %bigClient = %cl;// we have a new  
+            }
+         } 
+		if(%bigClient != %game.lastGuy && %bigClient != 0){
+            for(%i = 0; %i < ClientGroup.getCount(); %i++){
+               %cl = ClientGroup.getObject(%i);
+               
+			   messageClient(%cl, 'MsgPingWaypoint', '\c2%1 is on a kill streak of %2.',%bigClient.name,%bigClient.killCounter);
+				
+               hideTargetWaypoint(%cl,%game.lastGuy);
+               if(%cl != %bigClient){
+                  markTargetDM(%cl,%bigClient);
+               }
+            }
+            %game.lastGuy.isMarked = 0; 
+            %bigClient.isMarked = 1;
+            %game.lastGuy = %bigClient; 
+         }
+      case 2: // player with the highest score
+         %bigClient = 0;
+         for(%b = 0; %b < ClientGroup.getCount(); %b++){
+            %cl = ClientGroup.getObject(%b);
+            if(%cl.score > %bigClient.score && !%cl.isObserver){
+               %bigClient = %cl;
+            }
+
+         }  
+         if(%bigClient != 0 && %game.lastGuy != %bigClient){
+            for(%i = 0; %i < ClientGroup.getCount(); %i++){
+               %cl = ClientGroup.getObject(%i);
+			   //messageClient(%cl, 'MsgPingWaypoint', '\c2%1 now has the highest score.',%bigClient.name);
+               messageClient(%cl, 'MsgPingWaypoint', '\c2%1 now has the highest score.',%bigClient.name);
+               hideTargetWaypoint(%cl,%game.lastGuy);
+               if(%cl != %bigClient){
+                  markTargetDM(%cl,%bigClient);
+               }
+            }
+            %game.lastGuy = %bigClient;
+         }
+   }
+}
+//function listDM(){// for debug
+   //for(%a = 0; %a < ClientGroup.getCount(); %a++){
+      //%client = ClientGroup.getObject(%a);
+      //echo(%client.nameBase SPC KIlls SPC %client.killCounter);
+   //}
+//}
+function markTargetDM(%client,%clTarget){// out of bountygame
+   if(isObject(%clTarget) && isObject(%client) && !%client.isAIControlled()){
+      %visMask = getSensorGroupAlwaysVisMask(%clTarget.getSensorGroup());
+      %visMask |= (1 << %client.getSensorGroup());
+      setSensorGroupAlwaysVisMask(%clTarget.getSensorGroup(), %visMask);
+      %clTarget.player.scopeToClient(%client);
+      %client.setTargetId(%clTarget.target);
+      commandToClient(%client, 'TaskInfo', %client, -1, false, $DMGame::wpMessage);
+      %client.sendTargetTo(%client, true);
+   }
+}
+function hideTargetWaypoint(%client,%clTarget){
+   if(isObject(%clTarget) && isObject(%client) && !%client.isAIControlled()){
+      %visMask = getSensorGroupAlwaysVisMask(%clTarget.getSensorGroup());
+      %visMask &= ~(1 << %client.getSensorGroup());
+      setSensorGroupAlwaysVisMask(%clTarget.getSensorGroup(), %visMask);
+      removeClientTargetType(%client, "AssignedTask"); 
+   }
 }
 
 function DMGame::updateKillScores(%game, %clVictim, %clKiller, %damageType, %implement)
@@ -230,10 +341,10 @@ function DMGame::updateKillScores(%game, %clVictim, %clKiller, %damageType, %imp
       %game.awardScoreKill(%clKiller);
       messageClient(%clKiller, 'MsgDMKill', "", %clKiller.kills);
       %game.awardScoreDeath(%clVictim);
-   }       
+   }
    else if (%game.testSuicide(%clVictim, %clKiller, %damageType))  //otherwise test for suicide
-      %game.awardScoreSuicide(%clVictim);     
-
+      %game.awardScoreSuicide(%clVictim);
+   
    messageClient(%clVictim, 'MsgDMPlayerDies', "", %clVictim.deaths + %clVictim.suicides);
 }
 
@@ -242,13 +353,13 @@ function DMGame::recalcScore(%game, %client)
    %killValue = %client.kills * %game.SCORE_PER_KILL;
    %deathValue = %client.deaths * %game.SCORE_PER_DEATH;
    %suicideValue = %client.suicides * %game.SCORE_PER_SUICIDE;
-
+   %bigGameValue = %client.bigGame * %game.SCORE_PER_BIGGAME;
    if (%killValue - %deathValue == 0)
       %client.efficiency = %suicideValue;
    else
       %client.efficiency = ((%killValue * %killValue) / (%killValue - %deathValue)) + %suicideValue;
-
-   %client.score = mFloatLength(%client.efficiency, 1);
+   
+   %client.score = mFloatLength(%client.efficiency, 1) + %bigGameValue;
    messageClient(%client, 'MsgYourScoreIs', "", %client.score);
    %game.recalcTeamRanks(%client);
    %game.checkScoreLimit(%client);
@@ -271,10 +382,10 @@ function DMGame::scoreLimitReached(%game)
 function DMGame::gameOver(%game)
 {
    //call the default
-   DefaultGame::gameOver(%game);
-
+DefaultGame::gameOver(%game);
+   
    messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
-
+   
    cancel(%game.timeThread);
    messageAll('MsgClearObjHud', "");
    for(%i = 0; %i < ClientGroup.getCount(); %i ++) {
@@ -285,7 +396,7 @@ function DMGame::gameOver(%game)
 
 function DMGame::enterMissionArea(%game, %playerData, %player)
 {
-   %player.client.outOfBounds = false; 
+   %player.client.outOfBounds = false;
    messageClient(%player.client, 'EnterMissionArea', '\c1You are back in the mission area.');
    logEcho(%player.client.nameBase@" (pl "@%player@"/cl "@%player.client@") entered mission area");
    cancel(%player.alertThread);
@@ -294,95 +405,95 @@ function DMGame::enterMissionArea(%game, %playerData, %player)
 // borlak -- TAKEN FROM TR2 -- thanks! :D
 function plzBounceOffGrid(%obj, %bounceForce, %count)
 {
-	%bounds = MissionArea.area;
-	%boundsWest = firstWord(%bounds);
-	%boundsNorth = getWord(%bounds, 1);
-	%boundsEast = %boundsWest + getWord(%bounds, 2);
-	%boundsSouth = %boundsNorth + getWord(%bounds, 3);
-
-	%shapePos = %obj.getPosition();
-	%shapex = firstWord(%shapePos);
-	%shapey = getWord(%shapePos, 1);
-	
-	if( %shapex >= %boundsWest && %shapex <= %boundsEast && %shapey >= %boundsNorth && %shapey <= %boundsSouth) {
-		// we don't need to bounce at all
-		return;
-	}
-
-	if( %count == 8 ) {
-		// just kill this retard
-		%obj.scriptKill($DamageType::OutOfBounds);
-		return;
-	}
-
-	if (%bounceForce $= "")
-		%bounceForce = 65;
-      
-	%oldVel = %obj.getVelocity();
-	%obj.setVelocity("0 0 0");
-
-	%vecx = firstWord(%oldVel);
-	%vecy = getWord(%oldVel, 1);
-	%vecz = getWord(%oldVel, 2);
-
-	// four cases, not two cases you fucktard kineticpoet
-	// no wonder the trives of vengrances failed
-	if(%shapex <= %boundsWest) {
-		%vecx = mAbs(%vecx);
-	}
-	else if(%shapex >= %boundsEast) {
-		%vecx = -mAbs(%vecx);
-	}
-
-	if(%shapey <= %boundsNorth) {
-		%vecy = mAbs(%vecy);
-	}
-	else if(%shapey >= %boundsSouth) {
-		%vecy = -mAbs(%vecy);
-	}
-
-	%vec = %vecx SPC %vecy SPC %vecz;
-
-	// If the object's speed was pretty slow, give it a boost
-	%oldSpeed = VectorLen(%oldVel);
-	if (%oldSpeed < 25)
-	{
-		%vec = VectorNormalize(%vec);
-		%vec = VectorScale(%vec, 25);
-	}
-	else
-		%vec = VectorScale(%vec, 1.15);
-
-	// apply the impulse to the object
-	//%obj.applyImpulse(%obj.getWorldBoxCenter(), %vec);
-	%obj.setVelocity(%vec);
-	
-	// repeat this bounce 4 times per second.  if we're oob for 2 seconds, take action
-	// don't do this with the flag because that has its own thread
-	if( %obj.dataBlock !$= "Flag" ) {
-		schedule(250, 0, plzBounceOffGrid, %obj, %bounceForce, %count + 1);
-	}
+   %bounds = MissionArea.area;
+   %boundsWest = firstWord(%bounds);
+   %boundsNorth = getWord(%bounds, 1);
+   %boundsEast = %boundsWest + getWord(%bounds, 2);
+   %boundsSouth = %boundsNorth + getWord(%bounds, 3);
+   
+   %shapePos = %obj.getPosition();
+   %shapex = firstWord(%shapePos);
+   %shapey = getWord(%shapePos, 1);
+   
+   if( %shapex >= %boundsWest && %shapex <= %boundsEast && %shapey >= %boundsNorth && %shapey <= %boundsSouth) {
+      // we don't need to bounce at all
+      return;
+   }
+   
+   if( %count == 8 ) {
+      // just kill this retard
+      %obj.scriptKill($DamageType::OutOfBounds);
+      return;
+   }
+   
+   if (%bounceForce $= "")
+      %bounceForce = 65;
+   
+   %oldVel = %obj.getVelocity();
+   %obj.setVelocity("0 0 0");
+   
+   %vecx = firstWord(%oldVel);
+   %vecy = getWord(%oldVel, 1);
+   %vecz = getWord(%oldVel, 2);
+   
+   // four cases, not two cases you fucktard kineticpoet
+   // no wonder the trives of vengrances failed
+   if(%shapex <= %boundsWest) {
+      %vecx = mAbs(%vecx);
+   }
+   else if(%shapex >= %boundsEast) {
+      %vecx = -mAbs(%vecx);
+   }
+   
+   if(%shapey <= %boundsNorth) {
+      %vecy = mAbs(%vecy);
+   }
+   else if(%shapey >= %boundsSouth) {
+      %vecy = -mAbs(%vecy);
+   }
+   
+   %vec = %vecx SPC %vecy SPC %vecz;
+   
+   // If the object's speed was pretty slow, give it a boost
+   %oldSpeed = VectorLen(%oldVel);
+   if (%oldSpeed < 25)
+   {
+      %vec = VectorNormalize(%vec);
+      %vec = VectorScale(%vec, 25);
+   }
+   else
+      %vec = VectorScale(%vec, 1.15);
+   
+   // apply the impulse to the object
+   //%obj.applyImpulse(%obj.getWorldBoxCenter(), %vec);
+   %obj.setVelocity(%vec);
+   
+   // repeat this bounce 4 times per second.  if we're oob for 2 seconds, take action
+   // don't do this with the flag because that has its own thread
+   if( %obj.dataBlock !$= "Flag" ) {
+      schedule(250, 0, plzBounceOffGrid, %obj, %bounceForce, %count + 1);
+   }
 }
 function isOutOfBounds(%position)
 {
-	%shapePos = %position;
-	%shapex = firstWord(%shapePos);
-	%shapey = getWord(%shapePos, 1);
-	%bounds = MissionArea.area;
-	%boundsWest = firstWord(%bounds);
-	%boundsNorth = getWord(%bounds, 1);
-	%boundsEast = %boundsWest + getWord(%bounds, 2);
-	%boundsSouth = %boundsNorth + getWord(%bounds, 3);
+   %shapePos = %position;
+   %shapex = firstWord(%shapePos);
+   %shapey = getWord(%shapePos, 1);
+   %bounds = MissionArea.area;
+   %boundsWest = firstWord(%bounds);
+   %boundsNorth = getWord(%bounds, 1);
+   %boundsEast = %boundsWest + getWord(%bounds, 2);
+   %boundsSouth = %boundsNorth + getWord(%bounds, 3);
    
-	return (%shapex < %boundsWest  || %shapex > %boundsEast ||
-		%shapey < %boundsNorth || %shapey > %boundsSouth);
+   return (%shapex < %boundsWest  || %shapex > %boundsEast ||
+   %shapey < %boundsNorth || %shapey > %boundsSouth);
 }
 
 function DMGame::leaveMissionArea(%game, %playerData, %player)
 {
    if(%player.getState() $= "Dead")
       return;
-                                         
+   
    plzBounceOffGrid(%player, 65);
 }
 
@@ -392,13 +503,13 @@ function DMGame::DMAlertPlayer(%game, %count, %player)
    //messageClient(%player.client, 'MsgDMLeftMisAreaWarn', '~wfx/misc/red_alert.wav');
    if(%count > 1)
       %player.alertThread = %game.schedule(1000, "DMAlertPlayer", %count - 1, %player);
-   else 
+   else
       %player.alertThread = %game.schedule(1000, "MissionAreaDamage", %player);
 }
 
 function DMGame::MissionAreaDamage(%game, %player)
 {
-   if(%player.getState() !$= "Dead") {                                   
+   if(%player.getState() !$= "Dead") {
       %player.setDamageFlash(0.1);
       %prevHurt = %player.getDamageLevel();
       %player.setDamageLevel(%prevHurt + 0.05);
@@ -412,36 +523,36 @@ function DMGame::updateScoreHud(%game, %client, %tag)
 {
    // Clear the header:
    messageClient( %client, 'SetScoreHudHeader', "", "" );
-
+   
    // Send the subheader:
-   messageClient(%client, 'SetScoreHudSubheader', "", '<tab:15,235,340,415>\tPLAYER\tRATING\tKILLS\tDEATHS');
-
+   messageClient(%client, 'SetScoreHudSubheader', "", '<tab:15,200,280,360,465>\tPLAYER\tRATING\tKILLS\tDEATHS\tBONUS');
+   
    for (%index = 0; %index < $TeamRank[0, count]; %index++)
    {
       //get the client info
       %cl = $TeamRank[0, %index];
-
+      
       //get the score
-      %clScore = mFloatLength( %cl.efficiency, 1 );
-
+      %clScore = %cl.score;
+      
       %clKills = mFloatLength( %cl.kills, 0 );
       %clDeaths = mFloatLength( %cl.deaths + %cl.suicides, 0 );
-      %clStyle = %cl == %client ? "<color:dcdcdc>" : "";
-
+      %clStyle = %cl == %client ? "<color:dcdcdc>" : ""; 
+      
       //if the client is not an observer, send the message
       if (%client.team != 0)
-      {
-         messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:200>%1</clip><rmargin:280><just:right>%2<rmargin:370><just:right>%3<rmargin:460><just:right>%4', 
-               %cl.name, %clScore, %clKills, %clDeaths, %clStyle );
+      {                                                      //  <tab:15,235,340,415,500>\%5\%1\%2\%3\tBG'
+         messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115>%1</clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%6',
+         %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl.bigGame);
       }
       //else for observers, create an anchor around the player name so they can be observed
       else
       {
-         messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:200><a:gamelink\t%6>%1</a></clip><rmargin:280><just:right>%2<rmargin:370><just:right>%3<rmargin:460><just:right>%4', 
-               %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl );
+         messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6>%1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
+         %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl,%cl.bigGame );
       }
    }
-
+   
    // Tack on the list of observers:
    %observerCount = 0;
    for (%i = 0; %i < ClientGroup.getCount(); %i++)
@@ -450,12 +561,12 @@ function DMGame::updateScoreHud(%game, %client, %tag)
       if (%cl.team == 0)
          %observerCount++;
    }
-
+   
    if (%observerCount > 0)
    {
-	   messageClient( %client, 'SetLineHud', "", %tag, %index, "");
+      messageClient( %client, 'SetLineHud', "", %tag, %index, "");
       %index++;
-		messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:10, 310><spush><font:Univers Condensed:22>\tOBSERVERS (%1)<rmargin:260><just:right>TIME<spop>', %observerCount);
+      messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:10, 310><spush><font:Univers Condensed:22>\tOBSERVERS (%1)<rmargin:260><just:right>TIME<spop>', %observerCount);
       %index++;
       for (%i = 0; %i < ClientGroup.getCount(); %i++)
       {
@@ -465,13 +576,13 @@ function DMGame::updateScoreHud(%game, %client, %tag)
          {
             %obsTime = getSimTime() - %cl.observerStartTime;
             %obsTimeStr = %game.formatTime(%obsTime, false);
-		      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150>%1</clip><rmargin:260><just:right>%2',
-		                     %cl.name, %obsTimeStr );
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150>%1</clip><rmargin:260><just:right>%2',
+            %cl.name, %obsTimeStr );
             %index++;
          }
       }
    }
-
+   
    //clear the rest of Hud so we don't get old lines hanging around...
    messageClient( %client, 'ClearHud', "", %tag, %index );
 }
@@ -482,29 +593,29 @@ function DMGame::updateScoreHud(%game, %client, %tag)
 
 package DMGame
 {
-
-function deployMineCheck(%mineObj, %player)
-{
-	// explode it vgc
-	schedule(2000, %mineObj, "explodeMine", %mineObj, true);
-}
-
-function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
-{
+   
+   function deployMineCheck(%mineObj, %player)
+   {
+      // explode it vgc
+      schedule(2000, %mineObj, "explodeMine", %mineObj, true);
+   }
+   
+   function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
+   {
       if(!isObject(%targetObject) && !isObject(%projectile.sourceObject))
          return;
-      if(!(%targetObject.getType() & ($TypeMasks::StaticTSObjectType | $TypeMasks::InteriorObjectType | 
-                                      $TypeMasks::TerrainObjectType | $TypeMasks::WaterObjectType)))
+      if(!(%targetObject.getType() & ($TypeMasks::StaticTSObjectType | $TypeMasks::InteriorObjectType |
+         $TypeMasks::TerrainObjectType | $TypeMasks::WaterObjectType)))
       {
          if(%projectile.sourceObject.team !$= %targetObject.team)
          {
             if(%targetObject.getDataBlock().getClassName() $= "PlayerData" && %data.getName() $= "DiscProjectile")
             {
-	         %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType; 
-	         %start = %targetObject.getWorldBoxCenter();
+               %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+               %start = %targetObject.getWorldBoxCenter();
                %distance = mFloor(VectorDist(%start, %projectile.initialPosition));
-	         %end = getWord(%start, 0) SPC getWord(%start, 1) SPC getWord(%start, 2) - 15;
-	         %grounded = ContainerRayCast(%start, %end, %mask, 0);
+               %end = getWord(%start, 0) SPC getWord(%start, 1) SPC getWord(%start, 2) - 15;
+               %grounded = ContainerRayCast(%start, %end, %mask, 0);
                if(!%grounded)
                {
                   %projectile.sourceObject.client.scoreMidAir++;
@@ -516,143 +627,165 @@ function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifie
          }
          Parent::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal);
       }
-}
-
-function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
-{
-	//Other armors get more damage
-	if(%targetObject.client.armor $= "Medium")
-	{
-		%amount *= 1.3;
-	}
-	
-	if(%targetObject.client.armor $= "Heavy")
-	{
-		%amount *= 1.5;
-	}
-	
-	parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
-}
-
+   }
+   
+   function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
+   {
+      //Other armors get more damage
+      if(%targetObject.client.armor $= "Medium")
+      {
+         %amount *= 1.3;
+      }
+      
+      if(%targetObject.client.armor $= "Heavy")
+      {
+         %amount *= 1.5;
+      }
+      
+      parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
+   }
+   
 };
 
 function DMGame::sendGameVoteMenu(%game, %client, %key)
 {
-   	parent::sendGameVoteMenu( %game, %client, %key );
-	
-	%isAdmin = ( %client.isAdmin || %client.isSuperAdmin );
+   parent::sendGameVoteMenu( %game, %client, %key );
+   
+   %isAdmin = ( %client.isAdmin || %client.isSuperAdmin );
    
    if ( %game.scheduleVote $= "" )
    {
-     if(!%client.isAdmin)
-	 {
-		if(!$Host::DMSLOnlyMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to enable Shocklance Only Mode', 'Vote to enable Shocklance Only Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to disable Shocklance Only Mode', 'Vote to disable Shocklance Only Mode' );
-	 }
-	 else if (%client.ForceVote > 0 && %client.NextMission !$= 1 ) //Added for SetNextMission	 
-	 {
-		if(!$Host::DMSLOnlyMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to enable Shocklance Only Mode', 'Vote to enable Shocklance Only Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to disable Shocklance Only Mode', 'Vote to disable Shocklance Only Mode' );
-	 }
-     else if ( %client.NextMission !$= 1 ) //Added for SetNextMission
-	 {
-		if(!$Host::DMSLOnlyMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'change to enable Shocklance Only Mode', 'Enable Shocklance Only Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'change to disable Shocklance Only Mode', 'Disable Shocklance Only Mode' );
-	 }
+      if(!%client.isAdmin)
+      {
+         if(!$Host::DMSLOnlyMode)
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to enable Shocklance Only Mode', 'Vote to enable Shocklance Only Mode' );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to disable Shocklance Only Mode', 'Vote to disable Shocklance Only Mode' );
+      }
+      else if (%client.ForceVote > 0 && %client.NextMission !$= 1 ) //Added for SetNextMission
+      {
+         if(!$Host::DMSLOnlyMode)
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to enable Shocklance Only Mode', 'Vote to enable Shocklance Only Mode' );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to disable Shocklance Only Mode', 'Vote to disable Shocklance Only Mode' );
+      }
+      else if ( %client.NextMission !$= 1 ) //Added for SetNextMission
+      {
+         if(!$Host::DMSLOnlyMode)
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'change to enable Shocklance Only Mode', 'Enable Shocklance Only Mode' );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'change to disable Shocklance Only Mode', 'Disable Shocklance Only Mode' );
+      }
    }
 }
 
 function DMGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4)
-{ 
+{
    switch$ (%typeName)
    {
-	  case "DMSLOnlyMode":
+      case "DMSLOnlyMode":
          %game.DMSLOnlyMode(%admin, %arg1, %arg2, %arg3, %arg4);
    }
    
-   	parent::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4);
+   parent::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4);
 }
 
 //--------------------------------DMSLOnlyMode--------------------------------
 //
 $VoteMessage["DMSLOnlyMode"] = "turn";
-		 
+
 function DMGame::DMSLOnlyMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
-	if(	$countdownStarted && $MatchStarted )
+   if(	$countdownStarted && $MatchStarted )
+   {
+      if(%admin)
+      {
+         killeveryone();
+         
+         if( $Host::DMSLOnlyMode )
+         {
+            messageAll('MsgAdminForce', '\c2The Admin has disabled Shocklance Only Mode.');
+            
+            $Host::DMSLOnlyMode = false;
+         }
+         else
+         {
+            messageAll('MsgAdminForce', '\c2The Admin has enabled Shocklance Only Mode.');
+            
+            $Host::DMSLOnlyMode = true;
+         }
+      }
+      else
+      {
+         %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+         if(%totalVotes > 0 && (%game.totalVotesFor / ClientGroup.getCount()) > ($Host::VotePasspercent / 100))
+         {
+            killeveryone();
+            
+            if( $Host::DMSLOnlyMode )
+            {
+               messageAll('MsgVotePassed', '\c2Shocklance Only Mode Disabled.');
+               
+               $Host::DMSLOnlyMode = false;
+            }
+            else
+            {
+               messageAll('MsgVotePassed', '\c2Shocklance Only Mode Enabled.');
+               
+               $Host::DMSLOnlyMode = true;
+            }
+         }
+         else
+            messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100));
+      }
+   }
+}
+
+//from lak
+function killEveryone(%ignore, %message)
+{
+	if(!%message)
+		messageAll('msgKillEveryone', 'Resetting...');
+	else
+		messageAll('msgKillEveryone', %message);
+
+	for(%i = 0; %i < ClientGroup.getCount(); %i++)   
 	{
-		if(%admin) 
-		{
-			killeveryone();
-
-			if( $Host::DMSLOnlyMode )
-			{
-				messageAll('MsgAdminForce', '\c2The Admin has disabled Shocklance Only Mode.');
-				
-				$Host::DMSLOnlyMode = false;
-			}
-			else
-			{
-				messageAll('MsgAdminForce', '\c2The Admin has enabled Shocklance Only Mode.');
-				
-				$Host::DMSLOnlyMode = true;
-			}
-		}
-		else 
-		{
-			%totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-			if(%totalVotes > 0 && (%game.totalVotesFor / ClientGroup.getCount()) > ($Host::VotePasspercent / 100))
-			{
-				killeveryone();
-
-				if( $Host::DMSLOnlyMode )
-				{
-					messageAll('MsgVotePassed', '\c2Shocklance Only Mode Disabled.');
-					
-					$Host::DMSLOnlyMode = false;
-				}
-				else
-				{
-					messageAll('MsgVotePassed', '\c2Shocklance Only Mode Enabled.');
-					
-					$Host::DMSLOnlyMode = true;
-				}
-			}
-			else
-				messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100)); 
-		}
+		%target = ClientGroup.getObject(%i);
+		
+		if(!%target.player || %target.player == %ignore)
+			continue;
+		
+		%target.player.blowup();
+		%target.player.scriptKill();
 	}
 }
+
+
 // For voting to work properly - evo admin.ovl
 //
 //	  case "DMSLOnlyMode":
 //         if( %isAdmin && !%client.ForceVote )
 //         {
-//            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
-//			adminLog(%client, " has toggled " @ %arg1 @ " (" @ %arg2 @ ")");
+   //            adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
+   //			adminLog(%client, " has toggled " @ %arg1 @ " (" @ %arg2 @ ")");
 //         }
 //         else
 //         {
-//            if(Game.scheduleVote !$= "")
-//            {
-//               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
-//               return;
-//            }
-//			%actionMsg = ($Host::DMSLOnlyMode ? "disable Shocklance Only Mode" : "enable Shocklance Only Mode");
-//            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
-//            {
-//               %cl = ClientGroup.getObject(%idx);
-//               if(!%cl.isAIControlled())
-//               {
-//                  messageClient(%cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg);
-//                  %clientsVoting++;
-//               }
-//            }
-//            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
+   //            if(Game.scheduleVote !$= "")
+   //            {
+      //               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
+      //               return;
+   //            }
+   //			%actionMsg = ($Host::DMSLOnlyMode ? "disable Shocklance Only Mode" : "enable Shocklance Only Mode");
+   //            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
+   //            {
+      //               %cl = ClientGroup.getObject(%idx);
+      //               if(!%cl.isAIControlled())
+      //               {
+         //                  messageClient(%cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg);
+         //                  %clientsVoting++;
+      //               }
+   //            }
+   //            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
 //         }

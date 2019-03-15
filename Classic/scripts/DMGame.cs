@@ -369,7 +369,7 @@ function DMGame::recalcScore(%game, %client)
    if (%killValue - %deathValue == 0)
       %client.efficiency = %suicideValue;
    else
-      %client.efficiency = ((%killValue * %killValue) / (%killValue - %deathValue)) + (%suicideValue + %bigGameValue);
+      %client.efficiency = ((%killValue * %killValue) / (%killValue - (%deathValue + %suicideValue))) + %bigGameValue;
    
    %client.score = mFloatLength(%client.efficiency, 1);
    messageClient(%client, 'MsgYourScoreIs', "", %client.score);

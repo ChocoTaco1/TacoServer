@@ -18,6 +18,7 @@
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
 // v3.34 Febuary 2019
+// Coverted Else ifs to case in Armor::damageObject
 // Added SetNextMission support
 // Indoor Spawning support
 //
@@ -558,7 +559,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 					%points *= 2.0;
 				}
 			}
-			if(!ma)
+			if(!%ma)
 				%amount = 0;
 			%weapon = "MINE";		
 		case $DamageType::ShockLance:

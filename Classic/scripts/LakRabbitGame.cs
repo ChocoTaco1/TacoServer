@@ -715,9 +715,9 @@ function deployMineCheck(%mineObj, %player)
 	schedule(2000, %mineObj, "explodeMine", %mineObj, true);
 }
 // thanks mista
-function MineDeployed:: damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)
+function MineDeployed::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)
 {
-// NO NIFTY NADE/MINE SCRIPTS 
+	// NO NIFTY NADE/MINE SCRIPTS 
 	if (Game.duelMode && %damageType == $DamageType::Grenade && $lastObjExplode.isHandNade)
 		return;
 

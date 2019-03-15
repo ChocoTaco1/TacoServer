@@ -68,84 +68,76 @@ $LCTFRandomMapPick36 = "TWL_OsIris"; 			$LCTFRandomMapPick37 = "TWL_Damnation"; 
 
 function SetNextMapGetRandoms( %client )
 {
+	switch$($CurrentMissionType)
+	{
+		case "CTF":
+			//Get random numbers
+			%RandomPick1 = getRandom(1,5);
+			%RandomPick2 = getRandom(6,10);
+			%RandomPick3 = getRandom(11,15);
+			%RandomPick4 = getRandom(16,20);
+			%RandomPick5 = getRandom(21,25);
+			%RandomPick6 = getRandom(26,30);
+			%RandomPick7 = getRandom(31,35);
+			%RandomPick8 = getRandom(36,40);
 
-	if( $CurrentMissionType $= "CTF" )
-	{
-		//Get random numbers
-		%RandomPick1 = getRandom(1,5);
-		%RandomPick2 = getRandom(6,10);
-		%RandomPick3 = getRandom(11,15);
-		%RandomPick4 = getRandom(16,20);
-		%RandomPick5 = getRandom(21,25);
-		%RandomPick6 = getRandom(26,30);
-		%RandomPick7 = getRandom(31,35);
-		%RandomPick8 = getRandom(36,40);
+			//Deduction code
+			$SetNextMissionMapSlot1 = $RandomMapPick[%RandomPick1];
+			$SetNextMissionMapSlot2 = $RandomMapPick[%RandomPick2];
+			$SetNextMissionMapSlot3 = $RandomMapPick[%RandomPick3];
+			$SetNextMissionMapSlot4 = $RandomMapPick[%RandomPick4];
+			$SetNextMissionMapSlot5 = $RandomMapPick[%RandomPick5];
+			$SetNextMissionMapSlot6 = $RandomMapPick[%RandomPick6];
+			$SetNextMissionMapSlot7 = $RandomMapPick[%RandomPick7];
+			$SetNextMissionMapSlot8 = $RandomMapPick[%RandomPick8];
+		case "LakRabbit":
+			//Get random numbers		
+			%LakRandomPick1 = getRandom(1,3);
+			%LakRandomPick2 = getRandom(4,6);
+			%LakRandomPick3 = getRandom(7,9);
+			%LakRandomPick4 = getRandom(10,12);
+			%LakRandomPick5 = getRandom(13,15);
+			%LakRandomPick6 = getRandom(16,18);
+			%LakRandomPick7 = getRandom(19,21);
+			%LakRandomPick8 = getRandom(22,24);
+			
+			//Deduction code		
+			$SetNextMissionMapSlot1 = $LakRandomMapPick[%LakRandomPick1];
+			$SetNextMissionMapSlot2 = $LakRandomMapPick[%LakRandomPick2];
+			$SetNextMissionMapSlot3 = $LakRandomMapPick[%LakRandomPick3];
+			$SetNextMissionMapSlot4 = $LakRandomMapPick[%LakRandomPick4];
+			$SetNextMissionMapSlot5 = $LakRandomMapPick[%LakRandomPick5];
+			$SetNextMissionMapSlot6 = $LakRandomMapPick[%LakRandomPick6];
+			$SetNextMissionMapSlot7 = $LakRandomMapPick[%LakRandomPick7];
+			$SetNextMissionMapSlot8 = $LakRandomMapPick[%LakRandomPick8];
+		case "SCtF":
+			//Get random numbers
+			%LCTFRandomPick1 = getRandom(1,5);
+			%LCTFRandomPick2 = getRandom(6,10);
+			%LCTFRandomPick3 = getRandom(11,15);
+			%LCTFRandomPick4 = getRandom(16,20);
+			%LCTFRandomPick5 = getRandom(21,25);
+			%LCTFRandomPick6 = getRandom(26,30);
+			%LCTFRandomPick7 = getRandom(31,35);
+			%LCTFRandomPick8 = getRandom(36,40);
 
-		//Deduction code
-		$SetNextMissionMapSlot1 = $RandomMapPick[%RandomPick1];
-		$SetNextMissionMapSlot2 = $RandomMapPick[%RandomPick2];
-		$SetNextMissionMapSlot3 = $RandomMapPick[%RandomPick3];
-		$SetNextMissionMapSlot4 = $RandomMapPick[%RandomPick4];
-		$SetNextMissionMapSlot5 = $RandomMapPick[%RandomPick5];
-		$SetNextMissionMapSlot6 = $RandomMapPick[%RandomPick6];
-		$SetNextMissionMapSlot7 = $RandomMapPick[%RandomPick7];
-		$SetNextMissionMapSlot8 = $RandomMapPick[%RandomPick8];
+			//Deduction code
+			$SetNextMissionMapSlot1 = $LCTFRandomMapPick[%LCTFRandomPick1];
+			$SetNextMissionMapSlot2 = $LCTFRandomMapPick[%LCTFRandomPick2];
+			$SetNextMissionMapSlot3 = $LCTFRandomMapPick[%LCTFRandomPick3];
+			$SetNextMissionMapSlot4 = $LCTFRandomMapPick[%LCTFRandomPick4];
+			$SetNextMissionMapSlot5 = $LCTFRandomMapPick[%LCTFRandomPick5];
+			$SetNextMissionMapSlot6 = $LCTFRandomMapPick[%LCTFRandomPick6];
+			$SetNextMissionMapSlot7 = $LCTFRandomMapPick[%LCTFRandomPick7];
+			$SetNextMissionMapSlot8 = $LCTFRandomMapPick[%LCTFRandomPick8];
+		case "DM":
+			$SetNextMissionMapSlot1 = "RaspDM";
+			$SetNextMissionMapSlot2 = "EntombedDM";
+			$SetNextMissionMapSlot3 = "IceDomeDM";
+			$SetNextMissionMapSlot4 = "HoofToeDM";
+			$SetNextMissionMapSlot5 = "ArenaDomeDM";
+			$SetNextMissionMapSlot6 = "VulcansWrathDM";
+			$SetNextMissionMapSlot7 = "RampartsDM";
+			$SetNextMissionMapSlot8 = "ShrineDM";
 	}
-	else if( $CurrentMissionType $= "LakRabbit" )
-	{
-		//Get random numbers		
-		%LakRandomPick1 = getRandom(1,3);
-		%LakRandomPick2 = getRandom(4,6);
-		%LakRandomPick3 = getRandom(7,9);
-		%LakRandomPick4 = getRandom(10,12);
-		%LakRandomPick5 = getRandom(13,15);
-		%LakRandomPick6 = getRandom(16,18);
-		%LakRandomPick7 = getRandom(19,21);
-		%LakRandomPick8 = getRandom(22,24);
-		
-		//Deduction code		
-		$SetNextMissionMapSlot1 = $LakRandomMapPick[%LakRandomPick1];
-		$SetNextMissionMapSlot2 = $LakRandomMapPick[%LakRandomPick2];
-		$SetNextMissionMapSlot3 = $LakRandomMapPick[%LakRandomPick3];
-		$SetNextMissionMapSlot4 = $LakRandomMapPick[%LakRandomPick4];
-		$SetNextMissionMapSlot5 = $LakRandomMapPick[%LakRandomPick5];
-		$SetNextMissionMapSlot6 = $LakRandomMapPick[%LakRandomPick6];
-		$SetNextMissionMapSlot7 = $LakRandomMapPick[%LakRandomPick7];
-		$SetNextMissionMapSlot8 = $LakRandomMapPick[%LakRandomPick8];
-	}
-	else if( $CurrentMissionType $= "SCtF" )
-	{
-		//Get random numbers
-		%LCTFRandomPick1 = getRandom(1,5);
-		%LCTFRandomPick2 = getRandom(6,10);
-		%LCTFRandomPick3 = getRandom(11,15);
-		%LCTFRandomPick4 = getRandom(16,20);
-		%LCTFRandomPick5 = getRandom(21,25);
-		%LCTFRandomPick6 = getRandom(26,30);
-		%LCTFRandomPick7 = getRandom(31,35);
-		%LCTFRandomPick8 = getRandom(36,40);
-
-		//Deduction code
-		$SetNextMissionMapSlot1 = $LCTFRandomMapPick[%LCTFRandomPick1];
-		$SetNextMissionMapSlot2 = $LCTFRandomMapPick[%LCTFRandomPick2];
-		$SetNextMissionMapSlot3 = $LCTFRandomMapPick[%LCTFRandomPick3];
-		$SetNextMissionMapSlot4 = $LCTFRandomMapPick[%LCTFRandomPick4];
-		$SetNextMissionMapSlot5 = $LCTFRandomMapPick[%LCTFRandomPick5];
-		$SetNextMissionMapSlot6 = $LCTFRandomMapPick[%LCTFRandomPick6];
-		$SetNextMissionMapSlot7 = $LCTFRandomMapPick[%LCTFRandomPick7];
-		$SetNextMissionMapSlot8 = $LCTFRandomMapPick[%LCTFRandomPick8];
-	}
-	else if( $CurrentMissionType $= "DM" )
-	{
-		$SetNextMissionMapSlot1 = "RaspDM";
-		$SetNextMissionMapSlot2 = "EntombedDM";
-		$SetNextMissionMapSlot3 = "IceDomeDM";
-		$SetNextMissionMapSlot4 = "HoofToeDM";
-		$SetNextMissionMapSlot5 = "ArenaDomeDM";
-		$SetNextMissionMapSlot6 = "VulcansWrathDM";
-		$SetNextMissionMapSlot7 = "RampartsDM";
-		$SetNextMissionMapSlot8 = "ShrineDM";
-	}
-	else
-		return;
 }

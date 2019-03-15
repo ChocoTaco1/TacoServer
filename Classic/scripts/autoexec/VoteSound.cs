@@ -10,22 +10,25 @@ function VoteSound( %game, %typename, %arg1, %arg2, %VoteSoundRandom )
 {	
 	if( $VoteSoundInProgress && $Host::EnableVoteSound && $VoteSoundRandom $= %VoteSoundRandom ) 
 	{
-		if(%typename $= "VoteChangeMission")
-			messageAll('', '\c1Vote in Progress: \c0To change the mission to %1 (%2). Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1, %arg2 );
-		else if(%typename $= "VoteSkipMission")
-			messageAll('', '\c1Vote in Progress: \c0To skip the mission to %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', $EvoCachedNextMission );
-	    else if(%typename $= "VoteChangeTimeLimit")
+		switch$(%typename)
 		{
-			if(%arg1 $= "999") %arg1 = "unlimited";
-			messageAll('', '\c1Vote in Progress: \c0To change the time limit to %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1 );
+			case "VoteChangeMission":
+				messageAll('', '\c1Vote in Progress: \c0To change the mission to %1 (%2). Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1, %arg2 );
+			
+			case "VoteSkipMission":
+				messageAll('', '\c1Vote in Progress: \c0To skip the mission to %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', $EvoCachedNextMission );
+			
+			case "VoteChangeTimeLimit":
+				if(%arg1 $= "999") %arg1 = "unlimited";
+				messageAll('', '\c1Vote in Progress: \c0To change the time limit to %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1 );
+				
+			case "VoteKickPlayer":
+				messageAll('', '\c1Vote in Progress: \c0To kick player %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1.name );
+				
+			case "VoteTournamentMode":
+				messageAll('', '\c1Vote in Progress: \c0To change the mission to Tournament Mode (%1). Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1, %arg2 );
 		}
-		else if(%typename $= "VoteKickPlayer")
-			messageAll('', '\c1Vote in Progress: \c0To kick player %1. Press Insert for Yes or Delete for No.~wgui/objective_notification.wav', %arg1.name );
-		else
-			messageAll('', '\c1Vote in Progress: \c0Press Insert for Yes or Delete for No.~wgui/objective_notification.wav');
 
 		schedule(12000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
 	}
-	else
-	return;
 }

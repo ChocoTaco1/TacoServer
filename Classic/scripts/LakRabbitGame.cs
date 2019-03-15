@@ -432,72 +432,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		
 		switch$(%damageType)
 		{
-		case $DamageType::Disc:
-			if(%ma && %percentDam >= 98)
-			{
-				%points = %distanceBonus;
-				%sound = %defaultSound;
-			}
-			if(%percentDam >= 25 && !%ma && %distance >= 80 && %velTarget > 20)
-			{
-				%points = %longDistanceBonus;
-				%velBonus /= 2;
-				%long = 1;
-				%sound = %defaultSound;
-			}
-
-			// special knockback if you hit too close, max 15% chance (point blank).. 5% at 30meters, 1% chance for any MA
-
-			// Slap based on a Disc headshot
-			//%chance = mFloor(25 - %distance/3);
-			//if(%ma && getRandom(1,50) <= %chance && %targetObject.client.headshot)
-
-				
-			//Normal Slap
-			%chance = mFloor(15 - %distance/3);
-            if(%chance <= 0) %chance = 1;
-			
-            if(%ma && getRandom(1,100) <= %chance)
-			{
-				if(%targetObject.holdingFlag)
-				{
-					Game.playerDroppedFlag(%targetObject);
-					//Added so cloak is turned off when slapped.
-					%targetObject.setCloaked(false);
-					%targetObject.freeDJ = 1;
-				}
-				if(%sourceObject.holdingFlag && Game.duelMode)
-				{
-					duelBonus(%sourceObject.client);
-					$LakDamaged[%targetObject.client] = 0;
-				}
-					
-				// lower damage and make invincible to ground damage to make it a little more fun
-				%amount = 0.01;
-				%targetObject.setKnockback(true);
-				%targetObject.schedule(15000, "setKnockback", false);
-
-				%p = %targetObject.getWorldBoxCenter();
-				%muzzleVec = %sourceObject.getMuzzleVector(0);
-				%impulseVec = VectorScale(%muzzleVec, 25000);
-				%targetObject.applyImpulse(%p, %impulseVec);
-				%sound = '~wfx/misc/slapshot.wav';
-				
-				%slapmsg = getRandom(1,3);
-				switch$(%slapmsg)
-				{
-					case 1:
-						messageAll('msgSlapMessege','\c0%1 wonders what the five fingers said to the face.', %targetObject.client.name );
-					case 2:
-						messageAll('msgSlapMessege','\c0%1 gets slapped the heck out!', %targetObject.client.name );
-					case 3:				
-						messageAll('msgSlapMessege','\c0%1 is taking a short tour around the map.', %targetObject.client.name );
-				}	
-			}
-			%weapon = "Disc";
-		case $DamageType::Grenade:
-			if(Game.PubPro)
-			{
+			case $DamageType::Disc:
 				if(%ma && %percentDam >= 98)
 				{
 					%points = %distanceBonus;
@@ -510,114 +445,179 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 					%long = 1;
 					%sound = %defaultSound;
 				}
-			}
-			else 
-			{
+
+				// special knockback if you hit too close, max 15% chance (point blank).. 5% at 30meters, 1% chance for any MA
+
+				// Slap based on a Disc headshot
+				//%chance = mFloor(25 - %distance/3);
+				//if(%ma && getRandom(1,50) <= %chance && %targetObject.client.headshot)
+
+					
+				//Normal Slap
+				%chance = mFloor(15 - %distance/3);
+				if(%chance <= 0) %chance = 1;
+				
+				if(%ma && getRandom(1,100) <= %chance)
+				{
+					if(%targetObject.holdingFlag)
+					{
+						Game.playerDroppedFlag(%targetObject);
+						//Added so cloak is turned off when slapped.
+						%targetObject.setCloaked(false);
+						%targetObject.freeDJ = 1;
+					}
+					if(%sourceObject.holdingFlag && Game.duelMode)
+					{
+						duelBonus(%sourceObject.client);
+						$LakDamaged[%targetObject.client] = 0;
+					}
+						
+					// lower damage and make invincible to ground damage to make it a little more fun
+					%amount = 0.01;
+					%targetObject.setKnockback(true);
+					%targetObject.schedule(15000, "setKnockback", false);
+
+					%p = %targetObject.getWorldBoxCenter();
+					%muzzleVec = %sourceObject.getMuzzleVector(0);
+					%impulseVec = VectorScale(%muzzleVec, 25000);
+					%targetObject.applyImpulse(%p, %impulseVec);
+					%sound = '~wfx/misc/slapshot.wav';
+					
+					%slapmsg = getRandom(1,3);
+					switch$(%slapmsg)
+					{
+						case 1:
+							messageAll('msgSlapMessege','\c0%1 wonders what the five fingers said to the face.', %targetObject.client.name );
+						case 2:
+							messageAll('msgSlapMessege','\c0%1 gets slapped the heck out!', %targetObject.client.name );
+						case 3:				
+							messageAll('msgSlapMessege','\c0%1 is taking a short tour around the map.', %targetObject.client.name );
+					}	
+				}
+				%weapon = "Disc";
+			case $DamageType::Grenade:
+				if(Game.PubPro)
+				{
+					if(%ma && %percentDam >= 98)
+					{
+						%points = %distanceBonus;
+						%sound = %defaultSound;
+					}
+					if(%percentDam >= 25 && !%ma && %distance >= 80 && %velTarget > 20)
+					{
+						%points = %longDistanceBonus;
+						%velBonus /= 2;
+						%long = 1;
+						%sound = %defaultSound;
+					}
+				}
+				else 
+				{
+					if(%ma && %percentDam >= 98)
+					{
+						%points = %distanceBonus/1.85;
+						%sound = %defaultSound;
+					}
+					if(%percentDam >= 25 && !%ma && %distance >= 100 && %velTarget > 30)
+					{
+						%points = %longDistanceBonus/1.85;
+						%velBonus /= 4;
+						%long = 1;
+						%sound = %defaultSound;
+					}
+				}
+				%weapon = "Grenade-Launcher";
+			case $DamageType::Mortar:
 				if(%ma && %percentDam >= 98)
 				{
-					%points = %distanceBonus/1.85;
+					%points = %distanceBonus*2.66;
 					%sound = %defaultSound;
 				}
 				if(%percentDam >= 25 && !%ma && %distance >= 100 && %velTarget > 30)
 				{
-					%points = %longDistanceBonus/1.85;
-					%velBonus /= 4;
+					%points = %longDistanceBonus;
+					%velBonus /= 2;
 					%long = 1;
 					%sound = %defaultSound;
 				}
-			}
-			%weapon = "Grenade-Launcher";
-		case $DamageType::Mortar:
-			if(%ma && %percentDam >= 98)
-			{
-				%points = %distanceBonus*2.66;
-				%sound = %defaultSound;
-			}
-			if(%percentDam >= 25 && !%ma && %distance >= 100 && %velTarget > 30)
-			{
-				%points = %longDistanceBonus;
-				%velBonus /= 2;
-				%long = 1;
-				%sound = %defaultSound;
-			}
-			if(!Game.duelMode)
-				%amount /= 2;
-			%weapon = "Mortar";
-		case $DamageType::Mine:
-			%amount /= %amount > 0 ? 3 : 1;
-			
-			if(%ma)
-			{
-				%accuracy = " [Accuracy:" @ %percentDam @ "%]";
-				%points = (%percentDam/7)+2;
-				%velBonus = 0;
-				%sound = '~wfx/misc/coin.wav';
-
-				if(%percentDam >= 99)
+				if(!Game.duelMode)
+					%amount /= 2;
+				%weapon = "Mortar";
+			case $DamageType::Mine:
+				%amount /= %amount > 0 ? 3 : 1;
+				
+				if(%ma)
 				{
-					%sound = '~wfx/misc/Cheer.wav';
-					%points *= 2.0;
-				}
-			}
-			if(!%ma)
-				%amount = 0;
-			%weapon = "MINE";		
-		case $DamageType::ShockLance:
-			%height = getHeight(%sourceObject);
-			%heightBonus = (mPow(%height,1.20)/14)+1; //was 10
-			%velBonus /= 2;
-			%points = mFloor(%distance/2) + (%heightBonus);
-			
-			%accuracy = " [Height:" @ %height @"m]";
-			// borlak -- check rear shocklance hit
-			%muzzlePos  = %sourceObject.getMuzzlePoint(0);
-		        %forwardVec = %targetObject.getForwardVector();
-		        %objDir2D   = getWord(%forwardVec, 0) @ " " @ getWord(%forwardVec,1) @ " " @ "0.0";
-		        %objPos     = %targetObject.getPosition();
-		        %dif        = VectorSub(%objPos, %muzzlePos);
-		        %dif        = getWord(%dif, 0) @ " " @ getWord(%dif, 1) @ " 0";
-		        %dif        = VectorNormalize(%dif);
-		        %dot        = VectorDot(%dif, %objDir2D);
+					%accuracy = " [Accuracy:" @ %percentDam @ "%]";
+					%points = (%percentDam/7)+2;
+					%velBonus = 0;
+					%sound = '~wfx/misc/coin.wav';
 
-		        if(%dot >= mCos(1.05))
-			{
-				if(%sourceObject.holdingFlag && TestForMA(%targetObject, 6))
-				{
-					%sourceObject.setCloaked(true);
-					if($host::dontcloakflag)
-						%sourceObject.holdingFlag.setCloaked(false);
+					if(%percentDam >= 99)
+					{
+						%sound = '~wfx/misc/Cheer.wav';
+						%points *= 2.0;
+					}
 				}
-					
-				%points *= 2;
-				%special = "-in-the-back";
-			}
-			if(%ma)
-				%points += 3;
-				%sound = %defaultSound;
-				%sourceObject.client.totalShockHits++;
-				%weapon = "ShockLance";
-		case $DamageType::Blaster:
-			if(%ma)
-			{
-				%points = %distanceBonus/2;
+				if(!%ma)
+					%amount = 0;
+				%weapon = "MINE";		
+			case $DamageType::ShockLance:
+				%height = getHeight(%sourceObject);
+				%heightBonus = (mPow(%height,1.20)/14)+1; //was 10
 				%velBonus /= 2;
-				%sound = %defaultSound;
-			}
-			%weapon = "Blaster";
-		case $DamageType::Plasma:
-			if(%ma && %percentDam >= 98)
-			{
-				%points = %distanceBonus/1.3+2;
-				%sound = %defaultSound;
-			}
-			if(%percentDam >= 25 && !%ma && %distance >= 40 && %velTarget > 30)
-			{
-				%points = %longDistanceBonus*1.5;
-				%velBonus /= 1.75;
-				%long = 1;
-				%sound = %defaultSound;
-			}
-			%weapon = "Plasma";
+				%points = mFloor(%distance/2) + (%heightBonus);
+				
+				%accuracy = " [Height:" @ %height @"m]";
+				// borlak -- check rear shocklance hit
+				%muzzlePos  = %sourceObject.getMuzzlePoint(0);
+					%forwardVec = %targetObject.getForwardVector();
+					%objDir2D   = getWord(%forwardVec, 0) @ " " @ getWord(%forwardVec,1) @ " " @ "0.0";
+					%objPos     = %targetObject.getPosition();
+					%dif        = VectorSub(%objPos, %muzzlePos);
+					%dif        = getWord(%dif, 0) @ " " @ getWord(%dif, 1) @ " 0";
+					%dif        = VectorNormalize(%dif);
+					%dot        = VectorDot(%dif, %objDir2D);
+
+					if(%dot >= mCos(1.05))
+				{
+					if(%sourceObject.holdingFlag && TestForMA(%targetObject, 6))
+					{
+						%sourceObject.setCloaked(true);
+						if($host::dontcloakflag)
+							%sourceObject.holdingFlag.setCloaked(false);
+					}
+						
+					%points *= 2;
+					%special = "-in-the-back";
+				}
+				if(%ma)
+					%points += 3;
+					%sound = %defaultSound;
+					%sourceObject.client.totalShockHits++;
+					%weapon = "ShockLance";
+			case $DamageType::Blaster:
+				if(%ma)
+				{
+					%points = %distanceBonus/2;
+					%velBonus /= 2;
+					%sound = %defaultSound;
+				}
+				%weapon = "Blaster";
+			case $DamageType::Plasma:
+				if(%ma && %percentDam >= 98)
+				{
+					%points = %distanceBonus/1.3+2;
+					%sound = %defaultSound;
+				}
+				if(%percentDam >= 25 && !%ma && %distance >= 40 && %velTarget > 30)
+				{
+					%points = %longDistanceBonus*1.5;
+					%velBonus /= 1.75;
+					%long = 1;
+					%sound = %defaultSound;
+				}
+				%weapon = "Plasma";
 		}
 	}
 	

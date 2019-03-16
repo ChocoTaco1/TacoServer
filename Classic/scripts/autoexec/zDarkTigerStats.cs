@@ -56,6 +56,7 @@ $dtStats::slowSaveTime = 100;
 //FF0000 Red
 //dcdcdc White
 //02d404 T2 Green
+//fb3939 Lighter Red
 
 //---------------------------------
 //  Torque Markup Language - TML
@@ -86,7 +87,7 @@ $dtStats::slowSaveTime = 100;
 //<br>Forced line break.
 
 ///////////////////////////////////////////////////////////////////////////////
-//                             CTF
+//                             		CTF										 //
 ///////////////////////////////////////////////////////////////////////////////
 //Game type values out of CTFGame.cs
 $dtStats::fieldValue[%ctf++,"CTFGame"] = "kills";
@@ -267,7 +268,7 @@ $dtStats::fieldValue[%ctf++,"CTFGame"] = "elfShotsFired";
 $dtStats::fieldValue[%ctf++,"CTFGame"] = "unknownShotsFired";
 $dtStats::fieldCount["CTFGame"] = %ctf;
 ///////////////////////////////////////////////////////////////////////////////
-//                             LakRabbit
+//                            	 LakRabbit									 //
 ///////////////////////////////////////////////////////////////////////////////
 //Game type values - out of LakRabbitGame.cs
 $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "score";
@@ -1484,7 +1485,7 @@ if($dtStats::Enable){
    activatePackage(dtStats);
 }
 ////////////////////////////////////////////////////////////////////////////////
-//Game Type Commons
+//							 Game Type Commons								  //
 ////////////////////////////////////////////////////////////////////////////////
 function dtStatsMissionDropReady(%game, %client){ // called when client has finished loading
    %foundOld =0;
@@ -1632,7 +1633,7 @@ function dtStatsGameOver( %game ){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//Supporting Functions
+//							Supporting Functions							  //
 ////////////////////////////////////////////////////////////////////////////////
 
 function CTFGame::getGamePct(%game)
@@ -1752,7 +1753,7 @@ function getCNameToCID(%name){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//Load Save Management
+//							Load Save Management							  //
 ////////////////////////////////////////////////////////////////////////////////
 function loadGameStats(%dtStats,%game){// called when client joins server.cs onConnect
    if($dtStats::Enable  == 0){return;}
@@ -2391,7 +2392,7 @@ function clientShotsFired(%game, %data, %projectile){ // could do a fov check to
    }
 }
 ////////////////////////////////////////////////////////////////////////////////
-//Menu Stuff
+//								Menu Stuff									  //
 ////////////////////////////////////////////////////////////////////////////////
 function getGameRunAvg(%client, %value,%game){
    %c = 0;
@@ -2600,25 +2601,24 @@ function statsMenu(%client,%game){
             if(%in > $dtStats::MaxNumOfGames){
                %in = 1;
             }
-            for(%b = %in; %b <= %vClient.dtStats.gameCount[%game]; %b++){
+            for(%z = %in - 1; %z > 0; %z--){
+               %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
+               %map = %vClient.dtStats.gameStats["map",%z,%game];
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);
+            }
+            for(%b = %vClient.dtStats.gameCount[%game]; %b >= %in; %b--){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> <color:02d404><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> <color:FF0000><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);
                }
             }
-            for(%z = 1; %z < %in; %z++){
-               %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
-               %map = %vClient.dtStats.gameStats["map",%z,%game];
-               messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);
-            }
-            
          }
          else{
-            for(%z = 1; %z <= %vClient.dtStats.gameCount[%game]; %z++){
+            for(%z = %vClient.dtStats.gameCount[%game]; %z >= 1; %z--){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
                %map = %vClient.dtStats.gameStats["map",%z,%game];
                messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);
@@ -2806,25 +2806,25 @@ function statsMenu(%client,%game){
             if(%in > $dtStats::MaxNumOfGames){
                %in = 1;
             }
-            for(%b = %in; %b <= %vClient.dtStats.gameCount[%game]; %b++){
+            for(%z = %in - 1; %z > 0; %z--){
+               %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
+               %map = %vClient.dtStats.gameStats["map",%z,%game];
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);            
+            } 
+            for(%b = %vClient.dtStats.gameCount[%game]; %b >= %in; %b--){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> <color:02d404><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> <color:FF0000><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);
                }
             }
-            for(%z = 1; %z < %in; %z++){
-               %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
-               %map = %vClient.dtStats.gameStats["map",%z,%game];
-               messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);
-            }
             
          }
          else{
-            for(%z = 1; %z <= %vClient.dtStats.gameCount[%game]; %z++){
+            for(%z = %vClient.dtStats.gameCount[%game]; %z >= 1; %z--){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
                %map = %vClient.dtStats.gameStats["map",%z,%game];
                messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);

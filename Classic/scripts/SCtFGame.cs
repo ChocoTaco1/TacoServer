@@ -347,6 +347,105 @@ package SCtFGame
 		schedule(2000, %mineObj, "explodeMine", %mineObj, true);
 	}
 	
+    //Take out anything vehicle related
+	function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
+	{
+		//echo("working");
+		//Other armors get more damage
+		if(%targetObject.client.armor $= "Medium")
+		{
+			%amount *= 1.3;
+		}
+		  
+		if(%targetObject.client.armor $= "Heavy")
+		{
+			%amount *= 1.5;
+		}
+	   
+	   //error("Armor::damageObject( "@%data@", "@%targetObject@", "@%sourceObject@", "@%position@", "@%amount@", "@%damageType@", "@%momVec@" )");
+	   if(%targetObject.invincible || %targetObject.getState() $= "Dead")
+		  return;
+
+	   %targetClient = %targetObject.getOwnerClient();
+	   if(isObject(%mineSC))
+		  %sourceClient = %mineSC;   
+	   else
+		  %sourceClient = isObject(%sourceObject) ? %sourceObject.getOwnerClient() : 0;
+
+	   %targetTeam = %targetClient.team;
+
+		// if the source object is a player object, player's don't have sensor groups
+		// if it's a turret, get the sensor group of the target
+		// if its a vehicle (of any type) use the sensor group
+		if (%sourceClient)
+			%sourceTeam = %sourceClient.getSensorGroup();
+		else if(%damageType == $DamageType::Suicide)
+			%sourceTeam = 0;
+		
+		// if teamdamage is off, and both parties are on the same team
+		// (but are not the same person), apply no damage
+		if(!$teamDamage && (%targetClient != %sourceClient) && (%targetTeam == %sourceTeam))
+			return;
+
+		if(%targetObject.isShielded && %damageType != $DamageType::Blaster)
+			%amount = %data.checkShields(%targetObject, %position, %amount, %damageType);
+	   
+		if(%amount == 0)
+			return;
+
+		// Set the damage flash
+		%damageScale = %data.damageScale[%damageType];
+		if(%damageScale !$= "")
+			%amount *= %damageScale;
+	   
+		%flash = %targetObject.getDamageFlash() + (%amount * 2);
+		if (%flash > 0.75)
+			%flash = 0.75;
+	   
+		%previousDamage = %targetObject.getDamagePercent();
+		%targetObject.setDamageFlash(%flash);
+		%targetObject.applyDamage(%amount);
+		Game.onClientDamaged(%targetClient, %sourceClient, %damageType, %sourceObject);
+
+		%targetClient.lastDamagedBy = %damagingClient;
+		%targetClient.lastDamaged = getSimTime();
+	   
+		//now call the "onKilled" function if the client was... you know...  
+		if(%targetObject.getState() $= "Dead")
+		{
+			// where did this guy get it?
+			%damLoc = %targetObject.getDamageLocation(%position);
+		  
+			// should this guy be blown apart?
+			if( %damageType == $DamageType::Explosion || 
+				%damageType == $DamageType::Mortar || 
+				%damageType == $DamageType::SatchelCharge || 
+				%damageType == $DamageType::Missile )     
+			{
+				if( %previousDamage >= 0.35 ) // only if <= 35 percent damage remaining
+				{
+					%targetObject.setMomentumVector(%momVec);
+					%targetObject.blowup(); 
+				}
+			}
+		  
+			// If we were killed, max out the flash
+			%targetObject.setDamageFlash(0.75);
+		  
+			%damLoc = %targetObject.getDamageLocation(%position);
+			Game.onClientKilled(%targetClient, %sourceClient, %damageType, %sourceObject, %damLoc);
+	    }
+		else if ( %amount > 0.1 )
+		{   
+			if( %targetObject.station $= "" && %targetObject.isCloaked() )
+			{
+				%targetObject.setCloaked( false );
+				%targetObject.reCloak = %targetObject.schedule( 500, "setCloaked", true ); 
+			}
+		  
+			playPain( %targetObject );
+		}
+	} 
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////

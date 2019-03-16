@@ -22,11 +22,11 @@ $dtStats::fullGames["CTFGame"] = 1;
 //if they are here for 75% of the game, count it as a full game, this percentage is calc from time and score limit
 $dtStats::fgPercentage["CTFGame"] = 25;
 //0 score based, 1 time based, 2 the closer  one to finishing the game, 3 mix avg
-$dtStats::fgPercentageType["CTFGame"] = 2;
+$dtStats::fgPercentageType["CTFGame"] = 0;
 
 $dtStats::fullGames["LakRabbitGame"] = 1;
 $dtStats::fgPercentage["LakRabbitGame"] = 25;
-$dtStats::fgPercentageType["LakRabbitGame"] = 2;
+$dtStats::fgPercentageType["LakRabbitGame"] = 0;
 
 $dtStats::returnToMenuTimer = (30*1000)*1;// 1 min after not making an action reset
 //Set to 1 when your makeing changes to the menu so you can see them  update live note the refresh rate is like 2-4 secs
@@ -499,11 +499,11 @@ package dtStats{
          serverCmdObserveClient(%client, %targetClient);
          displayObserverHud(%client, %targetClient);
          
-         //if (%targetClient != %prevObsClient)
-         //{
-            //messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
-            //messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
-         //}
+         if (%targetClient != %prevObsClient)
+         {
+            messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
+            messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+         }
       }
    }
    
@@ -862,11 +862,11 @@ package dtStats{
          serverCmdObserveClient(%client, %targetClient);
          displayObserverHud(%client, %targetClient);
          
-         //if (%targetClient != %prevObsClient)
-         //{
-            //messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
-            //messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
-         //}
+         if (%targetClient != %prevObsClient)
+         {
+            messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
+            messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+         }
       }
    }
    function LakRabbitGame::updateScoreHud(%game, %client, %tag){
@@ -991,34 +991,34 @@ package dtStats{
                if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){
                   if(%col1Client.name !$= "" && %col2Client.name !$= "")
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left><a:gamelink\tStats\tView\t%4>+</a> %4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   else if(%col1Client.name !$= "" && %col2Client.name $= "")
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left>%4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   else if(%col1Client.name $= "" && %col2Client.name !$= "")
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150>%1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left><a:gamelink\tStats\tView\t%4>+</a> %4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   else
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150>%1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left>%4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   
                }
                else{
                   if(%col1Client.name $= %client.name && %col2Client.name !$= "")//<a:gamelink\tStats\tView\t%4>+</a>
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left> %4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   else if(%col1Client.name !$= "" && %col2Client.name $= %client.name)//<a:gamelink\tStats\tView\t%4>+</a>
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150> %1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left><a:gamelink\tStats\tView\t%4>+</a> %4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   else if(%col1Client.name $= %client.name && %col2Client.name $= "")
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left>%4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   else if(%col1Client.name $= "" && %col2Client.name $= %client.name)
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150>%1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left><a:gamelink\tStats\tView\t%4>+</a> %4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   else
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150>%1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left>%4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col2Client.nameBase, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style);
                   
                }
             }
@@ -1026,18 +1026,18 @@ package dtStats{
                if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){
                   if(%col1Client.name !$= "")
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col1Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style);
                   else
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200>%1</clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col1Style );
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style );
                }
                else{
                   if(%col1Client.name $= %client.name)
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col1Style);
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style);
                   else
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200>%1</clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
-                  %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col1Style );
+                  %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style );
                }
             }
          }
@@ -1052,23 +1052,23 @@ package dtStats{
                   {
                      if(%col1Client.name !$= "" && %col2Client.name !$= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name !$= "" && %col2Client.name $= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= "" && %col2Client.name !$= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      
                   }
@@ -1076,46 +1076,46 @@ package dtStats{
                   {
                      if(%col1Client.name !$= "" && %col2Client.name !$= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name !$= "" && %col2Client.name $= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= "" && %col2Client.name !$= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                   }
                   else
                   {
                      if(%col1Client.name !$= "" && %col2Client.name !$= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name !$= "" && %col2Client.name $= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= "" && %col2Client.name !$= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                   }
                }
@@ -1124,28 +1124,28 @@ package dtStats{
                   {
                      if(%col1Client.name $= %client.name && %col2Client.name !$= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name !$= "" && %col2Client.name $= %client.name)
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= %client.name && %col2Client.name $= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= "" && %col2Client.name $= %client.name)
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      
                   }
@@ -1153,56 +1153,56 @@ package dtStats{
                   {
                      if(%col1Client.name $= %client.name && %col2Client.name !$= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name !$= "" && %col2Client.name $= %client.name)
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= %client.name && %col2Client.name $= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= "" && %col2Client.name $= %client.name)
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                   }
                   else
                   {
                      if(%col1Client.name $= %client.name && %col2Client.name !$= "")//<a:gamelink\tStats\tView\t%4>+</a>
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name !$= "" && %col2Client.name $= %client.name)//<a:gamelink\tStats\tView\t%4>+</a>
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= %client.name && %col2Client.name $= "")
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else if(%col1Client.name $= "" && %col2Client.name $= %client.name)
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\tStats\tView\t%4>+</a> <a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                      else
                         messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime,
-                     %col2Client.nameBase, %col2ClientScore, %col2ClientTime,
+                     %col1Client.name, %col1ClientScore, %col1ClientTime,
+                     %col2Client.name, %col2ClientScore, %col2ClientTime,
                      %col1Style, %col1Client, %col2Client );
                   }
                   
@@ -1212,21 +1212,21 @@ package dtStats{
                if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){
                   if(%col1Client.name !$= ""){
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%5>%1</a></clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
+                     %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
                   }
                   else{
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200><a:gamelink\t%5>%1</a></clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
+                     %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
                   }
                }
                else{
                   if(%col1Client.name $= %client.name){
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200><a:gamelink\tStats\tView\t%1>+</a> <a:gamelink\t%5>%1</a></clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
+                     %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
                   }
                   else{
                      messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200><a:gamelink\t%5>%1</a></clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
-                     %col1Client.nameBase, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
+                     %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
                   }
                }
             }
@@ -1242,7 +1242,7 @@ package dtStats{
             %observerCount++;
       }
       
-      if (%observerCount > 0)
+      if (%observerCount > 0) 
       {
          messageClient( %client, 'SetLineHud', "", %tag, %index, "");
          %index++;
@@ -1257,16 +1257,16 @@ package dtStats{
                %obsTime = getSimTime() - %cl.observerStartTime;
                %obsTimeStr = %game.formatTime(%obsTime, false);//<a:gamelink\tStats\tView\t%3>+</a>
                if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%3>+</a> %1</clip><rmargin:260><just:right>%2',
-                  %cl.name, %obsTimeStr,%cl.nameBase );
+                  messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:260><just:right>%2',
+                  %cl.name, %obsTimeStr);
                }
                else if(%client.name $= %cl.name){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%3>+</a> %1</clip><rmargin:260><just:right>%2',
-                  %cl.name, %obsTimeStr,%cl.nameBase );
+                  messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:260><just:right>%2',
+                  %cl.name, %obsTimeStr);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150> %1</clip><rmargin:260><just:right>%2',
-                  %cl.name, %obsTimeStr,%cl.nameBase );
+                  %cl.name, %obsTimeStr);
                }
                
                %index++;
@@ -1498,7 +1498,7 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
             //error(%dtStats.guid SPC %client.guid);
             %client.dtStats = %dtStats;
             %dtStats.client = %client;
-            %dtStats.name = %client.nameBase;
+            %dtStats.name = %client.name;
             %dtStats.clientLeft = 0;
             %dtStats.markForDelete = 0;
             %foundOld =1;
@@ -1513,7 +1513,7 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          %client.dtStats = %dtStats;
          %dtStats.client =%client;
          %dtStats.guid = %client.guid;
-         %dtStats.name =%client.nameBase;
+         %dtStats.name =%client.name;
          %dtStats.clientLeft = 0;
          %dtStats.markForDelete = 0;
          %dtStats.lastGame[%game.class] = 0;
@@ -1737,18 +1737,20 @@ function getFieldValue(%obj,%field){
    }
 }
 function getCNameToCID(%name){
+
    if(isObject(%name) && %name.getClassName() $= "GameConnection"){
-      return %name;
+      return %name; // not a name its a client so return it
    }
    else{
       for (%i = 0; %i < ClientGroup.getCount(); %i++){
          %client = ClientGroup.getObject(%i);
-         if(%client.nameBase $= %name){
+         if(getTaggedString(%client.name) $= %name){
             return %client;
          }
       }
    }
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 //Load Save Management
 ////////////////////////////////////////////////////////////////////////////////
@@ -2471,7 +2473,7 @@ function statsMenu(%client,%game){
    switch$(%menu)
    {
       case "View":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase@ "'s Stats");
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @  getTaggedString(%vClient.name) @ "'s Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", "<a:gamelink\tStats\tReset>  Back</a>");
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>  Main Options Menu");
          if(%game $= "CTFGame"){
@@ -2587,7 +2589,7 @@ function statsMenu(%client,%game){
          //%line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tELFLAK\t%1> View ELF Projector Stats</a>';
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
       case "LAKH":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase @ "'s Lak History");
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Lak History");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Game history is set to" SPC $dtStats::MaxNumOfGames SPC "games.");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>The oldest game will be overwritten.");
@@ -2623,7 +2625,7 @@ function statsMenu(%client,%game){
             }
          }
       case "Lak":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase @ "'s Match Stats");
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Match Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -2667,19 +2669,19 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalShocks",%game)),getGameTotal(%vClient,"totalShocks",%game),mCeil(getGameTotalAvg(%vClient,"totalShocks",%game)));
 
       case "CTFA":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase @ "'s Kills/Deaths");
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Kills/Deaths");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          %a1 = getGameTotal(%vClient,"cgKills",%game); %b2 = getGameTotal(%vClient,"cgDeaths",%game); %c3 = getGameTotal(%vClient,"discKills",%game);
          %d4 = getGameTotal(%vClient,"discDeaths",%game); %e5 = getGameTotal(%vClient,"grenadeKills",%game); %f6 = getGameTotal(%vClient,"grenadeDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Chaingun: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Spinfusor: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Grenade Launcher: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Chaingun: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Spinfusor: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Grenade Launcher: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"laserKills",%game); %b2 = getGameTotal(%vClient,"laserDeaths",%game); %c3 = getGameTotal(%vClient,"mortarKills",%game);
          %d4 = getGameTotal(%vClient,"mortarDeaths",%game); %e5 = getGameTotal(%vClient,"shockLanceKills",%game); %f6 = getGameTotal(%vClient,"shockLanceDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Laser Rifle: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Fusion Mortar: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Shocklance: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Laser Rifle: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Fusion Mortar: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Shocklance: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"plasmaKills",%game); %b2 = getGameTotal(%vClient,"plasmaDeaths",%game); %c3 = getGameTotal(%vClient,"blasterKills",%game);
          %d4 = getGameTotal(%vClient,"blasterDeaths",%game); %e5 = getGameTotal(%vClient,"elfKills",%game); %f6 = getGameTotal(%vClient,"elfDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Plasma Rifle: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Blaster: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>ELF Projector: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Plasma Rifle: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Blaster: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>ELF Projector: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, " -----------------------------------------------------------------------------------------------------------------");
@@ -2688,49 +2690,49 @@ function statsMenu(%client,%game){
 		 
          %a1 = getGameTotal(%vClient,"mineKills",%game); %b2 = getGameTotal(%vClient,"mineDeaths",%game); %c3 = getGameTotal(%vClient,"explosionKills",%game);
          %d4 = getGameTotal(%vClient,"explosionDeaths",%game); %e5 = getGameTotal(%vClient,"impactKills",%game); %f6 = getGameTotal(%vClient,"impactDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Mines: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Explosion: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Impact: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Mines: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Explosion: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Impact: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"groundKills"); %b2 = getGameTotal(%vClient,"groundDeaths"); %c3 = getGameTotal(%vClient,"turretKills");
          %d4 = getGameTotal(%vClient,"turretDeaths",%game); %e5 = getGameTotal(%vClient,"plasmaTurretKills",%game); %f6 = getGameTotal(%vClient,"plasmaTurretDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Ground: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Turret: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Plasma Turret: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Ground: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Plasma Turret: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"aaTurretKills"); %b2 = getGameTotal(%vClient,"aaTurretDeaths"); %c3 = getGameTotal(%vClient,"elfTurretKills");
          %d4 = getGameTotal(%vClient,"elfTurretDeaths",%game); %e5 = getGameTotal(%vClient,"mortarTurretKills",%game); %f6 = getGameTotal(%vClient,"mortarTurretDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  AA Turret: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>ELF Turret: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Mortar Turret: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  AA Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>ELF Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Mortar Turret: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"missileTurretKills",%game); %b2 = getGameTotal(%vClient,"missileTurretDeaths",%game); %c3 = getGameTotal(%vClient,"indoorDepTurretKills",%game);
          %d4 = getGameTotal(%vClient,"indoorDepTurretDeaths",%game); %e5 = getGameTotal(%vClient,"outdoorDepTurretKills",%game); %f6 = getGameTotal(%vClient,"outdoorDepTurretDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Missile Turret: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Spider Camp Turret: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Land Spike Turret: <color:02d404>%5k/%6d';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Missile Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Spider Camp Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Land Spike Turret: <color:02d404>%5 k / %6 d';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          
          %a1 = getGameTotal(%vClient,"sentryTurretKills",%game); %b2 = getGameTotal(%vClient,"sentryTurretDeaths",%game); %c3 = getGameTotal(%vClient,"outOfBoundKills",%game);
          %d4 = getGameTotal(%vClient,"outOfBoundDeaths",%game); %e5 = getGameTotal(%vClient,"lavaKills",%game); %f6 = getGameTotal(%vClient,"lavaDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Sentry Turret: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Out Of Bounds: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Lava: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Sentry Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Out Of Bounds: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Lava: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"shrikeBlasterKills",%game); %b2 = getGameTotal(%vClient,"shrikeBlasterDeaths",%game); %c3 = getGameTotal(%vClient,"bellyTurretKills",%game);
          %d4 = getGameTotal(%vClient,"bellyTurretDeaths",%game); %e5 = getGameTotal(%vClient,"bomberBombsKills",%game); %f6 = getGameTotal(%vClient,"bomberBombsDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Shrike Blaster: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Bomber Turret: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Bomber Bombs: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Shrike Blaster: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Bomber Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Bomber Bombs: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"tankChaingunKills",%game); %b2 = getGameTotal(%vClient,"tankChaingunDeaths",%game); %c3 = getGameTotal(%vClient,"tankMortarKills",%game);
          %d4 = getGameTotal(%vClient,"tankMortarDeaths",%game); %e5 = getGameTotal(%vClient,"mpbMissileKills",%game); %f6 = getGameTotal(%vClient,"mpbMissileDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Tank Chaingun: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Tank Mortar: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>MPB Missile: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Tank Chaingun: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Tank Mortar: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>MPB Missile: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          
          %a1 = getGameTotal(%vClient,"satchelChargeKills",%game); %b2 = getGameTotal(%vClient,"satchelChargeDeaths",%game); %c3 = getGameTotal(%vClient,"lightningKills",%game);
          %d4 = getGameTotal(%vClient,"lightningDeaths",%game); %e5 = getGameTotal(%vClient,"vehicleSpawnKills",%game); %f6 = getGameTotal(%vClient,"vehicleSpawnDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Satchel Charge: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Lightning: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Vehicle Spawn: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Satchel Charge: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Lightning: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Vehicle Spawn: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"forceFieldPowerUpKills",%game); %b2 = getGameTotal(%vClient,"forceFieldPowerUpDeaths",%game); %c3 = getGameTotal(%vClient,"crashKills",%game);
          %d4 = getGameTotal(%vClient,"crashDeaths",%game); %e5 = getGameTotal(%vClient,"waterKills",%game); %f6 = getGameTotal(%vClient,"waterDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Forcefield Power: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Crash: <color:02d404>%3k/%4d<color:0befe7><lmargin:380>Water: <color:02d404>%5k/%6d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Forcefield Power: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Crash: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Water: <color:02d404>%5 k / %6 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"nexusCampingKills",%game); %b2 = getGameTotal(%vClient,"nexusCampingDeaths",%game); %c3 = getGameTotal(%vClient,"unknownKill",%game);
          %d4 = getGameTotal(%vClient,"unknownDeaths",%game); %e5 = 0; %f6 = 0;
-         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Nexus Camping: <color:02d404>%1k/%2d<color:0befe7><lmargin:175>Unknown??: <color:02d404>%3k/%4d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Nexus Camping: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Unknown??: <color:02d404>%3 k / %4 d<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          
       case "CTF":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase @ "'s Match Stats");
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Match Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -2793,7 +2795,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
          
       case "CTFH":// Past Games
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.namebase @ "'s CTF History");
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s CTF History");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Game history is set to" SPC $dtStats::MaxNumOfGames SPC "games.");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>The oldest game will be overwritten.");

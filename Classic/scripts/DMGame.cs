@@ -27,7 +27,8 @@ $InvBanList[DM, "CameraGrenade"] = 1;
 $InvBanList[DM, "FlashGrenade"] = 1;
 $InvBanList[DM, "InventoryDeployable"] = 1;
 
-$DMGame::wpKillCount = 5; //person with highest amount of kills above the kill count gets a mark on there head
+$DMGame::wpKillCount = 3; //person with highest amount of kills above the kill count gets a mark on there head
+$DMGame::wpKillCountDoubleBonus = 5;
 $DMGame::wpMessage = "";
 //set 1 only mark the target with highest amount of kills
 //set 2 only mark target with highest score
@@ -243,11 +244,13 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
    if(%clVictim.isMarked && $DMGame::mode){
       if(%clVictim != %clKiller && %clKiller !$= ""){
          
-		 if(%clVictim.killCounter < 10) {
+		 //single bonus
+		 if(%clVictim.killCounter < $DMGame::wpKillCountDoubleBonus) {
 			%clKiller.bigGame++; // stats rename to what ever 
 			%clKiller.scorebigGame++;
 			messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
 		 }
+		 //double bonus
 		 else {
 			%clKiller.bigGame++; 		%clKiller.bigGame++;
 			%clKiller.scorebigGame++;   %clKiller.scorebigGame++;

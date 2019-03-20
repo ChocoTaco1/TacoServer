@@ -9,8 +9,8 @@
 //Kill
 //Don't get killed
 //Points are scored for each kill you make and subtracted each time you die
-//First person to 25 points wins
-//Go after those on kill streaks for a bonus.
+//Kill waypointed enemies for a bonus
+//First to 25 points wins
 //--- GAME RULES END ---
 
 $InvBanList[DM, "TurretOutdoorDeployable"] = 1;

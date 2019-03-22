@@ -89,8 +89,9 @@ function DMGame::initGameVars(%game)
    %game.SCORE_PER_KILL = 1;
    %game.SCORE_PER_DEATH = -1; //was -1
    %game.SCORE_PER_SUICIDE = -1; //was -1
-   %game.SCORE_PER_MIDAIR = 0.2; // Added Chocotaco. From sctf
-   %game.SCORE_PER_BIGGAME = 1; // taking out a kill streak  
+   %game.SCORE_PER_MIDAIR = 0.25; //Added Chocotaco. From sctf
+   %game.SCORE_PER_BONUS = 1; //taking out a kill streak
+   %game.SCORE_PER_KILLSTREAKBONUS = 0.5; //bonus for those who get a kill while waypointed
 }
 
 exec("scripts/aiDeathMatch.cs");
@@ -226,7 +227,7 @@ function DMGame::resetScore(%game, %client)
    %client.efficiency = 0.0;
    %client.suicides = 0;
    %client.scoreMidAir = 0;
-   %client.bigGame = 0;
+   %client.Bonus = 0;
    %client.killCounter = 0;// not a score thing but needs to be reset
 }
 
@@ -241,87 +242,129 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
    
    DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
    
-   if(%clVictim.isMarked && $DMGame::mode){
-      if(%clVictim != %clKiller && %clKiller !$= ""){
-         
-		 //single bonus
-		 if(%clVictim.killCounter < $DMGame::wpKillCountDoubleBonus) {
-			%clKiller.bigGame++; // stats rename to what ever 
-			%clKiller.scorebigGame++;
-			messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
-		 }
-		 //double bonus
-		 else {
-			%clKiller.bigGame++; 		%clKiller.bigGame++;
-			%clKiller.scorebigGame++;   %clKiller.scorebigGame++;
-			messageAll('Msgding', '\c1%1 receives a double bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
-		 }
-		 Game.recalcScore(%clKiller);
-      }
-      for(%a = 0; %a < ClientGroup.getCount(); %a++)
-      {
-         %client = ClientGroup.getObject(%a);
-         if(%client != %clVictim){
-            hideTargetWaypoint(%client,%clVictim);
-         }
-      }
-      %clVictim.isMarked = 0;
+   if($ProcessBonusActive)
+	   schedule(300, 0, "ProcessBonusDM", %game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
+   else
+	   ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
+   
+}
+
+function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc)
+{
+	  $ProcessBonusActive = true;
+	  
+	  if(%clVictim.isMarked && $DMGame::mode)
+	  {
+		 if(%clVictim !$= %clKiller)
+		 {
+			 if(%clKiller $= "")
+				 return;
+			 
+			 //single bonus
+			 if(%clVictim.killCounter < $DMGame::wpKillCountDoubleBonus) 
+			 {
+				%clKiller.Bonus++; // stats rename to what ever 
+				%clKiller.scoreBonus++;
+				
+				messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+			 }
+			 //double bonus
+			 else 
+			 {
+				%clKiller.Bonus++; 		%clKiller.Bonus++;
+				%clKiller.scoreBonus++; %clKiller.scoreBonus++;
+				
+				messageAll('Msgding', '\c1%1 receives a double bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+			 }
+			 Game.recalcScore(%clKiller);
+        }
+		else if(%clVictim == %clKiller)
+			messageAll('Msgding', '\c1%1\'s %2x kill streak ended.', %clVictim.name, %clVictim.killCounter);	
+			
+		for(%a = 0; %a < ClientGroup.getCount(); %a++)
+		{
+			%client = ClientGroup.getObject(%a);
+			if(%client != %clVictim)
+			{
+				hideTargetWaypoint(%client,%clVictim);
+			}
+		}
+		%clVictim.isMarked = 0;
    }
-   else if($DMGame::mode == 2){
-      if(%game.lastGuy != %clKiller && %clVictim == %game.lastGuy){
-         %clKiller.bigGame++;
-          messageClient(%clKiller, 'MsgPingWaypoint', '\c2Big Target Count %1.~wfx/misc/~wfx/misc/flag_lost.wav',%clKiller.bigGame);
+   else if($DMGame::mode == 2)
+   {
+      if(%game.lastGuy != %clKiller && %clVictim == %game.lastGuy)
+	  {
+         %clKiller.Bonus++;
+          messageClient(%clKiller, 'MsgPingWaypoint', '\c1Bonus Target Count %1.~wfx/misc/~wfx/misc/flag_lost.wav',%clKiller.Bonus);
       }
    }
    %clKiller.killCounter++;
    %clVictim.killCounter = 0;
    
-   switch$($DMGame::mode){
+   switch$($DMGame::mode)
+   {
       case 1: // player with the highest kill streak if they are above $DMGame::wpKillCount
-		 %bigClient = 0;
-         for(%b = 0; %b < ClientGroup.getCount(); %b++){
+		 %bonusClient = 0;
+         for(%b = 0; %b < ClientGroup.getCount(); %b++)
+		 {
             %cl = ClientGroup.getObject(%b);
-            if(%cl.killCounter >= $DMGame::wpKillCount && %cl.killCounter > %bigClient.killCounter && !%cl.isObserver){
-               %bigClient = %cl;// we have a new  
+            if(%cl.killCounter >= $DMGame::wpKillCount && %cl.killCounter > %bonusClient.killCounter && !%cl.isObserver)
+			{
+               %bonusClient = %cl;// we have a new  
             }
          } 
-		if(%bigClient != %game.lastGuy && %bigClient != 0){
-            for(%i = 0; %i < ClientGroup.getCount(); %i++){
+		if(%bonusClient !$= %game.lastGuy && %bonusClient !$= 0)
+		{
+            for(%i = 0; %i < ClientGroup.getCount(); %i++)
+			{
                %cl = ClientGroup.getObject(%i);
                
-			   messageClient(%cl, 'MsgPingWaypoint', '\c2%1 is on a kill streak.~wgui/vote_nopass.wav',%bigClient.name);
+			   messageClient(%cl, 'MsgPingWaypoint', '\c1%1 is on a kill streak.~wgui/vote_nopass.wav',%bonusClient.name);
 				
                hideTargetWaypoint(%cl,%game.lastGuy);
-               if(%cl != %bigClient){
-                  markTargetDM(%cl,%bigClient);
+               if(%cl != %bonusClient){
+                  markTargetDM(%cl,%bonusClient);
                }
             }
             %game.lastGuy.isMarked = 0; 
-            %bigClient.isMarked = 1;
-            %game.lastGuy = %bigClient; 
+            %bonusClient.isMarked = 1;
+            %game.lastGuy = %bonusClient; 
          }
+		 else if(%bonusClient == %game.lastGuy && %bonusClient !$= 0) 
+		 { //give waypointed player a kill bonus
+			 %bonusClient.KillStreakBonus++;
+			 %bonusClient.scoreKillStreakBonus++;
+		 }
       case 2: // player with the highest score
-         %bigClient = 0;
-         for(%b = 0; %b < ClientGroup.getCount(); %b++){
+         %bonusClient = 0;
+         for(%b = 0; %b < ClientGroup.getCount(); %b++)
+		 {
             %cl = ClientGroup.getObject(%b);
-            if(%cl.score > %bigClient.score && !%cl.isObserver){
-               %bigClient = %cl;
+            if(%cl.score > %bonusClient.score && !%cl.isObserver)
+			{
+               %bonusClient = %cl;
             }
 
          }  
-         if(%bigClient != 0 && %game.lastGuy != %bigClient){
-            for(%i = 0; %i < ClientGroup.getCount(); %i++){
+         if(%bonusClient != 0 && %game.lastGuy != %bonusClient)
+		 {
+            for(%i = 0; %i < ClientGroup.getCount(); %i++)
+			{
                %cl = ClientGroup.getObject(%i);
-			   //messageClient(%cl, 'MsgPingWaypoint', '\c2%1 now has the highest score.',%bigClient.name);
-               messageClient(%cl, 'MsgPingWaypoint', '\c2%1 now has the highest score.~wgui/vote_nopass.wav',%bigClient.name);
+			   //messageClient(%cl, 'MsgPingWaypoint', '\c2%1 now has the highest score.',%bonusClient.name);
+               messageClient(%cl, 'MsgPingWaypoint', '\c1%1 now has the highest score.~wgui/vote_nopass.wav',%bonusClient.name);
                hideTargetWaypoint(%cl,%game.lastGuy);
-               if(%cl != %bigClient){
-                  markTargetDM(%cl,%bigClient);
+               if(%cl != %bonusClient)
+			   {
+                  markTargetDM(%cl,%bonusClient);
                }
             }
-            %game.lastGuy = %bigClient;
+            %game.lastGuy = %bonusClient;
          }
    }
+   
+   $ProcessBonusActive = false;
 }
 //function listDM(){// for debug
    //for(%a = 0; %a < ClientGroup.getCount(); %a++){
@@ -368,11 +411,14 @@ function DMGame::recalcScore(%game, %client)
    %killValue = %client.kills * %game.SCORE_PER_KILL;
    %deathValue = %client.deaths * %game.SCORE_PER_DEATH;
    %suicideValue = %client.suicides * %game.SCORE_PER_SUICIDE;
-   %bigGameValue = %client.bigGame * %game.SCORE_PER_BIGGAME;
+   %BonusValue = %client.Bonus * %game.SCORE_PER_BONUS;
+   %MidAirValue = %client.MidAir * %game.SCORE_PER_MIDAIR;
+   %KillStreakBonusValue = %client.KillStreakBonus * %game.SCORE_PER_KILLSTREAKBONUS;
+   
    if (%killValue - %deathValue == 0)
       %client.efficiency = %suicideValue;
    else
-      %client.efficiency = ((%killValue * %killValue) / (%killValue - (%deathValue + %suicideValue))) + %bigGameValue;
+      %client.efficiency = ((%killValue * %killValue) / (%killValue - (%deathValue + %suicideValue))) + (%BonusValue + %MidAirValue + %KillStreakBonusValue);
    
    %client.score = mFloatLength(%client.efficiency, 1);
    messageClient(%client, 'MsgYourScoreIs', "", %client.score);
@@ -552,19 +598,24 @@ function DMGame::updateScoreHud(%game, %client, %tag)
       
       %clKills = mFloatLength( %cl.kills, 0 );
       %clDeaths = mFloatLength( %cl.deaths + %cl.suicides, 0 );
+	  %clBonus = mFloor((%cl.Bonus * %game.SCORE_PER_BONUS) + (%cl.MidAir * %game.SCORE_PER_MIDAIR) + (%cl.KillStreakBonus * %game.SCORE_PER_KILLSTREAKBONUS ));
       %clStyle = %cl == %client ? "<color:dcdcdc>" : ""; 
+	  
+	  //%BonusValue = %client.Bonus * %game.SCORE_PER_BONUS;
+	  //%MidAirValue = %client.MidAir * %game.SCORE_PER_MIDAIR;
+      //%KillStreakBonusValue = %client.KillStreakBonus * %game.SCORE_PER_KILLSTREAKBONUS;
       
       //if the client is not an observer, send the message
       if (%client.team != 0)
       {                                                      //  <tab:15,235,340,415,500>\%5\%1\%2\%3\tBG'
          messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115>%1</clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%6',
-         %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl.bigGame);
+         %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %clBonus);
       }
       //else for observers, create an anchor around the player name so they can be observed
       else
       {
          messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6>%1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
-         %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl,%cl.bigGame );
+         %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl, %clBonus);
       }
    }
    

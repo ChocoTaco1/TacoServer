@@ -65,21 +65,42 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
    %data.deleteAllMounted(%obj);
    // -----------------------------------------------------------------------------------------
    // z0dd - ZOD - Czar, 6/24/02. Move this vehicle out of the way so nothing collides with it.
-   if(%data.getName() $="BomberFlyer" || %data.getName() $="MobileBaseVehicle" || %data.getName() $="AssaultVehicle")
+   if(%data.getName() $="AssaultVehicle")
    {
       // %obj.setFrozenState(true);
-      %obj.schedule(2000, "delete");
+      %obj.schedule(1, "delete"); //was 2000
       //%data.schedule(500, 'onAvoidCollisions', %obj);
 	  
 	  //Transfer the vehicle far away
-      %obj.schedule(10, "setPosition", vectorAdd(%obj.getPosition(), "40 -27 10000")); //Lowered: was 500
+      %obj.schedule(1, "setPosition", vectorAdd(%obj.getPosition(), "40 -27 10000")); //Lowered: was 500
+   }
+   else if(%data.getName() $="BomberFlyer" || %data.getName() $="MobileBaseVehicle")
+   {
+      // %obj.setFrozenState(true);
+      %obj.schedule(2000, "delete"); //was 2000
+      //%data.schedule(500, 'onAvoidCollisions', %obj);
+	  
+	  //Transfer the vehicle far away
+      %obj.schedule(100, "setPosition", vectorAdd(%obj.getPosition(), "40 -27 10000")); //Lowered: was 500
    }
    else
    {
       %obj.setFrozenState(true); 
-      %obj.schedule(500, "delete");
+      %obj.schedule(500, "delete"); //was 500
    }
    // -----------------------------------------------------------------------------------------
+}
+
+//Give people on invs and little less damage if they dont have the flag.
+function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
+{	
+	
+	if( $CurrentMission $= "SmallCrossing" && %targetObject.station && !%targetObject.holdingFlag )
+    {
+		%amount *= 0.5;
+    }
+	
+	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
 }
 
 };

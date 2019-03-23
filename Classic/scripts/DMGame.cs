@@ -214,9 +214,10 @@ function DMGame::checkScoreLimit(%game, %client)
 
 function DMGame::createPlayer(%game, %client, %spawnLoc, %respawn)
 {
-DefaultGame::createPlayer(%game, %client, %spawnLoc, %respawn);
-   %client.setSensorGroup(%client.team);
-      %client.isObserver =0;
+	DefaultGame::createPlayer(%game, %client, %spawnLoc, %respawn);
+	
+	%client.setSensorGroup(%client.team);
+      %client.isObserver = 0;
 }
 
 function DMGame::resetScore(%game, %client)
@@ -231,9 +232,10 @@ function DMGame::resetScore(%game, %client)
    %client.killCounter = 0;// not a score thing but needs to be reset
 }
 
-function DMGame::forceObserver( %game, %client, %reason ){
+function DMGame::forceObserver( %game, %client, %reason )
+{
    parent::forceObserver( %game, %client, %reason );
-   %client.isObserver =1;
+   %client.isObserver = 1;
 }
 
 function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc)
@@ -242,31 +244,32 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
    
    DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
    
-   if($ProcessBonusActive)
-	   schedule(300, 0, "ProcessBonusDM", %game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
-   else
-	   ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
-   
+   ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
 }
 
 function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc)
-{
-	  $ProcessBonusActive = true;
-	  
+{	   
 	  if(%clVictim.isMarked && $DMGame::mode)
 	  {
+		 if(%clKiller $= "")
+			return;
+		 
 		 if(%clVictim !$= %clKiller)
-		 {
-			 if(%clKiller $= "")
-				 return;
-			 
-			 //single bonus
+		 {	 
+			%temprampage = mfloor((%clVictim.killCounter - $DMGame::wpKillCount) * %game.SCORE_PER_KILLSTREAKBONUS);
+
+			//single bonus
 			 if(%clVictim.killCounter < $DMGame::wpKillCountDoubleBonus) 
 			 {
 				%clKiller.Bonus++; // stats rename to what ever 
 				%clKiller.scoreBonus++;
 				
-				messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+				//messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+				messageAllExcept(%clVictim, -1, 'Msgding', '\c4%1 is rewarded with a bonus for ending %5\'s %6X Kill Streak!~wfx/misc/flag_lost.wav', %clKiller.name, "", %clVictim, 1, %clVictim.name, %clVictim.killCounter );
+				if(%temprampage > 0)
+					messageClient(%clVictim, 'Msgding', '\c4%1 has ended your %2X Kill Streak. You\'ve been rewarded with %3 extra points!~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter, %temprampage);
+				else
+					messageClient(%clVictim, 'Msgding', '\c2%1 has ended your %2X Kill Streak.~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter);
 			 }
 			 //double bonus
 			 else 
@@ -274,13 +277,19 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
 				%clKiller.Bonus++; 		%clKiller.Bonus++;
 				%clKiller.scoreBonus++; %clKiller.scoreBonus++;
 				
-				messageAll('Msgding', '\c1%1 receives a double bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+				//messageAll('Msgding', '\c1%1 receives a double bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
+				messageAllExcept(%clVictim, -1, 'Msgding', '\c4%1 is rewarded with a double bonus for ending %5\'s %6X Kill Streak!~wfx/misc/flag_lost.wav', %clKiller.name, "", %clVictim, 1, %clVictim.name, %clVictim.killCounter );
+				if(%temprampage > 0)
+					messageClient(%clVictim, 'Msgding', '\c4%1 has ended your %2X Kill Streak. You\'ve been rewarded with %3 extra points!~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter, %temprampage);
+				else
+					messageClient(%clVictim, 'Msgding', '\c2%1 has ended your %2X Kill Streak.~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter);
 			 }
 			 Game.recalcScore(%clKiller);
         }
 		else if(%clVictim == %clKiller)
-			messageAll('Msgding', '\c1%1\'s %2x kill streak ended.', %clVictim.name, %clVictim.killCounter);	
-			
+		{
+			messageAll('Msgding', '\c2%1\'s Kill Streak has ended. No bonus rewarded.', %clVictim.name, %clVictim.killCounter);
+		}	
 		for(%a = 0; %a < ClientGroup.getCount(); %a++)
 		{
 			%client = ClientGroup.getObject(%a);
@@ -296,7 +305,7 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
       if(%game.lastGuy != %clKiller && %clVictim == %game.lastGuy)
 	  {
          %clKiller.Bonus++;
-          messageClient(%clKiller, 'MsgPingWaypoint', '\c1Bonus Target Count %1.~wfx/misc/~wfx/misc/flag_lost.wav',%clKiller.Bonus);
+          messageClient(%clKiller, 'MsgPingWaypoint', '\c2Bonus Target Count %1.~wfx/misc/~wfx/misc/flag_lost.wav',%clKiller.Bonus);
       }
    }
    %clKiller.killCounter++;
@@ -304,37 +313,45 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
    
    switch$($DMGame::mode)
    {
-      case 1: // player with the highest kill streak if they are above $DMGame::wpKillCount
+      case 1: // player with the highest kill streak if they are above $DMGame::wpKillCount		 
 		 %bonusClient = 0;
          for(%b = 0; %b < ClientGroup.getCount(); %b++)
 		 {
             %cl = ClientGroup.getObject(%b);
             if(%cl.killCounter >= $DMGame::wpKillCount && %cl.killCounter > %bonusClient.killCounter && !%cl.isObserver)
 			{
-               %bonusClient = %cl;// we have a new  
+               %bonusClient = %cl;// we have a new 
             }
          } 
-		if(%bonusClient !$= %game.lastGuy && %bonusClient !$= 0)
-		{
-            for(%i = 0; %i < ClientGroup.getCount(); %i++)
-			{
-               %cl = ClientGroup.getObject(%i);
-               
-			   messageClient(%cl, 'MsgPingWaypoint', '\c1%1 is on a kill streak.~wgui/vote_nopass.wav',%bonusClient.name);
+		 
+		 if(%bonusClient !$= 0 && %clKiller == %bonusClient)
+		 {
+			 if(%bonusClient == %game.lastGuy) 
+			 {   
+				//give waypointed player a kill bonus
+				%bonusClient.KillStreakBonus++;
+				%bonusClient.scoreKillStreakBonus++;
+				messageClient(%bonusClient, 'MsgPingWaypoint', '\c2You\'ve increase your Kill Streak to %1!', %bonusClient.killCounter);
+			 }
+			 else
+			 {
+				for(%i = 0; %i < ClientGroup.getCount(); %i++)
+				{
+				   %cl = ClientGroup.getObject(%i);
+					
+				   hideTargetWaypoint(%cl,%game.lastGuy);
+				   if(%cl !$= %bonusClient)
+				   {
+					  markTargetDM(%cl,%bonusClient);
+				   }
+				}
+				messageAllExcept(%bonusClient, -1, 'MsgPingWaypoint', '\c2%1 is on a Kill Streak. Kill them for a bonus!~wgui/vote_nopass.wav', %bonusClient.name, "", %bonusClient, 1 );
+				messageClient(%bonusClient, 'MsgPingWaypoint', '\c2You\'re on a Kill Streak. Get more kills for extra points!~wfx/misc/target_waypoint.wav', %bonusClient.killCounter);
 				
-               hideTargetWaypoint(%cl,%game.lastGuy);
-               if(%cl != %bonusClient){
-                  markTargetDM(%cl,%bonusClient);
-               }
-            }
-            %game.lastGuy.isMarked = 0; 
-            %bonusClient.isMarked = 1;
-            %game.lastGuy = %bonusClient; 
-         }
-		 else if(%bonusClient == %game.lastGuy && %bonusClient !$= 0) 
-		 { //give waypointed player a kill bonus
-			 %bonusClient.KillStreakBonus++;
-			 %bonusClient.scoreKillStreakBonus++;
+				%game.lastGuy.isMarked = 0; 
+				%bonusClient.isMarked = 1;
+				%game.lastGuy = %bonusClient; 
+			 }
 		 }
       case 2: // player with the highest score
          %bonusClient = 0;
@@ -363,8 +380,6 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
             %game.lastGuy = %bonusClient;
          }
    }
-   
-   $ProcessBonusActive = false;
 }
 //function listDM(){// for debug
    //for(%a = 0; %a < ClientGroup.getCount(); %a++){

@@ -2095,7 +2095,7 @@ function resetDtStats(%client){
 //Stats Collecting
 ////////////////////////////////////////////////////////////////////////////////
 function clientKillStats(%game, %clVictim, %clKiller, %damageType, %damageLocation){
-   error(%game SPC %clVictim SPC  %clKiller SPC  %damageType SPC  %damageLocation);
+   //error(%game SPC %clVictim SPC  %clKiller SPC  %damageType SPC  %damageLocation);
    if($dtStats::Enable  == 0){return;}
    if(%clKiller.team != %clVictim.team){
       switch$(%damageType){// list of all damage types to track see damageTypes.cs
@@ -2545,8 +2545,8 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"morepoints",%inc,%game),getGameTotal(%vClient,"morepoints",%game),mCeil(getGameTotalAvg(%vClient,"morepoints",%game)));
          %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"minePlusDisc",%inc,%game),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
-         %line = '<color:0befe7>  Total Speed<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"totalSpeed",%inc),getGameTotal(%vClient,"totalSpeed",%game),mCeil(getGameTotalAvg(%vClient,"totalSpeed",%game)));
+         //%line = '<color:0befe7>  Total Speed<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"totalSpeed",%inc),getGameTotal(%vClient,"totalSpeed",%game),mCeil(getGameTotalAvg(%vClient,"totalSpeed",%game)));
          %line = '<color:0befe7>  Total Distance<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"totalDistance",%inc,%game),getGameTotal(%vClient,"totalDistance",%game),mCeil(getGameTotalAvg(%vClient,"totalDistance",%game)));
          //%line = '<color:0befe7>Total Chain Accuracy<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2610,7 +2610,7 @@ function statsMenu(%client,%game){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> <color:FF0000><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> <color:FF9A00><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);
@@ -2651,8 +2651,8 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"morepoints",%game)),getGameTotal(%vClient,"morepoints",%game),mCeil(getGameTotalAvg(%vClient,"morepoints",%game)));
 		 %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"minedisc",%game)),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
-         %line = '<color:0befe7>  Total Speed<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalSpeed",%game)),getGameTotal(%vClient,"totalSpeed",%game),mCeil(getGameTotalAvg(%vClient,"totalSpeed",%game)));
+         //%line = '<color:0befe7>  Total Speed<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalSpeed",%game)),getGameTotal(%vClient,"totalSpeed",%game),mCeil(getGameTotalAvg(%vClient,"totalSpeed",%game)));
          %line = '<color:0befe7>  Total Distance<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalDistance",%game)),getGameTotal(%vClient,"totalDistance",%game),mCeil(getGameTotalAvg(%vClient,"totalDistance",%game)));
          //%line = '<color:0befe7>Total Chain Accuracy<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -2815,7 +2815,7 @@ function statsMenu(%client,%game){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> <color:FF0000><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> <color:FF9A00><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);

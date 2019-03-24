@@ -1554,8 +1554,8 @@ function LakRabbitGame::recalcScore(%game, %client)
    %timeHoldingFlagMS = %client.flagTimeMS;
    if (isObject(%client.player.holdingFlag))
       %timeHoldingFlagMS += getSimTime() - %client.startTime;
-   if(Game.PubPro) %client.score = %client.flagGrabs + (%client.kills*5) + %client.morepoints + mFloor(%timeHoldingFlagMS / 5000);
-   else %client.score = %client.flagGrabs + %client.kills + %client.morepoints + mFloor(%timeHoldingFlagMS / 5000);
+   if(Game.PubPro) %client.score = %client.flagGrabs + (%client.kills*5) + %client.morepoints + mFloor(%timeHoldingFlagMS / 4000);
+   else %client.score = %client.flagGrabs + %client.kills + %client.morepoints + mFloor(%timeHoldingFlagMS / 4000);
    messageClient(%client, 'MsgYourScoreIs', "", %client.score);
    %game.recalcTeamRanks(%client);
    %game.checkScoreLimit(%client);

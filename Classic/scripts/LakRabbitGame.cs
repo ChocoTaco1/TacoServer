@@ -1554,8 +1554,8 @@ function LakRabbitGame::recalcScore(%game, %client)
    %timeHoldingFlagMS = %client.flagTimeMS;
    if (isObject(%client.player.holdingFlag))
       %timeHoldingFlagMS += getSimTime() - %client.startTime;
-   if(Game.PubPro) %client.score = %client.flagGrabs + (%client.kills*5) + %client.morepoints + mFloor(%timeHoldingFlagMS / 4000);
-   else %client.score = %client.flagGrabs + %client.kills + %client.morepoints + mFloor(%timeHoldingFlagMS / 4000);
+   if(Game.PubPro) %client.score = %client.flagGrabs + (%client.kills*5) + %client.morepoints + mFloor(%timeHoldingFlagMS / 3000);
+   else %client.score = %client.flagGrabs + %client.kills + %client.morepoints + mFloor(%timeHoldingFlagMS / 3000);
    messageClient(%client, 'MsgYourScoreIs', "", %client.score);
    %game.recalcTeamRanks(%client);
    %game.checkScoreLimit(%client);
@@ -1953,15 +1953,15 @@ function LakRabbitGame::resetScore(%game, %client)
 	%client.morepoints	= 0;
 	
 	// new debriefing stuff
-	%client.mas			= 0;
-	%client.totalSpeed		= 0;
+	%client.mas					= 0;
+	%client.totalSpeed			= 0;
 	%client.totalDistance		= 0;
 	%client.totalChainAccuracy	= 0;
 	%client.totalChainHits		= 0;
 	%client.totalSnipeHits		= 0;
-	%client.totalSnipes		= 0;
+	%client.totalSnipes			= 0;
 	%client.totalShockHits		= 0;
-	%client.totalShocks		= 0;
+	%client.totalShocks			= 0;
 }
 
 function LakRabbitGame::enterMissionArea(%game, %playerData, %player)

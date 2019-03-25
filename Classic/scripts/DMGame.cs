@@ -227,9 +227,12 @@ function DMGame::resetScore(%game, %client)
    %client.score = 0;
    %client.efficiency = 0.0;
    %client.suicides = 0;
-   %client.scoreMidAir = 0;
+   %client.MidAir = 0;
    %client.Bonus = 0;
+   %client.KillStreakBonus = 0;
+   
    %client.killCounter = 0;// not a score thing but needs to be reset
+   %game.lastGuy = 0;
 }
 
 function DMGame::forceObserver( %game, %client, %reason )
@@ -254,8 +257,13 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
 		 if(%clKiller $= "")
 			return;
 		 
-		 if(%clVictim !$= %clKiller)
-		 {	 
+		if(%clVictim == %clKiller || %clVictim.lastDeathSuicide)
+		{
+			messageAll('Msgding', '\c2%1\'s Kill Streak has ended. No bonus rewarded.', %clVictim.name, %clVictim.killCounter);
+			%game.lastGuy = 0;
+		}		
+		else if(%clVictim !$= %clKiller)
+		{	 
 			%temprampage = mfloor((%clVictim.killCounter - $DMGame::wpKillCount) * %game.SCORE_PER_KILLSTREAKBONUS);
 
 			//single bonus
@@ -285,11 +293,8 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
 					messageClient(%clVictim, 'Msgding', '\c2%1 has ended your %2X Kill Streak.~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter);
 			 }
 			 Game.recalcScore(%clKiller);
+			 %game.lastGuy = 0;
         }
-		else if(%clVictim == %clKiller)
-		{
-			messageAll('Msgding', '\c2%1\'s Kill Streak has ended. No bonus rewarded.', %clVictim.name, %clVictim.killCounter);
-		}	
 		for(%a = 0; %a < ClientGroup.getCount(); %a++)
 		{
 			%client = ClientGroup.getObject(%a);
@@ -304,8 +309,9 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
    {
       if(%game.lastGuy != %clKiller && %clVictim == %game.lastGuy)
 	  {
-         %clKiller.Bonus++;
+          %clKiller.Bonus++;
           messageClient(%clKiller, 'MsgPingWaypoint', '\c2Bonus Target Count %1.~wfx/misc/~wfx/misc/flag_lost.wav',%clKiller.Bonus);
+		  %game.lastGuy = 0;
       }
    }
    %clKiller.killCounter++;
@@ -323,22 +329,14 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
                %bonusClient = %cl;// we have a new 
             }
          } 
-		 
 		 if(%bonusClient !$= 0 && %clKiller == %bonusClient)
 		 {
-			 if(%bonusClient == %game.lastGuy) 
-			 {   
-				//give waypointed player a kill bonus
-				%bonusClient.KillStreakBonus++;
-				%bonusClient.scoreKillStreakBonus++;
-				messageClient(%bonusClient, 'MsgPingWaypoint', '\c2You\'ve increase your Kill Streak to %1!', %bonusClient.killCounter);
-			 }
-			 else
+			 if(%bonusClient !$= %game.lastGuy)
 			 {
 				for(%i = 0; %i < ClientGroup.getCount(); %i++)
 				{
 				   %cl = ClientGroup.getObject(%i);
-					
+				   
 				   hideTargetWaypoint(%cl,%game.lastGuy);
 				   if(%cl !$= %bonusClient)
 				   {
@@ -351,6 +349,13 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
 				%game.lastGuy.isMarked = 0; 
 				%bonusClient.isMarked = 1;
 				%game.lastGuy = %bonusClient; 
+			 }
+			 else if(%bonusClient == %game.lastGuy && %bonusClient.killCounter > 3) 
+			 {   
+				//give waypointed player a kill bonus
+				%bonusClient.KillStreakBonus++;
+				%bonusClient.scoreKillStreakBonus++;
+				messageClient(%bonusClient, 'MsgPingWaypoint', '\c2You\'ve increase your Kill Streak to %1!', %bonusClient.killCounter);
 			 }
 		 }
       case 2: // player with the highest score
@@ -464,7 +469,8 @@ DefaultGame::gameOver(%game);
    
    cancel(%game.timeThread);
    messageAll('MsgClearObjHud', "");
-   for(%i = 0; %i < ClientGroup.getCount(); %i ++) {
+   for(%i = 0; %i < ClientGroup.getCount(); %i ++) 
+   {
       %client = ClientGroup.getObject(%i);
       %game.resetScore(%client);
    }
@@ -717,12 +723,12 @@ package DMGame
 		//Other armors get more damage
 		if(%targetObject.client.armor $= "Medium")
 		{
-			%amount *= 1.3;
+			%amount *= 1.2;
 		}
 		  
 		if(%targetObject.client.armor $= "Heavy")
 		{
-			%amount *= 1.5;
+			%amount *= 1.4;
 		}
 	   
 	   //error("Armor::damageObject( "@%data@", "@%targetObject@", "@%sourceObject@", "@%position@", "@%amount@", "@%damageType@", "@%momVec@" )");
@@ -943,7 +949,7 @@ function killEveryone(%ignore, %message)
 //               messageClient(%client, 'voteAlreadyRunning', '\c2A vote is already in progress.');
 //               return;
 //            }
-//			%actionMsg = ($Host::DMSLOnlyMode ? "disable Shocklance Only Mode" : "enable Shocklance Only Mode");
+//			  %actionMsg = ($Host::DMSLOnlyMode ? "disable Shocklance Only Mode" : "enable Shocklance Only Mode");
 //            for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
 //            {
 //               %cl = ClientGroup.getObject(%idx);

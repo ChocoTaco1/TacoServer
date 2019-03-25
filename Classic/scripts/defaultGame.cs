@@ -461,7 +461,7 @@ function DefaultGame::createPlayer(%game, %client, %spawnLoc, %respawn)
       %player.setInvincible(true);
       %player.setCloaked(true); // z0dd - ZOD, 8/6/02. Don't spawn players cloaked //was //
       %player.setInvincibleMode($InvincibleTime,0.02);
-      %player.respawnCloakThread = %player.schedule($InvincibleTime * 80, "setRespawnCloakOff"); // z0dd - ZOD, 8/6/02. Don't spawn players cloaked //was 1000
+      %player.respawnCloakThread = %player.schedule($InvincibleTime * 50, "setRespawnCloakOff"); // z0dd - ZOD, 8/6/02. Don't spawn players cloaked //was 1000
       %player.schedule($InvincibleTime * 1000, "setInvincible", false);
    }
    

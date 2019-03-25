@@ -16,12 +16,13 @@ function MapRepetitionChecker( %game )
 	//Debug
 	//%MapRepetitionCheckerDebug = true;
 	
-	if(!$GetRandomMapsLoaded)
+	if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
 		return;
 	
 	if(!$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
 	{
-		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
+		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
+		    $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
 			MapRepetitionCheckerFindRandom();
 		
 		//Set vars
@@ -39,25 +40,29 @@ function MapRepetitionChecker( %game )
 			if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
 		}
 	}
-		
 	$MapRepetitionCheckerRunOnce = 1;
 }
 
 function MapRepetitionCheckerFindRandom()
 {
 	if($GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
-		SetNextMapGetRandoms( %client ); //Get Random Set Next Mission maps
+		SetNextMapGetRandoms( %client ); //Get Random Set Next Mission maps	
 	else
 		return;
 	
-	%MapCheckerRandom = getRandom(1,6);
+	if( $CurrentMissionType $= "Deathmatch" )
+		%MapCheckerRandom = getRandom(1,8);
+	else
+		%MapCheckerRandom = getRandom(1,6);
+	
 	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
 	
-	if($EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back)
+	if( $EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || 
+	    $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back )
 		MapRepetitionCheckerFindRandom();
 	else
 	{	
-		error(formatTimeString("HH:nn:ss") SPC "Map Repetition Corrected.");
+		error(formatTimeString("HH:nn:ss") SPC "Map Repetition Corrected to" SPC $EvoCachedNextMission );
 		messageAll('MsgNoBaseRapeNotify', '\crMap Repetition Corrected: Next mission set to %1.', $EvoCachedNextMission);
 	}
 }

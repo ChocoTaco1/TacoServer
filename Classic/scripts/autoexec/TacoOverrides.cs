@@ -97,7 +97,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	
 	if( $CurrentMission $= "SmallCrossing" && %targetObject.station && !%targetObject.holdingFlag )
     {
-		%amount *= 0.5;
+		%amount *= 0.8;
     }
 	
 	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);

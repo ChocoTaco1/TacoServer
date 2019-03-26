@@ -723,12 +723,12 @@ package DMGame
 		//Other armors get more damage
 		if(%targetObject.client.armor $= "Medium")
 		{
-			%amount *= 1.2;
+			%amount *= 1.3;
 		}
 		  
 		if(%targetObject.client.armor $= "Heavy")
 		{
-			%amount *= 1.4;
+			%amount *= 1.5;
 		}
 	   
 	   //error("Armor::damageObject( "@%data@", "@%targetObject@", "@%sourceObject@", "@%position@", "@%amount@", "@%damageType@", "@%momVec@" )");

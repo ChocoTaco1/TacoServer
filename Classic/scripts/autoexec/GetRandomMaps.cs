@@ -43,7 +43,7 @@ $LakRandomMapPick16 = "PhasmaDustLak"; 			$LakRandomMapPick17 = "Sulfide"; 			$L
 //19-21
 $LakRandomMapPick19 = "Crater71Lak"; 			$LakRandomMapPick20 = "SolsDescentLak"; 	$LakRandomMapPick21 = "FrozenFuryLak"; 
 //22-24
-$LakRandomMapPick22 = "CankerLak"; 				$LakRandomMapPick23 = "S8_GeothermalLak"; 	$LakRandomMapPick24 = "EquinoxLak"; 
+$LakRandomMapPick22 = "CankerLak"; 				$LakRandomMapPick23 = "S8_GeothermalLak"; 	$LakRandomMapPick24 = "DustRunLak"; 
 //
 //LCTF
 //
@@ -134,7 +134,7 @@ function SetNextMapGetRandoms( %client )
 			$SetNextMissionMapSlot1 = "RaspDM";
 			$SetNextMissionMapSlot2 = "EntombedDM";
 			$SetNextMissionMapSlot3 = "IceDomeDM";
-			$SetNextMissionMapSlot4 = "HoofToeDM";
+			$SetNextMissionMapSlot4 = "LiveBaitDM";
 			$SetNextMissionMapSlot5 = "ArenaDomeDM";
 			$SetNextMissionMapSlot6 = "VulcansWrathDM";
 			$SetNextMissionMapSlot7 = "RampartsDM";

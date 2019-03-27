@@ -211,6 +211,7 @@ function AICorpseAdded(%corpse)
 // eat it ZP/Altimor
 function ChaingunImage::onFire(%data,%obj,%slot){}
 function SniperRifleImage::onFire(%data,%obj,%slot){}
+function ELFGunImage::onFire(%data,%obj,%slot){}
 function ShockLanceImage::onFire(%data, %obj, %slot)
 {
 	%p = parent::onFire(%data,%obj,%slot);

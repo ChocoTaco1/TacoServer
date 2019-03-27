@@ -21,15 +21,16 @@ function MapRepetitionChecker( %game )
 	
 	if(!$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
 	{
-		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
-		    $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
-			MapRepetitionCheckerFindRandom();
-		
 		//Set vars
 		if($PreviousMission3back !$= "") $PreviousMission4back = $PreviousMission3back;
 		if($PreviousMission2back !$= "") $PreviousMission3back = $PreviousMission2back;		
 		if($PreviousMission1back !$= "") $PreviousMission2back = $PreviousMission1back;
 										 $PreviousMission1back = $CurrentMission;
+										 
+		//Do work
+		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
+		    $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
+			MapRepetitionCheckerFindRandom();
 			
 		//Debug
 		if(%MapRepetitionCheckerDebug)	
@@ -57,6 +58,7 @@ function MapRepetitionCheckerFindRandom()
 	
 	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
 	
+	//Do work
 	if( $EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || 
 	    $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back )
 		MapRepetitionCheckerFindRandom();

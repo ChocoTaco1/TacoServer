@@ -21,16 +21,20 @@ function MapRepetitionChecker( %game )
 	
 	if(!$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
 	{
-		//Set vars
+		//Backup
+		$SetNextMissionRestore = $EvoCachedNextMission;
+		
+		//Do work
+		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
+		    $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission ||
+			$CurrentMission $= $EvoCachedNextMission )
+			MapRepetitionCheckerFindRandom();
+		
+		//Set vars	
 		if($PreviousMission3back !$= "") $PreviousMission4back = $PreviousMission3back;
 		if($PreviousMission2back !$= "") $PreviousMission3back = $PreviousMission2back;		
 		if($PreviousMission1back !$= "") $PreviousMission2back = $PreviousMission1back;
 										 $PreviousMission1back = $CurrentMission;
-										 
-		//Do work
-		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
-		    $PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission )
-			MapRepetitionCheckerFindRandom();
 			
 		//Debug
 		if(%MapRepetitionCheckerDebug)	
@@ -60,11 +64,12 @@ function MapRepetitionCheckerFindRandom()
 	
 	//Do work
 	if( $EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || 
-	    $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back )
+	    $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back ||
+		$CurrentMission $= $EvoCachedNextMission )
 		MapRepetitionCheckerFindRandom();
 	else
 	{	
-		error(formatTimeString("HH:nn:ss") SPC "Map Repetition Corrected to" SPC $EvoCachedNextMission );
+		error(formatTimeString("HH:nn:ss") SPC "Map Repetition Corrected from" SPC $SetNextMissionRestore SPC "to" SPC $EvoCachedNextMission @ "." );
 		messageAll('MsgNoBaseRapeNotify', '\crMap Repetition Corrected: Next mission set to %1.', $EvoCachedNextMission);
 	}
 }

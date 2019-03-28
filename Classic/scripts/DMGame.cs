@@ -231,8 +231,8 @@ function DMGame::resetScore(%game, %client)
    %client.Bonus = 0;
    %client.KillStreakBonus = 0;
    
-   %client.killCounter = 0;// not a score thing but needs to be reset
-   %game.lastGuy = 0;
+   // not a score thing but needs to be reset
+   %client.killCounter = 0;
 }
 
 function DMGame::forceObserver( %game, %client, %reason )
@@ -251,10 +251,10 @@ function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %imple
 }
 
 function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc)
-{	   
+{	   		  
 	  if(%clVictim.isMarked && $DMGame::mode)
 	  {
-		 if(%clKiller $= "")
+		if(%clKiller $= "" || %clVictim.killCounter < 3)
 			return;
 		 
 		if(%clVictim == %clKiller || %clVictim.lastDeathSuicide)

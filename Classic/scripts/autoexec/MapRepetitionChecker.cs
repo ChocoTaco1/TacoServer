@@ -19,8 +19,11 @@ function MapRepetitionChecker( %game )
 	if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
 		return;
 	
+	if($EvoCachedNextMission $= "")
+		return;
+	
 	if(!$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
-	{
+	{	
 		//Backup
 		$SetNextMissionRestore = $EvoCachedNextMission;
 		

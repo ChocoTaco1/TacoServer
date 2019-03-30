@@ -91,18 +91,6 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
    // -----------------------------------------------------------------------------------------
 }
 
-//Give people on invs and little less damage if they dont have the flag.
-function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
-{	
-	
-	if( $CurrentMission $= "SmallCrossing" && %targetObject.station && !%targetObject.holdingFlag )
-    {
-		%amount *= 0.8;
-    }
-	
-	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
-}
-
 };
 
 // Prevent package from being activated if it is already

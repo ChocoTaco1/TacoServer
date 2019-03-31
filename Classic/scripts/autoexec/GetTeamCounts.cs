@@ -52,16 +52,9 @@ function GetTeamCounts( %game, %client, %respawn )
 			%client = ClientGroup.getObject(%i);
     
 			//Pick a client for autobalance
-			if( %client.team == 1)
-			{
-				if(%client.score <= %lastclient1.score || %lastclient1 $= "") $team1canidate = %client;
-				%lastclient1 = %client;
-			}
-			if( %client.team == 2)
-			{
-				if(%client.score <= %lastclient2.score || %lastclient2 $= "") $team2canidate = %client;
-				%lastclient2 = %client;
-			}
+			%team = %client.team;
+			if(%client.score <= %lastclient[%team].score || %lastclient[%team] $= "") %teamcanidate[%team] = %client;
+				%lastclient[%team] = %client;
 			
 			//Check ver
 			if(!%client.isAIControlled()) //No bots
@@ -70,6 +63,9 @@ function GetTeamCounts( %game, %client, %respawn )
 			//if(!%client.isAIControlled())
 				$PlayerCount[%client.team]++;
 		}
+		
+		$team1canidate = %teamcanidate1;
+		$team2canidate = %teamcanidate2;
 		
 		//echo ("$PlayerCount[0] " @  $PlayerCount[0]);
 		//echo ("$PlayerCount[1] " @  $PlayerCount[1]);

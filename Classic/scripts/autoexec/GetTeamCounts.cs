@@ -31,30 +31,37 @@ if (!isActivePackage(StartTeamCounts))
     activatePackage(StartTeamCounts);
 
 function GetTeamCounts( %game, %client, %respawn )
-{	
+{		
 	//Run MissionTypeOptions
 	MissionTypeOptions();
 		
 	//Get teamcounts
 	if( $GetCountsClientTeamChange && $countdownStarted && $MatchStarted ) 
-	{
-		//Generate random to get random client for autobalance
-		%team1random = getRandom(1,$PlayerCount[1]); if(%team1random $= 0 || %team1random > $PlayerCount[1]) %team1random = 1;
-		%team2random = getRandom(1,$PlayerCount[2]); if(%team2random $= 0 || %team2random > $PlayerCount[2]) %team2random = 1;
-		//echo("team1random " @ %team1random); echo("team2random " @ %team2random);
-		
+	{	
 		//Team Count code by Keen
 		$PlayerCount[0] = 0;
 		$PlayerCount[1] = 0;
 		$PlayerCount[2] = 0;
+		
+		//For autobalance
+		%lastclient1 = "";
+		%lastclient2 = "";
 
 		for(%i = 0; %i < ClientGroup.getCount(); %i++)
 		{
 			%client = ClientGroup.getObject(%i);
     
-			//Pick a random client for autobalance
-			if( %client.team == 1 && %team1random == $PlayerCount[1] ) $team1canidate = %client;
-			if( %client.team == 2 && %team2random == $PlayerCount[2] ) $team2canidate = %client;
+			//Pick a client for autobalance
+			if( %client.team == 1)
+			{
+				if(%client.score <= %lastclient1.score || %lastclient1 $= "") $team1canidate = %client;
+				%lastclient1 = %client;
+			}
+			if( %client.team == 2)
+			{
+				if(%client.score <= %lastclient2.score || %lastclient2 $= "") $team2canidate = %client;
+				%lastclient2 = %client;
+			}
 			
 			//Check ver
 			if(!%client.isAIControlled()) //No bots

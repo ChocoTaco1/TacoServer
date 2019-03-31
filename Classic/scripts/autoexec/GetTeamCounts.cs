@@ -53,8 +53,10 @@ function GetTeamCounts( %game, %client, %respawn )
     
 			//Pick a client for autobalance
 			%team = %client.team;
-			if(%client.score <= %lastclient[%team].score || %lastclient[%team] $= "") %teamcanidate[%team] = %client;
-				%lastclient[%team] = %client;
+			if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "") { 
+				%teamcanidate[%team] = %client; 
+			}
+			%lastclient[%team] = %client;
 			
 			//Check ver
 			if(!%client.isAIControlled()) //No bots

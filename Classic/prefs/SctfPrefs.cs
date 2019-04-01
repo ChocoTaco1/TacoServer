@@ -42,9 +42,9 @@ function setArmorDefaults(%armor)
          $InvBanList[SCtF, "SniperRifle"] = 1;
          // Misc
          $InvBanList[SCtF, "Mine"] = 0;
-         $InvBanList[SCtF, "ConcussionGrenade"] = 1;
+         $InvBanList[SCtF, "ConcussionGrenade"] = 0;
          $InvBanList[SCtF, "CameraGrenade"] = 1;
-         $InvBanList[SCtF, "FlareGrenade"] = 1;
+         $InvBanList[SCtF, "FlareGrenade"] = 0;
          $InvBanList[SCtF, "FlashGrenade"] = 1;
          $InvBanList[SCtF, "Grenade"] = 0;
 		 //Pro Mode

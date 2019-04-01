@@ -1,10 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	Score Hud Stats System, Gather data across x number of games to do math/stats									//
-//	This also has the added benefit of restoreing scores after leaving												//
-//	Script BY: DarkTiger																							//
-//	Prerequisites - Classic 1.5.2 - Evolution Admin Mod  - (zAdvancedStatsLogless.vl2 - for mine disc support)		//
-//	Version 1.0 - initial release																					//
-//	Version 2.0 - code refactor/optimizing/fixes																	//
+//	Score Hud Stats System, Gather data across x number of games to do math/stats									
+//	This also has the added benefit of restoreing scores after leaving												
+//	Script BY: DarkTiger																							
+//	Prerequisites - Classic 1.5.2 - Evolution Admin Mod  - (zAdvancedStatsLogless.vl2 - for mine disc support)		
+//  Note this system only works in online mode as it uses guid to keep track of people
+//	Version 1.0 - initial release																					
+//	Version 2.0 - code refactor/optimizing/fixes		
+//  Version 3.0 - DM LCTF													
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -28,17 +30,18 @@ $dtStats::fullGames["LakRabbitGame"] = 1;
 $dtStats::fgPercentage["LakRabbitGame"] = 25;
 $dtStats::fgPercentageType["LakRabbitGame"] = 0;
 
+$dtStats::fullGames["DMGame"] = 1;
+$dtStats::fgPercentage["DMGame"] = 25;
+$dtStats::fgPercentageType["DMGame"] = 0;
+//LCTF
+$dtStats::fullGames["SCtFGame"] = 1;
+$dtStats::fgPercentage["SCtFGame"] = 25;
+$dtStats::fgPercentageType["SCtFGame"] = 0;
+
 $dtStats::returnToMenuTimer = (30*1000)*1;// 1 min after not making an action reset
 //Set to 1 when your makeing changes to the menu so you can see them  update live note the refresh rate is like 2-4 secs
 //just make your edit and exec("scripts/autoexec/stats.cs"); to re exec it and it should apply
 $dtStats::enableRefresh = 0;
-
-//set to 1  for it saves the last game played between games - 2 files per player each game
-//set to 0 for it to "only" save clients that have left this saves all data - $dtStats::MaxNumOfGames + 1 files for each player that has left
-$dtStats::saveBetweenGames = 1;
-
-//Turned this off for now to prevent any possable stutter
-//$dtStats::saveOnLeave = 0; // code has been comented out see dtStatsClientLeaveGame
 
 $dtStats::slowLoadTime = 500;// lets just load that slowly
 $dtStats::slowSaveTime = 100;
@@ -414,6 +417,318 @@ $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "blasterShotsFired";
 $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "elfShotsFired";
 $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "unknownShotsFired";
 $dtStats::fieldCount["LakRabbitGame"] = %lak;
+///////////////////////////////////////////////////////////////////////////////
+//                            	 DMGame									 //
+///////////////////////////////////////////////////////////////////////////////
+//Game type values - out of DMGame.cs
+$dtStats::fieldValue[%dmg++,"DMGame"] = "score";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "kills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "deaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "suicides";
+
+//Values in this script
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mineKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mineDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "explosionKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "explosionDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "impactKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "impactDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "groundKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "groundDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "outOfBoundKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "outOfBoundDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "lavaKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "lavaDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "satchelChargeKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "satchelChargeDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "lightningKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "lightningDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "forceFieldPowerUpKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "forceFieldPowerUpDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "waterKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "waterDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "nexusCampingKills";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "nexusCampingDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownKill";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownDeaths";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownDirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownInDmg";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownIndirectHits";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownInDmgTaken";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "cgShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "discShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "grenadeShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "laserShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "mortarShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "missileShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "shockLanceShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "plasmaShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "blasterShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "elfShotsFired";
+$dtStats::fieldValue[%dmg++,"DMGame"] = "unknownShotsFired";
+$dtStats::fieldCount["DMGame"] = %dmg;
+
+///////////////////////////////////////////////////////////////////////////////
+//                             		LCTF										 //
+///////////////////////////////////////////////////////////////////////////////
+//Game type values out of SCtFGame.cs
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "kills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "deaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "suicides";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "teamKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "flagCaps";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "flagGrabs";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "carrierKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "flagReturns";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "score";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "scoreMidAir";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "scoreHeadshot";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "minePlusDisc";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "scoreRearshot";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "escortAssists";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "defenseScore";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "offenseScore";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "flagDefends";
+
+//Values in this script
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mineKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mineDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "explosionKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "explosionDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "impactKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "impactDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "groundKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "groundDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "turretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "turretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "aaTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "aaTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "indoorDepTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "indoorDepTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "outdoorDepTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "outdoorDepTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "sentryTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "sentryTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "outOfBoundKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "outOfBoundDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "lavaKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "lavaDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shrikeBlasterKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shrikeBlasterDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "bellyTurretKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "bellyTurretDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "bomberBombsKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "bomberBombsDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "tankChaingunKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "tankChaingunDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "tankMortarKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "tankMortarDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "satchelChargeKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "satchelChargeDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mpbMissileKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mpbMissileDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "lightningKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "lightningDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "vehicleSpawnKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "vehicleSpawnDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "forceFieldPowerUpKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "forceFieldPowerUpDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "crashKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "crashDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "waterKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "waterDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "nexusCampingKills";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "nexusCampingDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownKill";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownDeaths";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownDirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownInDmg";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownIndirectHits";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownInDmgTaken";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "discShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "grenadeShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "laserShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "mortarShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "missileShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "shockLanceShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "plasmaShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "blasterShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "elfShotsFired";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "unknownShotsFired";
+$dtStats::fieldCount["SCtFGame"] = %lctf;
 
 if(!$dtStats::Enable){return;} // abort exec
 if(!isObject(statsGroup)){new SimGroup(statsGroup);}
@@ -445,6 +760,7 @@ package dtStats{
       parent::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
       clientKillStats(%game,%clVictim, %clKiller, %damageType, %damageLocation);//for stats collection
    }
+////////////////////////////////////////////////////////////////////////////////   
    function LakRabbitGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation){
       parent::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
       clientKillStats(%game,%clVictim, %clKiller, %damageType, %damageLocation);//for stats collection
@@ -470,7 +786,58 @@ package dtStats{
       dtStatsGameOver(%game);//common
       parent::gameOver(%game);
    }
+////////////////////////////////////////////////////////////////////////////////   
+   function DMGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation){
+      parent::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
+      clientKillStats(%game,%clVictim, %clKiller, %damageType, %damageLocation);//for stats collection
+   }
+   function DMGame::clientMissionDropReady(%game, %client){ // called when client has finished loading
+      parent::clientMissionDropReady(%game, %client);
+      dtStatsMissionDropReady(%game, %client);//common
+   }
+   function DMGame::onClientLeaveGame(%game, %client){
+      dtStatsClientLeaveGame(%game, %client);//common
+      parent::onClientLeaveGame(%game, %client);
+   }
    
+   function DMGame::timeLimitReached(%game){
+      dtStatsTimeLimitReached(%game);//common
+      parent::timeLimitReached(%game);
+   }
+   function DMGame::scoreLimitReached(%game){
+      dtStatsScoreLimitReached(%game);//common
+      parent::scoreLimitReached(%game);
+   }
+   function DMGame::gameOver( %game ){
+      dtStatsGameOver(%game);//common
+      parent::gameOver(%game);
+   }
+////////////////////////////////////////////////////////////////////////////////
+   function SCtFGame::clientMissionDropReady(%game, %client){
+      parent::clientMissionDropReady(%game, %client);
+      dtStatsMissionDropReady(%game, %client);//common
+   }
+   function SCtFGame::onClientLeaveGame(%game, %client){
+      dtStatsClientLeaveGame(%game, %client);//common
+      parent::onClientLeaveGame(%game, %client);
+   }
+   function SCtFGame::timeLimitReached(%game){
+      dtStatsTimeLimitReached(%game);//common
+      parent::timeLimitReached(%game);
+   }
+   function SCtFGame::scoreLimitReached(%game){
+      dtStatsScoreLimitReached(%game);//common
+      parent::scoreLimitReached(%game);
+   }
+   function SCtFGame::gameOver( %game ){
+      dtStatsGameOver(%game);//common
+      parent::gameOver(%game);
+   }
+   function SCtFGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation){
+      parent::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
+      clientKillStats(%game,%clVictim, %clKiller, %damageType, %damageLocation);//for stats collection
+   }
+////////////////////////////////////////////////////////////////////////////////
    function CTFGame::processGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4, %arg5){
       //the default behavior when clicking on a game link is to start observing that client
       if(%arg1 $= "Stats"){
@@ -1278,6 +1645,513 @@ package dtStats{
       //clear the rest of Hud so we don't get old lines hanging around...
       messageClient( %client, 'ClearHud', "", %tag, %index );
    }
+   
+      function DMGame::processGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4, %arg5){
+      //the default behavior when clicking on a game link is to start observing that client
+      if(%arg1 $= "Stats"){
+         %client.viewStats = 1;// lock out score hud from updateing untill they are done
+         %client.viewMenu = %arg2;
+         %client.viewClient = getCNameToCID(%arg3);
+         %client.GlArg4 = %arg4;
+         statsMenu(%client, %game.class);
+         if(%arg2 !$= "Reset"){
+            return;
+         }
+         else{
+            messageClient( %client, 'ClearHud', "", 'scoreScreen', 0 );
+            %client.viewStats = 0;
+            Game.updateScoreHud(%client, 'scoreScreen');
+         }
+      }
+      
+      %targetClient = %arg1;
+      if ((%client.team == 0) && isObject(%targetClient) && (%targetClient.team != 0))
+      {
+         %prevObsClient = %client.observeClient;
+         
+         // update the observer list for this client
+         observerFollowUpdate( %client, %targetClient, %prevObsClient !$= "" );
+         
+         serverCmdObserveClient(%client, %targetClient);
+         displayObserverHud(%client, %targetClient);
+         
+         if (%targetClient != %prevObsClient)
+         {
+            messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
+            messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+         }
+      }
+   }
+   function DMGame::updateScoreHud(%game, %client, %tag){// note in this game type the score hud can only display 30 or so players 
+      
+    if(%client.viewStats && $dtStats::enableRefresh){
+         //echo("view stats");
+         statsMenu(%client, %game.class);
+         return;
+   }
+   else if(%client.viewStats && !$dtStats::enableRefresh){
+      return;
+   }  
+   // Clear the header:
+   messageClient( %client, 'SetScoreHudHeader', "", "" );
+   
+   // Send the subheader:
+   messageClient(%client, 'SetScoreHudSubheader', "", '<tab:15,200,280,360,465>\tPLAYER\tRATING\tKILLS\tDEATHS\tBONUS');
+   
+   for (%index = 0; %index < $TeamRank[0, count]; %index++)
+   {
+      //get the client info
+      %cl = $TeamRank[0, %index];
+      
+      //get the score
+      %clScore = %cl.score;
+      
+      %clKills = mFloatLength( %cl.kills, 0 );
+      %clDeaths = mFloatLength( %cl.deaths + %cl.suicides, 0 );
+	  %clBonus = mFloor((%cl.Bonus * %game.SCORE_PER_BONUS) + (%cl.MidAir * %game.SCORE_PER_MIDAIR) + (%cl.KillStreakBonus * %game.SCORE_PER_KILLSTREAKBONUS ));
+      %clStyle = %cl == %client ? "<color:dcdcdc>" : ""; 
+	  
+	  //%BonusValue = %client.Bonus * %game.SCORE_PER_BONUS;
+	  //%MidAirValue = %client.MidAir * %game.SCORE_PER_MIDAIR;
+      //%KillStreakBonusValue = %client.KillStreakBonus * %game.SCORE_PER_KILLSTREAKBONUS;
+      
+      //if the client is not an observer, send the message
+      if (%client.team != 0)
+      { 
+         if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){                             //  <tab:15,235,340,415,500>\%5\%1\%2\%3\tBG'
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%6',
+            %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %clBonus);
+         }
+         else if(%client.name $= %cl.name){
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%6',
+            %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %clBonus); 
+         }
+         else{
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115>%1</clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%6',
+            %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %clBonus); 
+         }
+      }
+      //else for observers, create an anchor around the player name so they can be observed
+      else
+      {
+          if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){   
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6><a:gamelink\tStats\tView\t%1>+</a> %1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
+            %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl, %clBonus);
+          }
+         else if(%client.name $= %cl.name){
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6><a:gamelink\tStats\tView\t%1>+</a> %1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
+            %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl, %clBonus);  
+         }
+          else{
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6>%1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
+            %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl, %clBonus); 
+         }
+      }
+   }
+   
+   // Tack on the list of observers:
+   %observerCount = 0;
+   for (%i = 0; %i < ClientGroup.getCount(); %i++)
+   {
+      %cl = ClientGroup.getObject(%i);
+      if (%cl.team == 0)
+         %observerCount++;
+   }
+   
+   if (%observerCount > 0)
+   {
+      messageClient( %client, 'SetLineHud', "", %tag, %index, "");
+      %index++;
+      messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:10, 310><spush><font:Univers Condensed:22>\tOBSERVERS (%1)<rmargin:260><just:right>TIME<spop>', %observerCount);
+      %index++;
+      for (%i = 0; %i < ClientGroup.getCount(); %i++)
+      {
+         %cl = ClientGroup.getObject(%i);
+         //if this is an observer
+         if (%cl.team == 0)
+         {
+            %obsTime = getSimTime() - %cl.observerStartTime;
+            %obsTimeStr = %game.formatTime(%obsTime, false);
+            if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){  
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%1>+</a>%1</clip><rmargin:260><just:right>%2',
+               %cl.name, %obsTimeStr );
+            }
+            else if(%client.name $= %cl.name){
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%1>+</a>%1</clip><rmargin:260><just:right>%2',
+               %cl.name, %obsTimeStr );
+            }
+            else{
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150>%1</clip><rmargin:260><just:right>%2',
+               %cl.name, %obsTimeStr ); 
+            }
+            %index++;
+         }
+      }
+   }
+   
+   //clear the rest of Hud so we don't get old lines hanging around...
+   messageClient( %client, 'ClearHud', "", %tag, %index );
+   }
+   
+   function SCtFGame::processGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4, %arg5){
+      //the default behavior when clicking on a game link is to start observing that client
+      if(%arg1 $= "Stats"){
+         %client.viewStats = 1;// lock out score hud from updateing untill they are done
+         %client.viewMenu = %arg2;
+         %client.viewClient = %arg3;
+         %client.GlArg4 = %arg4;
+         statsMenu(%client, %game.class);
+         if(%arg2 !$= "Reset"){
+            return;
+         }
+         else{
+            messageClient( %client, 'ClearHud', "", 'scoreScreen', 0 );
+            %client.viewStats = 0;
+            Game.updateScoreHud(%client, 'scoreScreen');
+         }
+      }
+      
+      %targetClient = %arg1;
+      if ((%client.team == 0) && isObject(%targetClient) && (%targetClient.team != 0))
+      {
+         %prevObsClient = %client.observeClient;
+         
+         // update the observer list for this client
+         observerFollowUpdate( %client, %targetClient, %prevObsClient !$= "" );
+         
+         serverCmdObserveClient(%client, %targetClient);
+         displayObserverHud(%client, %targetClient);
+         
+         if (%targetClient != %prevObsClient)
+         {
+            messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
+            messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+         }
+      }
+   }
+   
+   function SCtFGame::updateScoreHud(%game, %client, %tag){// defaultGame/evo
+      if(%client.viewStats && $dtStats::enableRefresh){
+         //echo("view stats");
+         statsMenu(%client, %game.class);
+         return;
+      }
+      else if(%client.viewStats && !$dtStats::enableRefresh){
+         return;
+      }
+      
+      %ShowScores = ( $Host::TournamentMode || $Host::ShowIngamePlayerScores );
+      
+      if(Game.numTeams > 1)
+      {
+         // Send header:
+         messageClient(%client, 'SetScoreHudHeader', "", '<tab:15,315>\t%1<rmargin:260><just:right>%2<rmargin:560><just:left>\t%3<just:right>%4', %game.getTeamName(1), $TeamScore[1], %game.getTeamName(2), $TeamScore[2]);
+         
+         if ( !$TeamRank[1, count] )
+         {
+            $TeamRank[1, count] = 0;
+         }
+         
+         if ( !$TeamRank[2, count] )
+         {
+            $TeamRank[2, count] = 0;
+         }
+         
+         if ( $Host::EvoAveragePings )
+         {
+            for ( %count = 0; %count <= Game.numteams; %count++ )
+            {
+               %Ping[%count] = 0;
+               %PingSq[%count] = 0;
+               %PingCount[%count] = 0;
+            }
+            
+            for ( %ClientCount = ClientGroup.getCount() -1 ; %ClientCount >= 0;
+               %ClientCount-- )
+            {
+               %ThisClient = ClientGroup.getObject( %ClientCount );
+               %Team = %ThisClient.team;
+               
+               %PingVal = %ThisClient.getPing();
+               
+               %Ping[%Team] += %PingVal;
+               %PingSq[%Team] += ( %PingVal * %PingVal );
+               %PingCount[%Team] ++;
+            }
+            
+            for ( %count = 0; %count <= %game.numteams; %count++ )
+            {
+               if ( %PingCount[%count] )
+               {
+                  %Ping[%count]   /= %PingCount[%count];
+                  %PingSq[%count] /= %PingCount[%count];
+                  
+                  %PingSq[%count] = msqrt( %PingSq[%count] - ( %Ping[%count] * %Ping[%count] ) );
+                  
+                  %Ping[%count]   = mfloor( %Ping[%count] );
+                  %PingSq[%count] = mfloor( %PingSq[%count] );
+                  
+                  %PingString[%count] = "<spush><font:Arial:14>P<font:Arial:12>ING: " @ %Ping[%count] @ " +/- " @ %PingSq[%count] @ "ms   <spop>";
+               }
+            }
+         }
+         messageClient( %client, 'SetScoreHudSubheader', "",
+         '<tab:25,325>\tPLAYERS (%1)<rmargin:260><just:right>%4%3<rmargin:560><just:left>\tPLAYERS (%2)<just:right>%5%3', $TeamRank[1, count], $TeamRank[2, count], (%ShowScores?'SCORE':''),%PingString[1],%PingString[2]);
+         
+         %index = 0;
+         while(true)
+         {
+            
+            if(%index >= $TeamRank[1, count]+2 && %index >= $TeamRank[2, count]+2)
+               break;
+            
+            //get the team1 client info
+            %team1Client = "";
+            %team1ClientScore = "";
+            %col1Style = "";
+            if(%index < $TeamRank[1, count])
+            {
+               %team1Client = $TeamRank[1, %index];
+               
+               if(!$Host::TournamentMode && !$Host::ShowIngamePlayerScores && %team1Client.score >= 0)
+                  %team1ClientScore = 0;
+               else
+                  %team1ClientScore = %team1Client.score $= "" ? 0 : %team1Client.score;
+               
+               %col1Style = %team1Client == %client ? "<color:dcdcdc>" : "";
+               
+               if(!$Host::TournamentMode && !$Host::ShowIngamePlayerScores)
+                  %team1playersTotalScore = 0;
+               else
+                  %team1playersTotalScore += %team1Client.score;
+            }
+            else if(%index == $teamRank[1, count] && $teamRank[1, count] != 0 && %game.class $= "CTFGame")
+            {
+               %team1ClientScore = "--------------";
+            }
+            else if(%index == $teamRank[1, count]+1 && $teamRank[1, count] != 0 && %game.class $= "CTFGame")
+            {
+               if(!$Host::TournamentMode && !$Host::ShowIngamePlayerScores)
+                  %team1ClientScore = 0;
+               else
+                  %team1ClientScore = %team1playersTotalScore != 0 ? %team1playersTotalScore : 0;
+            }
+            
+            //get the team2 client info
+            %team2Client = "";
+            %team2ClientScore = "";
+            %col2Style = "";
+            if(%index < $TeamRank[2, count])
+            {
+               %team2Client = $TeamRank[2, %index];
+               
+               if(!$Host::TournamentMode && !$Host::ShowIngamePlayerScores && %team2Client.score >= 0)
+                  %team2ClientScore = 0;
+               else
+                  %team2ClientScore = %team2Client.score $= "" ? 0 : %team2Client.score;
+               
+               %col2Style = %team2Client == %client ? "<color:dcdcdc>" : "";
+               
+               if(!$Host::TournamentMode && !$Host::ShowIngamePlayerScores)
+                  %team2playersTotalScore = 0;
+               else
+                  %team2playersTotalScore += %team2Client.score;
+            }
+            else if(%index == $teamRank[2, count] && $teamRank[2, count] != 0 && %game.class $= "CTFGame")
+            {
+               %team2ClientScore = "--------------";
+            }
+            else if(%index == $teamRank[2, count]+1 && $teamRank[2, count] != 0 && %game.class $= "CTFGame")
+            {
+               if(!$Host::TournamentMode && !$Host::ShowIngamePlayerScores)
+                  %team2ClientScore = 0;
+               else
+                  %team2ClientScore = %team2playersTotalScore != 0 ? %team2playersTotalScore : 0;
+            }
+            
+            if (!%ShowScores)
+            {
+               %team1ClientScore = '';
+               %team2ClientScore = '';
+            }
+            
+            if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){
+               if(%client.team != 0){ //if the client is not an observer, send the message
+                  if(%team1Client.name !$= "" && %team2Client.name !$= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\tStats\tView\t%7>+</a> %1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\tStats\tView\t%8>+</a> %3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name !$= "" && %team2Client.name $= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\tStats\tView\t%7>+</a> %1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200>  %3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name $= "" && %team2Client.name !$= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\tStats\tView\t%8>+</a> %3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200>%3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style);
+                  
+               }
+               else{ //else for observers, create an anchor around the player name so they can be observed
+                  //messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  
+                  if(%team1Client.name !$= "" && %team2Client.name !$= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\tStats\tView\t%7>+</a><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\tStats\tView\t%8>+</a><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name !$= "" && %team2Client.name $= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\tStats\tView\t%7>+</a><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name $= "" && %team2Client.name !$= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\tStats\tView\t%8>+</a><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style);
+                  
+               }
+            }
+            else{
+               if(%client.team != 0){
+                  if(%team1Client.name $= %client.name && %team2Client.name !$= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\tStats\tView\t%7>+</a> %1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200> %3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name !$=""  && %team2Client.name $= %client.name)
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200> %1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\tStats\tView\t%8>+</a> %3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name $= %client.name && %team2Client.name $= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\tStats\tView\t%7>+</a> %1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200> %3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name $= "" && %team2Client.name $= %client.name)
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\tStats\tView\t%8>+</a> %3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200>%3</clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style);
+                  
+               }
+               else{ //else for observers, create an anchor around the player name so they can be observed
+                  //messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  if(%team1Client.name $= %client.name && %team2Client.name !$= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\tStats\tView\t%7>+</a><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name !$= "" && %team2Client.name $= %client.name)
+                     mssageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\tStats\tView\t%8>+</a><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name $= %client.name && %team2Client.name $= "")
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\tStats\tView\t%7>+</a><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else if(%team1Client.name $= "" && %team2Client.name $= %client.name)
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\tStats\tView\t%8>+</a><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client);
+                  else
+                     messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:0,300>\t<spush>%5<clip:200><a:gamelink\t%7> %1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8> %3</a></clip><just:right>%4', %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style);
+                  
+               }
+               
+            }
+            
+            %index++;
+         }
+      }
+      else
+      {
+         //tricky stuff here...  use two columns if we have more than 15 clients...
+         %numClients = $TeamRank[0, count];
+         if(%numClients > $ScoreHudMaxVisible)
+            %numColumns = 2;
+         
+         // Clear header:
+         messageClient(%client, 'SetScoreHudHeader', "", "");
+         
+         // Send header:
+         if(%numColumns == 2)
+            messageClient(%client, 'SetScoreHudSubheader', "", '<tab:15,315>\tPLAYER<rmargin:270><just:right>%1<rmargin:570><just:left>\tPLAYER<just:right>%1', (%ShowScores?'SCORE':''));
+         else
+            messageClient(%client, 'SetScoreHudSubheader', "", '<tab:15>\tPLAYER<rmargin:270><just:right>%1', (%ShowScores?'SCORE':''));
+         
+         %countMax = %numClients;
+         if(%countMax > ( 2 * $ScoreHudMaxVisible ))
+         {
+            if(%countMax & 1)
+               %countMax++;
+            %countMax = %countMax / 2;
+         }
+         else if(%countMax > $ScoreHudMaxVisible)
+            %countMax = $ScoreHudMaxVisible;
+         
+         for(%index = 0; %index < %countMax; %index++)
+         {
+            //get the client info
+            %col1Client = $TeamRank[0, %index];
+            %col1ClientScore = %col1Client.score $= "" ? 0 : %col1Client.score;
+            %col1Style = %col1Client == %client ? "<color:dcdcdc>" : "";
+            
+            //see if we have two columns
+            if(%numColumns == 2)
+            {
+               %col2Client = "";
+               %col2ClientScore = "";
+               %col2Style = "";
+               
+               //get the column 2 client info
+               %col2Index = %index + %countMax;
+               if(%col2Index < %numClients)
+               {
+                  %col2Client = $TeamRank[0, %col2Index];
+                  %col2ClientScore = %col2Client.score $= "" ? 0 : %col2Client.score;
+                  %col2Style = %col2Client == %client ? "<color:dcdcdc>" : "";
+               }
+            }
+            
+            if ( !%ShowScores )
+            {
+               %col1ClientScore = "";
+               %col2ClientScore = "";
+            }
+            
+            //if the client is not an observer, send the message
+            if(%client.team != 0)
+            {
+               if(%numColumns == 2)
+                  messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:25,325>\t<spush>%5<clip:195>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:195>%3</clip><just:right>%4', %col1Client.name, %col1ClientScore, %col2Client.name, %col2ClientScore, %col1Style, %col2Style);
+               else
+                  messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:25>\t%3<clip:195>%1</clip><rmargin:260><just:right>%2', %col1Client.name, %col1ClientScore, %col1Style);
+            }
+            //else for observers, create an anchor around the player name so they can be observed
+            else
+            {
+               if(%numColumns == 2)
+                  messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:25,325>\t<spush>%5<clip:195><a:gamelink\t%7>%1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:195><a:gamelink\t%8>%3</a></clip><just:right>%4', %col1Client.name, %col1ClientScore, %col2Client.name, %col2ClientScore, %col1Style, %col2Style, %col1Client, %col2Client);
+               else
+                  messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:25>\t%3<clip:195><a:gamelink\t%4>%1</a></clip><rmargin:260><just:right>%2', %col1Client.name, %col1ClientScore, %col1Style, %col1Client);
+            }
+         }
+         
+      }
+      
+      // Tack on the list of observers:
+      %observerCount = 0;
+      for(%i = 0; %i < ClientGroup.getCount(); %i++)
+      {
+         %cl = ClientGroup.getObject(%i);
+         if(%cl.team == 0)
+            %observerCount++;
+      }
+      
+      if(%observerCount > 0)
+      {
+         messageClient(%client, 'SetLineHud', "", %tag, %index, "");
+         %index++;
+         messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:10, 310><spush><font:Univers Condensed:22>\tOBSERVERS (%1)<rmargin:260><just:right>TIME<spop>', %observerCount);
+         %index++;
+         for(%i = 0; %i < ClientGroup.getCount(); %i++)
+         {
+            %cl = ClientGroup.getObject(%i);
+            //if this is an observer
+            if(%cl.team == 0)
+            {
+               %obsTime = getSimTime() - %cl.observerStartTime;
+               %obsTimeStr = %game.formatTime(%obsTime, false);
+               if(%client.isAdmin ||%client.isSuperAdmin || !$dtStats::viewSelf){
+                  messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%3>+</a> %1</clip><rmargin:260><just:right>%2', %cl.name, %obsTimeStr,%cl);
+                  
+               }
+               else if(%cl == %client){
+                  messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%3>+</a> %1</clip><rmargin:260><just:right>%2', %cl.name, %obsTimeStr,%cl);
+               }
+               else{
+                  messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150>%1</clip><rmargin:260><just:right>%2', %cl.name, %obsTimeStr);
+               }
+               %index++;
+            }
+         }
+      }
+      
+      //clear the rest of Hud so we don't get old lines hanging around...
+      messageClient(%client, 'ClearHud', "", %tag, %index);
+   }
    function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse, %sourceObject, %damageType)
    {
       // error("RadiusExplosion");
@@ -1539,9 +2413,6 @@ function dtStatsClientLeaveGame(%game, %client){
       %client.dtStats.clientLeft = 1;
       bakGameStats(%client,%game.class);//back up there current game in case they lost connection
       %client.dtStats.leftPCT = %game.getGamePct();
-      //if($dtStats::saveOnLeave){
-         //saveGameStats(%client.dtStats,%game.class);
-      //}
    }
 }
 function dtStatsTimeLimitReached(%game){
@@ -1584,13 +2455,13 @@ function dtStatsGameOver( %game ){
                %dtStats.markForDelete = 1;
                incBakGameStats(%dtStats,%game.class);// dump the backup into are stats and save
                %time += %timeNext; // this will chain them
-               %timeNext = $dtStats::slowSaveTime * ($dtStats::saveBetweenGames ? 1 : %dtStats.gameCount[%game]);
+               %timeNext = $dtStats::slowSaveTime;
                schedule(%time ,0,"saveGameStats",%dtStats,%game.class); //
             }
             else{
                %dtStats.markForDelete = 1;
                %time += %timeNext; // this will chain them
-               %timeNext = $dtStats::slowSaveTime * ($dtStats::saveBetweenGames ? 1 : %dtStats.gameCount[%game]);
+               %timeNext = $dtStats::slowSaveTime;
                schedule(%time ,0,"saveGameStats",%dtStats,%game.class); //
             }
          }
@@ -1598,7 +2469,7 @@ function dtStatsGameOver( %game ){
             %dtStats.markForDelete = 1;
             incBakGameStats(%dtStats,%game.class);// dump the backup into are stats and save
             %time += %timeNext; // this will chain them
-            %timeNext = $dtStats::slowSaveTime * ($dtStats::saveBetweenGames ? 1 : %dtStats.gameCount[%game]);
+            %timeNext = $dtStats::slowSaveTime;
             schedule(%time ,0,"saveGameStats",%dtStats,%game.class); //
          }
       }
@@ -1621,9 +2492,9 @@ function dtStatsGameOver( %game ){
                %client.dtStats.dtGameCounter++;
             }
          }
-         if($dtStats::saveBetweenGames && %client.dtStats.lastGame[%game.class] > 0){// as it says
+         if(%client.dtStats.lastGame[%game.class] > 0){// as it says
             %time += %timeNext; // this will chain them
-            %timeNext = $dtStats::slowSaveTime * ($dtStats::saveBetweenGames ? 1 : %dtStats.gameCount[%game]);
+            %timeNext = $dtStats::slowSaveTime;
             schedule(%time ,0,"saveGameStats",%client.dtStats,%game.class); //
          }
          resetDtStats(%client);
@@ -1653,7 +2524,7 @@ function CTFGame::getGamePct(%game)
    else
       %scorePct =  ($TeamScore[2] / %scoreLimit) * 100;
    
-   switch$($dtStats::fgPercentageType["CTFGame"]){
+   switch$($dtStats::fgPercentageType[%game.class]){
       case 0:
          return %scorePct;
       case 1:
@@ -1694,7 +2565,7 @@ function LakRabbitGame::getGamePct(%game)
    }
    %scorePct =  (%lScore / %scoreLimit) * 100;
    
-   switch$($dtStats::fgPercentageType["LakRabbitGame"]){
+   switch$($dtStats::fgPercentageType[%game.class]){
       case 0:
          return %scorePct;
       case 1:
@@ -1714,6 +2585,84 @@ function LakRabbitGame::getGamePct(%game)
             return %timePct;
    }
    
+}
+function DMGame::getGamePct(%game)
+{
+   if(!$MatchStarted){
+      return 0;// if we are not running prob between games
+   }
+   %curTimeLeftMS =  mAbs((($missionStartTime - getSimTime())/60)/1000);
+   %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+   
+   %scoreLimit =  MissionGroup.DM_scoreLimit;
+   if(%scoreLimit $= "")
+      %scoreLimit = 25;
+   
+   for (%i = 0; %i < ClientGroup.getCount(); %i++){
+      %client = ClientGroup.getObject(%i);
+      if(%lScore < %client.score){
+         %lScore = %client.score;
+      }
+   }
+   %scorePct =  (%lScore / %scoreLimit) * 100;
+   
+   switch$($dtStats::fgPercentageType[%game.class]){
+      case 0:
+         return %scorePct;
+      case 1:
+         return %timePct;
+      case 2:
+         if(%scorePct > %timePct)
+            return %scorePct;
+         else
+            return %timePct;
+      case 3:
+         %mixPct =  (%scorePct +  %timePct) / 2;
+         return %mixPct;
+      default:
+         if(%scorePct > %timePct)
+            return %scorePct;
+         else
+            return %timePct;
+   }
+   
+}
+function SCtFGame::getGamePct(%game)
+{
+   if(!$MatchStarted){
+      return 0;// if we are not running prob between games
+   }
+   %curTimeLeftMS =  mAbs((($missionStartTime - getSimTime())/60)/1000);
+   %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+   
+   %scoreLimit = MissionGroup.CTF_scoreLimit * %game.SCORE_PER_TEAM_FLAG_CAP;
+   if(%scoreLimit $= "")
+      %scoreLimit = 5 * %game.SCORE_PER_TEAM_FLAG_CAP;
+   
+   if($TeamScore[1] > $TeamScore[2])
+      %scorePct =  ($TeamScore[1] / %scoreLimit) * 100;
+   else
+      %scorePct =  ($TeamScore[2] / %scoreLimit) * 100;
+   
+   switch$($dtStats::fgPercentageType[%game.class]){
+      case 0:
+         return %scorePct;
+      case 1:
+         return %timePct;
+      case 2:
+         if(%scorePct > %timePct)
+            return %scorePct;
+         else
+            return %timePct;
+      case 3:
+         %mixPct =  (%scorePct + %timePct) / 2;
+         return %mixPct;
+      default:
+         if(%scorePct > %timePct)
+            return %scorePct;
+         else
+            return %timePct;
+   }
 }
 function setFieldValue(%obj,%field,%value){
    if(isObject(%obj)){
@@ -1808,9 +2757,9 @@ function loadGameSlow(%dtStats,%i,%game){
    
 }
 
-function saveGameStats(%dtStats,%game){ // called when client leaves server.cs onDrop
+function saveGameStats(%dtStats,%game){
    if($dtStats::Enable  == 0){return;}
-   if(%dtStats.lastGame[%game] > 0 && $dtStats::saveBetweenGames){
+   if(%dtStats.lastGame[%game] > 0){
       saveTotalStats(%dtStats,%game);
       %c = %dtStats.lastGame[%game];
       if(%dtStats.guid !$= ""){
@@ -1835,12 +2784,12 @@ function saveGameStats(%dtStats,%game){ // called when client leaves server.cs o
          %dtStats.delete();
       }
    }
-   else{
+   else{// fail safe 
       saveTotalStats(%dtStats,%game);
       saveStatsSlow(%dtStats,1,%game);
    }
 }
-function saveStatsSlow(%dtStats,%c,%game){ // called when client leaves server.cs onDrop
+function saveStatsSlow(%dtStats,%c,%game){
    
    //if(!isObject(%file)){ error("no object");}
    
@@ -2477,36 +3426,63 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @  getTaggedString(%vClient.name) @ "'s Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", "<a:gamelink\tStats\tReset>  Back</a>");
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>  Main Options Menu");
-         if(%game $= "CTFGame"){
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTF\t%1>  + CTF Match Stats</a>',%vClient);
-            if(%isTargetSelf || %isAdmin) {
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTFW\t%1>  + CTF Weapon Stats</a>',%vClient);
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTFA\t%1>  + CTF Kills/Deaths</a>',%vClient);
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTFH\t%1>  + Previous CTF Games</a>',%vClient);
-			}
-			else {
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");	
-			}
+         switch$(%game){
+            case "CTFGame":
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTF\t%1>  + CTF Match Stats</a>',%vClient);
+               if(%isTargetSelf || %isAdmin) {
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTFW\t%1>  + CTF Weapon Stats</a>',%vClient);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTFA\t%1>  + CTF Kills/Deaths</a>',%vClient);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTFH\t%1>  + Previous CTF Games</a>',%vClient);
+               }
+               else {
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");	
+               }
+            case "LakRabbitGame":
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLak\t%1>  + Lak Match Stats</a>',%vClient);
+               if(%isTargetSelf || %isAdmin) {
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLAKW\t%1>  + Lak Weapon Stats</a>',%vClient);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLAKH\t%1>  + Previous Lak Games</a>',%vClient);
+               }
+               else {
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+               }
+                  //messageClient( %client, 'SetLineHud', "", %tag, %index++, '(LakRabbit Games Played = %2) (LakRabbit Running Average %3/%4) (OW %5)',%vClient,%vClient.dtStats.lakTotalNumGames,%vClient.dtStats.lakGameCount,$dtStats::MaxNumOfGames,%vClient.dtStats.lakStatsOverWrite);
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+            case "DMGame":
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tDM\t%1>  + Deathmatch Stats</a>',%vClient);
+               if(%isTargetSelf || %isAdmin) {
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tDMW\t%1>  + Deathmatch Weapon Stats</a>',%vClient);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tDMH\t%1>  + Previous Deathmatch Games</a>',%vClient);
+               }
+               else {
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+               }
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+            case "SCtFGame":// LCTF
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLCTF\t%1>  + LCTF Match Stats</a>',%vClient);
+               if(%isTargetSelf || %isAdmin) {
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLCTFW\t%1>  + LCTF Weapon Stats</a>',%vClient);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLCTFA\t%1>  + LCTF Kills/Deaths</a>',%vClient); 
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLCTFH\t%1>  + Previous LCTF Games</a>',%vClient);
+               }
+               else {
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");	
+               }
          }
-         if(%game $= "LakRabbitGame"){
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLak\t%1>  + Lak Match Stats</a>',%vClient);
-            if(%isTargetSelf || %isAdmin) {
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLAKW\t%1>  + Lak Weapon Stats</a>',%vClient);
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLAKH\t%1>  + Previous Lak Games</a>',%vClient);
-			}
-			else {
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-			}
-            //messageClient( %client, 'SetLineHud', "", %tag, %index++, '(LakRabbit Games Played = %2) (LakRabbit Running Average %3/%4) (OW %5)',%vClient,%vClient.dtStats.lakTotalNumGames,%vClient.dtStats.lakGameCount,$dtStats::MaxNumOfGames,%vClient.dtStats.lakStatsOverWrite);
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-         }
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
@@ -2515,8 +3491,10 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+		 messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+		 messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, '<just:center>Updates are at the end of every map.');
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Based on the last" SPC $dtStats::MaxNumOfGames SPC "games.");
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Based on the last" SPC $dtStats::MaxNumOfGames SPC "games.");
       case "LAKHIST":
          %inc = %client.GlArg4;
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.dtStats.gameStats["map",%inc,%game] SPC %vClient.dtStats.gameStats["timeStamp",%inc,%game]);
@@ -2533,9 +3511,9 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"suicides",%inc,%game),getGameTotal(%vClient,"suicides",%game),mCeil(getGameTotalAvg(%vClient,"suicides",%game)));
          %line = '<color:0befe7>  Midairs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"mas",%inc,%game),getGameTotal(%vClient,"mas",%game),mCeil(getGameTotalAvg(%vClient,"mas",%game)));         
-		 %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+		   %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagGrabs",%inc,%game),getGameTotal(%vClient,"flagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"flagGrabs",%game)));
-		 %line = '<color:0befe7>  Midair Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+		   %line = '<color:0befe7>  Midair Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"MidairflagGrabs",%inc,%game),getGameTotal(%vClient,"MidairflagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"MidairflagGrabs",%game)));
          %line = '<color:0befe7>  Midair Flag Grab Points<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"MidairflagGrabPoints",%inc,%game),getGameTotal(%vClient,"MidairflagGrabPoints",%game),mCeil(getGameTotalAvg(%vClient,"MidairflagGrabPoints",%game)));
@@ -2639,9 +3617,9 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"suicides",%game)),getGameTotal(%vClient,"suicides",%game),mCeil(getGameTotalAvg(%vClient,"suicides",%game)));
          %line = '<color:0befe7>  Midairs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mas",%game)),getGameTotal(%vClient,"mas",%game),mCeil(getGameTotalAvg(%vClient,"mas",%game)));         
-		 %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+		   %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagGrabs",%game)),getGameTotal(%vClient,"flagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"flagGrabs",%game)));
-		 %line = '<color:0befe7>  Midair Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+		   %line = '<color:0befe7>  Midair Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"MidairflagGrabs",%inc,%game),getGameTotal(%vClient,"MidairflagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"MidairflagGrabs",%game)));
          %line = '<color:0befe7>  Midair Flag Grab Points<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"MidairflagGrabPoints",%inc,%game),getGameTotal(%vClient,"MidairflagGrabPoints",%game),mCeil(getGameTotalAvg(%vClient,"MidairflagGrabPoints",%game)));         
@@ -2649,7 +3627,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagTimeMS",%game)),getGameTotal(%vClient,"flagTimeMS",%game),mCeil(getGameTotalAvg(%vClient,"flagTimeMS",%game)));
          %line = '<color:0befe7>  Bonus Points<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"morepoints",%game)),getGameTotal(%vClient,"morepoints",%game),mCeil(getGameTotalAvg(%vClient,"morepoints",%game)));
-		 %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+		   %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"minedisc",%game)),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
          //%line = '<color:0befe7>  Total Speed<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalSpeed",%game)),getGameTotal(%vClient,"totalSpeed",%game),mCeil(getGameTotalAvg(%vClient,"totalSpeed",%game)));
@@ -2667,7 +3645,97 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalShockHits",%game)),getGameTotal(%vClient,"totalShockHits",%game),mCeil(getGameTotalAvg(%vClient,"totalShockHits",%game)));
          %line = '<color:0befe7>  Total Shocks<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"totalShocks",%game)),getGameTotal(%vClient,"totalShocks",%game),mCeil(getGameTotalAvg(%vClient,"totalShocks",%game)));
-
+      case "DM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Match Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         %line = '<color:0befe7><lmargin%:0>  Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"score",%game)),getGameTotal(%vClient,"score",%game),mCeil(getGameTotalAvg(%vClient,"score",%game)));
+         %line = '<color:0befe7>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"kills",%game)),getGameTotal(%vClient,"kills",%game),mCeil(getGameTotalAvg(%vClient,"kills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"deaths",%game)),getGameTotal(%vClient,"deaths",%game),mCeil(getGameTotalAvg(%vClient,"deaths",%game)));
+         %line = '<color:0befe7>  Suicides<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"suicides",%game)),getGameTotal(%vClient,"suicides",%game),mCeil(getGameTotalAvg(%vClient,"suicides",%game)));
+      case "DMH":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Deathmatch History");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Game history is set to" SPC $dtStats::MaxNumOfGames SPC "games.");
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>The oldest game will be overwritten.");
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+         if(%vClient.dtStats.gameCount[%game] >= $dtStats::MaxNumOfGames){
+            %in = %vClient.dtStats.statsOverWrite[%game] + 1;
+            if(%in > $dtStats::MaxNumOfGames){
+               %in = 1;
+            }
+            for(%z = %in - 1; %z > 0; %z--){
+               %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
+               %map = %vClient.dtStats.gameStats["map",%z,%game];
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tDMHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);
+            }
+            for(%b = %vClient.dtStats.gameCount[%game]; %b >= %in; %b--){
+               %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
+               %map = %vClient.dtStats.gameStats["map",%b,%game];
+               if(%b == %in){
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tDMHIST\t%1\t%3> + %4 - %2</a> <color:FF9A00><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+               }
+               else{
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tDMHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);
+               }
+            }
+         }
+         else{
+            for(%z = %vClient.dtStats.gameCount[%game]; %z >= 1; %z--){
+               %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
+               %map = %vClient.dtStats.gameStats["map",%z,%game];
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tDMHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);
+            }
+         }  
+         
+      case "DMHIST":
+         %inc = %client.GlArg4;
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.dtStats.gameStats["map",%inc,%game] SPC %vClient.dtStats.gameStats["timeStamp",%inc,%game]);
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMH\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Avg Per Game";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         %line = '<color:0befe7><lmargin%:0>  Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"score",%inc,%game),getGameTotal(%vClient,"score",%game),mCeil(getGameTotalAvg(%vClient,"score",%game)));
+         %line = '<color:0befe7>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"kills",%inc,%game),getGameTotal(%vClient,"kills",%game),mCeil(getGameTotalAvg(%vClient,"kills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"deaths",%inc,%game),getGameTotal(%vClient,"deaths",%game),mCeil(getGameTotalAvg(%vClient,"deaths",%game)));
+         %line = '<color:0befe7>  Suicides<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"suicides",%inc,%game),getGameTotal(%vClient,"suicides",%game),mCeil(getGameTotalAvg(%vClient,"suicides",%game)));
+      case "DMW":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Weapon Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         //%header = "<color:0befe7>Weapons";
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tChaingunDM\t%1>  + Chaingun Stats</a><lmargin:230>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tSpinfusorDM\t%1>  + Spinfusor Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tGrenadeLauncherDM\t%1>  + Grenade Launcher Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tLaserRifleDM\t%1>  + Laser Rifle Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tFusionMortarDM\t%1>  + Fusion Mortar Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tMissileLauncherDM\t%1>  + Missile Launcher Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tShocklanceDM\t%1>  + Shocklance Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tPlasmaRifleDM\t%1>  + Plasma Rifle Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tBlasterDM\t%1>  + Blaster Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         //%line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tELFLAK\t%1> View ELF Projector Stats</a>';
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+      
       case "CTFA":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Kills/Deaths");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
@@ -2686,7 +3754,7 @@ function statsMenu(%client,%game){
          
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, " -----------------------------------------------------------------------------------------------------------------");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-		 messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+		   messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
 		 
          %a1 = getGameTotal(%vClient,"mineKills",%game); %b2 = getGameTotal(%vClient,"mineDeaths",%game); %c3 = getGameTotal(%vClient,"explosionKills",%game);
          %d4 = getGameTotal(%vClient,"explosionDeaths",%game); %e5 = getGameTotal(%vClient,"impactKills",%game); %f6 = getGameTotal(%vClient,"impactDeaths",%game);
@@ -2762,9 +3830,9 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"defenseScore",%game)),getGameTotal(%vClient,"defenseScore",%game),mCeil(getGameTotalAvg(%vClient,"defenseScore",%game)));
          %line = '<color:0befe7>  Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"score",%game)),getGameTotal(%vClient,"score",%game),mCeil(getGameTotalAvg(%vClient,"score",%game)));
-         %line = '<color:0befe7>  Rearshot<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Backshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreRearshot",%game)),getGameTotal(%vClient,"scoreRearshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreRearshot",%game)));
-         %line = '<color:0befe7>  Headshot<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Headshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreHeadshot",%game)),getGameTotal(%vClient,"scoreHeadshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreHeadshot",%game)));
       case "CTFW":// Weapons
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Weapon Stats");
@@ -2862,10 +3930,208 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"defenseScore",%inc,%game),getGameTotal(%vClient,"defenseScore",%game),mCeil(getGameTotalAvg(%vClient,"defenseScore",%game)));
          %line = '<color:0befe7>  Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"score",%inc,%game),getGameTotal(%vClient,"score",%game),mCeil(getGameTotalAvg(%vClient,"score",%game)));
-         %line = '<color:0befe7>  Rearshot<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Backshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"scoreRearshot",%inc,%game),getGameTotal(%vClient,"scoreRearshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreRearshot",%game)));
-         %line = '<color:0befe7>  Headshot<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Headshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"scoreHeadshot",%inc,%game),getGameTotal(%vClient,"scoreHeadshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreHeadshot",%game)));
+      case "LCTFA":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Kills/Deaths");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         %a1 = getGameTotal(%vClient,"cgKills",%game); %b2 = getGameTotal(%vClient,"cgDeaths",%game); %c3 = getGameTotal(%vClient,"discKills",%game);
+         %d4 = getGameTotal(%vClient,"discDeaths",%game); %e5 = getGameTotal(%vClient,"grenadeKills",%game); %f6 = getGameTotal(%vClient,"grenadeDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Chaingun: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Spinfusor: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Grenade Launcher: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"laserKills",%game); %b2 = getGameTotal(%vClient,"laserDeaths",%game); %c3 = getGameTotal(%vClient,"mortarKills",%game);
+         %d4 = getGameTotal(%vClient,"mortarDeaths",%game); %e5 = getGameTotal(%vClient,"shockLanceKills",%game); %f6 = getGameTotal(%vClient,"shockLanceDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Laser Rifle: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Fusion Mortar: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Shocklance: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"plasmaKills",%game); %b2 = getGameTotal(%vClient,"plasmaDeaths",%game); %c3 = getGameTotal(%vClient,"blasterKills",%game);
+         %d4 = getGameTotal(%vClient,"blasterDeaths",%game); %e5 = getGameTotal(%vClient,"elfKills",%game); %f6 = getGameTotal(%vClient,"elfDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Plasma Rifle: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Blaster: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>ELF Projector: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, " -----------------------------------------------------------------------------------------------------------------");
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+		   messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+		 
+         %a1 = getGameTotal(%vClient,"mineKills",%game); %b2 = getGameTotal(%vClient,"mineDeaths",%game); %c3 = getGameTotal(%vClient,"explosionKills",%game);
+         %d4 = getGameTotal(%vClient,"explosionDeaths",%game); %e5 = getGameTotal(%vClient,"impactKills",%game); %f6 = getGameTotal(%vClient,"impactDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Mines: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Explosion: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Impact: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"groundKills"); %b2 = getGameTotal(%vClient,"groundDeaths"); %c3 = getGameTotal(%vClient,"turretKills");
+         %d4 = getGameTotal(%vClient,"turretDeaths",%game); %e5 = getGameTotal(%vClient,"plasmaTurretKills",%game); %f6 = getGameTotal(%vClient,"plasmaTurretDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Ground: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Plasma Turret: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"aaTurretKills"); %b2 = getGameTotal(%vClient,"aaTurretDeaths"); %c3 = getGameTotal(%vClient,"elfTurretKills");
+         %d4 = getGameTotal(%vClient,"elfTurretDeaths",%game); %e5 = getGameTotal(%vClient,"mortarTurretKills",%game); %f6 = getGameTotal(%vClient,"mortarTurretDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  AA Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>ELF Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Mortar Turret: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"missileTurretKills",%game); %b2 = getGameTotal(%vClient,"missileTurretDeaths",%game); %c3 = getGameTotal(%vClient,"indoorDepTurretKills",%game);
+         %d4 = getGameTotal(%vClient,"indoorDepTurretDeaths",%game); %e5 = getGameTotal(%vClient,"outdoorDepTurretKills",%game); %f6 = getGameTotal(%vClient,"outdoorDepTurretDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Missile Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Spider Camp Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Land Spike Turret: <color:02d404>%5 k / %6 d';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         
+         %a1 = getGameTotal(%vClient,"sentryTurretKills",%game); %b2 = getGameTotal(%vClient,"sentryTurretDeaths",%game); %c3 = getGameTotal(%vClient,"outOfBoundKills",%game);
+         %d4 = getGameTotal(%vClient,"outOfBoundDeaths",%game); %e5 = getGameTotal(%vClient,"lavaKills",%game); %f6 = getGameTotal(%vClient,"lavaDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Sentry Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Out Of Bounds: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Lava: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"shrikeBlasterKills",%game); %b2 = getGameTotal(%vClient,"shrikeBlasterDeaths",%game); %c3 = getGameTotal(%vClient,"bellyTurretKills",%game);
+         %d4 = getGameTotal(%vClient,"bellyTurretDeaths",%game); %e5 = getGameTotal(%vClient,"bomberBombsKills",%game); %f6 = getGameTotal(%vClient,"bomberBombsDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Shrike Blaster: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Bomber Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Bomber Bombs: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"tankChaingunKills",%game); %b2 = getGameTotal(%vClient,"tankChaingunDeaths",%game); %c3 = getGameTotal(%vClient,"tankMortarKills",%game);
+         %d4 = getGameTotal(%vClient,"tankMortarDeaths",%game); %e5 = getGameTotal(%vClient,"mpbMissileKills",%game); %f6 = getGameTotal(%vClient,"mpbMissileDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Tank Chaingun: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Tank Mortar: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>MPB Missile: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         
+         %a1 = getGameTotal(%vClient,"satchelChargeKills",%game); %b2 = getGameTotal(%vClient,"satchelChargeDeaths",%game); %c3 = getGameTotal(%vClient,"lightningKills",%game);
+         %d4 = getGameTotal(%vClient,"lightningDeaths",%game); %e5 = getGameTotal(%vClient,"vehicleSpawnKills",%game); %f6 = getGameTotal(%vClient,"vehicleSpawnDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Satchel Charge: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Lightning: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Vehicle Spawn: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"forceFieldPowerUpKills",%game); %b2 = getGameTotal(%vClient,"forceFieldPowerUpDeaths",%game); %c3 = getGameTotal(%vClient,"crashKills",%game);
+         %d4 = getGameTotal(%vClient,"crashDeaths",%game); %e5 = getGameTotal(%vClient,"waterKills",%game); %f6 = getGameTotal(%vClient,"waterDeaths",%game);
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Forcefield Power: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Crash: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Water: <color:02d404>%5 k / %6 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         %a1 = getGameTotal(%vClient,"nexusCampingKills",%game); %b2 = getGameTotal(%vClient,"nexusCampingDeaths",%game); %c3 = getGameTotal(%vClient,"unknownKill",%game);
+         %d4 = getGameTotal(%vClient,"unknownDeaths",%game); %e5 = 0; %f6 = 0;
+         %line = '<font:univers condensed:18><color:0befe7><lmargin:0>  Nexus Camping: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Unknown??: <color:02d404>%3 k / %4 d<color:0befe7>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
+         
+      case "LCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s Match Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"kills",%game)),getGameTotal(%vClient,"kills",%game),mCeil(getGameTotalAvg(%vClient,"kills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"deaths",%game)),getGameTotal(%vClient,"deaths",%game),mCeil(getGameTotalAvg(%vClient,"deaths",%game)));
+         %line = '<color:0befe7>  Mid-Air<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreMidAir",%game)),getGameTotal(%vClient,"scoreMidAir",%game),mCeil(getGameTotalAvg(%vClient,"scoreMidAir",%game)));
+         %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"minePlusDisc",%game)),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
+         %line = '<color:0befe7>  Flag Caps<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagCaps",%game)),getGameTotal(%vClient,"flagCaps",%game),mCeil(getGameTotalAvg(%vClient,"flagCaps",%game)));
+         %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagGrabs",%game)),getGameTotal(%vClient,"flagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"flagGrabs",%game)));
+         %line = '<color:0befe7>  Carrier Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"carrierKills",%game)),getGameTotal(%vClient,"carrierKills",%game),mCeil(getGameTotalAvg(%vClient,"carrierKills",%game)));
+         %line = '<color:0befe7>  Flag Returns<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagReturns",%game)),getGameTotal(%vClient,"flagReturns",%game),mCeil(getGameTotalAvg(%vClient,"flagReturns",%game)));
+         %line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"escortAssists",%game)),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
+         %line = '<color:0befe7>  Flag Defends<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagDefends",%game)),getGameTotal(%vClient,"flagDefends",%game),mCeil(getGameTotalAvg(%vClient,"flagDefends",%game)));
+         %line = '<color:0befe7>  Offense Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"offenseScore",%game)),getGameTotal(%vClient,"offenseScore",%game),mCeil(getGameTotalAvg(%vClient,"offenseScore",%game)));
+         %line = '<color:0befe7>  Defense Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"defenseScore",%game)),getGameTotal(%vClient,"defenseScore",%game),mCeil(getGameTotalAvg(%vClient,"defenseScore",%game)));
+         %line = '<color:0befe7>  Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"score",%game)),getGameTotal(%vClient,"score",%game),mCeil(getGameTotalAvg(%vClient,"score",%game)));
+         %line = '<color:0befe7>  Backshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreRearshot",%game)),getGameTotal(%vClient,"scoreRearshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreRearshot",%game)));
+         %line = '<color:0befe7>  Headshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreHeadshot",%game)),getGameTotal(%vClient,"scoreHeadshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreHeadshot",%game)));
+      case "LCTFW":// Weapons
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Weapon Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         //%header = "<color:0befe7>Weapons";
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tChaingunLCTF\t%1>  + Chaingun Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line, %vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tSpinfusorLCTF\t%1>  + Spinfusor Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tGrenadeLauncherLCTF\t%1>  + Grenade Launcher Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tLaserRifleLCTF\t%1>  + Laser Rifle Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tFusionMortarLCTF\t%1>  + Fusion Mortar Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tMissileLauncherLCTF\t%1>  + Missile Launcher Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tShocklanceLCTF\t%1>  + Shocklance Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tPlasmaRifleLCTF\t%1>  + Plasma Rifle Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tBlasterLCTF\t%1>  + Blaster Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         %line = '<spush><color:00dcd4><lmargin%:0><a:gamelink\tStats\tELFLCTF\t%1>  + ELF Projector Stats</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
+         
+      case "LCTFH":// Past Games
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ getTaggedString(%vClient.name) @ "'s LCTF History");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Game history is set to" SPC $dtStats::MaxNumOfGames SPC "games.");
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>The oldest game will be overwritten.");
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+         if(%vClient.dtStats.gameCount[%game] >= $dtStats::MaxNumOfGames){
+            %in = %vClient.dtStats.statsOverWrite[%game] + 1;
+            if(%in > $dtStats::MaxNumOfGames){
+               %in = 1;
+            }
+            for(%z = %in - 1; %z > 0; %z--){
+               %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
+               %map = %vClient.dtStats.gameStats["map",%z,%game];
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);            
+            } 
+            for(%b = %vClient.dtStats.gameCount[%game]; %b >= %in; %b--){
+               %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
+               %map = %vClient.dtStats.gameStats["map",%b,%game];
+               if(%b == %in){
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLCTFHist\t%1\t%3> + %4 - %2</a> <color:FF9A00><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+               }
+               else{
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);
+               }
+            }
+            
+         }
+         else{
+            for(%z = %vClient.dtStats.gameCount[%game]; %z >= 1; %z--){
+               %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
+               %map = %vClient.dtStats.gameStats["map",%z,%game];
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%z,%map);
+            }
+         }
+      case "LCTFHist":
+         %inc = %client.GlArg4;
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.dtStats.gameStats["map",%inc,%game] SPC %vClient.dtStats.gameStats["timeStamp",%inc,%game]);
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFH\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Avg Per Game";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"kills",%inc,%game),getGameTotal(%vClient,"kills",%game),mCeil(getGameTotalAvg(%vClient,"kills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"deaths",%inc,%game),getGameTotal(%vClient,"deaths",%game),mCeil(getGameTotalAvg(%vClient,"deaths",%game)));
+         %line = '<color:0befe7>  Mid-Air<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"scoreMidAir",%inc,%game),getGameTotal(%vClient,"scoreMidAir",%game),mCeil(getGameTotalAvg(%vClient,"scoreMidAir",%game)));
+         %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"minePlusDisc",%inc,%game),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
+         %line = '<color:0befe7>  Flag Caps<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagCaps",%inc,%game),getGameTotal(%vClient,"flagCaps",%game),mCeil(getGameTotalAvg(%vClient,"flagCaps",%game)));
+         %line = '<color:0befe7>  Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagGrabs",%inc,%game),getGameTotal(%vClient,"flagGrabs",%game),mCeil(getGameTotalAvg(%vClient,"flagGrabs",%game)));
+         %line = '<color:0befe7>  Carrier Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"carrierKills",%inc,%game),getGameTotal(%vClient,"carrierKills",%game),mCeil(getGameTotalAvg(%vClient,"carrierKills",%game)));
+         %line = '<color:0befe7>  Flag Returns<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagReturns",%inc,%game),getGameTotal(%vClient,"flagReturns",%game),mCeil(getGameTotalAvg(%vClient,"flagReturns",%game)));
+         %line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"escortAssists",%inc,%game),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
+         %line = '<color:0befe7>  Flag Defends<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagDefends",%inc,%game),getGameTotal(%vClient,"flagDefends",%game),mCeil(getGameTotalAvg(%vClient,"flagDefends",%game)));
+         %line = '<color:0befe7>  Offense Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"offenseScore",%inc,%game),getGameTotal(%vClient,"offenseScore",%game),mCeil(getGameTotalAvg(%vClient,"offenseScore",%game)));
+         %line = '<color:0befe7>  Defense Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"defenseScore",%inc,%game),getGameTotal(%vClient,"defenseScore",%game),mCeil(getGameTotalAvg(%vClient,"defenseScore",%game)));
+         %line = '<color:0befe7>  Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"score",%inc,%game),getGameTotal(%vClient,"score",%game),mCeil(getGameTotalAvg(%vClient,"score",%game)));
+         %line = '<color:0befe7>  Backshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"scoreRearshot",%inc,%game),getGameTotal(%vClient,"scoreRearshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreRearshot",%game)));
+         %line = '<color:0befe7>  Headshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"scoreHeadshot",%inc,%game),getGameTotal(%vClient,"scoreHeadshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreHeadshot",%game)));      
       case "BlasterCTF":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Blaster Stats");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
@@ -2977,7 +4243,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDirectHits",%game)),getGameTotal(%vClient,"laserDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"laserDirectHits",%game)));
          %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserShotsFired",%game)),getGameTotal(%vClient,"laserShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"laserShotsFired",%game)));
-         %line = '<color:0befe7>  Head Shots <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Headshots <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreHeadshot",%game)),getGameTotal(%vClient,"scoreHeadshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreHeadshot",%game)));
          
       case "FusionMortarCTF":
@@ -3052,7 +4318,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDirectHits",%game)),getGameTotal(%vClient,"shockLanceDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDirectHits",%game)));
          %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceShotsFired",%game)),getGameTotal(%vClient,"shockLanceShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceShotsFired",%game)));
-         %line = '<color:0befe7>  Rearshot<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Backshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreRearshot",%game)),getGameTotal(%vClient,"scoreRearshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreRearshot",%game)));
       case "PlasmaRifleCTF":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Plasma Rifle Stats");
@@ -3204,7 +4470,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDirectHits",%game)),getGameTotal(%vClient,"laserDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"laserDirectHits",%game)));
          %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserShotsFired",%game)),getGameTotal(%vClient,"laserShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"laserShotsFired",%game)));
-         %line = '<color:0befe7>  Head Shots <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Headshots <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreHeadshot",%game)),getGameTotal(%vClient,"scoreHeadshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreHeadshot",%game)));
          
       case "FusionMortarLAK":
@@ -3281,7 +4547,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDirectHits",%game)),getGameTotal(%vClient,"shockLanceDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDirectHits",%game)));
          %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceShotsFired",%game)),getGameTotal(%vClient,"shockLanceShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceShotsFired",%game)));
-         %line = '<color:0befe7>  Rearshot<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         %line = '<color:0befe7>  Backshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreRearshot",%game)),getGameTotal(%vClient,"scoreRearshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreRearshot",%game)));
          
       case "PlasmaRifleLAK":
@@ -3320,7 +4586,452 @@ function statsMenu(%client,%game){
          
          %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"elfShotsFired",%game)),getGameTotal(%vClient,"elfShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"elfShotsFired",%game)));
+     case "BlasterDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Blaster Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterKills",%game)),getGameTotal(%vClient,"blasterKills",%game),mCeil(getGameTotalAvg(%vClient,"blasterKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterDeaths",%game)),getGameTotal(%vClient,"blasterDeaths",%game),mCeil(getGameTotalAvg(%vClient,"blasterDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterDmg",%game)),getGameTotal(%vClient,"blasterDmg",%game),mCeil(getGameTotalAvg(%vClient,"blasterDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterDmgTaken",%game)),getGameTotal(%vClient,"blasterDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"blasterDmgTaken",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterDirectHits",%game)),getGameTotal(%vClient,"blasterDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"blasterDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterShotsFired",%game)),getGameTotal(%vClient,"blasterShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"blasterShotsFired",%game)));
+      case "SpinfusorDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Spinfusor Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discKills",%game)),getGameTotal(%vClient,"discKills",%game),mCeil(getGameTotalAvg(%vClient,"discKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discDeaths",%game)),getGameTotal(%vClient,"discDeaths",%game),mCeil(getGameTotalAvg(%vClient,"discDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discDmg",%game)),getGameTotal(%vClient,"discDmg",%game),mCeil(getGameTotalAvg(%vClient,"discDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discDmgTaken",%game)),getGameTotal(%vClient,"discDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"discDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discInDmg",%game)),getGameTotal(%vClient,"discInDmg",%game),mCeil(getGameTotalAvg(%vClient,"discInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discInDmgTaken",%game)),getGameTotal(%vClient,"discInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"discInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discIndirectHits",%game)),getGameTotal(%vClient,"discIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"discIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discDirectHits",%game)),getGameTotal(%vClient,"discDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"discDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discShotsFired",%game)),getGameTotal(%vClient,"discShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"discShotsFired",%game)));
+         %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"minePlusDisc",%game)),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
+      case "ChaingunDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Chaingun Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgKills",%game)),getGameTotal(%vClient,"cgKills",%game),mCeil(getGameTotalAvg(%vClient,"cgKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgDeaths",%game)),getGameTotal(%vClient,"cgDeaths",%game),mCeil(getGameTotalAvg(%vClient,"cgDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgDmg",%game)),getGameTotal(%vClient,"cgDmg",%game),mCeil(getGameTotalAvg(%vClient,"cgDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgDmgTaken",%game)),getGameTotal(%vClient,"cgDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"cgDmgTaken",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgDirectHits",%game)),getGameTotal(%vClient,"cgDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"cgDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgShotsFired",%game)),getGameTotal(%vClient,"cgShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"cgShotsFired",%game)));
+      case "GrenadeLauncherDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Grenade Launcher Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeKills",%game)),getGameTotal(%vClient,"grenadeKills",%game),mCeil(getGameTotalAvg(%vClient,"grenadeKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeDeaths",%game)),getGameTotal(%vClient,"grenadeDeaths",%game),mCeil(getGameTotalAvg(%vClient,"grenadeDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeDmg",%game)),getGameTotal(%vClient,"grenadeDmg",%game),mCeil(getGameTotalAvg(%vClient,"grenadeDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeDmgTaken",%game)),getGameTotal(%vClient,"grenadeDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"grenadeDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeInDmg",%game)),getGameTotal(%vClient,"grenadeInDmg",%game),mCeil(getGameTotalAvg(%vClient,"grenadeInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeInDmgTaken",%game)),getGameTotal(%vClient,"grenadeInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"grenadeInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeIndirectHits",%game)),getGameTotal(%vClient,"grenadeIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"grenadeIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeDirectHits",%game)),getGameTotal(%vClient,"grenadeDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"grenadeDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeShotsFired",%game)),getGameTotal(%vClient,"grenadeShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"grenadeShotsFired",%game)));
+      case "LaserRifleDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Laser Rifle Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserKills",%game)),getGameTotal(%vClient,"laserKills",%game),mCeil(getGameTotalAvg(%vClient,"laserKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDeaths",%game)),getGameTotal(%vClient,"laserDeaths",%game),mCeil(getGameTotalAvg(%vClient,"laserDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDmg",%game)),getGameTotal(%vClient,"laserDmg",%game),mCeil(getGameTotalAvg(%vClient,"laserDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDmgTaken",%game)),getGameTotal(%vClient,"laserDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"laserDmgTaken",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDirectHits",%game)),getGameTotal(%vClient,"laserDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"laserDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserShotsFired",%game)),getGameTotal(%vClient,"laserShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"laserShotsFired",%game)));
+         %line = '<color:0befe7>  Headshots <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreHeadshot",%game)),getGameTotal(%vClient,"scoreHeadshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreHeadshot",%game)));
+         
+      case "FusionMortarDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Fusion Mortar Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarKills",%game)),getGameTotal(%vClient,"mortarKills",%game),mCeil(getGameTotalAvg(%vClient,"mortarKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarDeaths",%game)),getGameTotal(%vClient,"mortarDeaths",%game),mCeil(getGameTotalAvg(%vClient,"mortarDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarDmg",%game)),getGameTotal(%vClient,"mortarDmg",%game),mCeil(getGameTotalAvg(%vClient,"mortarDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarDmgTaken",%game)),getGameTotal(%vClient,"mortarDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"mortarDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarInDmg",%game)),getGameTotal(%vClient,"mortarInDmg",%game),mCeil(getGameTotalAvg(%vClient,"mortarInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarInDmgTaken",%game)),getGameTotal(%vClient,"mortarInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"mortarInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarIndirectHits",%game)),getGameTotal(%vClient,"mortarIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"mortarIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarDirectHits",%game)),getGameTotal(%vClient,"mortarDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"mortarDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarShotsFired",%game)),getGameTotal(%vClient,"mortarShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"mortarShotsFired",%game)));
+      case "MissileLauncherDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Missile Launcher Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileKills",%game)),getGameTotal(%vClient,"missileKills",%game),mCeil(getGameTotalAvg(%vClient,"missileKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileDeaths",%game)),getGameTotal(%vClient,"missileDeaths",%game),mCeil(getGameTotalAvg(%vClient,"missileDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileDmg",%game)),getGameTotal(%vClient,"missileDmg",%game),mCeil(getGameTotalAvg(%vClient,"missileDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileDmgTaken",%game)),getGameTotal(%vClient,"missileDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"missileDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileInDmg",%game)),getGameTotal(%vClient,"missileInDmg",%game),mCeil(getGameTotalAvg(%vClient,"missileInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileInDmgTaken",%game)),getGameTotal(%vClient,"missileInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"missileInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileIndirectHits",%game)),getGameTotal(%vClient,"missileIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"missileIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileDirectHits",%game)),getGameTotal(%vClient,"missileDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"missileDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileShotsFired",%game)),getGameTotal(%vClient,"missileShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"missileShotsFired",%game)));
+      case "ShocklanceDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Shocklance Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceKills",%game)),getGameTotal(%vClient,"shockLanceKills",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDeaths",%game)),getGameTotal(%vClient,"shockLanceDeaths",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDmg",%game)),getGameTotal(%vClient,"shockLanceDmg",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDmgTaken",%game)),getGameTotal(%vClient,"shockLanceDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDirectHits",%game)),getGameTotal(%vClient,"shockLanceDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceShotsFired",%game)),getGameTotal(%vClient,"shockLanceShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceShotsFired",%game)));
+         %line = '<color:0befe7>  Backshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreRearshot",%game)),getGameTotal(%vClient,"scoreRearshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreRearshot",%game)));
+      case "PlasmaRifleDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Plasma Rifle Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaKills",%game)),getGameTotal(%vClient,"plasmaKills",%game),mCeil(getGameTotalAvg(%vClient,"plasmaKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaDeaths",%game)),getGameTotal(%vClient,"plasmaDeaths",%game),mCeil(getGameTotalAvg(%vClient,"plasmaDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaDmg",%game)),getGameTotal(%vClient,"plasmaDmg",%game),mCeil(getGameTotalAvg(%vClient,"plasmaDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaDmgTaken",%game)),getGameTotal(%vClient,"plasmaDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"plasmaDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaInDmg",%game)),getGameTotal(%vClient,"plasmaInDmg",%game),mCeil(getGameTotalAvg(%vClient,"plasmaInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaInDmgTaken",%game)),getGameTotal(%vClient,"plasmaInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"plasmaInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaIndirectHits",%game)),getGameTotal(%vClient,"plasmaIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"plasmaIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaDirectHits",%game)),getGameTotal(%vClient,"plasmaDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"plasmaDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaShotsFired")),getGameTotal(%vClient,"plasmaShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"plasmaShotsFired",%game)));
+      case "ELFDM":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>ELF Projector Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tDMW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"elfShotsFired",%game)),getGameTotal(%vClient,"elfShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"elfShotsFired",%game)));
+      
+      case "BlasterLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Blaster Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterKills",%game)),getGameTotal(%vClient,"blasterKills",%game),mCeil(getGameTotalAvg(%vClient,"blasterKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterDeaths",%game)),getGameTotal(%vClient,"blasterDeaths",%game),mCeil(getGameTotalAvg(%vClient,"blasterDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterDmg",%game)),getGameTotal(%vClient,"blasterDmg",%game),mCeil(getGameTotalAvg(%vClient,"blasterDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterDmgTaken",%game)),getGameTotal(%vClient,"blasterDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"blasterDmgTaken",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterDirectHits",%game)),getGameTotal(%vClient,"blasterDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"blasterDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"blasterShotsFired",%game)),getGameTotal(%vClient,"blasterShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"blasterShotsFired",%game)));
+      case "SpinfusorLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Spinfusor Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discKills",%game)),getGameTotal(%vClient,"discKills",%game),mCeil(getGameTotalAvg(%vClient,"discKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discDeaths",%game)),getGameTotal(%vClient,"discDeaths",%game),mCeil(getGameTotalAvg(%vClient,"discDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discDmg",%game)),getGameTotal(%vClient,"discDmg",%game),mCeil(getGameTotalAvg(%vClient,"discDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discDmgTaken",%game)),getGameTotal(%vClient,"discDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"discDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discInDmg",%game)),getGameTotal(%vClient,"discInDmg",%game),mCeil(getGameTotalAvg(%vClient,"discInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discInDmgTaken",%game)),getGameTotal(%vClient,"discInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"discInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discIndirectHits",%game)),getGameTotal(%vClient,"discIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"discIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discDirectHits",%game)),getGameTotal(%vClient,"discDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"discDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"discShotsFired",%game)),getGameTotal(%vClient,"discShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"discShotsFired",%game)));
+         %line = '<color:0befe7>  Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"minePlusDisc",%game)),getGameTotal(%vClient,"minePlusDisc",%game),mCeil(getGameTotalAvg(%vClient,"minePlusDisc",%game)));
+      case "ChaingunLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Chaingun Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgKills",%game)),getGameTotal(%vClient,"cgKills",%game),mCeil(getGameTotalAvg(%vClient,"cgKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgDeaths",%game)),getGameTotal(%vClient,"cgDeaths",%game),mCeil(getGameTotalAvg(%vClient,"cgDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgDmg",%game)),getGameTotal(%vClient,"cgDmg",%game),mCeil(getGameTotalAvg(%vClient,"cgDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgDmgTaken",%game)),getGameTotal(%vClient,"cgDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"cgDmgTaken",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgDirectHits",%game)),getGameTotal(%vClient,"cgDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"cgDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"cgShotsFired",%game)),getGameTotal(%vClient,"cgShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"cgShotsFired",%game)));
+      case "GrenadeLauncherLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Grenade Launcher Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeKills",%game)),getGameTotal(%vClient,"grenadeKills",%game),mCeil(getGameTotalAvg(%vClient,"grenadeKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeDeaths",%game)),getGameTotal(%vClient,"grenadeDeaths",%game),mCeil(getGameTotalAvg(%vClient,"grenadeDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeDmg",%game)),getGameTotal(%vClient,"grenadeDmg",%game),mCeil(getGameTotalAvg(%vClient,"grenadeDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeDmgTaken",%game)),getGameTotal(%vClient,"grenadeDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"grenadeDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeInDmg",%game)),getGameTotal(%vClient,"grenadeInDmg",%game),mCeil(getGameTotalAvg(%vClient,"grenadeInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeInDmgTaken",%game)),getGameTotal(%vClient,"grenadeInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"grenadeInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeIndirectHits",%game)),getGameTotal(%vClient,"grenadeIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"grenadeIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeDirectHits",%game)),getGameTotal(%vClient,"grenadeDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"grenadeDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"grenadeShotsFired",%game)),getGameTotal(%vClient,"grenadeShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"grenadeShotsFired",%game)));
+      case "LaserRifleLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Laser Rifle Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserKills",%game)),getGameTotal(%vClient,"laserKills",%game),mCeil(getGameTotalAvg(%vClient,"laserKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDeaths",%game)),getGameTotal(%vClient,"laserDeaths",%game),mCeil(getGameTotalAvg(%vClient,"laserDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDmg",%game)),getGameTotal(%vClient,"laserDmg",%game),mCeil(getGameTotalAvg(%vClient,"laserDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDmgTaken",%game)),getGameTotal(%vClient,"laserDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"laserDmgTaken",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserDirectHits",%game)),getGameTotal(%vClient,"laserDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"laserDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"laserShotsFired",%game)),getGameTotal(%vClient,"laserShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"laserShotsFired",%game)));
+         %line = '<color:0befe7>  Headshots <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreHeadshot",%game)),getGameTotal(%vClient,"scoreHeadshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreHeadshot",%game)));
+         
+      case "FusionMortarLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Fusion Mortar Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarKills",%game)),getGameTotal(%vClient,"mortarKills",%game),mCeil(getGameTotalAvg(%vClient,"mortarKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarDeaths",%game)),getGameTotal(%vClient,"mortarDeaths",%game),mCeil(getGameTotalAvg(%vClient,"mortarDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarDmg",%game)),getGameTotal(%vClient,"mortarDmg",%game),mCeil(getGameTotalAvg(%vClient,"mortarDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarDmgTaken",%game)),getGameTotal(%vClient,"mortarDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"mortarDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarInDmg",%game)),getGameTotal(%vClient,"mortarInDmg",%game),mCeil(getGameTotalAvg(%vClient,"mortarInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarInDmgTaken",%game)),getGameTotal(%vClient,"mortarInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"mortarInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarIndirectHits",%game)),getGameTotal(%vClient,"mortarIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"mortarIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarDirectHits",%game)),getGameTotal(%vClient,"mortarDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"mortarDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"mortarShotsFired",%game)),getGameTotal(%vClient,"mortarShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"mortarShotsFired",%game)));
+      case "MissileLauncherLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Missile Launcher Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileKills",%game)),getGameTotal(%vClient,"missileKills",%game),mCeil(getGameTotalAvg(%vClient,"missileKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileDeaths",%game)),getGameTotal(%vClient,"missileDeaths",%game),mCeil(getGameTotalAvg(%vClient,"missileDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileDmg",%game)),getGameTotal(%vClient,"missileDmg",%game),mCeil(getGameTotalAvg(%vClient,"missileDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileDmgTaken",%game)),getGameTotal(%vClient,"missileDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"missileDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileInDmg",%game)),getGameTotal(%vClient,"missileInDmg",%game),mCeil(getGameTotalAvg(%vClient,"missileInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileInDmgTaken",%game)),getGameTotal(%vClient,"missileInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"missileInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileIndirectHits",%game)),getGameTotal(%vClient,"missileIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"missileIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileDirectHits",%game)),getGameTotal(%vClient,"missileDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"missileDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"missileShotsFired",%game)),getGameTotal(%vClient,"missileShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"missileShotsFired",%game)));
+      case "ShocklanceLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Shocklance Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceKills",%game)),getGameTotal(%vClient,"shockLanceKills",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDeaths",%game)),getGameTotal(%vClient,"shockLanceDeaths",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDmg",%game)),getGameTotal(%vClient,"shockLanceDmg",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDmgTaken",%game)),getGameTotal(%vClient,"shockLanceDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceDirectHits",%game)),getGameTotal(%vClient,"shockLanceDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"shockLanceShotsFired",%game)),getGameTotal(%vClient,"shockLanceShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"shockLanceShotsFired",%game)));
+         %line = '<color:0befe7>  Backshots<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"scoreRearshot",%game)),getGameTotal(%vClient,"scoreRearshot",%game),mCeil(getGameTotalAvg(%vClient,"scoreRearshot",%game)));
+      case "PlasmaRifleLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Plasma Rifle Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaKills",%game)),getGameTotal(%vClient,"plasmaKills",%game),mCeil(getGameTotalAvg(%vClient,"plasmaKills",%game)));
+         %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaDeaths",%game)),getGameTotal(%vClient,"plasmaDeaths",%game),mCeil(getGameTotalAvg(%vClient,"plasmaDeaths",%game)));
+         %line = '<color:0befe7>  Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaDmg",%game)),getGameTotal(%vClient,"plasmaDmg",%game),mCeil(getGameTotalAvg(%vClient,"plasmaDmg",%game)));
+         %line = '<color:0befe7>  Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaDmgTaken",%game)),getGameTotal(%vClient,"plasmaDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"plasmaDmgTaken",%game)));
+         %line = '<color:0befe7>  Splash Damage<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaInDmg",%game)),getGameTotal(%vClient,"plasmaInDmg",%game),mCeil(getGameTotalAvg(%vClient,"plasmaInDmg",%game)));
+         %line = '<color:0befe7>  Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaInDmgTaken",%game)),getGameTotal(%vClient,"plasmaInDmgTaken",%game),mCeil(getGameTotalAvg(%vClient,"plasmaInDmgTaken",%game)));
+         
+         %line = '<color:0befe7>  Indirect Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaIndirectHits",%game)),getGameTotal(%vClient,"plasmaIndirectHits",%game),mCeil(getGameTotalAvg(%vClient,"plasmaIndirectHits",%game)));
+         %line = '<color:0befe7>  Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaDirectHits",%game)),getGameTotal(%vClient,"plasmaDirectHits",%game),mCeil(getGameTotalAvg(%vClient,"plasmaDirectHits",%game)));
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"plasmaShotsFired")),getGameTotal(%vClient,"plasmaShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"plasmaShotsFired",%game)));
+      case "ELFLCTF":
+         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>ELF Projector Stats");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLCTFW\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
+         
+         %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         %line = '<color:0befe7>  Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"elfShotsFired",%game)),getGameTotal(%vClient,"elfShotsFired",%game),mCeil(getGameTotalAvg(%vClient,"elfShotsFired",%game)));
+                 
       default://faill safe / reset
          %client.viewMenu = 0;
          %client.viewClient = 0;

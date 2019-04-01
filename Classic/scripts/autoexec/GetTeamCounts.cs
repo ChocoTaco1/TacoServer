@@ -8,6 +8,9 @@
 // To control whether the server auto resets when empty
 // $Host::EmptyServerReset = 0;
 
+$GetCountsClientTeamChange = true;
+
+
 package StartTeamCounts 
 {
 
@@ -17,9 +20,6 @@ function CreateServer( %mission, %missionType )
 	//Call for a GetTeamCount update
 	GetTeamCounts( %game, %client, %respawn );
 
-
-	//Make sure teamchange variable is set
-	ResetClientChangedTeams();
 	//Whether the server auto restarts when empty or not
 	$Host::Dedicated = $Host::EmptyServerReset;
 }

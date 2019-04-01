@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//	Score Hud Stats System, Gather data across x number of games to do math/stats									
-//	This also has the added benefit of restoreing scores after leaving												
-//	Script BY: DarkTiger																							
-//	Prerequisites - Classic 1.5.2 - Evolution Admin Mod  - (zAdvancedStatsLogless.vl2 - for mine disc support)		
-//  Note this system only works in online mode as it uses guid to keep track of people
-//	Version 1.0 - initial release																					
-//	Version 2.0 - code refactor/optimizing/fixes		
-//  Version 3.0 - DM LCTF													
+//	Score Hud Stats System, Gather data across x number of games to do math/stats									//
+//	This also has the added benefit of restoreing scores after leaving												//
+//	Script BY: DarkTiger																							//
+//	Prerequisites - Classic 1.5.2 - Evolution Admin Mod  - (zAdvancedStatsLogless.vl2 - for mine disc support)		//
+//  Note this system only works in online mode as it uses guid to keep track of people								//
+//	Version 1.0 - initial release																					//
+//	Version 2.0 - code refactor/optimizing/fixes																	//
+//  Version 3.0 - DM LCTF																							//
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -418,7 +418,7 @@ $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "elfShotsFired";
 $dtStats::fieldValue[%lak++,"LakRabbitGame"] = "unknownShotsFired";
 $dtStats::fieldCount["LakRabbitGame"] = %lak;
 ///////////////////////////////////////////////////////////////////////////////
-//                            	 DMGame									 //
+//                            	 DMGame								   		 //
 ///////////////////////////////////////////////////////////////////////////////
 //Game type values - out of DMGame.cs
 $dtStats::fieldValue[%dmg++,"DMGame"] = "score";
@@ -551,7 +551,7 @@ $dtStats::fieldValue[%dmg++,"DMGame"] = "unknownShotsFired";
 $dtStats::fieldCount["DMGame"] = %dmg;
 
 ///////////////////////////////////////////////////////////////////////////////
-//                             		LCTF										 //
+//                             		LCTF									 //
 ///////////////////////////////////////////////////////////////////////////////
 //Game type values out of SCtFGame.cs
 $dtStats::fieldValue[%lctf++,"SCtFGame"] = "kills";

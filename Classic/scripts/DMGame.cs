@@ -257,11 +257,11 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
 		if(%clKiller $= "" || %clVictim.killCounter < 3)
 			return;
 		 
-		if(%clVictim == %clKiller || %clVictim.lastDeathSuicide)
+		if(%clVictim == %clKiller || %damageType == $DamageType::Suicide || %damageType == $DamageType::Lava || %damageType == $DamageType::OutOfBounds || %damageType == $DamageType::Ground || %damageType == $DamageType::Lightning)
 		{
 			messageAll('Msgding', '\c2%1\'s Kill Streak has ended. No bonus rewarded.', %clVictim.name, %clVictim.killCounter);
 			%game.lastGuy = 0;
-		}		
+		}
 		else if(%clVictim !$= %clKiller)
 		{	 
 			%temprampage = mfloor((%clVictim.killCounter - $DMGame::wpKillCount) * %game.SCORE_PER_KILLSTREAKBONUS);

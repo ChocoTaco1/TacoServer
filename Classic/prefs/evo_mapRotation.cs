@@ -26,7 +26,7 @@
 
 
 // ******************************
-// * Capture The Flag Maps *
+// * Capture The Flag Maps 		*
 // ******************************
 
 addRotationMap("SmallCrossing", CTF, 1, 1);
@@ -223,9 +223,9 @@ addRotationMap("Magmatic", CTF, 1, 0);
 addRotationMap("Blink", CTF, 1, 1);
 
 
-// ********************
-// * LakRabbit Maps *
-// ********************
+// ************************
+// * LakRabbit Maps 	  *
+// ************************
 
 
 addRotationMap("VaubanLak", LakRabbit, 1, 1);
@@ -256,18 +256,19 @@ addRotationMap("TitaniaLak", LakRabbit, 1, 1);
 addRotationMap("InfernusLak", LakRabbit, 1, 1);
 //addRotationMap("EscaladeLak", LakRabbit, 1, 0);
 addRotationMap("Arrakis", LakRabbit, 1, 0);
-//addRotationMap("EquinoxLak", LakRabbit, 1, 0);
+addRotationMap("EquinoxLak", LakRabbit, 1, 0);
 addRotationMap("FrozenFuryLak", LakRabbit, 1, 0);
-//addRotationMap("S8_GeothermalLak", LakRabbit, 1, 1);
+addRotationMap("S8_GeothermalLak", LakRabbit, 1, 0);
 addRotationMap("Sulfide", LakRabbit, 1, 0);
-
+addRotationMap("CankerLak", LakRabbit, 1, 1);
+addRotationMap("DustRunLak", LakRabbit, 1, 1);
 
 
 
 
 
 // ************************
-// * DuelMod Maps *
+// * DuelMod Maps		  *
 // ************************
 
 //addRotationMap("AgentsOfFortune", Duel, 0, 0);
@@ -293,7 +294,7 @@ addRotationMap("Sulfide", LakRabbit, 1, 0);
 
 
 // ************************
-// * SpawnCTF Maps *
+// * SpawnCTF Maps		  *
 // ************************
 
 addRotationMap("BastardForgeLT", sctf, 1, 1);
@@ -413,7 +414,7 @@ addRotationMap("Blink", sctf, 1, 1);
 
 
 // ************************
-// * Siege Maps *
+// * Siege Maps			  *
 // ************************
 
 //addRotationMap("Isleofman", Siege, 1, 1);
@@ -422,9 +423,8 @@ addRotationMap("Blink", sctf, 1, 1);
 
 
 
-
 // ************************
-// * DM Maps *
+// * DM Maps			  *
 // ************************
 
 addRotationMap("RaspDM", DM, 1, 1);
@@ -433,5 +433,7 @@ addRotationMap("IceDomeDM", DM, 1, 1);
 addRotationMap("HoofToeDM", DM, 1, 1);
 addRotationMap("ArenaDomeDM", DM, 1, 1);
 addRotationMap("VulcansWrathDM", DM, 1, 1);
-//addRotationMap("SmallCrossingLT", DM, 1, 1);
-//addRotationMap("MiniSunDried", DM, 1, 1);
+addRotationMap("RampartsDM", DM, 1, 1);
+addRotationMap("ShrineDM", DM, 1, 1);
+addRotationMap("LiveBaitDM", DM, 1, 1);
+addRotationMap("FourSquareDM", DM, 1, 1);

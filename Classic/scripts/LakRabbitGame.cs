@@ -17,6 +17,10 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.35 April 2019
+// Added Not enought players flag messege delay
+// Shock in the back bonus 2 > 1.5
+//
 // v3.34 Febuary 2019
 // Armor::damageObject rework
 // Added SetNextMission support
@@ -589,7 +593,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 							%sourceObject.holdingFlag.setCloaked(false);
 					}
 						
-					%points *= 2;
+					%points *= 1.5; //was 2
 					%special = "-in-the-back";
 				}
 				if(%ma)
@@ -1711,15 +1715,25 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
 	}
 }
 
+function ResetCantPickUpFlag(%player)
+{
+	%player.client.CantPickUpFlag = false;
+}
+
 function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 {
 	if(%player.getState() $= "Dead" || %player.client.flagDeny)
 		return;
 
-// borlak - can't pick up flag until 2 ppl are on
+	// borlak - can't pick up flag until 2 ppl are on
 	if(PlayingPlayers() < 2)
 	{
-		messageClient(%player.client, 'msgNoFlagWarning', "\c2You can't pick up the flag until another person joins." );
+		if(!%player.client.CantPickUpFlag)
+		{
+			messageClient(%player.client, 'msgNoFlagWarning', "\c2You can't pick up the flag until another person joins." );
+			%player.client.CantPickUpFlag = true;
+			schedule(5000, 0, "ResetCantPickUpFlag", %player ); //Messege only every 5 seconds
+		}
 		return;
 	}
 

@@ -401,6 +401,31 @@ package SCtFGame
 		%flash = %targetObject.getDamageFlash() + (%amount * 2);
 		if (%flash > 0.75)
 			%flash = 0.75;
+		
+		// Teratos: Originally from Eolk? Mine+Disc tracking/death message support.
+		// client.mineDisc = [true|false]
+		// client.mineDiscCheck [0-None|1-Disc Damage|2-Mine Damage]
+		// Teratos: Don't understand why "%client = %targetClient;" -- possibly to avoid carrying .minediscCheck field?
+		// Teratos: A little more redundant code and less readable for a few less comparisons.
+		%targetClient.mineDisc = false;
+		if(%damageType == $DamageType::Disc) {
+			%client = %targetClient; // Oops
+			if(%client.minediscCheck == 0) { // No Mine or Disc damage recently
+				%client.minediscCheck = 1;
+				schedule(300, 0, "resetMineDiscCheck", %client);
+			} else if(%client.minediscCheck == 2) { // Recent Mine damage
+				%client.mineDisc = true;
+			}
+		} else if (%damageType == $DamageType::Mine) {
+			%client = %targetClient; // Oops
+			if(%client.minediscCheck == 0) { // No Mine or Disc damage recently
+				%client.minediscCheck = 2;
+				schedule(300, 0, "resetMineDiscCheck", %client);
+			} else if(%client.minediscCheck == 1) { // Recent Disc damage
+				%client.mineDisc = true;
+			}
+		}
+		// -- End Mine+Disc insert.
 	   
 		%previousDamage = %targetObject.getDamagePercent();
 		%targetObject.setDamageFlash(%flash);

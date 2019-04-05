@@ -386,14 +386,20 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
          }
    }
 }
-//function listDM(){// for debug
-   //for(%a = 0; %a < ClientGroup.getCount(); %a++){
-      //%client = ClientGroup.getObject(%a);
-      //echo(%client.nameBase SPC KIlls SPC %client.killCounter);
-   //}
+
+//function listDM() // for debug
+//{
+//   for(%a = 0; %a < ClientGroup.getCount(); %a++)
+//	 {
+//      %client = ClientGroup.getObject(%a);
+//      echo(%client.nameBase SPC KIlls SPC %client.killCounter);
+//   }
 //}
-function markTargetDM(%client,%clTarget){// out of bountygame
-   if(isObject(%clTarget) && isObject(%client) && !%client.isAIControlled()){
+
+function markTargetDM(%client,%clTarget) // out of bountygame
+{
+   if(isObject(%clTarget) && isObject(%client) && !%client.isAIControlled())
+   {
       %visMask = getSensorGroupAlwaysVisMask(%clTarget.getSensorGroup());
       %visMask |= (1 << %client.getSensorGroup());
       setSensorGroupAlwaysVisMask(%clTarget.getSensorGroup(), %visMask);
@@ -403,8 +409,10 @@ function markTargetDM(%client,%clTarget){// out of bountygame
       %client.sendTargetTo(%client, true);
    }
 }
-function hideTargetWaypoint(%client,%clTarget){
-   if(isObject(%clTarget) && isObject(%client) && !%client.isAIControlled()){
+function hideTargetWaypoint(%client,%clTarget)
+{
+   if(isObject(%clTarget) && isObject(%client) && !%client.isAIControlled())
+   {
       %visMask = getSensorGroupAlwaysVisMask(%clTarget.getSensorGroup());
       %visMask &= ~(1 << %client.getSensorGroup());
       setSensorGroupAlwaysVisMask(%clTarget.getSensorGroup(), %visMask);
@@ -463,7 +471,7 @@ function DMGame::scoreLimitReached(%game)
 function DMGame::gameOver(%game)
 {
    //call the default
-DefaultGame::gameOver(%game);
+   DefaultGame::gameOver(%game);
    
    messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
    
@@ -556,6 +564,7 @@ function plzBounceOffGrid(%obj, %bounceForce, %count)
       schedule(250, 0, plzBounceOffGrid, %obj, %bounceForce, %count + 1);
    }
 }
+
 function isOutOfBounds(%position)
 {
    %shapePos = %position;
@@ -591,7 +600,8 @@ function DMGame::DMAlertPlayer(%game, %count, %player)
 
 function DMGame::MissionAreaDamage(%game, %player)
 {
-   if(%player.getState() !$= "Dead") {
+   if(%player.getState() !$= "Dead") 
+   {
       %player.setDamageFlash(0.1);
       %prevHurt = %player.getDamageLevel();
       %player.setDamageLevel(%prevHurt + 0.05);
@@ -676,6 +686,7 @@ function DMGame::updateScoreHud(%game, %client, %tag)
 
 //function DMGame::applyConcussion(%game, %player)
 //{
+//
 //}
 
 package DMGame
@@ -772,6 +783,31 @@ package DMGame
 		%flash = %targetObject.getDamageFlash() + (%amount * 2);
 		if (%flash > 0.75)
 			%flash = 0.75;
+		
+		// Teratos: Originally from Eolk? Mine+Disc tracking/death message support.
+		// client.mineDisc = [true|false]
+		// client.mineDiscCheck [0-None|1-Disc Damage|2-Mine Damage]
+		// Teratos: Don't understand why "%client = %targetClient;" -- possibly to avoid carrying .minediscCheck field?
+		// Teratos: A little more redundant code and less readable for a few less comparisons.
+		%targetClient.mineDisc = false;
+		if(%damageType == $DamageType::Disc) {
+			%client = %targetClient; // Oops
+			if(%client.minediscCheck == 0) { // No Mine or Disc damage recently
+				%client.minediscCheck = 1;
+				schedule(300, 0, "resetMineDiscCheck", %client);
+			} else if(%client.minediscCheck == 2) { // Recent Mine damage
+				%client.mineDisc = true;
+			}
+		} else if (%damageType == $DamageType::Mine) {
+			%client = %targetClient; // Oops
+			if(%client.minediscCheck == 0) { // No Mine or Disc damage recently
+				%client.minediscCheck = 2;
+				schedule(300, 0, "resetMineDiscCheck", %client);
+			} else if(%client.minediscCheck == 1) { // Recent Disc damage
+				%client.mineDisc = true;
+			}
+		}
+		// -- End Mine+Disc insert.
 	   
 		%previousDamage = %targetObject.getDamagePercent();
 		%targetObject.setDamageFlash(%flash);
@@ -932,7 +968,6 @@ function killEveryone(%ignore, %message)
 		%target.player.scriptKill();
 	}
 }
-
 
 // For voting to work properly - evo admin.ovl
 //

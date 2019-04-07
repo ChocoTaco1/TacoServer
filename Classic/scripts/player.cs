@@ -1198,11 +1198,13 @@ datablock DebrisData( PlayerDebris )
 // z0dd - ZOD, 4/21/02. Altered most of these properties
 datablock PlayerData(LightMaleHumanArmor) : LightPlayerDamageProfile
 {
+   detectsUsingLOS = true; //Kills autopoints
+   
    emap = true;
 
    className = Armor;
    shapeFile = "light_male.dts";
-   cameraMaxDist = 3;
+   cameraMaxDist = 2.5; //Was 3
    computeCRC = true;
 
    canObserve = true;
@@ -1450,11 +1452,13 @@ datablock DecalData(MediumMaleFootprint)
 // z0dd - ZOD, 4/21/02. Altered most of these properties
 datablock PlayerData(MediumMaleHumanArmor) : MediumPlayerDamageProfile
 {
+   detectsUsingLOS = true; //Kills autopoints
+   
    emap = true;
 
    className = Armor;
    shapeFile = "medium_male.dts";
-   cameraMaxDist = 3;
+   cameraMaxDist = 2.5; //Was 3
    computeCRC = true;
 
    canObserve = true;
@@ -1703,11 +1707,13 @@ datablock DecalData(HeavyMaleFootprint)
 // z0dd - ZOD, 4/21/02. Altered most of these properties
 datablock PlayerData(HeavyMaleHumanArmor) : HeavyPlayerDamageProfile
 {
+   detectsUsingLOS = true; //Kills autopoints
+
    emap = true;
 
    className = Armor;
    shapeFile = "heavy_male.dts";
-   cameraMaxDist = 3;
+   cameraMaxDist = 2.5; //Was 3
    computeCRC = true;
 
    canObserve = true;
@@ -2968,6 +2974,7 @@ function Armor::applyConcussion( %this, %dist, %radius, %sourceObject, %targetOb
          %targetObject.throwWeapon();
       }   
    }
+   
 }             
 
 //----------------------------------------------------------------------------

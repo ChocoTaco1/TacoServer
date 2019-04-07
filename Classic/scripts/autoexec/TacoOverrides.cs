@@ -68,7 +68,7 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
    if(%data.getName() $="AssaultVehicle")
    {
       // %obj.setFrozenState(true);
-      %obj.schedule(1, "delete"); //was 2000
+      %obj.schedule(500, "delete"); //was 2000
       //%data.schedule(500, 'onAvoidCollisions', %obj);
 	  
 	  //Transfer the vehicle far away
@@ -89,6 +89,16 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
       %obj.schedule(500, "delete"); //was 500
    }
    // -----------------------------------------------------------------------------------------
+}
+
+//OG Blaster Buff
+function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
+{	
+    //Takes 10 blaster shots to kill a heavy, 13 normal.
+	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
+		%amount *= 1.3;
+	
+	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
 }
 
 };

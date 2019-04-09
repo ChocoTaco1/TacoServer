@@ -3588,7 +3588,7 @@ function statsMenu(%client,%game){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> <color:FF9A00><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> <color:02d404><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLAKHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);
@@ -3679,7 +3679,7 @@ function statsMenu(%client,%game){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tDMHIST\t%1\t%3> + %4 - %2</a> <color:FF9A00><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tDMHIST\t%1\t%3> + %4 - %2</a> <color:02d404><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tDMHIST\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);
@@ -3883,7 +3883,7 @@ function statsMenu(%client,%game){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> <color:FF9A00><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> <color:02d404><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);
@@ -4081,7 +4081,7 @@ function statsMenu(%client,%game){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLCTFHist\t%1\t%3> + %4 - %2</a> <color:FF9A00><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<color:0befe7><a:gamelink\tStats\tLCTFHist\t%1\t%3> + %4 - %2</a> <color:02d404><just:center>This game will be overwritten',%vClient,%timeDate,%b,%map);
                }
                else{
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,'<color:0befe7><a:gamelink\tStats\tLCTFHist\t%1\t%3> + %4 - %2</a> ',%vClient,%timeDate,%b,%map);

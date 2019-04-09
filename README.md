@@ -63,6 +63,6 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
 ### Credits & Thanks
  - BattleLore for this template and help
  - The T2 community for the free testing
- - Radiant Keen
+ - Radiant Keen and DarkTiger
  - The TribesNext community
  - Some very specific people for all their harsh criticism

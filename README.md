@@ -35,6 +35,7 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
  - Improved Deathmatch experience
  - Pro Mode for LCTF
  - Shocklance Only Mode for Deathmatch
+ - Full Stats System
 
 ---
 

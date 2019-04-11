@@ -4,8 +4,8 @@
 //	Script BY: DarkTiger																							//
 //	Prerequisites - Classic 1.5.2 - Evolution Admin Mod  - (zAdvancedStatsLogless.vl2 - for mine disc support)		//
 //  Note this system only works in online mode as it uses guid to keep track of people								//
-//	Version 1.0 - initial release																					//
-//	Version 2.0 - code refactor/optimizing/fixes																	//
+//  Version 1.0 - initial release																					//
+//  Version 2.0 - code refactor/optimizing/fixes																	//
 //  Version 3.0 - DM LCTF																							//
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -113,6 +113,10 @@ $dtStats::fieldValue[%ctf++,"CTFGame"] = "flagDefends";
 
 //Values in this script - keep this one as is,
 //Then this can be copied from to setup other game types then one can trimed back the game the other game types
+
+
+$dtStats::fieldValue[%ctf++,"CTFGame"] = "winCount";
+$dtStats::fieldValue[%ctf++,"CTFGame"] = "lossCount";
 
 $dtStats::fieldValue[%ctf++,"CTFGame"] = "cgKills";
 $dtStats::fieldValue[%ctf++,"CTFGame"] = "cgDeaths";
@@ -573,6 +577,9 @@ $dtStats::fieldValue[%lctf++,"SCtFGame"] = "offenseScore";
 $dtStats::fieldValue[%lctf++,"SCtFGame"] = "flagDefends";
 
 //Values in this script
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "winCount";
+$dtStats::fieldValue[%lctf++,"SCtFGame"] = "lossCount";
+
 $dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgKills";
 $dtStats::fieldValue[%lctf++,"SCtFGame"] = "cgDeaths";
 $dtStats::fieldValue[%lctf++,"SCtFGame"] = "discKills";
@@ -2386,6 +2393,9 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          %dtStats = new scriptObject(); // object used stats storage
          statsGroup.add(%dtStats);
          %client.dtStats = %dtStats;
+         %dtStats.gameCount[%game.class] = 0;
+         %dtStats.totalNumGames[%game.class] = 0;
+         %dtStats.statsOverWrite[%game.class] = 0;
          %dtStats.client =%client;
          %dtStats.guid = %client.guid;
          %dtStats.name =%client.name;
@@ -2394,7 +2404,6 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          %dtStats.lastGame[%game.class] = 0;
          loadGameStats(%client.dtStats,%game.class);
          %client.dtStats.gameData[%game.class] = 1;
-         //loadGameStats(%client.dtStats,"LakRabbitGame);
          %client.dtStats.dtGameCounter = 0;// mark player as just joined after the first game over  they will record stats
          
          if(Game.getGamePct() < (100 - $dtStats::fgPercentage[%game.class]) && $dtStats::fullGames[%game.class]){// they will be here long enough to count as a full game
@@ -2403,6 +2412,9 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
       }
    }
    else if(isObject(%client.dtStats) && %client.dtStats.gameData[%game.class] $= ""){ // game type change
+      %client.dtStats.gameCount[%game.class] = 0;
+      %client.dtStats.totalNumGames[%game.class] = 0;
+      %client.dtStats.statsOverWrite[%game.class] = 0;
       loadGameStats(%client.dtStats,%game.class);
       %client.dtStats.gameData[%game.class] = 1;
    }
@@ -2411,6 +2423,7 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
 function dtStatsClientLeaveGame(%game, %client){
    if(!%client.isAiControlled()){
       %client.dtStats.clientLeft = 1;
+      %game.gameWinStat(%client); 
       bakGameStats(%client,%game.class);//back up there current game in case they lost connection
       %client.dtStats.leftPCT = %game.getGamePct();
    }
@@ -2420,8 +2433,8 @@ function dtStatsTimeLimitReached(%game){
    if($dtStats::fullGames[%game.class]){
       for (%i = 0; %i < ClientGroup.getCount(); %i++){
          %client = ClientGroup.getObject(%i);
+         %game.gameWinStat(%client);
          if(!%client.isAiControlled()){
-            
             if( %client.dtStats.dtGameCounter > 0){ //we throw out the first game as we joined it in progress
                incGameStats(%client,%game.class); // setup for next game
             }
@@ -2435,6 +2448,7 @@ function dtStatsScoreLimitReached(%game){
    if($dtStats::fullGames[%game.class]){ // same as time limit reached
       for (%i = 0; %i < ClientGroup.getCount(); %i++){
          %client = ClientGroup.getObject(%i);
+         %game.gameWinStat(%client);
          if(!%client.isAiControlled()){
             if( %client.dtStats.dtGameCounter > 0){
                incGameStats(%client,%game.class);
@@ -2445,7 +2459,7 @@ function dtStatsScoreLimitReached(%game){
    }
 }
 function dtStatsGameOver( %game ){
-   //error("CTF::gameOver");
+   //error("CTF::gameOver");  
    %timeNext =0;
    for (%i = 0; %i < statsGroup.getCount(); %i++){// see if we have any old clients data
       %dtStats = statsGroup.getObject(%i);
@@ -2481,6 +2495,7 @@ function dtStatsGameOver( %game ){
       %client.viewStats = 0;
       if(!%client.isAiControlled() ){
          if(%game.scoreLimitHit != 1 && %game.timeLimitHit != 1){
+            %game.gameWinStat(%client);
             // if game was longer then x precent and admin changemaps then save
             if(%game.getGamePct() > $dtStats::fgPercentage[%game.class] && $dtStats::fullGames[%game.class] && %client.dtstats.dtGameCounter > 0){ // if we dont care about full games  setup next gamea and copy over stats
                incGameStats(%client,%game.class);
@@ -2500,12 +2515,27 @@ function dtStatsGameOver( %game ){
          resetDtStats(%client);
       }
    }
-  // error($MissionDisplayName);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //							Supporting Functions							  //
 ////////////////////////////////////////////////////////////////////////////////
+
+function DefaultGame::gameWinStat(%game,%client){
+   if(%game.class $= "CTFGame" || %game.class $= "SCtFGame"){
+      if($teamScore[1] == $teamScore[2]){
+          %client.winCount = 0;  
+          %client.lossCount = 0;
+      }
+      else if($teamScore[1] > $teamScore[2] && %client.team == 1)
+         %client.winCount = 1;
+      else if($teamScore[2] > $teamScore[1]  && %client.team == 2)
+         %client.winCount = 1;
+      else
+         %client.lossCount = 1;
+   } 
+   //error(%client.winCount SPC   %client.lossCount); 
+}
 
 function CTFGame::getGamePct(%game)
 {
@@ -2853,6 +2883,7 @@ function incGameStats(%client,%game) {// record that games stats and inc by one
 }
 function incBakGameStats(%dtStats,%game) {// record that games stats and inc by one
    if($dtStats::Enable  == 0){return;}
+   
    if(%dtStats.gameCount[%game]  >= $dtStats::MaxNumOfGames){ // we have the max number allowed
       if(%dtStats.statsOverWrite[%game] < $dtStats::MaxNumOfGames){
          %c = %dtStats.statsOverWrite[%game]++;
@@ -2865,9 +2896,11 @@ function incBakGameStats(%dtStats,%game) {// record that games stats and inc by 
    else{
       %c = %dtStats.gameCount[%game]++; // number of games this player has played
    }
+   
    %dtStats.lastGame[%game] = %c;
    %dtStats.gameStats["timeStamp",%c,%game] = formattimestring("hh:nn a, mm-dd");
    %dtStats.gameStats["map",%c,%game] = $MissionDisplayName;
+   
    for(%i = 1; %i <= $dtStats::fieldCount[%game]; %i++){
       %val = $dtStats::fieldValue[%i,%game];
       %var = %dtStats.gameStats[%val,"b",%game];
@@ -2880,7 +2913,7 @@ function incBakGameStats(%dtStats,%game) {// record that games stats and inc by 
 }
 function addGameBakTotal(%dtStats,%game) {// record that games stats and inc by one
    if($dtStats::Enable  == 0){return;}
-   %client.dtStats.totalNumGames[%game]++;
+   %dtStats.totalNumGames[%game]++;
    %dtStats.gameStats["timeStamp",%c,%game] += formattimestring("hh:nn a, mm-dd");
    for(%i = 1; %i <= $dtStats::fieldCount[%game]; %i++){
       %val = $dtStats::fieldValue[%i,%game];
@@ -2904,6 +2937,9 @@ function resGameStats(%client,%game) {// copy data back over to client
    for(%i = 1; %i <= $dtStats::fieldCount[%game]; %i++){
       %val = $dtStats::fieldValue[%i,%game];
       %var = %client.dtStats.gameStats[%val,"b",%game];
+      if(%val $= "winCount" || %val $= "lossCount"){
+         %var = 0; // set to 0 becuase we came back and its not the end of the game
+      }
       setFieldValue(%client,%val,%var);
    }
 }
@@ -3039,6 +3075,7 @@ function resetDtStats(%client){
    %client.shockLanceShotsFired = 0;   %client.plasmaShotsFired = 0;       %client.blasterShotsFired = 0;
    %client.elfShotsFired = 0;          %client.minePlusDisc = 0;           %client.unknownShotsFired = 0;
    %client.MidairflagGrabs = 0;		   %client.MidairflagGrabPoints = 0;
+   %client.winCount = 0;               %client.lossCount = 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
 //Stats Collecting
@@ -3366,6 +3403,16 @@ function getGameRunAvg(%client, %value,%game){
       return 0;
    }
 }
+function getGameRunWinLossAvg(%client,%game){
+   if(%client.dtStats.gameCount[%game] != 0 && %client.dtStats.gameCount[%game] !$= ""){
+      for(%i=1; %i <= %client.dtStats.gameCount[%game]; %i++){
+            %winCount += %client.dtStats.gameStats["winCount",%i,%game];
+            %lossCount += %client.dtStats.gameStats["lossCount",%i,%game];
+            %total = %winCount + %lossCount;
+      }
+      return (%winCount / %total) * 100 SPC (%lossCount / %total) * 100;
+   }
+}
 function getGameTotalAvg(%vClient,%value,%game){
    //error(%vClient SPC %value);
    if(%vClient.dtStats.gameStats[%value,"t",%game] !$= "" && %vClient.dtStats.totalNumGames[%game] > 0)
@@ -3492,9 +3539,20 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
 		 messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-		 messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, '<just:center>Updates are at the end of every map.');
-         //messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Based on the last" SPC $dtStats::MaxNumOfGames SPC "games.");
+		 if(%vClient.dtStats.gameCount[%game] == 0)
+		 messageClient( %client, 'SetLineHud', "", %tag, %index++, "");	 
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, '<just:center>Stats update at the end of every map.');
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Based on the last" SPC %3 SPC "games.");
+         //%line = '<just:center>Games Played = %3 Running Average = %1/%2 Overwrite Counter = %4';
+		 if(%vClient.dtStats.gameCount[%game] > 1) {
+			%line = '<just:center>Based on the last %3 games played.';
+			messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient.dtStats.gameCount[%game],$dtStats::MaxNumOfGames,%vClient.dtStats.totalNumGames[%game],%vClient.dtStats.statsOverWrite[%game]);
+		 }
+		 else if(%vClient.dtStats.gameCount[%game] == 1) {
+			%line = '<just:center>Based on the last game played.';
+			messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient.dtStats.gameCount[%game],$dtStats::MaxNumOfGames,%vClient.dtStats.totalNumGames[%game],%vClient.dtStats.statsOverWrite[%game]);
+		 }
+			
       case "LAKHIST":
          %inc = %client.GlArg4;
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %vClient.dtStats.gameStats["map",%inc,%game] SPC %vClient.dtStats.gameStats["timeStamp",%inc,%game]);
@@ -3804,6 +3862,20 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Win %5<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         
+         %wlPCT =  getGameRunWinLossAvg(%client,%game);
+         %runAvg = mFloor(getWord(%wlPCT,0)) @ "%"; 
+         
+         %winTotal = getGameTotal(%vClient,"winCount",%game);
+         %lossTotal = getGameTotal(%vClient,"lossCount",%game);
+         %total  = %winTotal SPC "W /" SPC %lossTotal SPC "L"; 
+         
+         %totalWinLoss = %winTotal +  %lossTotal;
+         %totalAvg = mFloor((%winTotal / %totalWinLoss)* 100) @ "%";  
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%runAvg,%total,%totalAvg,"%");
+         
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"kills",%game)),getGameTotal(%vClient,"kills",%game),mCeil(getGameTotalAvg(%vClient,"kills",%game)));
          %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -4002,6 +4074,20 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset>Return To Score Screen</a>',%vClient);
          %header = "<color:0befe7><lmargin:0>       <lmargin:175> Stats<lmargin:330>Totals<lmargin:450>Totals Avg";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
+         
+         %line = '<color:0befe7><lmargin%:0>  Win %5<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         
+         %wlPCT =  getGameRunWinLossAvg(%client,%game);
+         %runAvg = mFloor(getWord(%wlPCT,0)) @ "%"; 
+         
+         %winTotal = getGameTotal(%vClient,"winCount",%game);
+         %lossTotal = getGameTotal(%vClient,"lossCount",%game);
+         %total  = %winTotal SPC "W /" SPC %lossTotal SPC "L"; 
+         
+         %totalWinLoss = %winTotal +  %lossTotal;
+         %totalAvg = mFloor((%winTotal / %totalWinLoss)* 100) @ "%";  
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%runAvg,%total,%totalAvg,"%");
+         
          %line = '<color:0befe7><lmargin%:0>  Kills<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"kills",%game)),getGameTotal(%vClient,"kills",%game),mCeil(getGameTotalAvg(%vClient,"kills",%game)));
          %line = '<color:0befe7>  Deaths<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';

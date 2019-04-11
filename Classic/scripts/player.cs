@@ -1198,7 +1198,9 @@ datablock DebrisData( PlayerDebris )
 // z0dd - ZOD, 4/21/02. Altered most of these properties
 datablock PlayerData(LightMaleHumanArmor) : LightPlayerDamageProfile
 {
-   detectsUsingLOS = true; //Kills autopoints
+   //Kills autopoints
+   detectsUsingLOSEnemy[1] = true;
+   detectsUsingLOSEnemy[2] = true;
    
    emap = true;
 
@@ -1452,7 +1454,9 @@ datablock DecalData(MediumMaleFootprint)
 // z0dd - ZOD, 4/21/02. Altered most of these properties
 datablock PlayerData(MediumMaleHumanArmor) : MediumPlayerDamageProfile
 {
-   detectsUsingLOS = true; //Kills autopoints
+   //Kills autopoints
+   detectsUsingLOSEnemy[1] = true;
+   detectsUsingLOSEnemy[2] = true; 
    
    emap = true;
 
@@ -1707,7 +1711,9 @@ datablock DecalData(HeavyMaleFootprint)
 // z0dd - ZOD, 4/21/02. Altered most of these properties
 datablock PlayerData(HeavyMaleHumanArmor) : HeavyPlayerDamageProfile
 {
-   detectsUsingLOS = true; //Kills autopoints
+   //Kills autopoints
+   detectsUsingLOSEnemy[1] = true;
+   detectsUsingLOSEnemy[2] = true;
 
    emap = true;
 

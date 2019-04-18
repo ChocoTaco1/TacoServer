@@ -739,7 +739,7 @@ package DMGame
 		  
 		if(%targetObject.client.armor $= "Heavy")
 		{
-			%amount *= 1.5;
+			%amount *= 1.43;
 		}
 	   
 	   //error("Armor::damageObject( "@%data@", "@%targetObject@", "@%sourceObject@", "@%position@", "@%amount@", "@%damageType@", "@%momVec@" )");

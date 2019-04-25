@@ -1765,7 +1765,10 @@ datablock PlayerData(HeavyMaleHumanArmor) : HeavyPlayerDamageProfile
    maxDamage = 1.32;
    maxEnergy =  110;
    repairRate = 0.0033;
-   energyPerDamagePoint = 54.0; // shield energy required to block one point of damage
+   
+   //Value changed halfway between base and classic.
+   //Classic is 54, Base is 75
+   energyPerDamagePoint = 64.5; // shield energy required to block one point of damage
 
    rechargeRate = 0.256;
    jetForce = 29.58 * 180;

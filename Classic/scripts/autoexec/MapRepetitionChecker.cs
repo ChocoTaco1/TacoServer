@@ -26,9 +26,6 @@ function MapRepetitionChecker( %game )
 		
 		if(!$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
 		{	
-			//Backup
-			$SetNextMissionRestore = $EvoCachedNextMission;
-			
 			//Do work
 			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
 				$PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission ||
@@ -66,9 +63,13 @@ function MapRepetitionCheckerFindRandom()
 	else
 		%MapCheckerRandom = getRandom(1,6);
 	
-	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
+	//Backup
+	$SetNextMissionRestore = $EvoCachedNextMission;
 	
 	//Do work
+	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
+	
+	//Make sure new map still complies
 	if( $EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || 
 	    $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back ||
 		$CurrentMission $= $EvoCachedNextMission )
@@ -76,7 +77,15 @@ function MapRepetitionCheckerFindRandom()
 	else
 	{	
 		error(formatTimeString("HH:nn:ss") SPC "Map Repetition Corrected from" SPC $SetNextMissionRestore SPC "to" SPC $EvoCachedNextMission @ "." );
-		messageAll('MsgNoBaseRapeNotify', '\crMap Repetition Corrected: Next mission set to %1.', $EvoCachedNextMission);
+
+		//Admin Message Only
+		for(%idx = 0; %idx < ClientGroup.getCount(); %idx++) 
+		{
+			%cl = ClientGroup.getObject(%idx);
+					  
+			if(%cl.isAdmin)
+				messageClient(%cl, 'MsgMapRepCorrection', '\crMap Repetition Corrected: Next mission set from %1 to %2.', $SetNextMissionRestore, $EvoCachedNextMission);
+		}
 	}
 }
 

@@ -39,7 +39,7 @@ $LakRandomMapPick10 = "Arrakis"; 				$LakRandomMapPick11 = "BoxLak"; 			$LakRand
 //13-15
 $LakRandomMapPick13 = "Raindance_nefLak"; 		$LakRandomMapPick14 = "SaddiesHill"; 		$LakRandomMapPick15 = "TWL_BeachBlitzLak"; 
 //16-18
-$LakRandomMapPick16 = "PhasmaDustLak"; 			$LakRandomMapPick17 = "Sulfide"; 			$LakRandomMapPick18 = "HavenLak"; 
+$LakRandomMapPick16 = "PhasmaDustLak"; 			$LakRandomMapPick17 = "TibbawLak"; 			$LakRandomMapPick18 = "HavenLak"; 
 //19-21
 $LakRandomMapPick19 = "Crater71Lak"; 			$LakRandomMapPick20 = "SolsDescentLak"; 	$LakRandomMapPick21 = "FrozenFuryLak"; 
 //22-24

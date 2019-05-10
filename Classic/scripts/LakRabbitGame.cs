@@ -18,7 +18,7 @@
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
 // v3.35 April 2019
-// Added Not enought players flag messege delay
+// Added Not enought players flag message delay
 // Shock in the back bonus 2 > 1.5
 //
 // v3.34 Febuary 2019
@@ -40,7 +40,7 @@
 // Cleaned up voting language.
 // Fixed a bug where the player would stay invisible when slapped.
 // Added disc headshot functionality to slap.
-// Fixed a bug where you would get multiple back in bounds messeges even when you were dead after a slap.
+// Fixed a bug where you would get multiple back in bounds messages even when you were dead after a slap.
 //
 // v3.3 - July 2018
 // Nerfed Midair Flag grab points since its easier with the flag updater code.
@@ -492,11 +492,11 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 					switch$(%slapmsg)
 					{
 						case 1:
-							messageAll('msgSlapMessege','\c0%1 wonders what the five fingers said to the face.', %targetObject.client.name );
+							messageAll('msgSlapmessage','\c0%1 wonders what the five fingers said to the face.', %targetObject.client.name );
 						case 2:
-							messageAll('msgSlapMessege','\c0%1 gets slapped the heck out!', %targetObject.client.name );
+							messageAll('msgSlapmessage','\c0%1 gets slapped the heck out!', %targetObject.client.name );
 						case 3:				
-							messageAll('msgSlapMessege','\c0%1 is taking a short tour around the map.', %targetObject.client.name );
+							messageAll('msgSlapmessage','\c0%1 is taking a short tour around the map.', %targetObject.client.name );
 					}	
 				}
 				%weapon = "Disc";
@@ -1757,7 +1757,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 		{
 			messageClient(%player.client, 'msgNoFlagWarning', "\c2You can't pick up the flag until another person joins." );
 			%player.client.CantPickUpFlag = true;
-			schedule(5000, 0, "ResetCantPickUpFlag", %player ); //Messege only every 5 seconds
+			schedule(5000, 0, "ResetCantPickUpFlag", %player ); //message only every 5 seconds
 		}
 		return;
 	}

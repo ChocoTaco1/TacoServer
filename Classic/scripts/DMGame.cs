@@ -265,6 +265,7 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
 		else if(%clVictim !$= %clKiller)
 		{	 
 			%temprampage = mfloor((%clVictim.killCounter - $DMGame::wpKillCount) * %game.SCORE_PER_KILLSTREAKBONUS);
+			%s = "";
 
 			//single bonus
 			 if(%clVictim.killCounter < $DMGame::wpKillCountDoubleBonus) 
@@ -275,7 +276,10 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
 				//messageAll('Msgding', '\c1%1 receives a bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
 				messageAllExcept(%clVictim, -1, 'Msgding', '\c4%1 is rewarded with a bonus for ending %5\'s %6X Kill Streak!~wfx/misc/flag_lost.wav', %clKiller.name, "", %clVictim, 1, %clVictim.name, %clVictim.killCounter );
 				if(%temprampage > 0)
-					messageClient(%clVictim, 'Msgding', '\c4%1 has ended your %2X Kill Streak. You\'ve been rewarded with %3 extra points!~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter, %temprampage);
+				{
+					if(%temprampage > 1) %s = "s";
+					messageClient(%clVictim, 'Msgding', '\c4%1 has ended your %2X Kill Streak. You\'ve been rewarded with %3 extra point%4!~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter, %temprampage, %s);
+				}
 				else
 					messageClient(%clVictim, 'Msgding', '\c2%1 has ended your %2X Kill Streak.~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter);
 			 }
@@ -288,7 +292,10 @@ function ProcessBonusDM(%game, %clVictim, %clKiller, %damageType, %implement, %d
 				//messageAll('Msgding', '\c1%1 receives a double bonus for ending %2\'s %3x kill streak.~wfx/misc/flag_lost.wav',%clKiller.name,%clVictim.name, %clVictim.killCounter);
 				messageAllExcept(%clVictim, -1, 'Msgding', '\c4%1 is rewarded with a double bonus for ending %5\'s %6X Kill Streak!~wfx/misc/flag_lost.wav', %clKiller.name, "", %clVictim, 1, %clVictim.name, %clVictim.killCounter );
 				if(%temprampage > 0)
-					messageClient(%clVictim, 'Msgding', '\c4%1 has ended your %2X Kill Streak. You\'ve been rewarded with %3 extra points!~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter, %temprampage);
+				{
+					if(%temprampage > 1) %s = "s";
+					messageClient(%clVictim, 'Msgding', '\c4%1 has ended your %2X Kill Streak. You\'ve been rewarded with %3 extra point%4!~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter, %temprampage, %s);
+				}
 				else
 					messageClient(%clVictim, 'Msgding', '\c2%1 has ended your %2X Kill Streak.~wfx/misc/flag_lost.wav', %clKiller.name, %clVictim.killCounter);
 			 }

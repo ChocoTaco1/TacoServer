@@ -2370,26 +2370,34 @@ if($dtStats::Enable){
 ////////////////////////////////////////////////////////////////////////////////
 function dtStatsMissionDropReady(%game, %client){ // called when client has finished loading
    %foundOld =0;
-   if(!%client.isAIControlled() && !isObject(%client.dtStats)){
-      for (%i = 0; %i < statsGroup.getCount(); %i++){ // check to see if my old data is still there
+   if(!%client.isAIControlled() && !isObject(%client.dtStats))
+   {
+      for (%i = 0; %i < statsGroup.getCount(); %i++)
+	  { // check to see if my old data is still there
          %dtStats = statsGroup.getObject(%i);
-         if(%dtStats.guid == %client.guid){
-            if(%dtStats.leftPCT < $dtStats::fgPercentage[%game.class] && $dtStats::fullGames[%game.class]){
-               %client.dtStats.dtGameCounter = 0;// reset to 0 so this game does count this game
-            }
-            //error(%dtStats.guid SPC %client.guid);
-            %client.dtStats = %dtStats;
-            %dtStats.client = %client;
-            %dtStats.name = %client.name;
-            %dtStats.clientLeft = 0;
-            %dtStats.markForDelete = 0;
-            %foundOld =1;
-            resGameStats(%client,%game.class); // restore stats;
-            messageClient(%client, 'MsgClient', '\crWelcome back %1. Your score has been restored.~wfx/misc/rolechange.wav', %client.name);
-            break;
+         if(%dtStats.guid == %client.guid)
+		 {
+            if(%dtStats.leftPCT < $dtStats::fgPercentage[%game.class] && $dtStats::fullGames[%game.class])
+			{
+				%client.dtStats.dtGameCounter = 0;// reset to 0 so this game does count this game
+			}
+			//error(%dtStats.guid SPC %client.guid);
+			%client.dtStats = %dtStats;
+			%dtStats.client = %client;
+			%dtStats.name = %client.name;
+			%dtStats.clientLeft = 0;
+			%dtStats.markForDelete = 0;
+			%foundOld =1;
+			if(%dtStats.score !$= 0)
+			{
+				resGameStats(%client,%game.class); // restore stats;
+				messageClient(%client, 'MsgClient', '\crWelcome back %1. Your score has been restored.~wfx/misc/rolechange.wav', %client.name);
+			}
+			break;
          }
       }
-      if(!%foundOld){
+      if(!%foundOld)
+	  {
          %dtStats = new scriptObject(); // object used stats storage
          statsGroup.add(%dtStats);
          %client.dtStats = %dtStats;
@@ -2411,7 +2419,8 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          }
       }
    }
-   else if(isObject(%client.dtStats) && %client.dtStats.gameData[%game.class] $= ""){ // game type change
+   else if(isObject(%client.dtStats) && %client.dtStats.gameData[%game.class] $= "")
+   { // game type change
       %client.dtStats.gameCount[%game.class] = 0;
       %client.dtStats.totalNumGames[%game.class] = 0;
       %client.dtStats.statsOverWrite[%game.class] = 0;
@@ -2932,15 +2941,18 @@ function bakGameStats(%client,%game) {// record that games stats and inc by one
       %client.dtStats.gameStats[%val,"b",%game] = %var;
    }
 }
-function resGameStats(%client,%game) {// copy data back over to client
+function resGameStats(%client,%game) 
+{// copy data back over to client
    if($dtStats::Enable  == 0){return;}
-   for(%i = 1; %i <= $dtStats::fieldCount[%game]; %i++){
+   for(%i = 1; %i <= $dtStats::fieldCount[%game]; %i++)
+   {
       %val = $dtStats::fieldValue[%i,%game];
       %var = %client.dtStats.gameStats[%val,"b",%game];
-      if(%val $= "winCount" || %val $= "lossCount"){
+      if(%val $= "winCount" || %val $= "lossCount")
+	  {
          %var = 0; // set to 0 becuase we came back and its not the end of the game
-      }
-      setFieldValue(%client,%val,%var);
+	  }
+   setFieldValue(%client,%val,%var);
    }
 }
 
@@ -3892,8 +3904,8 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"carrierKills",%game)),getGameTotal(%vClient,"carrierKills",%game),mCeil(getGameTotalAvg(%vClient,"carrierKills",%game)));
          %line = '<color:0befe7>  Flag Returns<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagReturns",%game)),getGameTotal(%vClient,"flagReturns",%game),mCeil(getGameTotalAvg(%vClient,"flagReturns",%game)));
-         %line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"escortAssists",%game)),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
+         //%line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"escortAssists",%game)),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
          %line = '<color:0befe7>  Flag Defends<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagDefends",%game)),getGameTotal(%vClient,"flagDefends",%game),mCeil(getGameTotalAvg(%vClient,"flagDefends",%game)));
          %line = '<color:0befe7>  Offense Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -3992,8 +4004,8 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"carrierKills",%inc,%game),getGameTotal(%vClient,"carrierKills",%game),mCeil(getGameTotalAvg(%vClient,"carrierKills",%game)));
          %line = '<color:0befe7>  Flag Returns<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagReturns",%inc,%game),getGameTotal(%vClient,"flagReturns",%game),mCeil(getGameTotalAvg(%vClient,"flagReturns",%game)));
-         %line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"escortAssists",%inc,%game),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
+         //%line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"escortAssists",%inc,%game),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
          %line = '<color:0befe7>  Flag Defends<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagDefends",%inc,%game),getGameTotal(%vClient,"flagDefends",%game),mCeil(getGameTotalAvg(%vClient,"flagDefends",%game)));
          %line = '<color:0befe7>  Offense Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -4104,8 +4116,8 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"carrierKills",%game)),getGameTotal(%vClient,"carrierKills",%game),mCeil(getGameTotalAvg(%vClient,"carrierKills",%game)));
          %line = '<color:0befe7>  Flag Returns<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagReturns",%game)),getGameTotal(%vClient,"flagReturns",%game),mCeil(getGameTotalAvg(%vClient,"flagReturns",%game)));
-         %line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"escortAssists",%game)),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
+         //%line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"escortAssists",%game)),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
          %line = '<color:0befe7>  Flag Defends<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,mCeil(getGameRunAvg(%vClient,"flagDefends",%game)),getGameTotal(%vClient,"flagDefends",%game),mCeil(getGameTotalAvg(%vClient,"flagDefends",%game)));
          %line = '<color:0befe7>  Offense Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
@@ -4204,8 +4216,8 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"carrierKills",%inc,%game),getGameTotal(%vClient,"carrierKills",%game),mCeil(getGameTotalAvg(%vClient,"carrierKills",%game)));
          %line = '<color:0befe7>  Flag Returns<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagReturns",%inc,%game),getGameTotal(%vClient,"flagReturns",%game),mCeil(getGameTotalAvg(%vClient,"flagReturns",%game)));
-         %line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"escortAssists",%inc,%game),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
+         //%line = '<color:0befe7>  Escort Assists<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"escortAssists",%inc,%game),getGameTotal(%vClient,"escortAssists",%game),mCeil(getGameTotalAvg(%vClient,"escortAssists",%game)));
          %line = '<color:0befe7>  Flag Defends<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameDetails(%vClient,"flagDefends",%inc,%game),getGameTotal(%vClient,"flagDefends",%game),mCeil(getGameTotalAvg(%vClient,"flagDefends",%game)));
          %line = '<color:0befe7>  Offense Score<color:00dcd4><lmargin:180>%2<lmargin:330>%3<lmargin:450>%4';

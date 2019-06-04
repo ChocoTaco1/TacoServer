@@ -164,6 +164,7 @@ $Host::EvoTKWarn2 = 6;
 $Host::EvoTourneySameMap = 1;
 $Host::EvoUseHighPerformanceCounter = 0;
 $Host::FloodProtectionEnabled = 1;
+$Host::ForceAFKObserverTime = 1;
 $Host::GameName = "Discord PU";
 $Host::HiVisibility = "1";
 $Host::holoName1 = "Storm";

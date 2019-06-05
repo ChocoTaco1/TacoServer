@@ -4,9 +4,9 @@
 //TacoServer:
 //Change to how many minutes to set forced Observer for AFK players
 //Setting to 0 disables this feature
-//$Host::ForceAFKObserverTime = 1;
+//$Host::AFKTime = 1;
 
-$dtVar::AFKtime = 60000 * $Host::ForceAFKObserverTime;//if player is afk specific amount of time, force them into observer
+$dtVar::AFKtime = 60000 * $Host::AFKTime;//if player is afk specific amount of time, force them into observer
 $dtVar::AFKloop = 1000 * 30;//loop check timer currently set to 30 secs 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,8 +89,8 @@ function DefaultGame::AFKForceObserver(%game, %client)
 
    
    %client.camera.getDataBlock().setMode( %client.camera, "observerFly" );
-   messageClient(%client, 'MsgClientJoinTeam', '\c2You have been placed into observer mode due to being AFK.', %client.name, %game.getTeamName(0), %client, 0 );
-   logEcho(%client.nameBase@" (cl "@%client@") was forced into observer mode for being AFK");
+   messageClient(%client, 'MsgClientJoinTeam', '\c2You have been placed into observer mode due to inactivity.', %client.name, %game.getTeamName(0), %client, 0 );
+   logEcho(%client.nameBase@" (cl "@%client@") was forced into observer mode due to inactivity");
    %client.lastTeam = %client.team;
    
    if($Host::TournamentMode)
@@ -124,7 +124,7 @@ function DefaultGame::AFKForceObserver(%game, %client)
    //displayObserverHud(%client, 0);
    updateObserverFlyHud(%client);
    
-   messageAllExcept(%client, -1, 'MsgClientJoinTeam', '\c2%1 has been placed into observer mode due to being AFK.', %client.name, %game.getTeamName(0), %client, 0 );
+   messageAllExcept(%client, -1, 'MsgClientJoinTeam', '\c2%1 has been placed into observer mode due to inactivity.', %client.name, %game.getTeamName(0), %client, 0 );
    
    updateCanListenState( %client );
    

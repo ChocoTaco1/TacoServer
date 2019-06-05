@@ -203,7 +203,7 @@ $Host::loadingmsgline3 = "Required Mappacks: ";									//Loading screen msg lin
 $Host::loadingmsgline3content = "S5 S8 TWL TWL2";								//Loading screen msg content 3
 $Host::loadingmsgline4 = "Hosted by: ";											//Loading screen msg line 4
 $Host::loadingmsgline4content = "Branzone";										//Loading screen msg content 4
-$Host::ForceAFKObserverTime = 1;				//Change the time in minutes it takes to force a player into observer mode for being AFK
+$Host::AFKTime = 1;								//Time in minutes to put AFK player in observer mode, 0 disables it
 //LakRabbit
 $Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
 $Host::LakRabbitNoSplashDamage = 0;				//Splash Damage enabled or not

@@ -1,15 +1,10 @@
 //AFK Timeout
 //Script BY: DarkTiger
 //
-//TacoServer:
-//Change to how many minutes to set forced Observer for AFK players
-//Setting to 0 disables this feature
-//$Host::AFKTimeout = 1;
-//
 //Client specific to save on schedules
 //Add clients who are normally AFK
 
-$dtVar::AFKtime = 60000 * $Host::AFKTimeout;//if player is afk specific amount of time, force them into observer
+$dtVar::AFKtime = 60000 * 3;//if player is afk specific amount of time, force them into observer
 $dtVar::AFKloop = 1000 * 30;//loop check timer currently set to 30 secs 
 
 ////////////////////////////////////////////////////////////////////////////////

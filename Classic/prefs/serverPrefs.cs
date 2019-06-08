@@ -8,7 +8,6 @@ $Host::AllowMapScript = "True";
 $Host::AnimateWithTransitions = 0;
 $Host::AntiCloakEnable = 1;
 $Host::AntiCloakPlayerCount = 6;
-$Host::AFKTimeout = 3;
 $Host::BanTime = 2147483647;
 $Host::BotCount = 2;
 $Host::BotsEnabled = 0;

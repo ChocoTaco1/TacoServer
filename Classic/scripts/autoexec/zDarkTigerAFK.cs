@@ -1,12 +1,15 @@
-//Observer AFK
+//AFK Timeout
 //Script BY: DarkTiger
 //
 //TacoServer:
 //Change to how many minutes to set forced Observer for AFK players
 //Setting to 0 disables this feature
-//$Host::AFKTime = 1;
+//$Host::AFKTimeout = 1;
+//
+//Client specific to save on schedules
+//Add clients who are normally AFK
 
-$dtVar::AFKtime = 60000 * $Host::AFKTime;//if player is afk specific amount of time, force them into observer
+$dtVar::AFKtime = 60000 * $Host::AFKTimeout;//if player is afk specific amount of time, force them into observer
 $dtVar::AFKloop = 1000 * 30;//loop check timer currently set to 30 secs 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -18,8 +21,24 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 {
 	Parent::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch );
 	
+	%guid = %client.guid;
+	
+	//Add clients here
+	%AFKWatchList1 = "";
+	%AFKWatchList2 = "";
+	%AFKWatchList3 = "";
+	%AFKWatchList4 = "";
+	
 	if($dtVar::AFKtime > 0)
-		%client.afkLoopCheck();// starts it 
+	{
+		if(%guid $= %AFKWatchList1 || %guid $= %AFKWatchList2 || %guid $= %AFKWatchList3 || %guid $= %AFKWatchList4 )
+		{
+			if(%guid $= "")
+				return;
+			
+			%client.afkLoopCheck();// starts it
+		}
+	}
 }
 
 };

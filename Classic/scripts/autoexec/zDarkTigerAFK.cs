@@ -3,9 +3,10 @@
 //
 //Client specific to save on schedules
 //Add clients who are normally AFK
+//0 minutes disables
 
-$dtVar::AFKtime = 60000 * 3;//if player is afk specific amount of time, force them into observer
-$dtVar::AFKloop = 1000 * 30;//loop check timer currently set to 30 secs 
+$dtVar::AFKtime = 60000 * 2;//if player is afk specific amount of time in minutes, force them into observer
+$dtVar::AFKloop = 1000 * 30;//loop check timer
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -16,16 +17,16 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 {
 	Parent::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch );
 	
-	%guid = %client.guid;
-	
-	//Add clients here
-	%AFKWatchList1 = "";
-	%AFKWatchList2 = "";
-	%AFKWatchList3 = "";
-	%AFKWatchList4 = "";
-	
-	if($dtVar::AFKtime > 0)
+	if($dtVar::AFKtime > 0) //0 minutes disables
 	{
+		%guid = %client.guid;
+	
+		//Add clients here
+		%AFKWatchList1 = "";
+		%AFKWatchList2 = "";
+		%AFKWatchList3 = "";
+		%AFKWatchList4 = "";
+		
 		if(%guid $= %AFKWatchList1 || %guid $= %AFKWatchList2 || %guid $= %AFKWatchList3 || %guid $= %AFKWatchList4 )
 		{
 			if(%guid $= "")
@@ -39,7 +40,7 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 };
 
 // Prevent package from being activated if it is already
-if (!isActivePackage(afkScript))
+if(!isActivePackage(afkScript))
     activatePackage(afkScript);
 
 
@@ -48,13 +49,15 @@ if (!isActivePackage(afkScript))
 
 function GameConnection::afkLoopCheck(%this)
 {
-   if(isObject(%this) && !%this.isAiControlled())// make sure client is still there other wise stop
-      %this.schedule($dtVar::AFKloop,"afkLoopCheck");
-   else
-      return;
+	if(isObject(%this) && !%this.isAiControlled())// make sure client is still there other wise stop
+		%this.schedule($dtVar::AFKloop,"afkLoopCheck");
+	else
+		return;
       
-   if(isObject(%this.player) && %this.player.getState() !$= "Dead" && $matchStarted)
-      AFKChk(%this);
+	//echo(%this.team);
+	  
+	if(isObject(%this.player) && %this.player.getState() !$= "Dead" && $matchStarted && %this.team !$= 0) //Added no check if observer
+		AFKChk(%this);
 }
 
 function AFKChk(%client)
@@ -73,7 +76,7 @@ function AFKChk(%client)
    else
    {
       //echo("is moving");
-      %client.player.afkTimer = 0;//reset if moveing
+      %client.player.afkTimer = 0;//reset if moving
    }
    
    %client.player.curTransform = %client.player.getTransform();//save current transform 

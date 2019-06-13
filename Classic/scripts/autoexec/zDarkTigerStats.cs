@@ -2388,11 +2388,8 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
 			%dtStats.clientLeft = 0;
 			%dtStats.markForDelete = 0;
 			%foundOld =1;
-			if(%dtStats.score !$= 0)
-			{
-				resGameStats(%client,%game.class); // restore stats;
-				messageClient(%client, 'MsgClient', '\crWelcome back %1. Your score has been restored.~wfx/misc/rolechange.wav', %client.name);
-			}
+			resGameStats(%client,%game.class); // restore stats;
+			messageClient(%client, 'MsgClient', '\crWelcome back %1. Your score has been restored.~wfx/misc/rolechange.wav', %client.name);
 			break;
          }
       }
@@ -2431,12 +2428,17 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
 
 function dtStatsClientLeaveGame(%game, %client){
    if(!%client.isAiControlled()){
+      if(%client.score == 0){
+            %client.dtStats.delete();
+            return;
+      }
       %client.dtStats.clientLeft = 1;
       %game.gameWinStat(%client); 
       bakGameStats(%client,%game.class);//back up there current game in case they lost connection
       %client.dtStats.leftPCT = %game.getGamePct();
    }
 }
+
 function dtStatsTimeLimitReached(%game){
    %game.timeLimitHit = 1;
    if($dtStats::fullGames[%game.class]){

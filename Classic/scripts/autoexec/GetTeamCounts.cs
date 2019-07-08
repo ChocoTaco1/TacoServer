@@ -31,10 +31,7 @@ if (!isActivePackage(StartTeamCounts))
     activatePackage(StartTeamCounts);
 
 function GetTeamCounts( %game, %client, %respawn )
-{		
-	//Run MissionTypeOptions
-	MissionTypeOptions();
-		
+{	
 	//Get teamcounts
 	if( $GetCountsClientTeamChange && $countdownStarted && $MatchStarted ) 
 	{	

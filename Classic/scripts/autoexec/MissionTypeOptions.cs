@@ -10,35 +10,50 @@
 // $Host::PUGPassword = "pickup";
 //
 
+package MissionTypeOptions
+{
+
+function loadMissionStage2()
+{
+   //Run MissionTypeOptions
+   MissionTypeOptions();
+   
+   parent::loadMissionStage2();
+}
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(MissionTypeOptions))
+    activatePackage(MissionTypeOptions);
+
+
+
 function MissionTypeOptions()
 {	
-	//Only run before mission start and countdown start
-	if( !$MatchStarted && !$countdownStarted )
+	if( $CurrentMissionType !$= "LakRabbit" ) 
 	{
-		if( $CurrentMissionType !$= "LakRabbit" ) 
-		{
-			if( $Host::TournamentMode && $Host::PUGautoPassword )
-				
-				$Host::Password = $Host::PUGPassword;
-		
-			else if( !$Host::TournamentMode )
-			{
-				$Host::Password = "";
-			}
-		
-			$Host::HiVisibility = "0";
-		}
-		else if( $CurrentMissionType $= "LakRabbit" ) 
+		if( $Host::TournamentMode && $Host::PUGautoPassword )
+			
+			$Host::Password = $Host::PUGPassword;
+	
+		else if( !$Host::TournamentMode )
 		{
 			$Host::Password = "";
-			$Host::TournamentMode = 0;
-		
-			$Host::HiVisibility = "1";
 		}
-		//For zCheckVar.cs TournyNetClient
-		if( $CurrentMissionType !$= "CTF" && $CheckVerObserverRunOnce )
-			CheckVerObserverReset();
 		
-		//echo ("PUGpassCheck");
+		$Host::HiVisibility = "0";
 	}
+	else if( $CurrentMissionType $= "LakRabbit" ) 
+	{
+		$Host::Password = "";
+		$Host::TournamentMode = 0;
+		
+		$Host::HiVisibility = "1";
+	}
+	//For zCheckVar.cs TournyNetClient
+	if( $CurrentMissionType !$= "CTF" && $CheckVerObserverRunOnce )
+		CheckVerObserverReset();
+		
+	//echo ("PUGpassCheck");
 }

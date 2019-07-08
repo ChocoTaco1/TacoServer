@@ -2369,28 +2369,30 @@ if($dtStats::Enable){
 //							 Game Type Commons								  //
 ////////////////////////////////////////////////////////////////////////////////
 function dtStatsMissionDropReady(%game, %client){ // called when client has finished loading
-   %foundOld =0;
+   %foundOld = 0;
    if(!%client.isAIControlled() && !isObject(%client.dtStats))
    {
       for (%i = 0; %i < statsGroup.getCount(); %i++)
 	  { // check to see if my old data is still there
          %dtStats = statsGroup.getObject(%i);
-         if(%dtStats.guid == %client.guid)
-		 {
+         if(%dtStats.guid == %client.guid && %dtStats.markForDelete == 0)
+		   {
             if(%dtStats.leftPCT < $dtStats::fgPercentage[%game.class] && $dtStats::fullGames[%game.class])
-			{
-				%client.dtStats.dtGameCounter = 0;// reset to 0 so this game does count this game
-			}
-			//error(%dtStats.guid SPC %client.guid);
-			%client.dtStats = %dtStats;
-			%dtStats.client = %client;
-			%dtStats.name = %client.name;
-			%dtStats.clientLeft = 0;
-			%dtStats.markForDelete = 0;
-			%foundOld =1;
-			resGameStats(%client,%game.class); // restore stats;
-			messageClient(%client, 'MsgClient', '\crWelcome back %1. Your score has been restored.~wfx/misc/rolechange.wav', %client.name);
-			break;
+            {
+               %client.dtStats.dtGameCounter = 0;// reset to 0 so this game does count this game
+            }
+            //error(%dtStats.guid SPC %client.guid);
+            %client.dtStats = %dtStats;
+            %dtStats.client = %client;
+            %dtStats.name = %client.name;
+            %dtStats.clientLeft = 0;
+            %dtStats.markForDelete = 0;
+            %foundOld =1;
+            resGameStats(%client,%game.class); // restore stats;
+            if(%client.score >= 1 || %client.score <= -1 ){ //if(%num >= 1 || %num <= -1 ){
+               messageClient(%client, 'MsgClient', '\crWelcome back %1. Your score has been restored.~wfx/misc/rolechange.wav', %client.name);
+            }
+            break;
          }
       }
       if(!%foundOld)
@@ -2425,10 +2427,9 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
       %client.dtStats.gameData[%game.class] = 1;
    }
 }
-
 function dtStatsClientLeaveGame(%game, %client){
-   if(!%client.isAiControlled()){
-      if(%client.score == 0){
+   if(!%client.isAiControlled() && isObject(%client.dtStats)){
+      if(%client.score < 1 && %client.score > -1 ){ // if(%num < 1 && %num > -1 ){
             %client.dtStats.delete();
             return;
       }

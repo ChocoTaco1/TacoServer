@@ -15,22 +15,6 @@ package MissionTypeOptions
 
 function loadMissionStage2()
 {
-   //Run MissionTypeOptions
-   MissionTypeOptions();
-   
-   parent::loadMissionStage2();
-}
-
-};
-
-// Prevent package from being activated if it is already
-if (!isActivePackage(MissionTypeOptions))
-    activatePackage(MissionTypeOptions);
-
-
-
-function MissionTypeOptions()
-{	
 	if( $CurrentMissionType !$= "LakRabbit" ) 
 	{
 		if( $Host::TournamentMode && $Host::PUGautoPassword )
@@ -56,4 +40,12 @@ function MissionTypeOptions()
 		CheckVerObserverReset();
 		
 	//echo ("PUGpassCheck");
+   
+    parent::loadMissionStage2();
 }
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(MissionTypeOptions))
+    activatePackage(MissionTypeOptions);

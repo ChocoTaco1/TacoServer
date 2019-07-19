@@ -177,6 +177,8 @@ $Host::MapPlayerLimits["Whiteout", "DM"] = "8 -1";
 $Host::MapPlayerLimits["Whiteout", "Bounty"] = "8 -1";
 
 //Taco Addons
+$Host::EmptyServerReset = 1;					//To control whether the server auto resets when empty
+$Host::EmptyServerResetTime = 120;				//Time in Minutes to reset an empty server
 $Host::EnableAutobalance = 1;					//Will autobalance when teams are uneven.
 $Host::EnableMortarTurret = 0; 					//Enable or Disable Mortar Turret
 $Host::EnableNetTourneyClient = 1; 				//Enable or Disable Tourney Net Client checking

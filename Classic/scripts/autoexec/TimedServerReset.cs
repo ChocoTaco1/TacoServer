@@ -82,6 +82,7 @@
 //	}  
 //	
 //	%resettime = $Host::EmptyServerResetTime * 60000;
+//	if(%resettime <= 0) %resettime = 1;
 //	schedule(%resettime, 0, "ResetServerTimed");
 //	$TimedServerResetActive = true;
 //	error(formatTimeString("HH:nn:ss") SPC "Timed Server Reset schedule started..." );

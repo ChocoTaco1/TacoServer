@@ -789,12 +789,13 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    else
       %client.nameBase = %realName;
 
+   //Allow - ChocoTaco
    // Make sure that the connecting client is not trying to use a bot skin:
-   %temp = detag( %skin );
-   if ( %temp $= "basebot" || %temp $= "basebbot" )
-      %client.skin = addTaggedString( "base" );
-   else
-      %client.skin = addTaggedString( %skin );
+   //%temp = detag( %skin );
+   //if ( %temp $= "basebot" || %temp $= "basebbot" )
+   //   %client.skin = addTaggedString( "base" );
+   //else
+        %client.skin = addTaggedString( %skin );
 
    %client.voice = %voice;
    %client.voiceTag = addtaggedString(%voice);

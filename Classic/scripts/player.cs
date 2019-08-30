@@ -1436,6 +1436,10 @@ datablock PlayerData(LightMaleHumanArmor) : LightPlayerDamageProfile
 
    observeParameters = "0.5 4.5 4.5";
    shieldEffectScale = "0.7 0.7 1.0";
+   
+   //Kills autopoints
+   detectsUsingLOSEnemy[1] = true;
+   detectsUsingLOSEnemy[2] = true;
 };
 
 //----------------------------------------------------------------------------
@@ -1690,6 +1694,10 @@ datablock PlayerData(MediumMaleHumanArmor) : MediumPlayerDamageProfile
    observeParameters = "0.5 4.5 4.5";
 
    shieldEffectScale = "0.7 0.7 1.0";
+   
+   //Kills autopoints
+   detectsUsingLOSEnemy[1] = true;
+   detectsUsingLOSEnemy[2] = true;
 };
 
 //----------------------------------------------------------------------------
@@ -1945,6 +1953,10 @@ datablock PlayerData(HeavyMaleHumanArmor) : HeavyPlayerDamageProfile
    observeParameters = "0.5 4.5 4.5";
 
    shieldEffectScale = "0.7 0.7 1.0";
+   
+   //Kills autopoints
+   detectsUsingLOSEnemy[1] = true;
+   detectsUsingLOSEnemy[2] = true;
 };
 
 //----------------------------------------------------------------------------

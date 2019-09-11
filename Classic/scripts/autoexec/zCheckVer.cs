@@ -163,7 +163,6 @@ function CheckVerList(%client)
 //			   CheckVerObserver(%client);
 //			   
 //			   messageClient( %client, '', "Tournament Net Client checking has been enabled.~wfx/powered/vehicle_screen_on.wav" );
-//			   CheckVerObserverReset();
 //			   ResetClientChangedTeams();
 //			   adminLog(%client, " has enabled Net Tourney Client checking.");
 //            }

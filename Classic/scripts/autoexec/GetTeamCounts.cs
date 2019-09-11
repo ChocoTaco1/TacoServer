@@ -49,10 +49,6 @@ function GetTeamCounts( %game, %client, %respawn )
 				%teamcanidate[%team] = %client; 
 			}
 			%lastclient[%team] = %client;
-			
-			//Check ver
-			if(!%client.isAIControlled()) //No bots
-				CheckVerObserver(%client);
 				
 			//if(!%client.isAIControlled())
 				$PlayerCount[%client.team]++;

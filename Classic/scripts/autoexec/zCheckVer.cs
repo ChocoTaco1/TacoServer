@@ -20,38 +20,7 @@
 // Admins can override this restriction when forcing players to join a team.
 
 
-//Added -ChocoTaco
-//Toggle Touney Net Client
-//$Host::EnableNetTourneyClient = 1; 
-$CheckVerObserverRunOnce = false;
-$CheckVerObserverTrys = 0;
-
-//Added -ChocoTaco
-//Run in GetCounts.cs
-//Coming from other modes, checks all %clients and put them into observer with a Version check fail
-function CheckVerObserver(%client)
-{
-	if($Host::EnableNetTourneyClient && !$CheckVerObserverRunOnce && !$Host::TournamentMode)
-	{
-		if (!%client.t2csri_sentComCertDone)
-		{
-			messageClient(%client, 'MsgClientCheckObserver', '\c2Tribesnext version check has failed.');
-			serverCmdClientMakeObserver( %client );
-		}
-		
-		$CheckVerObserverTrys++; if($CheckVerObserverTrys $= $AllPlayerCount) $CheckVerObserverRunOnce = true;
-		//echo($CheckVerObserverTrys);
-	}
-}
-
-//Added -ChocoTaco
-//Run in PUGpasscheck.cs. Reset when the server leaves ctf and when its reenabled thru admin options.
-function CheckVerObserverReset()
-{
-	$CheckVerObserverRunOnce = false;
-	$CheckVerObserverTrys = 0;
-}
-
+// Added some things so it can be toggled in game. -ChocoTaco
 
 //Original
 function checkVer_showBanner(%client)
@@ -64,37 +33,31 @@ package checkver
 {
 	function serverCmdClientJoinTeam(%client, %team)
 	{
-		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
+		if (!%client.t2csri_sentComCertDone)
 		{
-			if (!%client.t2csri_sentComCertDone)
-			{
-				checkVer_showBanner(%client);
-				return;
-			}
+			checkVer_showBanner(%client);
+			return;
 		}
 		Parent::serverCmdClientJoinTeam(%client, %team);
 	}
 	function serverCmdClientJoinGame(%client)
 	{
-		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
-		{	
-			if (!%client.t2csri_sentComCertDone)
-			{
-				checkVer_showBanner(%client);
-				return;
-			}
+		if (!%client.t2csri_sentComCertDone)
+		{
+			checkVer_showBanner(%client);
+			return;
 		}
 		Parent::serverCmdClientJoinGame(%client);
 	}
 	function serverCmdClientPickedTeam(%client, %option)
 	{
-		Parent::serverCmdClientPickedTeam(%client, %option); //Put first -ChocoTaco
+		Parent::serverCmdClientPickedTeam(%client, %option); //Put first
 		
-		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
+		if($Host::EnableNetTourneyClient) //Added
 		{		
 			if (!%client.t2csri_sentComCertDone)
 			{
-				if($Host::TournamentMode && %client.team !$= 0) //Added -ChocoTaco
+				if($Host::TournamentMode && %client.team !$= 0) //Added
 				{	
 					serverCmdClientMakeObserver( %client );
 					messageAll('', '\cr%1 has failed the Tribesnext version check.', %client.name);
@@ -106,37 +69,64 @@ package checkver
 	}
 	function serverCmdClientTeamChange(%client, %option)
 	{
-		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
-		{		
-			if (!%client.t2csri_sentComCertDone)
-			{
-				checkVer_showBanner(%client);
-				return;
-			}
+		if (!%client.t2csri_sentComCertDone)
+		{
+			checkVer_showBanner(%client);
+			return;
 		}
 		Parent::serverCmdClientTeamChange(%client, %option);
 	}
 	function Observer::onTrigger(%data, %obj, %trigger, %state)
-	{	
-		if($Host::EnableNetTourneyClient) //Added -ChocoTaco
-		{	
-			%client = %obj.getControllingClient();
-			if (!%client.t2csri_sentComCertDone)
-			{			
-				checkVer_showBanner(%client);
-				return;
-			}
+	{
+		%client = %obj.getControllingClient();
+		if (!%client.t2csri_sentComCertDone)
+		{
+			checkVer_showBanner(%client);
+			return;
 		}
 		Parent::onTrigger(%data, %obj, %trigger, %state);
 	}	
 };
 
-activatePackage(checkver);
+// Moved to MissionTypeOptions.cs
+//
+//if($Host::EnableNetTourneyClient && !isActivePackage(checkver)) //Added
+//	activatePackage(checkver);
 
+//Throw a offenders to observer when enabled
+function CheckVerObserver(%client)
+{
+	if($Host::EnableNetTourneyClient && !$Host::TournamentMode)
+	{
+		for(%i = 0; %i < ClientGroup.getCount(); %i++)	   
+		{
+			%client = ClientGroup.getObject(%i);
+			
+			//Check ver
+			if(!%client.isAIControlled() && !%client.t2csri_sentComCertDone) //No bots
+			{
+				messageClient(%client, 'MsgClientCheckObserver', '\c2Tribesnext version check has failed.');
+				serverCmdClientMakeObserver( %client );
+			}
+		}
+	}
+}
 
+//List Names of players without NTC
+function CheckVerList(%client)
+{
+	for(%i = 0; %i < ClientGroup.getCount(); %i++)	   
+	{
+		%client = ClientGroup.getObject(%i);
+			
+		//Check ver
+		if(!%client.isAIControlled() && !%client.t2csri_sentComCertDone) //No bots
+			echo(%client.nameBase);
+	}
+}
 
 //Added -ChocoTaco
-//Evo options
+//Evo Code
 //
 //In defaultgame.ovl DefaultGame::sendGameVoteMenu(%game, %client, %key) 
 //		 
@@ -155,14 +145,26 @@ activatePackage(checkver);
 //            if($Host::EnableNetTourneyClient)
 //			{
 //               $Host::EnableNetTourneyClient = 0;
+//			   
+//			   if(isActivePackage(checkver))
+//					deactivatePackage(checkver);
+//			   
 //			   messageClient( %client, '', "Tournament Net Client checking has been disabled.~wfx/powered/vehicle_screen_on.wav" );
+//			   adminLog(%client, " has disabled Net Tourney Client checking.");
 //			}
 //            else
 //            {
 //               $Host::EnableNetTourneyClient = 1;
+//			   
+//			   if(!isActivePackage(checkver))
+//					activatePackage(checkver);
+//			   
+//			   //Boot Offenders into Obs
+//			   CheckVerObserver(%client);
+//			   
 //			   messageClient( %client, '', "Tournament Net Client checking has been enabled.~wfx/powered/vehicle_screen_on.wav" );
 //			   CheckVerObserverReset();
 //			   ResetClientChangedTeams();
+//			   adminLog(%client, " has enabled Net Tourney Client checking.");
 //            }
 //         }
-		

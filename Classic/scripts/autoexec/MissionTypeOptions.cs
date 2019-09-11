@@ -1,10 +1,10 @@
 // To manage options in certain missiontypes
-// called in Getcounts.cs
 
 // Variables
-// Add these to ServerPrefs
 //
-// Turn on Auto Password in Tournament mode
+// Turns Password on and off in Tournament mode
+// Used to be auto but isnt anymore. 
+// Enabled in the admin menu.
 // $Host::PUGautoPassword = 1;
 // The PUG password you want
 // $Host::PUGPassword = "pickup";
@@ -35,9 +35,10 @@ function loadMissionStage2()
 		
 		$Host::HiVisibility = "1";
 	}
-	//For zCheckVar.cs TournyNetClient
-	if( $CurrentMissionType !$= "CTF" && $CheckVerObserverRunOnce )
-		CheckVerObserverReset();
+		
+	//Activate NetTourneyClient package if enabled. zCheckVar.cs
+	if($Host::EnableNetTourneyClient && !isActivePackage(checkver)) //Added
+		activatePackage(checkver);
 		
 	//echo ("PUGpassCheck");
    

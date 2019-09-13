@@ -1,10 +1,12 @@
-//Make a sound every so seconds to make sure everyone votes
+// VoteSound Script
 //
-//Enable or Disable VoteSound
-//$Host::EnableVoteSound = 1;
+// Make a sound every so seconds to make sure everyone votes
 //
-//%VotesoundRandom must match $VoteSoundRandom to prevent duplicate messages
-//$VoteSoundRandom is generated everytime a vote starts and if it doesnt match an ongoing schedule does not play.
+// Enable or Disable VoteSound
+// $Host::EnableVoteSound = 1;
+//
+// %VotesoundRandom must match $VoteSoundRandom to prevent duplicate messages
+// $VoteSoundRandom is generated everytime a vote starts and if it doesnt match an ongoing schedule does not play.
 
 function VoteSound( %game, %typename, %arg1, %arg2, %VoteSoundRandom )
 {	

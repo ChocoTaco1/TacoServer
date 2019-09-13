@@ -1,6 +1,10 @@
+// Vote OverTime Script
+//
+// Dont allow the match to end if a time vote is pending
+
+
 //Changes were also made in the Evo Admin.ovl and DefaultGame.ovl
 //DefaultGame::voteChangeMission, DefaultGame::voteChangeTimeLimit, serverCmdStartNewVote
-
 package VoteOverTime
 {
 

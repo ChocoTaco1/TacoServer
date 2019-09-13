@@ -1,5 +1,7 @@
-// Made as a preventitive measure to ensure no rapid observer/spawning
-// 
+// Observer Cooldown Script
+//
+// Made as a preventative measure to ensure no rapid observer/spawning
+// Limits how fast a client can spawn and go to observer
 //
 
 package ObserverTimeout

@@ -1,8 +1,12 @@
-//Enable or Disable
-//$Host::EnableNoBaseRapeNotify = 1;
+// No Base Rape Notify Script
+//
+// Notifys clients if NoBase rape is on or off.
+//
+// Enable or Disable
+// $Host::EnableNoBaseRapeNotify = 1;
 //
 
-//Notifys the user if NoBase rape is on or off.
+// Called in GetTeamCounts.cs
 function NBRStatusNotify( %game )
 {	
 	if( $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled )
@@ -28,16 +32,16 @@ function NBRStatusNotify( %game )
 	}
 }
 
-//This function is at DefaultGame::gameOver(%game) CTFGame.cs
-//Resets the client NotifyCount when the mission ends
+// This function is at DefaultGame::gameOver(%game) CTFGame.cs
+// Resets the client NotifyCount when the mission ends
 function ResetNBRNotify()
 {
 	$NoBaseRapeNotifyCount = -1;
 }
 
-//This function is at StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)
-//In the staticshape.ovl in evoClassic.vl2
-//Plays a sound when a player hits a protected asset
+// This function is at StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)
+// In the staticshape.ovl in evoClassic.vl2
+// Plays a sound when a player hits a protected asset
 function NBRAssetSound( %game, %sourceObject )
 {
 	%client = %sourceObject;
@@ -51,7 +55,7 @@ function NBRAssetSound( %game, %sourceObject )
 	}
 }
 
-//Cool down between messeges
+// Cool down between messages
 function ResetNBRAssetSound( %client )
 {
 	%client.NBRAssetSoundMsgPlayed = false;

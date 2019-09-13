@@ -1,12 +1,14 @@
-//Timed Server reset
-//Reset Server after a certain time
+// Timed Server Reset Script
 //
-//Time in Minutes
+// Reset Server after a certain time
+// after the last client leaves
+//
+// Time in Minutes
 // $Host::EmptyServerResetTime = 120;
-//To control whether the server auto resets when empty
+// To control whether the server auto resets when empty
 // $Host::EmptyServerReset = 1;
 
-//Changed in evo Server.ovl
+// Changed in evo Server.ovl
 //
 //function GameConnection::onDrop(%client, %reason)
 //{

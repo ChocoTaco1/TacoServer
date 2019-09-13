@@ -1,7 +1,13 @@
-// Amount of players needed on server for CloakPack to be banned/unbanned
+// AntiCloak Script
 //
+// Amount of players needed on server for CloakPack to be banned/unbanned
+// This is useful for low numbers
+//
+// Enable/Disable the feature
 // $Host::AntiCloakEnable = 1;
+// When you would like for it to deactivate
 // $Host::AntiCloakPlayerCount = 6;
+//
 
 // Called in GetCounts.cs
 function ActivateAntiCloak( %game )
@@ -54,7 +60,7 @@ function ActivateAntiCloak( %game )
 	}	
 }
 
-//So if the player is able to get a cloakpack, he cant use it
+// So if the player is able to get a cloakpack, he cant use it
 package DisableCloakPack
 {
 

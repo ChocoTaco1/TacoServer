@@ -1,3 +1,7 @@
+// AntiTurret Script
+//
+// Turrets are disabled until threshold is reached
+//
 // Amount of players on a team to enable turrets
 // $Host::EnableTurretPlayerCount = 10;
 //

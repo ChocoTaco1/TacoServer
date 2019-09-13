@@ -21,8 +21,10 @@
 
 
 // Added some things so it can be toggled in game. -ChocoTaco
+// Toggle Tourney Net Client
+// $Host::EnableNetTourneyClient = 1; 
 
-//Original
+// Original
 function checkVer_showBanner(%client)
 {
 	// customize me
@@ -88,12 +90,28 @@ package checkver
 	}	
 };
 
-// Moved to MissionTypeOptions.cs
-//
-//if($Host::EnableNetTourneyClient && !isActivePackage(checkver)) //Added
-//	activatePackage(checkver);
 
-//Throw a offenders to observer when enabled
+package StartCheckVer
+{
+
+function loadMissionStage2()
+{		
+	//Activate NetTourneyClient package if enabled.
+	if($Host::EnableNetTourneyClient && !isActivePackage(checkver)) //Added
+		activatePackage(checkver);
+   
+    parent::loadMissionStage2();
+}
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(StartCheckVer))
+    activatePackage(StartCheckVer);
+
+
+
+// Throw offenders to observer when enabled
 function CheckVerObserver(%client)
 {
 	if($Host::EnableNetTourneyClient && !$Host::TournamentMode)
@@ -112,7 +130,7 @@ function CheckVerObserver(%client)
 	}
 }
 
-//List Names of players without NTC
+// List Names of players without NTC
 function CheckVerList(%client)
 {
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)	   

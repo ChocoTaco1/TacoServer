@@ -30,6 +30,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 			
 		//Pick a client for autobalance
 		%team = %client.team;
+		//Try to pick a low scoring player
 		if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "") 
 			%teamcanidate[%team] = %client; 
 
@@ -48,81 +49,63 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 		$StatsMsgPlayed = 0;
 		return;
 	}
-	//Safetynet
-	else if(( %teamcanidate1 $= "" && %team1difference >= 2 )||( %teamcanidate2 $= "" && %team2difference >= 2 ))
-	{
-		%AutobalanceSafetynetTrys++; if(%AutobalanceSafetynetTrys $= 3) return;
-
-		if( %AutobalanceDebug )
-		{
-			if( %teamcanidate1 $= "" ) %teamcanidate1 = "NULL"; if( %teamcanidate2 $= "" ) %teamcanidate2 = "NULL";
-			messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: %1, %2, %3, %4', %teamcanidate1, %teamcanidate2, %team1difference, %team2difference );
-			if( %teamcanidate1 $= "NULL" ) %teamcanidate1 = ""; if( %teamcanidate2 $= "NULL" ) %teamcanidate2 = "";
-		}
-		else if( %teamcanidate1 $= "" && %teamcanidate2 $= "" ) messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: Both Teams' );
-		else if( %teamcanidate1 $= "" ) messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: Team1' );
-		else if( %teamcanidate2 $= "" ) messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: Team2' );
-			
-		//Trigger GetCounts
-		ResetClientChangedTeams();
-		//Rerun in 10 secs
-		schedule(10000, 0, "Autobalance", %game, %AutobalanceSafetynetTrys );
-		return;
-	}
-	//Team 1
 	else if( %team1difference >= 2 )
-	{	
-		if( %AutobalanceDebug )
-		{
-			if( %teamcanidate1 $= "" ) %teamcanidate1 = "NULL"; if( %teamcanidate2 $= "" ) %teamcanidate2 = "NULL";
-			messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4', %teamcanidate1, %teamcanidate2, %team1difference, %team2difference );
-			if( %teamcanidate1 $= "NULL" ) %teamcanidate1 = ""; if( %teamcanidate2 $= "NULL" ) %teamcanidate2 = "";
-		}
-			
-		%client = %teamcanidate1;
-		%team = %teamcanidate1.team;
-		%otherTeam = ( %team == 1 ) ? 2 : 1;
-			
-		if( %teamcanidate1.team $= 1 )
-		{
-			Game.clientChangeTeam( %client, %otherTeam, 0 );
-			messageAll('MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
-		}
-		else
-			messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: Team1 mismatch.' );
-			
-		//Trigger GetCounts
-		ResetClientChangedTeams();
-		//Reset Unbalanced
-		$UnbalancedMsgPlayed = 0;
-		return;
-	}
-	//Team 2
+		%bigTeam = 1;
 	else if( %team2difference >= 2 )
+		%bigTeam = 2;
+
+	//Debug
+	if( %AutobalanceDebug )
 	{
-		if( %AutobalanceDebug )
+		if( %teamcanidate[%bigTeam] $= "" )
 		{
-			if( %teamcanidate1 $= "" ) %teamcanidate1 = "NULL"; if( %teamcanidate2 $= "" ) %teamcanidate2 = "NULL";
-			messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4', %teamcanidate1, %teamcanidate2, %team1difference, %team2difference );
-			if( %teamcanidate1 $= "NULL" ) %teamcanidate1 = ""; if( %teamcanidate2 $= "NULL" ) %teamcanidate2 = "";
-		}
+			%AutobalanceSafetynetTrys++; 
+			if(%AutobalanceSafetynetTrys $= 3) 
+				return;
+
+			AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference);
 			
-		%client = %teamcanidate2;
-		%team = %teamcanidate2.team;
-		%otherTeam = ( %team == 1 ) ? 2 : 1;
-			
-		if( %teamcanidate2.team $= 2 )
-		{
-			Game.clientChangeTeam( %client, %otherTeam, 0 );
-			messageAll('MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
+			if( %teamcanidate1 $= "" && %teamcanidate2 $= "" )
+				%error = "Both Teams";
+			else if( %teamcanidate[%bigTeam] $= "" )
+				%error = "Team " @ %bigTeam;
+				
+			if( %error !$= "" )
+				messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: %1', %error );
+				
+			//Trigger GetCounts
+			ResetClientChangedTeams();
+			//Rerun in 10 secs
+			schedule(10000, 0, "Autobalance", %game, %AutobalanceSafetynetTrys );
+			return;
 		}
-		else
-			messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: Team2 mismatch.' );
-		
-		//Trigger GetCounts
-		ResetClientChangedTeams();
-		//Reset Unbalanced
-		$UnbalancedMsgPlayed = 0;
-		return;
+	}	
+				
+	%client = %teamcanidate[%bigTeam];
+	%team = %teamcanidate[%bigTeam].team;
+	%otherTeam = ( %team == 1 ) ? 2 : 1;
+			
+	if( %teamcanidate[%bigTeam].team $= %bigTeam )
+	{
+		Game.clientChangeTeam( %client, %otherTeam, 0 );
+		messageAll('MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
 	}
+	else
+		messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: Team %1 mismatch.', %bigTeam );
+			
+	//Trigger GetCounts
+	ResetClientChangedTeams();
+	//Reset Unbalanced
+	$UnbalancedMsgPlayed = 0;
+	return;
+}
+
+function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference)
+{
+		if( %teamcanidate1 $= "" ) 
+			%teamcanidate1 = "NULL"; 
+		if( %teamcanidate2 $= "" ) 
+			%teamcanidate2 = "NULL";
+		
+		messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4', %teamcanidate1, %team1difference, %teamcanidate2, %team2difference );
 }

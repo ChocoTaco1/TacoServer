@@ -780,7 +780,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
 
       %smurfName = %name;
       // Tag the name with the "smurf" color:
-      %name = "\cp\c8" @ %name @ "\co";
+      %name = "\cp\c0" @ %name @ "\co";
    }
 
    %client.name = addTaggedString(%name);

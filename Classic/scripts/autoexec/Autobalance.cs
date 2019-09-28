@@ -9,12 +9,12 @@
 
 
 // Run from TeamBalanceNotify.cs via UnbalancedSound( %game )
-// Fire Autobalance
 function Autobalance( %game, %AutobalanceSafetynetTrys )
 {	
+	//Debug: Uncomment to enable
 	//%AutobalanceDebug = true;
 	
-	//For autobalance
+	//Reset
 	%lastclient1 = "";
 	%lastclient2 = "";
 		
@@ -29,8 +29,8 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 		%client = ClientGroup.getObject(%i);
 			
 		//Pick a client for autobalance
-		%team = %client.team;
 		//Try to pick a low scoring player
+		%team = %client.team;
 		if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "") 
 			%teamcanidate[%team] = %client; 
 
@@ -44,11 +44,13 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	%team1difference = $PlayerCount[1] - $PlayerCount[2];
 	%team2difference = $PlayerCount[2] - $PlayerCount[1];
 	
+	//If even, stop.
 	if( %team1difference == 1 || %team2difference == 1 || $PlayerCount[1] == $PlayerCount[2] )
 	{
 		$StatsMsgPlayed = 0;
 		return;
 	}
+	//Determine bigTeam
 	else if( %team1difference >= 2 )
 		%bigTeam = 1;
 	else if( %team2difference >= 2 )
@@ -56,30 +58,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 
 	//Debug
 	if( %AutobalanceDebug )
-	{
-		if( %teamcanidate[%bigTeam] $= "" )
-		{
-			%AutobalanceSafetynetTrys++; 
-			if(%AutobalanceSafetynetTrys $= 3) 
-				return;
-
-			AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference);
-			
-			if( %teamcanidate1 $= "" && %teamcanidate2 $= "" )
-				%error = "Both Teams";
-			else if( %teamcanidate[%bigTeam] $= "" )
-				%error = "Team " @ %bigTeam;
-				
-			if( %error !$= "" )
-				messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: %1', %error );
-				
-			//Trigger GetCounts
-			ResetClientChangedTeams();
-			//Rerun in 10 secs
-			schedule(10000, 0, "Autobalance", %game, %AutobalanceSafetynetTrys );
-			return;
-		}
-	}	
+		AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys);
 				
 	%client = %teamcanidate[%bigTeam];
 	%team = %teamcanidate[%bigTeam].team;
@@ -87,6 +66,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 			
 	if( %teamcanidate[%bigTeam].team $= %bigTeam )
 	{
+		// Fire Autobalance
 		Game.clientChangeTeam( %client, %otherTeam, 0 );
 		messageAll('MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
 	}
@@ -100,12 +80,34 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	return;
 }
 
-function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference)
+function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys)
 {
-		if( %teamcanidate1 $= "" ) 
-			%teamcanidate1 = "NULL"; 
-		if( %teamcanidate2 $= "" ) 
-			%teamcanidate2 = "NULL";
+	if( %teamcanidate[%bigTeam] $= "" )
+	{
+		%AutobalanceSafetynetTrys++; 
+		if(%AutobalanceSafetynetTrys $= 3) 
+			return;
+			
+		if( %teamcanidate1 $= "" && %teamcanidate2 $= "" )
+			%error = "Both Teams";
+		else if( %teamcanidate[%bigTeam] $= "" )
+			%error = "Team " @ %bigTeam;
+				
+		if( %error !$= "" )
+			messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: %1', %error );
+				
+		//Trigger GetCounts
+		ResetClientChangedTeams();
+		//Rerun in 10 secs
+		schedule(10000, 0, "Autobalance", %game, %AutobalanceSafetynetTrys );
+	}
 		
-		messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4', %teamcanidate1, %team1difference, %teamcanidate2, %team2difference );
+	if( %teamcanidate1 $= "" ) 
+		%teamcanidate1 = "NULL"; 
+	if( %teamcanidate2 $= "" ) 
+		%teamcanidate2 = "NULL";
+		
+	messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4', %teamcanidate1, %team1difference, %teamcanidate2, %team2difference );
+	
+	return;
 }

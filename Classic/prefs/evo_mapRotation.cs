@@ -221,6 +221,10 @@ addRotationMap(Choke, CTF, 1, 0);
 addRotationMap(Magmatic, CTF, 1, 1);
 //addRotationMap(Sub-zero, CTF, 1, 1);
 addRotationMap(Blink, CTF, 1, 1);
+addRotationMap(Machineeggs, CTF, 1, 1);
+addRotationMap(HighAnxiety, CTF, 1, 1);
+addRotationMap(LandingParty, CTF, 1, 1);
+addRotationMap(Sangre_de_Grado, CTF, 1, 1);
 
 
 // ************************

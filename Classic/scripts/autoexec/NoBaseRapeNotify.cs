@@ -32,13 +32,6 @@ function NBRStatusNotify( %game )
 	}
 }
 
-// This function is at DefaultGame::gameOver(%game) CTFGame.cs
-// Resets the client NotifyCount when the mission ends
-function ResetNBRNotify()
-{
-	$NoBaseRapeNotifyCount = -1;
-}
-
 // This function is at StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)
 // In the staticshape.ovl in evoClassic.vl2
 // Plays a sound when a player hits a protected asset
@@ -60,5 +53,23 @@ function ResetNBRAssetSound( %client )
 {
 	%client.NBRAssetSoundMsgPlayed = false;
 }
+
+// Reset every map change
+package ResetNoBaseRapeNotify
+{
+
+function DefaultGame::gameOver(%game)
+{
+	Parent::gameOver(%game);
+	
+	//Reset NoBaseRapeNotify
+	$NoBaseRapeNotifyCount = -1;
+}
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(ResetNoBaseRapeNotify))
+    activatePackage(ResetNoBaseRapeNotify);
 
 

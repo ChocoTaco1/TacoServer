@@ -24,7 +24,7 @@ function TeamBalanceNotify( %game, %team1difference, %team2difference )
 		{
 			//Reset Balanced.
 			$BalancedMsgPlayed = 0;
-				
+			
 			if( %team1difference >= 2 || %team2difference >= 2 )
 			{				
 				if( $UnbalancedMsgPlayed !$= 1)
@@ -98,10 +98,28 @@ function UnbalancedSound( %game )
 }
 
 
-//Reset Notify at defaultgame::gameOver in evo defaultgame.ovl
+// Reset Notify
 function ResetTeamBalanceNotifyGameOver() 
 {
 	//Reset All TeamBalance Variables
 	$BalancedMsgPlayed = -1;
 	$UnbalancedMsgPlayed = -1;
 }
+
+// Reset every map change
+package ResetTeamBalanceNotify
+{
+
+function DefaultGame::gameOver(%game)
+{
+	Parent::gameOver(%game);
+	
+	//Reset All TeamBalance Variables
+	ResetTeamBalanceNotifyGameOver();
+}
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(ResetTeamBalanceNotify))
+    activatePackage(ResetTeamBalanceNotify);

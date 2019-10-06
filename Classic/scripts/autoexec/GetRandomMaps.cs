@@ -146,3 +146,21 @@ function SetNextMapGetRandoms( %client )
 			$SetNextMissionMapSlot8 = "ShrineDM";
 	}
 }
+
+// Reset SetNextMission every map change
+package ResetSetNextMission
+{
+
+function DefaultGame::gameOver(%game)
+{
+	Parent::gameOver(%game);
+	
+	//Reset SetNextMission Restore
+	$SetNextMissionRestore = "";
+}
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(ResetSetNextMission))
+    activatePackage(ResetSetNextMission);

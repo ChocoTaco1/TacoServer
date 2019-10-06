@@ -1428,9 +1428,6 @@ function DefaultGame::clientJoinTeam( %game, %client, %team, %respawn )
    updateCanListenState( %client );
 
    logEcho(%client.nameBase@" (cl "@%client@") joined team "@%client.team);
-
-   //Trigger GetCounts
-   ResetClientChangedTeams();
 }
 
 function DefaultGame::AIHasJoined(%game, %client)
@@ -1483,9 +1480,6 @@ function DefaultGame::AIChangeTeam(%game, %client, %newTeam)
    }
    
    messageAllExcept( %client, -1, 'MsgClientJoinTeam', '\c1bot %1 has switched to team %2.', %client.name, %game.getTeamName(%client.team), %client, %client.team );
-
-   //Trigger GetCounts
-   ResetClientChangedTeams();
 }
 
 function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned) // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
@@ -1561,9 +1555,6 @@ function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawn
    // MES - switch objective hud lines when client switches teams
    messageClient(%client, 'MsgCheckTeamLines', "", %client.team);
    logEcho(%client.nameBase@" (cl "@%client@") switched to team "@%client.team);
-   
-   //Trigger GetCounts
-   ResetClientChangedTeams();
 }
 
 //  missioncleanup and missiongroup are checked prior to entering game code
@@ -1646,9 +1637,6 @@ function DefaultGame::onClientLeaveGame(%game, %client)
    //remove them from the team rank arrays
    %game.removeFromTeamRankArray(%client);
    logEcho(%client.nameBase@" (cl "@%client@") dropped");
-   
-   //Trigger GetCounts
-   ResetClientChangedTeams();
 }
 
 function DefaultGame::clientMissionDropReady(%game, %client)
@@ -1780,10 +1768,6 @@ function DefaultGame::testDrop( %game, %client )
 function DefaultGame::onClientEnterObserverMode( %game, %client )
 {
    // Default game doesn't care...
-   
-   //Trigger GetCounts
-   ResetClientChangedTeams();
-
 }
 
 // from 'item.cs'

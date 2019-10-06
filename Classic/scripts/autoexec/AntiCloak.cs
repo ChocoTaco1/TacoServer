@@ -10,7 +10,7 @@
 //
 
 // Called in GetCounts.cs
-function ActivateAntiCloak( %game )
+function CheckAntiCloak( %game )
 {
 	//CTF only
 	if( $Host::AntiCloakEnable && $CurrentMissionType $= "CTF" )

@@ -56,6 +56,15 @@ function DefaultGame::checkTimeLimit(%game, %forced)
    }
 }
 
+// Reset every map change
+function DefaultGame::gameOver(%game)
+{
+	Parent::gameOver(%game);
+	
+	//Reset everything to do with Vote Overtime
+	ResetVOall(%game);
+}
+
 };
 
 function RestartcheckTimeLimit(%game, %forced)

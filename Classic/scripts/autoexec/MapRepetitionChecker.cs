@@ -24,7 +24,7 @@ function MapRepetitionChecker( %game )
 		if($EvoCachedNextMission $= "")
 			return;
 		
-		if(!$Host::TournamentMode && $MapRepetitionCheckerRunOnce !$= 1 )
+		if(!$Host::TournamentMode)
 		{	
 			//Do work
 			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
@@ -47,7 +47,6 @@ function MapRepetitionChecker( %game )
 				if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
 			}
 		}
-		$MapRepetitionCheckerRunOnce = 1;
 	}
 }
 
@@ -87,11 +86,4 @@ function MapRepetitionCheckerFindRandom()
 				messageClient(%cl, 'MsgMapRepCorrection', '\crMap Repetition Corrected: Next mission set from %1 to %2.', $SetNextMissionRestore, $EvoCachedNextMission);
 		}
 	}
-}
-
-//Once per match
-//Called in DefaultGame::gameOver(%game) in defaultGame.ovl evo
-function MapRepetitionCheckerReset( %game )
-{
-	$MapRepetitionCheckerRunOnce = 0;
 }

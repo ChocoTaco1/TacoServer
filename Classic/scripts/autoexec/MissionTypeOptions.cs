@@ -34,6 +34,9 @@ function loadMissionStage2()
 		//Set server mode to DISTANCE
 		$Host::HiVisibility = "1";
 	}
+	
+	//Start MapRepetitionChecker
+	schedule(20000, 0, "MapRepetitionChecker", %game);
    
     parent::loadMissionStage2();
 }

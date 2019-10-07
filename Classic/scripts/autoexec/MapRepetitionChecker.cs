@@ -1,51 +1,56 @@
-//To help decrease the chances of a repeated map in the map rotation by correcting repeated maps thru script
-//$EvoCachedNextMission = "RoundTheMountain";
-//$EvoCachedNextMission = "Arrakis";
-//$EvoCachedNextMission = "RoundTheMountainLT";
-//$EvoCachedNextMission = "ArenaDomeDM";
+// Map Repetition Checker Script
 //
+// To help decrease the chances of a repeated map in the map rotation by correcting repeated maps thru script
 //
+// Runs at the beginning of every map change
+// Keeps track of maps played (Last 4)
+// If any are repeating it picks a new map
+//
+// $EvoCachedNextMission = "RoundTheMountain";
+// $EvoCachedNextMission = "Arrakis";
+// $EvoCachedNextMission = "RoundTheMountainLT";
+// $EvoCachedNextMission = "ArenaDomeDM";
+//
+
+
 $PreviousMission4back = "";
 $PreviousMission3back = "";		
 $PreviousMission2back = "";
 $PreviousMission1back = "";
 
-//Run in GetTeamCounts.cs
+//Ran in MissionTypeOptions.cs
 function MapRepetitionChecker( %game )
 {
-	if($countdownStarted && $MatchStarted)
-	{
-		//Debug
-		//%MapRepetitionCheckerDebug = true;
+	//Debug
+	//%MapRepetitionCheckerDebug = true;
 		
-		if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
-			return;
+	if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
+		return;
 		
-		if($EvoCachedNextMission $= "")
-			return;
-		
-		if(!$Host::TournamentMode)
-		{	
-			//Do work
-			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
-				$PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission ||
-				$CurrentMission $= $EvoCachedNextMission )
-				MapRepetitionCheckerFindRandom();
+	if($EvoCachedNextMission $= "")
+		return;
+	
+	if(!$Host::TournamentMode)
+	{	
+		//Do work
+		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
+			$PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission ||
+			$CurrentMission $= $EvoCachedNextMission )
+			MapRepetitionCheckerFindRandom();
 			
-			//Set vars	
-			if($PreviousMission3back !$= "") $PreviousMission4back = $PreviousMission3back;
-			if($PreviousMission2back !$= "") $PreviousMission3back = $PreviousMission2back;		
-			if($PreviousMission1back !$= "") $PreviousMission2back = $PreviousMission1back;
-											 $PreviousMission1back = $CurrentMission;
+		//Set vars	
+		if($PreviousMission3back !$= "") $PreviousMission4back = $PreviousMission3back;
+		if($PreviousMission2back !$= "") $PreviousMission3back = $PreviousMission2back;		
+		if($PreviousMission1back !$= "") $PreviousMission2back = $PreviousMission1back;
+										 $PreviousMission1back = $CurrentMission;
 				
-			//Debug
-			if(%MapRepetitionCheckerDebug)	
-			{
-				if($PreviousMission1back !$= "") echo("PM1: " @ $PreviousMission1back);
-				if($PreviousMission2back !$= "") echo("PM2: " @ $PreviousMission2back);
-				if($PreviousMission3back !$= "") echo("PM3: " @ $PreviousMission3back);
-				if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
-			}
+		//Debug
+		if(%MapRepetitionCheckerDebug)	
+		{
+			if($PreviousMission1back !$= "") echo("PM1: " @ $PreviousMission1back);
+			if($PreviousMission2back !$= "") echo("PM2: " @ $PreviousMission2back);
+			if($PreviousMission3back !$= "") echo("PM3: " @ $PreviousMission3back);
+			if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
 		}
 	}
 }

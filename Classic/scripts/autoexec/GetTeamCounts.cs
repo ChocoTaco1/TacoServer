@@ -8,7 +8,7 @@
 // Whether or not a portion of the script is run or not depends on 
 // if a player has switched teams or not. Or if a team changing event has occurred.
 // This is triggered via various event functions throughout the game.
-// All included in EvoClassicTaco.vl2
+//
 
 // Set reset string
 $GetCountsClientTeamChange = true;

@@ -947,7 +947,7 @@ function explodeFirework(%position, %id)
 		velocity = "1";
 	};
 
-	echo(%emitter.position);
+	//echo(%emitter.position);
 	serverPlay3d(dtFireworksSound, %emitter.position);
 	MissionCleanup.add(%emitter);
 	%emitter.schedule(1250, "delete");

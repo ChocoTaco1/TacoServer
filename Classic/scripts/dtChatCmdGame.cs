@@ -130,10 +130,12 @@ function chatCmd(%client, %message) //%client is sender
 		 
 	   case "/report":
 		   LogMessage(%client, %message, "report");
+		   messageClient(%client, 'msgChatCmd', 'Your report has been received.');
 		   
        case "/msg":
 		   LogMessage(%client, %message, "message");
-		   
+		   messageClient(%client, 'msgChatCmd', 'Your message has been received.');
+  
        case "/idInfo":
 			if(%client.isSuperAdmin || %client.isAdmin)
 			{

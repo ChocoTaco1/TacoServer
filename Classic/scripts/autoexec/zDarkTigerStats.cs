@@ -1742,15 +1742,15 @@ package dtStats{
       else
       {
           if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){   
-            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6><a:gamelink\tStats\tView\t%1>+</a> %1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\tStats\tView\t%1>+</a><a:gamelink\t%6> %1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
             %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl, %clBonus);
           }
          else if(%client.name $= %cl.name){
-            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6><a:gamelink\tStats\tView\t%1>+</a> %1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\tStats\tView\t%1>+</a><a:gamelink\t%6> %1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
             %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl, %clBonus);  
          }
           else{
-            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6>%1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '%5<tab:20, 450>\t<clip:115><a:gamelink\t%6> %1</a></clip><rmargin:225><just:right>%2<rmargin:300><just:right>%3<rmargin:390><just:right>%4<rmargin:490>%7',
             %cl.name, %clScore, %clKills, %clDeaths, %clStyle, %cl, %clBonus); 
          }
       }
@@ -1780,15 +1780,15 @@ package dtStats{
             %obsTime = getSimTime() - %cl.observerStartTime;
             %obsTimeStr = %game.formatTime(%obsTime, false);
             if(%client.isAdmin || %client.isSuperAdmin || !$dtStats::viewSelf){  
-               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%1>+</a>%1</clip><rmargin:260><just:right>%2',
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:260><just:right>%2',
                %cl.name, %obsTimeStr );
             }
             else if(%client.name $= %cl.name){
-               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%1>+</a>%1</clip><rmargin:260><just:right>%2',
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tStats\tView\t%1>+</a> %1</clip><rmargin:260><just:right>%2',
                %cl.name, %obsTimeStr );
             }
             else{
-               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150>%1</clip><rmargin:260><just:right>%2',
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150> %1</clip><rmargin:260><just:right>%2',
                %cl.name, %obsTimeStr ); 
             }
             %index++;

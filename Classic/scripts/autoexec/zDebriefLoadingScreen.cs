@@ -24,12 +24,6 @@
 // Enable Debrief Loading Screen
 // $Host::LoadingScreenUseDebrief = 0;
 
-// MOTD or EVENTS Messages
-// $Host::LoadScreenMOTD1 = "Blaster is here to stay!";
-// $Host::LoadScreenMOTD2 = "Come play Arena on Wednesday Nights!";
-// $Host::LoadScreenMOTD3 = "Lak crowd early evenings after work during the week.";
-// $Host::LoadScreenMOTD4 = "Big CTF games Fridays, Saturdays, and Sundays!";
-
 // Colors
 // $Host::LoadScreenColor1 = "05edad"; //Light Teal
 // $Host::LoadScreenColor2 = "29DEE7"; //Bright Blue Teal
@@ -48,6 +42,12 @@
 // $Host::LoadScreenLine5_Msg = "Branzone";
 // $Host::LoadScreenLine6 = "Server Github:";
 // $Host::LoadScreenLine6_Msg = "https://github.com/ChocoTaco1/TacoServer";
+
+// MOTD or EVENTS Messages
+// $Host::LoadScreenMOTD1 = "Blaster is here to stay!";
+// $Host::LoadScreenMOTD2 = "Come play Arena on Wednesday Nights!";
+// $Host::LoadScreenMOTD3 = "Lak crowd early evenings after work during the week.";
+// $Host::LoadScreenMOTD4 = "Big CTF games Fridays, Saturdays, and Sundays!";
 
 // First Screen loading time (Map Screen)
 // If this is set too low the second screen wont show at all
@@ -136,6 +136,7 @@ if (!isActivePackage(LoadScreenPackage) && $Host::LoadingScreenUseDebrief)
 // Just make our own
 function ALTsendModInfoToClient(%client)
 {  
+	// Wont allow Debrief on consecutive map loads
 	if(%client.loaded)
 	{
 		schedule($dtLoadingScreen::FirstScreen, 0, "NORMALsendModInfoToClient", %client);
@@ -164,11 +165,11 @@ function ALTsendModInfoToClient(%client)
 	%smurf = "<color:" @ $Host::LoadScreenColor1 @ ">Refuse smurfs: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::NoSmurfs ? "On" : "Off");
 
 	//%random = "<color:" @ $Host::LoadScreenColor1 @ ">Random teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($RandomTeams ? "On" : "Off");
-	//%fair = "<color:" @ $Host::LoadScreenColor1 @ ">Fair teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::ClassicFairTeams ? "On" : "Off");
-	//%rape = "<color:" @ $Host::LoadScreenColor1 @ ">No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::EvoNoBaseRapeEnabled ? "On" : "Off");
-	//%td = "<color:" @ $Host::LoadScreenColor1 @ ">Team damage: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::TeamDamageOn ? "On" : "Off");
-	//%crc = "<color:" @ $Host::LoadScreenColor1 @ ">CRC checking: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::CRCTextures ? "On" : "Off");
-	//%pure = "<color:" @ $Host::LoadScreenColor1 @ ">Pure server: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::PureServer ? "On" : "Off");
+	//%fair = 	"<color:" @ $Host::LoadScreenColor1 @ ">Fair teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::ClassicFairTeams ? "On" : "Off");
+	//%rape = 	"<color:" @ $Host::LoadScreenColor1 @ ">No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::EvoNoBaseRapeEnabled ? "On" : "Off");
+	//%td = 	"<color:" @ $Host::LoadScreenColor1 @ ">Team damage: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::TeamDamageOn ? "On" : "Off");
+	//%crc = 	"<color:" @ $Host::LoadScreenColor1 @ ">CRC checking: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::CRCTextures ? "On" : "Off");
+	//%pure = 	"<color:" @ $Host::LoadScreenColor1 @ ">Pure server: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::PureServer ? "On" : "Off");
 
 	if($Host::EvoNoBaseRapeEnabled)
 		%rapeppl = "<color:" @ $Host::LoadScreenColor1 @ ">Min No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::EvoNoBaseRapeClassicPlayerCount;
@@ -205,6 +206,7 @@ function ALTsendModInfoToClient(%client)
 	// Images
 	// Desired pics much exist in the texticons folder on the client in some capacity
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	if($dtLoadingScreen::ShowImages)
 	{
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
@@ -373,11 +375,11 @@ function NORMALsendModInfoToClient(%client)
 	%smurf = "<color:" @ $Host::LoadScreenColor1 @ ">Refuse smurfs: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::NoSmurfs ? "On" : "Off");
    
 	//%random = "<color:" @ $Host::LoadScreenColor1 @ ">Random teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($RandomTeams ? "On" : "Off");
-	//%fair = "<color:" @ $Host::LoadScreenColor1 @ ">Fair teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::ClassicFairTeams ? "On" : "Off");
-	//%rape = "<color:" @ $Host::LoadScreenColor1 @ ">No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::EvoNoBaseRapeEnabled ? "On" : "Off");
-	//%td = "<color:" @ $Host::LoadScreenColor1 @ ">Team damage: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::TeamDamageOn ? "On" : "Off");
-	//%crc = "<color:" @ $Host::LoadScreenColor1 @ ">CRC checking: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::CRCTextures ? "On" : "Off");
-	//%pure = "<color:" @ $Host::LoadScreenColor1 @ ">Pure server: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::PureServer ? "On" : "Off");
+	//%fair = 	"<color:" @ $Host::LoadScreenColor1 @ ">Fair teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::ClassicFairTeams ? "On" : "Off");
+	//%rape = 	"<color:" @ $Host::LoadScreenColor1 @ ">No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::EvoNoBaseRapeEnabled ? "On" : "Off");
+	//%td = 	"<color:" @ $Host::LoadScreenColor1 @ ">Team damage: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::TeamDamageOn ? "On" : "Off");
+	//%crc = 	"<color:" @ $Host::LoadScreenColor1 @ ">CRC checking: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::CRCTextures ? "On" : "Off");
+	//%pure = 	"<color:" @ $Host::LoadScreenColor1 @ ">Pure server: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::PureServer ? "On" : "Off");
 
 
 	if($Host::EvoNoBaseRapeEnabled)

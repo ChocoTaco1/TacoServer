@@ -1,9 +1,11 @@
-if (! $EjectDone) 
+// Vehicle Passenger Eject Script
+//
+// Originally eject.cs
+// If Pilot, eject passengers from your vehicle using the Pack Activation button.
+
+
+package VehiclePassengerEject
 {
-	schedule( 30000, 0, "exec", "scripts/autoexec/VehiclePassengerEject.cs" );
-	$EjectDone = true;
-}
-	
 
 function Player::use( %this,%data )
 {
@@ -42,6 +44,12 @@ function Player::use( %this,%data )
    
    return ShapeBase::use( %this, %data );
 }
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(VehiclePassengerEject))
+    activatePackage(VehiclePassengerEject);
 
 
 function EjectAllPassengers(%obj, %player)

@@ -468,7 +468,4 @@ function NORMALsendModInfoToClient(%client)
 		messageClient(%client, 'MsgLoadRulesLine', "", %ServerTextLine[%line], !%singlePlayer);
 
 	messageClient(%client, 'MsgLoadInfoDone');
-
-	// z0dd - ZOD, 5/12/02. Send mission info again so as not to conflict with cs scripts.
-	schedule(10000, 0, "sendLoadInfoToClient", %client, true);
 }

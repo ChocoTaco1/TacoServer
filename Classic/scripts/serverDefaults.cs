@@ -213,7 +213,8 @@ $Host::LoadScreenLine6_Msg = "https://github.com/ChocoTaco1/TacoServer";								
 $Host::LoadScreenMOTD1 = "Blaster is here to stay!";								//MOTD or Events Line 1 Message (Debrief LoadScreen Only)
 $Host::LoadScreenMOTD2 = "Come play Arena on Wednesday Nights!";					//MOTD or Events Line 2 Message (Debrief LoadScreen Only)
 $Host::LoadScreenMOTD3 = "Lak crowd early evenings after work during the week.";	//MOTD or Events Line 3 Message (Debrief LoadScreen Only)
-$Host::LoadScreenMOTD4 = "Big CTF games Fridays, Saturdays, and Sundays!";			//MOTD or Events Line 4 Message	(Debrief LoadScreen Only)									
+$Host::LoadScreenMOTD4 = "Big CTF games Fridays, Saturdays, and Sundays!";			//MOTD or Events Line 4 Message	(Debrief LoadScreen Only)
+$Host::EvoAdminSwitchTeams = 1;					//Enable or Disable an admins ability to switch other players teams.			
 //LakRabbit
 $Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
 $Host::LakRabbitNoSplashDamage = 0;				//Splash Damage enabled or not

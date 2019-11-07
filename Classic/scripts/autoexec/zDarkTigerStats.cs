@@ -189,6 +189,7 @@ $dtStats::fieldCount["SCtFGame"] = $dtLCTF;
 //                              Weapon/Misc Stats    
 ///////////////////////////////////////////////////////////////////////////////
 //these are field values from this script  
+$dtWep = 0;
 $dtStats::fieldValue[$dtWep++,"dtStats"] = "cgKills";
 $dtStats::fieldValue[$dtWep++,"dtStats"] = "cgDeaths";
 $dtStats::fieldValue[$dtWep++,"dtStats"] = "discKills";

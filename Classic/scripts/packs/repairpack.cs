@@ -189,7 +189,7 @@ function RepairPackImage::onUnmount(%data, %obj, %node)
 function RepairPackImage::onActivate(%data, %obj, %slot)
 {
    // don't activate the pack if player is piloting a vehicle
-   if(%obj.isPilot())
+   if(%obj.isPilot() || %obj.getImageState(0) $= "Fire") // Cant activate repair pack while firing
    {
       %obj.setImageTrigger(%slot, false);
       return;

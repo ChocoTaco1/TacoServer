@@ -530,7 +530,11 @@ function ShapeBase::cycleWeapon( %this, %data )
    %slot = -1;
    if ( %this.getMountedImage($WeaponSlot) != 0 )
    {
-      %curWeapon = %this.getMountedImage($WeaponSlot).item.getName();
+      if( %this.getMountedImage(0).getName() $= "RepairGunImage" ) //Console spam fix
+		%curWeapon = "RepairGunImage";
+	  else
+		%curWeapon = %this.getMountedImage($WeaponSlot).item.getName();
+	
       for ( %i = 0; %i < %this.weaponSlotCount; %i++ )
       {
          //error("curWeaponName == " @ %curWeaponName);

@@ -18,7 +18,7 @@
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
 // v3.35 April 2019
-// Added Not enought players flag message delay
+// Added Not enough players flag message delay
 // Shock in the back bonus 2 > 1.5
 //
 // v3.34 Febuary 2019
@@ -882,6 +882,13 @@ function Player::setKnockback(%this, %val)
 //}
 
 };
+
+// Added
+function LakRabbitGame::AIInit(%game)
+{
+   //call the default AIInit() function
+   AIInit();
+}
 
 //exec the AI scripts
 //exec("scripts/aiRabbit.cs");

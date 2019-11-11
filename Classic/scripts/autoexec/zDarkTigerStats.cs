@@ -2988,7 +2988,7 @@ function statsMenu(%client,%game){
    {
       case "View":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @  getTaggedString(%vClient.name) @ "'s Stats");
-         messageClient( %client, 'SetScoreHudSubheader', "", "<a:gamelink\tStats\tReset>  Back</a>");
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tReset\t%1>  Back</a>',%vClient); // Change ME
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>  Main Options Menu");
          switch$(%game){
             case "CTFGame":

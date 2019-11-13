@@ -158,11 +158,14 @@ function ALTsendModInfoToClient(%client)
 	%line6 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine6 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine6_Msg;	
 
 	if($Host::TimeLimit $= "999" || $Host::TimeLimit $= "unlimited") %timeloadingvar = "Unlimited"; else %timeloadingvar = $Host::TimeLimit;
+	
+	if($Host::EvoKickObservers $= 0) %obskickvar = "Off"; else %obskickvar = ($Host::EvoKickObservers / 60)  @ " Minutes";
 
 	%time = "<color:" @ $Host::LoadScreenColor1 @ ">Time limit: <color:" @ $Host::LoadScreenColor2 @ ">" @ %timeloadingvar;
 	%max = "<color:" @ $Host::LoadScreenColor1 @ ">Max players: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::MaxPlayers;
 	%net = "<color:" @ $Host::LoadScreenColor1 @ ">Packets Rate / Size: <color:" @ $Host::LoadScreenColor2 @ ">" @ $pref::Net::PacketRateToClient @ " / " @ $pref::Net::PacketSize;
 	%smurf = "<color:" @ $Host::LoadScreenColor1 @ ">Refuse smurfs: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::NoSmurfs ? "On" : "Off");
+	%obskick = "<color:" @ $Host::LoadScreenColor1 @ ">Obs Kick Time: <color:" @ $Host::LoadScreenColor2 @ ">" @ %obskickvar;
 
 	//%random = "<color:" @ $Host::LoadScreenColor1 @ ">Random teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($RandomTeams ? "On" : "Off");
 	//%fair = 	"<color:" @ $Host::LoadScreenColor1 @ ">Fair teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::ClassicFairTeams ? "On" : "Off");
@@ -286,6 +289,7 @@ function ALTsendModInfoToClient(%client)
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %smurf;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %rapeppl;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %turrets;
+	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %obskick;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %stats;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %nmis;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";

@@ -57,34 +57,31 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	//Toggle for All Mode
 	//If a team is behind pick anyone, not just a low scoring player
 	if( $TeamScore[%bigTeam] > ($TeamScore[%littleTeam] + $AllModeThreshold) )
+	{
 		%UseAllMode = 1;
+		%autobalanceRandom = getRandom(1,($PlayerCount[%bigTeam] - 1));
+	}
 	
     //Pick a client for autobalance
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
 		%client = ClientGroup.getObject(%i);
+		%team = %client.team;
 		
 		if(%UseAllMode)
 		{
 			//Try to pick any player
-			%team = %client.team;
-			%autobalanceRandom = getRandom(1,($PlayerCount[%bigTeam] - 1));
 			if(%autobalanceRandom == %autobalanceLoop || %lastclient[%team] $= "") 
 				%teamcanidate[%team] = %client; 
 			
 			%autobalanceLoop++;
-			
-			//echo("All Mode");
 		}
 		else
 		{
 			//Normal circumstances
 			//Try to pick a low scoring player
-			%team = %client.team;
 			if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "") 
 				%teamcanidate[%team] = %client;
-
-			//echo("Low Mode");
 		}
 
 		%lastclient[%team] = %client;
@@ -92,7 +89,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 
 	//Debug
 	if( %AutobalanceDebug )
-		AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys);
+		AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys, %UseAllMode);
 				
 	%client = %teamcanidate[%bigTeam];
 	%team = %teamcanidate[%bigTeam].team;
@@ -115,7 +112,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	return;
 }
 
-function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys)
+function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys, %UseAllMode)
 {
 	if( %teamcanidate[%bigTeam] $= "" )
 	{
@@ -136,13 +133,18 @@ function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %tea
 		//Rerun in 10 secs
 		schedule(10000, 0, "Autobalance", %game, %AutobalanceSafetynetTrys );
 	}
+	
+	if(%UseAllMode)
+		%mode = "All Mode";
+	else
+		%mode = "Low Mode";
 		
 	if( %teamcanidate1 $= "" ) 
 		%teamcanidate1 = "NULL"; 
 	if( %teamcanidate2 $= "" ) 
 		%teamcanidate2 = "NULL";
 		
-	messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4', %teamcanidate1, %team1difference, %teamcanidate2, %team2difference );
+	messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4, %5', %teamcanidate1, %team1difference, %teamcanidate2, %team2difference, %mode );
 	
 	return;
 }

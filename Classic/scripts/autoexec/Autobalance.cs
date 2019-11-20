@@ -7,11 +7,6 @@
 // $Host::EnableAutobalance = 1;
 //
 
-// How far behind littleTeam must be to use All Mode.
-// Meaning picking from a pool of all players on the bigTeam instead of just the lowest scoring player.
-// 400 equals 400 points. 4 caps behind.
-$AllModeThreshold = 400;
-
 
 // Run from TeamBalanceNotify.cs via UnbalancedSound( %game )
 function Autobalance( %game, %AutobalanceSafetynetTrys )
@@ -32,6 +27,12 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
 		%client = ClientGroup.getObject(%i);
+			
+		//Pick a client for autobalance
+		//Try to pick a low scoring player
+		%team = %client.team;
+		if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "") 
+			%teamcanidate[%team] = %client; 
 
 		%lastclient[%team] = %client;
 			
@@ -55,44 +56,6 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	else if( %team2difference >= 2 )
 		%bigTeam = 2;
 
-	%littleTeam = ( %bigTeam == 1 ) ? 2 : 1;
-	
-	//Toggle for All Mode
-	//If a team is behind pick anyone, not just a low scoring player
-	if( $TeamScore[%bigTeam] > ($TeamScore[%littleTeam] + $AllModeThreshold) )
-		%UseAllMode = 1;
-	
-    //Pick a client for autobalance
-	for(%i = 0; %i < ClientGroup.getCount(); %i++)
-	{
-		%client = ClientGroup.getObject(%i);
-		
-		if(%UseAllMode)
-		{
-			//Try to pick any player
-			%team = %client.team;
-			%autobalanceRandom = getRandom(1,($PlayerCount[%bigTeam] - 1));
-			if(%autobalanceRandom == %autobalanceLoop || %lastclient[%team] $= "") 
-				%teamcanidate[%team] = %client; 
-			
-			%autobalanceLoop++;
-			
-			//echo("All Mode");
-		}
-		else
-		{
-			//Normal circumstances
-			//Try to pick a low scoring player
-			%team = %client.team;
-			if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "") 
-				%teamcanidate[%team] = %client;
-
-			//echo("Low Mode");
-		}
-
-		%lastclient[%team] = %client;
-	}
-
 	//Debug
 	if( %AutobalanceDebug )
 		AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys);
@@ -109,7 +72,6 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	}
 	else
 		messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: Team %1 mismatch.', %bigTeam );
-			
 			
 	//Trigger GetCounts
 	ResetClientChangedTeams();

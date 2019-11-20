@@ -5,7 +5,6 @@
 //
 // Enable or Disable Autobalance
 // $Host::EnableAutobalance = 1;
-//
 
 // How far behind littleTeam must be to use All Mode.
 // Meaning picking from a pool of all players on the bigTeam instead of just the lowest scoring player.
@@ -32,8 +31,6 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
 		%client = ClientGroup.getObject(%i);
-
-		%lastclient[%team] = %client;
 			
 		//if(!%client.isAIControlled())
 			$PlayerCount[%client.team]++;

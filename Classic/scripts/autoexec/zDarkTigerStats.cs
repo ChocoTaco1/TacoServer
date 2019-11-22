@@ -860,6 +860,133 @@ package dtStats{
          statsMenu(%client,Game.class);
       }
    }
+	// called from player scripts
+	function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %sourceObject)
+	{ 
+	   //set the vars if it was a turret
+	   if (isObject(%sourceObject))
+	   {
+		  %sourceClassType = %sourceObject.getDataBlock().getClassName();
+		  %sourceType = %sourceObject.getDataBlock().getName();
+	   }
+
+	   if (%sourceClassType $= "TurretData")
+	   {
+		  // jff: are there special turret types which makes this needed?   
+		  // tinman:  yes, we don't want bots stopping to fire on the big outdoor turrets, which they
+		  // will just get mowed down.  deployables only.
+		  if (%sourceType $= "TurretDeployedFloorIndoor" || %sourceType $= "TurretDeployedWallIndoor" ||
+				   %sourceType $= "TurretDeployedCeilingIndoor" || %sourceType $= "TurretDeployedOutdoor")
+		  {
+			 %clVictim.lastDamageTurretTime = getSimTime();
+			 %clVictim.lastDamageTurret = %sourceObject;
+		  }
+	   
+		  %turretAttacker = %sourceObject.getControllingClient();
+		  
+		  //-------------------------------------------------------------------
+		  // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
+		  if(%turretAttacker)
+		  {
+			 %client = %turretAttacker;
+		  }
+		  //-------------------------------------------------------------------
+
+		  // should get a damagae message from friendly fire turrets also
+		  if(%turretAttacker && %turretAttacker != %clVictim && %turretAttacker.team == %clVictim.team)
+		  {   
+			 if (%game.numTeams > 1 && %turretAttacker.player.causedRecentDamage != %clVictim.player)    //is a teamgame & player just damaged a teammate
+			 {
+				%turretAttacker.player.causedRecentDamage = %clVictim.player;
+				%turretAttacker.player.schedule(1000, "causedRecentDamage", "");   //allow friendly fire message every x ms
+				%game.friendlyFireMessage(%clVictim, %turretAttacker);          
+			 }        
+		  }
+	   }
+	   else if (%sourceClassType $= "PlayerData")
+	   {
+		  %client = %clAttacker; // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
+		  //now see if both were on the same team
+		  if(%clAttacker && %clAttacker != %clVictim && %clVictim.team == %clAttacker.team)
+		  {   
+			 if (%game.numTeams > 1 && %clAttacker.player.causedRecentDamage != %clVictim.player)    //is a teamgame & player just damaged a teammate
+			 {
+				   %clAttacker.player.causedRecentDamage = %clVictim.player;
+				%clAttacker.player.schedule(1000, "causedRecentDamage", "");   //allow friendly fire message every x ms
+				%game.friendlyFireMessage(%clVictim, %clAttacker);          
+			 }        
+		  }
+		  if (%clAttacker && %clAttacker != %clVictim)
+		  {
+			 %clVictim.lastDamageTime = getSimTime();
+			 %clVictim.lastDamageClient = %clAttacker;
+			 if (%clVictim.isAIControlled())
+				%clVictim.clientDetected(%clAttacker);
+		  }   
+	   }
+	   // ------------------------------------------------------------------
+	   // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
+	   else if( %sourceClassType $= "WheeledVehicleData" ||
+				%sourceClassType $= "FlyingVehicleData"  ||
+				%sourceClassType $= "HoverVehicleData" )
+	   {
+		  if (%sourceObject.getControllingClient())
+		  {
+			 %client = %sourceObject.getControllingClient();
+		  }
+	   }
+
+	   if ( %client && %client.playerHitSound && ($CurrentMissionType !$= TR2))
+	   {
+		  // 1)  Blaster
+		  // 2)  Plasma Gun
+		  // 3)  Chaingun
+		  // 4)  Disc
+		  // 5)  Grenades (GL and hand)
+		  // 6)  Laser
+		  // 8)  Mortar
+		  // 9)  Missile
+		  // 10) ShockLance
+
+		  // 13) Impact (object to object)
+
+		  // 16) Plasma Turret
+		  // 17) AA Turret
+		  // 18) ELF Turret
+		  // 19) Mortar Turret
+		  // 20) Missile Turret
+		  // 21) Indoor Deployable Turret
+		  // 22) Outdoor Deployable Turret
+		  // 23) Sentry Turret
+
+		  // 26) Shrike Blaster
+		  // 27) Bobmer Plasma
+		  // 28) Bomber Bomb
+		  // 29) Tank Chaingun
+		  // 30) Tank Mortar
+		  // 31) Satchel
+		  // 100) Hand Grenade
+		  
+		  if (%client.team != %clVictim.team)
+		  {	
+			 if ((%damageType > 0  && %damageType < 11) ||
+				 (%damageType == 13)                    ||
+				 (%damageType > 15 && %damageType < 24) ||
+				 (%damageType > 25 && %damageType < 32) ||
+				 (%damageType == 100))
+			 {
+				messageClient(%client, 'MsgClientHit', %client.playerHitWav);
+			 }
+		  }
+	   }
+	   // ------------------------------------------------------------------
+
+	   //call the game specific AI routines...
+	   if (isObject(%clVictim) && %clVictim.isAIControlled())
+		  %game.onAIDamaged(%clVictim, %clAttacker, %damageType, %sourceObject);
+	   if (isObject(%clAttacker) && %clAttacker.isAIControlled())
+		  %game.onAIFriendlyFire(%clVictim, %clAttacker, %damageType, %sourceObject);
+	}
 
 };
 if($dtStats::Enable){

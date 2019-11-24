@@ -39,8 +39,15 @@
 //    Total stats now reset onces a value has getting near the 32 bit int limit 
 //    Added Live View so players can watch there stats in realtime with the added feature of being able to pin it and keep that window in place
 //    Added Player/Armror kill stats
-
-
+//
+//    5.5 fixes
+//    Rework hand grenade stats collection 
+//    Moved commonly overridden functions in its own package and uses
+//    DefaultGame activate/deactivatePackages to correctly postion them on top of gameType overides 
+//    this fixes issues with lakRabbitGame overrides
+//    Reworked some of the values on live screen to be more correct 
+//    Moved resetDtStats to MissionDropReady so that liveStats work in lan game
+//    
 //-----------Settings------------
 //disable stats system restart required;
 $dtStats::Enable = 1; 
@@ -85,6 +92,8 @@ $dtStats::Hist =1;
 $dtStats::Vehicle = 0; 
 $dtStats::Turret = 0; 
 $dtStats::Armor = 0; 
+$dtStats::Match = 0;
+$dtStats::Weapon = 0;
 
 //debug stuff
 //Set to 1 when your makeing changes to the menu so you can see them  update live note the refresh rate is like 2-4 secs
@@ -134,7 +143,7 @@ $dtStats::debugEchos = 1;// echos function calls
 //<br>Forced line break.
 // This function allows you to reload all modified
 ///////////////////////////////////////////////////////////////////////////////
-//                             		CTF										 //
+//                             		CTF
 ///////////////////////////////////////////////////////////////////////////////
 $dtCTF = 0;
 $dtStats::fieldValue[$dtCTF++,"CTFGame"] = "kills";
@@ -216,7 +225,7 @@ $dtStats::fieldValue[$dtLCTF++,"SCtFGame"] = "winCount";// in this script only
 $dtStats::fieldValue[$dtLCTF++,"SCtFGame"] = "lossCount";
 $dtStats::fieldCount["SCtFGame"] = $dtLCTF;
 ///////////////////////////////////////////////////////////////////////////////
-//                            	 DuelGame								   	 //
+//                            	 DuelGame								   		 //
 ///////////////////////////////////////////////////////////////////////////////
 $dtDuelG = 0;
 $dtStats::fieldValue[$dtDuelG++,"DuelGame"] = "score";
@@ -224,7 +233,7 @@ $dtStats::fieldValue[$dtDuelG++,"DuelGame"] = "kills";
 $dtStats::fieldValue[$dtDuelG++,"DuelGame"] = "deaths";
 $dtStats::fieldCount["DuelGame"] = $dtDuelG;
 ///////////////////////////////////////////////////////////////////////////////
-//                            	 ArenaGame								     //
+//                            	 ArenaGame								   		 //
 ///////////////////////////////////////////////////////////////////////////////
 $dtArenaG = 0;
 $dtStats::fieldValue[$dtArenaG++,"ArenaGame"] = "kills";
@@ -240,7 +249,7 @@ $dtStats::fieldValue[$dtArenaG++,"ArenaGame"] = "hatTricks";
 $dtStats::fieldValue[$dtArenaG++,"ArenaGame"] = "score";
 $dtStats::fieldCount["ArenaGame"] = $dtArenaG;
 ///////////////////////////////////////////////////////////////////////////////
-//                            	 HuntersGame								 //
+//                            	 HuntersGame								   		 //
 ///////////////////////////////////////////////////////////////////////////////
 //$dtHunter = 0;
 //$dtStats::fieldValue[$dtHunter++,"HuntersGame"] = "score";
@@ -251,7 +260,7 @@ $dtStats::fieldCount["ArenaGame"] = $dtArenaG;
 //$dtStats::fieldValue[$dtHunter++,"HuntersGame"] = "flagPoints";
 //$dtStats::fieldCount["HuntersGame"] = $dtHunter;
 ///////////////////////////////////////////////////////////////////////////////
-//                              Weapon/Misc Stats							 //
+//                              Weapon/Misc Stats
 ///////////////////////////////////////////////////////////////////////////////
 //these are field values from this script
 $dtWep = 0;
@@ -400,6 +409,7 @@ $dtStats::fieldValue[$dtWep++,"dtStats"] = "minePlusDisc";
    $dtStats::fieldValue[$dtWep++,"dtStats"] = "killStreak";
    $dtStats::fieldValue[$dtWep++,"dtStats"] = "assist";
    $dtStats::fieldValue[$dtWep++,"dtStats"] = "maxSpeed";
+   $dtStats::fieldValue[$dtWep++,"dtStats"] = "avgSpeed";
    $dtStats::fieldValue[$dtWep++,"dtStats"] = "maxRV";
    $dtStats::fieldValue[$dtWep++,"dtStats"] = "comboPT";
    $dtStats::fieldValue[$dtWep++,"dtStats"] = "comboCount";
@@ -777,7 +787,65 @@ package dtStats{
       DuelHud(%game, %client, %tag);
    }
 ///////////////////////////////////////////////////////////////////////////////
-   function ShapeBaseImageData::onFire(%data, %obj, %slot){
+
+   function DefaultGame::missionLoadDone(%game){
+      parent::missionLoadDone(%game);
+          //check to see if we are running evo or not, if not then lets just enable these 
+         if(!isFile("scripts/autoexec/evolution.cs")){
+            $Host::EvoAveragePings = $Host::ShowIngamePlayerScores = 1;
+         }
+   }
+   function serverCmdShowHud(%client, %tag){ // to refresh screen when client opens it up
+      parent::serverCmdShowHud(%client, %tag);
+      %tagName = getWord(%tag, 1);
+      %tag = getWord(%tag, 0);
+      if(%tag $= 'scoreScreen' && %client.viewStats){
+         statsMenu(%client,Game.class);
+      }
+   }
+   //function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %sourceObject){ 
+      //clientDmgStats(%data,%position,%sourceObject,%targetObject, %damageType,%amount);
+      //parent::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %sourceObject)
+   //}
+//////////////////////////////////////////////////////////////////////////////////
+   function DefaultGame::activatePackages(%game){
+         parent::activatePackages(%game);
+         if(isActivePackage(dtStatsGame)){
+             deactivatePackage(dtStatsGame);
+             activatePackage(dtStatsGame);
+         }
+         else{
+             activatePackage(dtStatsGame);
+         }
+   }
+   function DefaultGame::deactivatePackages(%game){
+         parent::deactivatePackages(%game);
+      if(isActivePackage(dtStatsGame))
+         deactivatePackage(dtStatsGame);
+   }
+//////////////////////////////////////////////////////////////////////////////////
+};
+//helps with game types that override functions and dont use parent
+// that way we get called first then the gametype can do whatever 
+package dtStatsGame{
+     function detonateGrenade(%obj){// from lakRabbitGame.cs for grenade tracking      
+      %obj.dtNade = 1;
+      $dtObjExplode = %obj;
+      parent::detonateGrenade(%obj);
+   } 
+   function MineDeployed::onThrow(%this, %mine, %thrower){
+       parent::onThrow(%this, %mine, %thrower);
+       %thrower.client.mineShotsFired++;
+       %thrower.client.shotsFired++;
+       %thrower.client.mineACC = (%thrower.client.mineIndirectHits / %thrower.client.mineShotsFired) * 100;
+   }
+   function GrenadeThrown::onThrow(%this, %gren,%thrower){
+       parent::onThrow(%this, %gren);
+       %thrower.client.hGrenadeShotsFired++;
+       %thrower.client.shotsFired++;
+       %thrower.client.hGrenadeACC = (%thrower.client.hGrenadeInHits / %thrower.client.hGrenadeShotsFired) * 100;
+   }
+      function ShapeBaseImageData::onFire(%data, %obj, %slot){
       %p = parent::onFire(%data, %obj, %slot);
       if(isObject(%p)){
          clientShotsFired(%data.projectile, %obj, %p);
@@ -788,6 +856,7 @@ package dtStats{
       clientDmgStats(%data,%position,%sourceObject,%targetObject, %damageType,%amount);
       parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
    }
+
    function StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType){
        clientDmgStats(%data,%position,%sourceObject,%targetObject, %damageType,%amount);
        parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType);
@@ -832,162 +901,6 @@ package dtStats{
       parent::onMount(%this,%obj,%vehicle,%node);
       %obj.client.vehDBName = %vehicle.getDataBlock().getName();
    }
-   function DefaultGame::missionLoadDone(%game){
-      parent::missionLoadDone(%game);
-         hGrenadeProfile(%game);// Hand Grenade tracking
-          //check to see if we are running evo or not, if not then lets just enable these 
-         if(!isFile("scripts/autoexec/evolution.cs")){
-            $Host::EvoAveragePings = $Host::ShowIngamePlayerScores = 1;
-         }
-   }
-   function MineDeployed::onThrow(%this, %mine, %thrower){
-       parent::onThrow(%this, %mine, %thrower);
-       %thrower.client.mineShotsFired++;
-       %thrower.client.shotsFired++;
-       %thrower.client.mineACC = (%thrower.client.mineIndirectHits / %thrower.client.mineShotsFired) * 100;
-   }
-   function GrenadeThrown::onThrow(%this, %gren,%thrower){
-       parent::onThrow(%this, %gren);
-       %thrower.client.hGrenadeShotsFired++;
-       %thrower.client.shotsFired++;
-       %thrower.client.hGrenadeACC = (%thrower.client.hGrenadeInHits / %thrower.client.hGrenadeShotsFired) * 100;
-   }
-   function serverCmdShowHud(%client, %tag){ // to refresh screen when client opens it up
-      parent::serverCmdShowHud(%client, %tag);
-      %tagName = getWord(%tag, 1);
-      %tag = getWord(%tag, 0);
-      if(%tag $= 'scoreScreen' && %client.viewStats){
-         statsMenu(%client,Game.class);
-      }
-   }
-	// called from player scripts
-	function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %sourceObject)
-	{ 
-	   //set the vars if it was a turret
-	   if (isObject(%sourceObject))
-	   {
-		  %sourceClassType = %sourceObject.getDataBlock().getClassName();
-		  %sourceType = %sourceObject.getDataBlock().getName();
-	   }
-
-	   if (%sourceClassType $= "TurretData")
-	   {
-		  // jff: are there special turret types which makes this needed?   
-		  // tinman:  yes, we don't want bots stopping to fire on the big outdoor turrets, which they
-		  // will just get mowed down.  deployables only.
-		  if (%sourceType $= "TurretDeployedFloorIndoor" || %sourceType $= "TurretDeployedWallIndoor" ||
-				   %sourceType $= "TurretDeployedCeilingIndoor" || %sourceType $= "TurretDeployedOutdoor")
-		  {
-			 %clVictim.lastDamageTurretTime = getSimTime();
-			 %clVictim.lastDamageTurret = %sourceObject;
-		  }
-	   
-		  %turretAttacker = %sourceObject.getControllingClient();
-		  
-		  //-------------------------------------------------------------------
-		  // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
-		  if(%turretAttacker)
-		  {
-			 %client = %turretAttacker;
-		  }
-		  //-------------------------------------------------------------------
-
-		  // should get a damagae message from friendly fire turrets also
-		  if(%turretAttacker && %turretAttacker != %clVictim && %turretAttacker.team == %clVictim.team)
-		  {   
-			 if (%game.numTeams > 1 && %turretAttacker.player.causedRecentDamage != %clVictim.player)    //is a teamgame & player just damaged a teammate
-			 {
-				%turretAttacker.player.causedRecentDamage = %clVictim.player;
-				%turretAttacker.player.schedule(1000, "causedRecentDamage", "");   //allow friendly fire message every x ms
-				%game.friendlyFireMessage(%clVictim, %turretAttacker);          
-			 }        
-		  }
-	   }
-	   else if (%sourceClassType $= "PlayerData")
-	   {
-		  %client = %clAttacker; // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
-		  //now see if both were on the same team
-		  if(%clAttacker && %clAttacker != %clVictim && %clVictim.team == %clAttacker.team)
-		  {   
-			 if (%game.numTeams > 1 && %clAttacker.player.causedRecentDamage != %clVictim.player)    //is a teamgame & player just damaged a teammate
-			 {
-				   %clAttacker.player.causedRecentDamage = %clVictim.player;
-				%clAttacker.player.schedule(1000, "causedRecentDamage", "");   //allow friendly fire message every x ms
-				%game.friendlyFireMessage(%clVictim, %clAttacker);          
-			 }        
-		  }
-		  if (%clAttacker && %clAttacker != %clVictim)
-		  {
-			 %clVictim.lastDamageTime = getSimTime();
-			 %clVictim.lastDamageClient = %clAttacker;
-			 if (%clVictim.isAIControlled())
-				%clVictim.clientDetected(%clAttacker);
-		  }   
-	   }
-	   // ------------------------------------------------------------------
-	   // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
-	   else if( %sourceClassType $= "WheeledVehicleData" ||
-				%sourceClassType $= "FlyingVehicleData"  ||
-				%sourceClassType $= "HoverVehicleData" )
-	   {
-		  if (%sourceObject.getControllingClient())
-		  {
-			 %client = %sourceObject.getControllingClient();
-		  }
-	   }
-
-	   if ( %client && %client.playerHitSound && ($CurrentMissionType !$= TR2))
-	   {
-		  // 1)  Blaster
-		  // 2)  Plasma Gun
-		  // 3)  Chaingun
-		  // 4)  Disc
-		  // 5)  Grenades (GL and hand)
-		  // 6)  Laser
-		  // 8)  Mortar
-		  // 9)  Missile
-		  // 10) ShockLance
-
-		  // 13) Impact (object to object)
-
-		  // 16) Plasma Turret
-		  // 17) AA Turret
-		  // 18) ELF Turret
-		  // 19) Mortar Turret
-		  // 20) Missile Turret
-		  // 21) Indoor Deployable Turret
-		  // 22) Outdoor Deployable Turret
-		  // 23) Sentry Turret
-
-		  // 26) Shrike Blaster
-		  // 27) Bobmer Plasma
-		  // 28) Bomber Bomb
-		  // 29) Tank Chaingun
-		  // 30) Tank Mortar
-		  // 31) Satchel
-		  // 100) Hand Grenade
-		  
-		  if (%client.team != %clVictim.team)
-		  {	
-			 if ((%damageType > 0  && %damageType < 11) ||
-				 (%damageType == 13)                    ||
-				 (%damageType > 15 && %damageType < 24) ||
-				 (%damageType > 25 && %damageType < 32) ||
-				 (%damageType == 100))
-			 {
-				messageClient(%client, 'MsgClientHit', %client.playerHitWav);
-			 }
-		  }
-	   }
-	   // ------------------------------------------------------------------
-
-	   //call the game specific AI routines...
-	   if (isObject(%clVictim) && %clVictim.isAIControlled())
-		  %game.onAIDamaged(%clVictim, %clAttacker, %damageType, %sourceObject);
-	   if (isObject(%clAttacker) && %clAttacker.isAIControlled())
-		  %game.onAIFriendlyFire(%clVictim, %clAttacker, %damageType, %sourceObject);
-	}
-
 };
 if($dtStats::Enable){
    activatePackage(dtStats);
@@ -1229,6 +1142,7 @@ function ArenaHud(%game, %client, %tag){
    //clear the rest of Hud so we don't get old lines hanging around...
    messageClient(%client, 'ClearHud', "", %tag, %index);
 }
+
 function DuelHud(%game, %client, %tag){
       if(%client.viewStats && $dtStats::enableRefresh){
          statsMenu(%client, %game.class);
@@ -1548,7 +1462,7 @@ function DMHud(%game, %client, %tag){// note in this game type the score hud can
    
    //clear the rest of Hud so we don't get old lines hanging around...
    messageClient( %client, 'ClearHud', "", %tag, %index );
-   }
+}
 function LakRabbitHud(%game, %client, %tag){
       if(%client.viewStats && $dtStats::enableRefresh){
          statsMenu(%client, %game.class);
@@ -2279,7 +2193,7 @@ function LakRabbitHud(%game, %client, %tag){
 function dtStatsMissionDropReady(%game, %client){ // called when client has finished loading
    if($dtStats::debugEchos){error("dtStatsMissionDropReady GUID = "  SPC %client.guid);}  
    %client.lp = "";
-   if(%client.guid $= ""){ return;}
+   if(%client.guid $= ""){ resetDtStats(%client,%game.class,1); return;}
    %foundOld = 0;
    if(!%client.isAIControlled() && !isObject(%client.dtStats))
    {
@@ -2321,6 +2235,7 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          %dtStats.clientLeft = 0;
          %dtStats.markForDelete = 0;
          %dtStats.lastGame[%game.class] = 0;
+		 resetDtStats(%client,%game.class,1);
          loadGameStats(%client.dtStats,%game.class);
          %client.dtStats.gameData[%game.class] = 1;
          %client.dtStats.dtGameCounter = 0;
@@ -2620,48 +2535,6 @@ function msToMinSec(%time)
 
    return(%min @ ":" @ %sec);
 }
-function hGrenadeProfile(%game){ // remaps hand grenade to its own damage type so we can track it 
-   if(%game.class !$= "LakRabbitGame"){// lakrabbit has its own method of doing this so we revert back and use that   
-      $lastObjExplode = 0;
-      GrenadeThrown.radiusDamageType = $DamageType::HGrenade	 = 100;
-      $DamageTypeText[100] = 'grenade';
-      ShrikeDamageProfile.damageScale[$DamageType::HGrenade] = 0.75;
-      ShrikeDamageProfile.shieldDamageScale[$DamageType::HGrenade] = 1;
-      BomberDamageProfile.damageScale[$DamageType::HGrenade] = 0.75;
-      BomberDamageProfile.shieldDamageScale[$DamageType::HGrenade] = 1;
-      HavocDamageProfile.damageScale[$DamageType::HGrenade] = 0.75;
-      HavocDamageProfile.shieldDamageScale[$DamageType::HGrenade] = 1;
-      WildcatDamageProfile.damageScale[$DamageType::HGrenade] = 1;
-      WildcatDamageProfile.shieldDamageScale[$DamageType::HGrenade] = 2;
-      TankDamageProfile.damageScale[$DamageType::HGrenade] = 1;
-      TankDamageProfile.shieldDamageScale[$DamageType::HGrenade] = 0.8;
-      MPBDamageProfile.damageScale[$DamageType::HGrenade] = 1;
-      MPBDamageProfile.shieldDamageScale[$DamageType::HGrenade] = 0.8;
-      TurretDamageProfile.damageScale[$DamageType::HGrenade] = 1;
-      TurretDamageProfile.shieldDamageScale[$DamageType::HGrenade] = 1.5;
-      StaticShapeDamageProfile.damageScale[$DamageType::HGrenade] = 1.2;
-      StaticShapeDamageProfile.shieldDamageScale[$DamageType::HGrenade] = 1.2;
-      LightPlayerDamageProfile.damageScale[$DamageType::HGrenade] = 1.2;
-      MediumPlayerDamageProfile.damageScale[$DamageType::HGrenade] = 1.0;
-      HeavyPlayerDamageProfile.damageScale[$DamageType::HGrenade] = 0.8;
-      $DeathMessageSelfKill[$DamageType::HGrenade, 0] = '\c0%1 destroys %2self with a grenade!';
-      $DeathMessageSelfKill[$DamageType::HGrenade, 1] = '\c0%1 took a bad bounce from %3 own grenade!';
-      $DeathMessageSelfKill[$DamageType::HGrenade, 2] = '\c0%1 pulled the pin a shade early.';
-      $DeathMessageSelfKill[$DamageType::HGrenade, 3] = '\c0%1\'s own grenade turns on %2.';
-      $DeathMessageSelfKill[$DamageType::HGrenade, 4] = '\c0%1 blows %2self up real good.';
-      
-      $DeathMessageTeamKill[$DamageType::HGrenade, 0] = '\c0%4 TEAMKILLED %1 with a grenade!';
-      
-      $DeathMessage[$DamageType::HGrenade, 0] = '\c0%4 eliminates %1 with a grenade.';
-      $DeathMessage[$DamageType::HGrenade, 1] = '\c0%4 blows up %1 real good!';
-      $DeathMessage[$DamageType::HGrenade, 2] = '\c0%1 gets annihilated by %4\'s grenade.';
-      $DeathMessage[$DamageType::HGrenade, 3] = '\c0%1 receives a kaboom lesson from %4.';
-      $DeathMessage[$DamageType::HGrenade, 4] = '\c0%4 turns %1 into grenade salad.';
-   }
-   else{
-      GrenadeThrown.radiusDamageType = $DamageType::Grenade;
-   }
-}
 
 function setFieldValue(%obj,%field,%value){
    if(isObject(%obj)){
@@ -2705,7 +2578,6 @@ function getCNameToCID(%name){
 //							Load Save Management							  //
 ////////////////////////////////////////////////////////////////////////////////
 function loadGameStats(%dtStats,%game){// called when client joins server.cs onConnect
-   resetDtStats(%dtStats.client,%game,1);
    if($dtStats::debugEchos){error("loadGameStats GUID = "  SPC %dtStats.guid);} 
    if(%dtStats.guid !$= "" && !$dtStats::Basic){
       loadGameTotalStats(%dtStats,%game);
@@ -3091,7 +2963,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             if(%clKiller.discT < %vel){%clKiller.discT = %vel;} 
             if(%isCombo){%clKiller.discCom++;} 
          case $DamageType::Grenade:
-            if($lastObjExplode.isHandNade){
+            if($dtObjExplode.dtNade){
                %clKiller.hGrenadeKills++;
                %clVictim.hGrenadeDeaths++;
                if(%clKiller.hGrenadeMax < %dis){%clKiller.hGrenadeMax = %dis;}
@@ -3105,12 +2977,6 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
                if(%clKiller.grenadeT < %vel){%clKiller.grenadeT = %vel;} 
                if(%isCombo){%clKiller.grenadeCom++;}
             }
-         case $DamageType::HGrenade:
-            %clKiller.hGrenadeKills++;
-            %clVictim.hGrenadeDeaths++;
-            if(%clKiller.hGrenadeMax < %dis){%clKiller.hGrenadeMax = %dis;}
-            if(%clKiller.hGrenadeT < %vel){%clKiller.hGrenadeT = %vel;}  
-            if(%isCombo){%clKiller.hGrenadeCom++;}
          case $DamageType::Laser:
             %clKiller.laserKills++;
             %clVictim.laserDeaths++;
@@ -3332,6 +3198,9 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
             %vel = vectorLen(%vD);
             if(%client.maxRV < %vel){%client.maxRV = %vel;} 
             if(%client.maxSpeed < %speed){%client.maxSpeed = %speed;}
+            %targetClient.avgTSpeed += %vel; %targetClient.avgSpeedCount++;
+            %targetClient.avgSpeed = %targetClient.avgTSpeed/%targetClient.avgSpeedCount;
+            if(%targetClient.avgSpeedCount >= 50){%targetClient.avgSpeedCount=%targetClient.avgTSpeed=0;}
          }
       }
       switch$(%damageType){// list of all damage types to track see damageTypes.cs
@@ -3371,7 +3240,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
                if(%targetClient != %client && rayTest(%targetObject,DiscProjectile.damageRadius+1)){%client.discMA++;}   
             }
          case $DamageType::Grenade:
-            if($lastObjExplode.isHandNade){
+            if($dtObjExplode.dtNade){
                %client.hGrenadeInDmg += %amount;
                %client.hGrenadeInHits++;
                %client.hGrenadeACC = (%client.hGrenadeInHits / %client.hGrenadeShotsFired) * 100;
@@ -3433,14 +3302,6 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
                %targetClient.md = 1;
                schedule(300,0,"mdReset");
                if(%targetClient != %client && rayTest(%targetObject,MineDeployed.damageRadius+1)){%client.mineMA++;}
-            }
-         case $DamageType::HGrenade:
-            %client.hGrenadeInDmg += %amount;
-            %client.hGrenadeInHits++;
-            %client.hGrenadeACC = (%client.hGrenadeInHits / %client.hGrenadeShotsFired) * 100;
-            if(%t){
-               %targetClient.hGrenadeInDmgTaken += %amount;
-               if(%targetClient != %client && rayTest(%targetObject,GrenadeThrown.damageRadius+1)){%client.hGrenadeMA++;}
             }
          case $DamageType::SatchelCharge:
             %client.SatchelInDmg += %amount;
@@ -3521,6 +3382,11 @@ function clientShotsFired(%data, %sourceObject, %projectile){ // could do a fov 
       %client = %sourceObject.client;
    }
    if(!isObject(%client) || %client.isAiControlled()){ return;}
+   
+   %speed = vectorLen(%client.player.getVelocity());
+   %client.avgTSpeed += %speed; %client.avgSpeedCount++;
+   %client.avgSpeed = %client.avgTSpeed/%client.avgSpeedCount;
+   if(%client.avgSpeedCount >= 50){%client.avgSpeedCount=%client.avgTSpeed=0;}   
    
    %pos = getWords(%sourceObject.getPosition(),0,1) SPC 0;
    if(%client.lp !$= ""){%client.distT += vectorDist(%client.lp,%pos);}
@@ -3683,7 +3549,7 @@ function getGameTotal(%vClient,%value,%game){
 function kdr(%x,%y) 
 {
 	 if(%x == 0)
-		return 0; 
+       return 0; 
      else if(%y == 0)
         return 100;
 	
@@ -3731,9 +3597,11 @@ function statsMenu(%client,%game){
             case "CTFGame":
                if($dtStats::Live)
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLIVE\t%1>  + CTF Live Stats</a>',%vClient);
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTFGame\t%1\t-1>  + CTF Match Stats</a>',%vClient);
+			   if($dtStats::Match)
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tCTFGame\t%1\t-1>  + CTF Match Stats</a>',%vClient);
                if(%isTargetSelf || %isAdmin) {
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + CTF Weapon Stats </a>',%vClient);
+				  if($dtStats::Weapon)
+                     messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + CTF Weapon Stats </a>',%vClient);
                   if($dtStats::Vehicle)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tVehicles\t%1>  + CTF Vehicle Stats</a>',%vClient);
                   if($dtStats::Turret)
@@ -3750,9 +3618,11 @@ function statsMenu(%client,%game){
             case "LakRabbitGame":
                if($dtStats::Live)
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLIVE\t%1>  + Lak Live Stats</a>',%vClient);
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLakRabbitGame\t%1\t-1>  + Lak Match Stats</a>',%vClient);
+			   if($dtStats::Match)
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLakRabbitGame\t%1\t-1>  + Lak Match Stats</a>',%vClient);
                if(%isTargetSelf || %isAdmin) {
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1>  + Lak Weapon Stats</a>',%vClient);
+				  if($dtStats::Weapon)
+                     messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1>  + Lak Weapon Stats</a>',%vClient);
                   if($dtStats::Armor)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tARMOR\t%1>  + Arena Armor Stats</a>',%vClient); 
                   
@@ -3765,7 +3635,8 @@ function statsMenu(%client,%game){
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLIVE\t%1>  + Deathmatch Live Stats</a>',%vClient); 
                messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tDMGame\t%1\t-1>  + Deathmatch Stats</a>',%vClient);
                if(%isTargetSelf || %isAdmin) {
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + Deathmatch Weapon Stats</a>',%vClient);
+				  if($dtStats::Weapon)
+                     messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + Deathmatch Weapon Stats</a>',%vClient);
                   if($dtStats::Armor)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tARMOR\t%1>  + Deathmatch Armor Stats</a>',%vClient); 
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
@@ -3777,7 +3648,8 @@ function statsMenu(%client,%game){
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLIVE\t%1>  + Duel Mod Live Stats</a>',%vClient);
                messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tDuelGame\t%1\t-1>  + Duel Mod Stats</a>',%vClient);
                if(%isTargetSelf || %isAdmin) {
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + Duel Mod Weapon Stats</a>',%vClient);
+				  if($dtStats::Weapon)
+                     messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + Duel Mod Weapon Stats</a>',%vClient);
                   if($dtStats::Armor)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tARMOR\t%1>  + Duel Mod Armor Stats</a>',%vClient);
                   
@@ -3788,9 +3660,10 @@ function statsMenu(%client,%game){
             case "SCtFGame":// LCTF
                if($dtStats::Live)
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLIVE\t%1>  + LCTF Live Stats</a>',%vClient);
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tSCtFGame\t%1\t-1>  + LCTF Match Stats</a>',%vClient);
+               //messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tSCtFGame\t%1\t-1>  + LCTF Match Stats</a>',%vClient);
                if(%isTargetSelf || %isAdmin) {
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + LCTF Weapon Stats</a>',%vClient);
+				  if($dtStats::Weapon)
+                     messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + LCTF Weapon Stats</a>',%vClient);
                   if($dtStats::Vehicle)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tVehicles\t%1>  + CTF Vehicle Stats</a>',%vClient);
                   if($dtStats::Turret)
@@ -3807,7 +3680,8 @@ function statsMenu(%client,%game){
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLIVE\t%1>  + Arena Live Stats</a>',%vClient);
                messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tArenaGame\t%1\t-1>  + Arena Stats</a>',%vClient);
                if(%isTargetSelf || %isAdmin) {
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + Arena Weapon Stats</a>',%vClient);
+                  if($dtStats::Weapon)
+					 messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + Arena Weapon Stats</a>',%vClient);
                   if($dtStats::Armor)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tARMOR\t%1>  + Arena Armor Stats</a>',%vClient); 
                  
@@ -4233,15 +4107,15 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient);
          %a1 = getGameTotal(%vClient,"cgKills",%game); %b2 = getGameTotal(%vClient,"cgDeaths",%game); %c3 = getGameTotal(%vClient,"discKills",%game);
          %d4 = getGameTotal(%vClient,"discDeaths",%game); %e5 = getGameTotal(%vClient,"grenadeKills",%game); %f6 = getGameTotal(%vClient,"grenadeDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Chaingun: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Spinfusor: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Grenade Launcher: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Chaingun: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Spinfusor: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Grenade Launcher: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"laserKills",%game); %b2 = getGameTotal(%vClient,"laserDeaths",%game); %c3 = getGameTotal(%vClient,"mortarKills",%game);
          %d4 = getGameTotal(%vClient,"mortarDeaths",%game); %e5 = getGameTotal(%vClient,"shockLanceKills",%game); %f6 = getGameTotal(%vClient,"shockLanceDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Laser Rifle: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Fusion Mortar: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Shocklance: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Laser Rifle: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Fusion Mortar: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Shocklance: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"plasmaKills",%game); %b2 = getGameTotal(%vClient,"plasmaDeaths",%game); %c3 = getGameTotal(%vClient,"blasterKills",%game);
          %d4 = getGameTotal(%vClient,"blasterDeaths",%game); %e5 = getGameTotal(%vClient,"elfKills",%game); %f6 = getGameTotal(%vClient,"elfDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Plasma Rifle: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Blaster: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>ELF Projector: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Plasma Rifle: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Blaster: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>ELF Projector: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, " -----------------------------------------------------------------------------------------------------------------");
@@ -4250,44 +4124,44 @@ function statsMenu(%client,%game){
          
          %a1 = getGameTotal(%vClient,"mineKills",%game); %b2 = getGameTotal(%vClient,"mineDeaths",%game); %c3 = getGameTotal(%vClient,"explosionKills",%game);
          %d4 = getGameTotal(%vClient,"explosionDeaths",%game); %e5 = getGameTotal(%vClient,"impactKills",%game); %f6 = getGameTotal(%vClient,"impactDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Mines: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Explosion: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Impact: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Mines: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Explosion: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Impact: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"groundKills"); %b2 = getGameTotal(%vClient,"groundDeaths"); %c3 = getGameTotal(%vClient,"turretKills");
          %d4 = getGameTotal(%vClient,"turretDeaths",%game); %e5 = getGameTotal(%vClient,"plasmaTurretKills",%game); %f6 = getGameTotal(%vClient,"plasmaTurretDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Ground: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Plasma Turret: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Ground: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Turret: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Plasma Turret: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"aaTurretKills"); %b2 = getGameTotal(%vClient,"aaTurretDeaths"); %c3 = getGameTotal(%vClient,"elfTurretKills");
          %d4 = getGameTotal(%vClient,"elfTurretDeaths",%game); %e5 = getGameTotal(%vClient,"mortarTurretKills",%game); %f6 = getGameTotal(%vClient,"mortarTurretDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  AA Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>ELF Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Mortar Turret: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  AA Turret: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>ELF Turret: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Mortar Turret: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"missileTurretKills",%game); %b2 = getGameTotal(%vClient,"missileTurretDeaths",%game); %c3 = getGameTotal(%vClient,"indoorDepTurretKills",%game);
          %d4 = getGameTotal(%vClient,"indoorDepTurretDeaths",%game); %e5 = getGameTotal(%vClient,"outdoorDepTurretKills",%game); %f6 = getGameTotal(%vClient,"outdoorDepTurretDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Missile Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Spider Camp Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Land Spike Turret: <color:02d404>%5 k / %6 d';
+         %line = '<font:univers condensed:18><color:0befe7>  Missile Turret: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Spider Camp Turret: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Land Spike Turret: <color:33CCCC>%5:%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          
          %a1 = getGameTotal(%vClient,"sentryTurretKills",%game); %b2 = getGameTotal(%vClient,"sentryTurretDeaths",%game); %c3 = getGameTotal(%vClient,"outOfBoundKills",%game);
          %d4 = getGameTotal(%vClient,"outOfBoundDeaths",%game); %e5 = getGameTotal(%vClient,"lavaKills",%game); %f6 = getGameTotal(%vClient,"lavaDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Sentry Turret: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Out Of Bounds: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Lava: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Sentry Turret: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Out Of Bounds: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Lava: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"shrikeBlasterKills",%game); %b2 = getGameTotal(%vClient,"shrikeBlasterDeaths",%game); %c3 = getGameTotal(%vClient,"bellyTurretKills",%game);
          %d4 = getGameTotal(%vClient,"bellyTurretDeaths",%game); %e5 = getGameTotal(%vClient,"bomberBombsKills",%game); %f6 = getGameTotal(%vClient,"bomberBombsDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Shrike Blaster: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Bomber Turret: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Bomber Bombs: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Shrike Blaster: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Bomber Turret: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Bomber Bombs: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"tankChaingunKills",%game); %b2 = getGameTotal(%vClient,"tankChaingunDeaths",%game); %c3 = getGameTotal(%vClient,"tankMortarKills",%game);
          %d4 = getGameTotal(%vClient,"tankMortarDeaths",%game); %e5 = getGameTotal(%vClient,"nexusCampingKills",%game); %f6 = getGameTotal(%vClient,"nexusCampingDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Tank Chaingun: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Tank Mortar: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Nexus Camping: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Tank Chaingun: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Tank Mortar: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Nexus Camping: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          
          %a1 = getGameTotal(%vClient,"satchelChargeKills",%game); %b2 = getGameTotal(%vClient,"satchelChargeDeaths",%game); %c3 = getGameTotal(%vClient,"lightningKills",%game);
          %d4 = getGameTotal(%vClient,"lightningDeaths",%game); %e5 = getGameTotal(%vClient,"vehicleSpawnKills",%game); %f6 = getGameTotal(%vClient,"vehicleSpawnDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Satchel Charge: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Lightning: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Vehicle Spawn: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Satchel Charge: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Lightning: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Vehicle Spawn: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"forceFieldPowerUpKills",%game); %b2 = getGameTotal(%vClient,"forceFieldPowerUpDeaths",%game); %c3 = getGameTotal(%vClient,"crashKills",%game);
          %d4 = getGameTotal(%vClient,"crashDeaths",%game); %e5 = getGameTotal(%vClient,"waterKills",%game); %f6 = getGameTotal(%vClient,"waterDeaths",%game);
-         %line = '<font:univers condensed:18><color:0befe7>  Forcefield Power: <color:02d404>%1 k / %2 d<color:0befe7><lmargin:175>Crash: <color:02d404>%3 k / %4 d<color:0befe7><lmargin:380>Water: <color:02d404>%5 k / %6 d<color:0befe7>';
+         %line = '<font:univers condensed:18><color:0befe7>  Forcefield Power: <color:33CCCC>%1:%2<color:0befe7><lmargin:200>Crash: <color:33CCCC>%3:%4<color:0befe7><lmargin:395>Water: <color:33CCCC>%5:%6<color:0befe7>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2,%c3,%d4,%e5,%f6);
          %a1 = getGameTotal(%vClient,"nexusCampingKills",%game); %b2 = getGameTotal(%vClient,"nexusCampingDeaths",%game); 
-         //%line = '<font:univers condensed:18><color:0befe7>  Nexus Camping: <color:02d404>%1 k / %2 d';
+         //%line = '<font:univers condensed:18><color:0befe7>  Nexus Camping: <color:33CCCC>%1:%2';
         // messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%b2);
          
       case "WEAPON":// Weapons
@@ -4473,7 +4347,7 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4);         
          
          %i1 = "KDR:" SPC kdr(%vClient.kills,%vClient.deaths) @ "%"; 
-         %i2 = "Kill Streak:" SPC %vClient.killStreak;
+         %i2 = "KillStreak:" SPC %vClient.killStreak;
          %i3 = "Combos:" SPC %vClient.comboCount;
          %i4 = %vClient.plasmaMA + %vClient.discMA + %vClient.mineMA + %vClient.grenadeMA + %vClient.hGrenadeMA + %vClient.mortarMA + %vClient.shockLanceMA + %vClient.laserMA +
          %vClient.laserHeadShot + %vClient.shockRearShot + %vClient.comboPT + %vClient.assist +
@@ -4487,7 +4361,7 @@ function statsMenu(%client,%game){
          %dmg =  %vClient.blasterDmg + %vClient.plasmaInDmg + %vClient.grenadeInDmg + %vClient.hGrenadeInDmg + %vClient.cgDmg + 
          %vClient.discInDmg + %vClient.laserDmg + %vClient.mortarInDmg + %vClient.missileInDmg + %vClient.shockLanceInDmg + %vClient.mineInDmg;
          %i1 = "Damage:" SPC numReduce(%dmg,1);
-         %i2 = "Avg Speed:" SPC  mFloatLength(%vClient.maxSpeed,1) + 0;
+         %i2 = "Speed:" SPC  mFloatLength(%vClient.avgSpeed,1) + 0;
          %i3 = "Shots Fired:" SPC numReduce(%vClient.shotsFired,2); //"RelSpeed:" SPC mFloatLength(%vClient.maxRV,1)+0;
          %i4 = "Dist Moved:" SPC numReduce(%vClient.distT,1); // %vClient.dtStats.totalGames[%game];
          %line = '<color:0befe7>  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';
@@ -5527,5 +5401,3 @@ function statsMenu(%client,%game){
          %client.viewStats = 0;
    }
 }
-
-  

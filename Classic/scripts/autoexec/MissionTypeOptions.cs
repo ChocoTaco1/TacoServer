@@ -9,7 +9,8 @@
 // $Host::PUGautoPassword = 1;
 // The PUG password you want
 // $Host::PUGPassword = "pickup";
-//
+// PUG Password is always on no matter what
+// $Host::$PUGpasswordAlwaysOn = 1;
 
 package MissionTypeOptions
 {
@@ -34,6 +35,9 @@ function loadMissionStage2()
 		//Set server mode to DISTANCE
 		$Host::HiVisibility = "1";
 	}
+	
+	if( $Host::PUGpasswordAlwaysOn )
+		$Host::Password = $Host::PUGPassword;
 	
 	//Start MapRepetitionChecker
 	schedule(20000, 0, "MapRepetitionChecker", %game);

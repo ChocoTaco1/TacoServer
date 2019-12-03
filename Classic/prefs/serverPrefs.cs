@@ -1441,6 +1441,7 @@ $Host::PlayerRespawnTimeout = 60;
 $Host::Port = 28000;
 $Host::PUGautoPassword = 0;
 $Host::PUGPassword = "pickup";
+$Host::PUGpasswordAlwaysOn = 0;
 $Host::PureServer = 0;
 $Host::SCtFProMode = 0;
 $Host::ShowEndingPlayerScores = 1;

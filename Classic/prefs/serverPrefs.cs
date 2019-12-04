@@ -64,6 +64,7 @@ $Host::EmptyServerReset = 1;
 $Host::EmptyServerResetTime = 120;
 $Host::EnableAutobalance = 1;
 $Host::EnableLakUnlimitedDJ = 1;
+$Host::EnableMapRepetitionChecker = 1;
 $Host::EnableMortarTurret = 0;
 $Host::EnableNoBaseRapeNotify = 1;
 $Host::EnableNetTourneyClient = 0;

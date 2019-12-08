@@ -21,60 +21,51 @@ $PreviousMission1back = "";
 //Ran in MissionTypeOptions.cs
 function MapRepetitionChecker( %game )
 {
-	if($Host::EnableMapRepetitionChecker)
-	{
-		//Debug
-		//%MapRepetitionCheckerDebug = true;
-			
-		if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
-			return;
-			
-		if($EvoCachedNextMission $= "")
-			return;
+	//Debug
+	//%MapRepetitionCheckerDebug = true;
 		
-		if(!$Host::TournamentMode)
-		{	
-			//Do work
-			if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
-				$PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission ||
-				$CurrentMission $= $EvoCachedNextMission )
-				MapRepetitionCheckerFindRandom();
+	if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
+		return;
+		
+	if($EvoCachedNextMission $= "")
+		return;
+	
+	if(!$Host::TournamentMode && $Host::EnableMapRepetitionChecker)
+	{	
+		//Do work
+		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
+			$PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission ||
+			$CurrentMission $= $EvoCachedNextMission )
+			MapRepetitionCheckerFindRandom();
+			
+		//Set vars	
+		if($PreviousMission3back !$= "") $PreviousMission4back = $PreviousMission3back;
+		if($PreviousMission2back !$= "") $PreviousMission3back = $PreviousMission2back;		
+		if($PreviousMission1back !$= "") $PreviousMission2back = $PreviousMission1back;
+										 $PreviousMission1back = $CurrentMission;
 				
-			//Set vars	
-			if($PreviousMission3back !$= "") $PreviousMission4back = $PreviousMission3back;
-			if($PreviousMission2back !$= "") $PreviousMission3back = $PreviousMission2back;		
-			if($PreviousMission1back !$= "") $PreviousMission2back = $PreviousMission1back;
-											 $PreviousMission1back = $CurrentMission;
-					
-			//Debug
-			if(%MapRepetitionCheckerDebug)	
-			{
-				if($PreviousMission1back !$= "") echo("PM1: " @ $PreviousMission1back);
-				if($PreviousMission2back !$= "") echo("PM2: " @ $PreviousMission2back);
-				if($PreviousMission3back !$= "") echo("PM3: " @ $PreviousMission3back);
-				if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
-			}
+		//Debug
+		if(%MapRepetitionCheckerDebug)	
+		{
+			if($PreviousMission1back !$= "") echo("PM1: " @ $PreviousMission1back);
+			if($PreviousMission2back !$= "") echo("PM2: " @ $PreviousMission2back);
+			if($PreviousMission3back !$= "") echo("PM3: " @ $PreviousMission3back);
+			if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
 		}
 	}
 }
 
 function MapRepetitionCheckerFindRandom()
 {
-	if($GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
-		SetNextMapGetRandoms( %client ); //Get Random Set Next Mission maps	
-	else
+	if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
 		return;
-	
-	if( $CurrentMissionType $= "Deathmatch" )
-		%MapCheckerRandom = getRandom(1,8);
-	else
-		%MapCheckerRandom = getRandom(1,6);
-	
+
 	//Backup
 	$SetNextMissionRestore = $EvoCachedNextMission;
 	
 	//Do work
-	$EvoCachedNextMission = $SetNextMissionMapSlot[%MapCheckerRandom];
+	//getRandomMap() is in GetRandomMaps.cs
+	$EvoCachedNextMission = getRandomMap();
 	
 	//Make sure new map still complies
 	if( $EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || 

@@ -1,10 +1,15 @@
 // Vote OverTime Script
 //
 // Dont allow the match to end if a time vote is pending
+// Or if the timelimit has changed
+//
+// Changes were also made in the Evo Admin.ovl and DefaultGame.ovl
+// DefaultGame::voteChangeMission, DefaultGame::voteChangeTimeLimit, serverCmdStartNewVote
+//
+// The VoteChangeTimeLimit functions in evo dictate VOStatus conditions
 
+$VOStatus = "Normal";
 
-//Changes were also made in the Evo Admin.ovl and DefaultGame.ovl
-//DefaultGame::voteChangeMission, DefaultGame::voteChangeTimeLimit, serverCmdStartNewVote
 package VoteOverTime
 {
 
@@ -25,23 +30,24 @@ function DefaultGame::checkTimeLimit(%game, %forced)
 
    if (%curTimeLeftMS <= 0)
    {
-        //Vote Overtime
-		//Check if Vote is active or if the timelimit has changed.
-		if( !$VoteInProgress && !$TimeLimitChanged )
+		//Vote Overtime
+		//Check if Time Vote is starting or active or if the timelimit has changed.
+		//If the timelimit has changed, don't end the game.
+		switch$($VOStatus)
 		{
-			// time's up, put down your pencils
-			%game.timeLimitReached();
-		}
-		else if( $missionRunning && $VoteInProgress && !$TimeLimitChanged )
-		{
-			//Restart the function so the map can end if the Vote doesnt pass.
-			schedule(2000, 0, "RestartcheckTimeLimit", %game, %forced);
-
-			if( !$VoteInProgressMsg )
-			{
-				messageAll('', '\c2Vote Overtime Initiated.~wfx/powered/turret_heavy_activate.wav', %display);
-				$VoteInProgressMsg = true;
-			}
+			case Starting:
+				if($missionRunning)
+				{
+					messageAll('', '\c2Vote Overtime Initiated.~wfx/powered/turret_heavy_activate.wav', %display);
+					$VOStatus = "InProgress";
+				}
+			case InProgress:
+				//Do Nothing
+			case TimeChanged:				
+				//Do Nothing
+			case Normal:				
+				// time's up, put down your pencils
+				%game.timeLimitReached();
 		}
    }
    else
@@ -56,42 +62,39 @@ function DefaultGame::checkTimeLimit(%game, %forced)
    }
 }
 
-// Reset every map change
 function DefaultGame::gameOver(%game)
 {
 	Parent::gameOver(%game);
 	
 	//Reset everything to do with Vote Overtime
 	ResetVOall(%game);
+	
+	if(isEventPending($VoteSoundSchedule)) 
+		cancel($VoteSoundSchedule);
 }
 
 };
 
-function RestartcheckTimeLimit(%game, %forced)
-{
-	%game.checkTimeLimit(%game, %forced);
-}
-
+// Various Flags for the different situations
+// Starting a TimeVote - Sets flags so the game wont end during this vote
 function StartVOTimeVote(%game)
 {
+	$VOStatus = "Starting";
 	$VoteSoundInProgress = true;
-	$VoteInProgress = true;
-	$TimeLimitChanged = false;
 }
 
+// Tribes wont change the time after its reached zero and you cant change it again afterwards until a gameover/map change.
+// But this serves its purpose for extending the game whether it works (technically) or not.
 function ResetVOTimeChanged(%game)
 {
-	$VoteInProgress = false;
-	$TimeLimitChanged = true;
-	$VoteInProgressMsg = false;
+	$VOStatus = "TimeChanged";
 	$VoteSoundInProgress = false;
 }
 
+// Reset everything. So everything functions normally after a map change.
 function ResetVOall(%game)
 {
-	$VoteInProgress = false;
-	$TimeLimitChanged = false;
-	$VoteInProgressMsg = false;
+	$VOStatus = "Normal";
 	$VoteSoundInProgress = false;
 }
 

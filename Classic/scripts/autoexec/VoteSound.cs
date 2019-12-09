@@ -52,6 +52,9 @@ function VoteSound( %game, %typename, %arg1, %arg2, %VoteSoundRandom )
 				messageAll('', '\c1Vote in Progress: \c0To change the mission to Tournament Mode (%1). %3~wgui/objective_notification.wav', %arg1, %arg2, %votemsg );
 		}
 
-		schedule(12000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
+		if(isEventPending($VoteSoundSchedule)) 
+			cancel($VoteSoundSchedule);
+		
+		$VoteSoundSchedule = schedule(12000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
 	}
 }

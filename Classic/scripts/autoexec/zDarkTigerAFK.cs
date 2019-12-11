@@ -1,86 +1,168 @@
-//AFK Timeout
-//Script BY: DarkTiger
-//
-//Client specific to save on schedules
-//Add clients who are normally AFK
-//0 minutes disables
+// AFK Timeout Script
+// Script BY: DarkTiger
+// Worked on: ChocoTaco
+// If player is afk specific amount of time in minutes, force them into observer
 
-$dtVar::AFKtime = 60000 * 2;//if player is afk specific amount of time in minutes, force them into observer
-$dtVar::AFKloop = 1000 * 30;//loop check timer
+// Enable/Disable entire script
+$dtVar::AFKTimeout = 1;
+// 60000 * 2 is 2 minutes
+// 0 minutes disables
+$dtVar::AFKtime = 60000 * 2;
+// Run from List Only instead of All clients on the server. 1 is yes, 0 is no
+$dtVar::ListOnly = 1;
+// Add clients who are normally AFK 
+$dtVar::AFKList[$AFKCount++] = "";
+$dtVar::AFKList[$AFKCount++] = "";
+// Loop Check Timer
+// How often do you want a AFKLoop. 1000 * 30 is 30 seconds
+$dtVar::AFKloop = 1000 * 30; 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-package afkScript
+// Set Status Var
+if($dtVar::ListOnly)
+	$DT_AFKStatus = "IDLE";
+else
+	$DT_AFKStatus = "ACTIVE";
+
+////////////////////////////////////////////////////////////////////////////////
+
+package DT_AFKPackage
 {
-   
-function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
+	
+function CreateServer( %mission, %missionType )
 {
-	Parent::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch );
+	parent::CreateServer( %mission, %missionType );
 	
-	if($dtVar::AFKtime > 0) //0 minutes disables
-	{
-		%guid = %client.guid;
+	//Call to start AFKTimeout update
+	DT_AFKtimeoutLoop();
 	
-		//Add clients here
-		%AFKWatchList1 = "";
-		%AFKWatchList2 = "";
-		%AFKWatchList3 = "";
-		%AFKWatchList4 = "";
-		
-		if(%guid $= %AFKWatchList1 || %guid $= %AFKWatchList2 || %guid $= %AFKWatchList3 || %guid $= %AFKWatchList4 )
-		{
-			if(%guid $= "")
-				return;
-			
-			%client.afkLoopCheck();// starts it
-		}
-	}
+	// Prevent package from being activated if it is already
+	if(!isActivePackage(DT_AFKOverrides) && $dtVar::ListOnly)
+		activatePackage(DT_AFKOverrides);
 }
 
 };
 
 // Prevent package from being activated if it is already
-if(!isActivePackage(afkScript))
-    activatePackage(afkScript);
+if(!isActivePackage(DT_AFKPackage) && $dtVar::AFKTimeout)
+	activatePackage(DT_AFKPackage);
 
+package DT_AFKOverrides
+{
+
+function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
+{
+	Parent::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch);
+   
+	DT_AFKStatusConnect(%client);
+}
+
+function GameConnection::onDrop(%client, %reason)
+{
+	Parent::onDrop(%client, %reason);
+	
+	DT_AFKStatusDrop(%client);
+}
+
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-function GameConnection::afkLoopCheck(%this)
+function DT_AFKStatusConnect(%client)
 {
-	if(isObject(%this) && !%this.isAiControlled())// make sure client is still there other wise stop
-		%this.schedule($dtVar::AFKloop,"afkLoopCheck");
-	else
-		return;
-      
-	//echo(%this.team);
-	  
-	if(isObject(%this.player) && %this.player.getState() !$= "Dead" && $matchStarted && %this.team !$= 0) //Added no check if observer
-		AFKChk(%this);
+	for(%x = 1; %x <= $AFKCount; %x++) 
+	{
+		%guid = $dtVar::AFKList[%x];
+		if(%client.guid $= %guid && %guid !$= "")
+		{
+			$DT_AFKStatus = "ACTIVE";
+			$DT_AFKListCount++;
+		}
+	}
 }
+
+function DT_AFKStatusDrop(%client)
+{
+	for(%x = 1; %x <= $AFKCount; %x++) 
+	{
+		%guid = $dtVar::AFKList[%x];
+		if(%client.guid $= %guid && %guid !$= "")
+			$DT_AFKListCount = $DT_AFKListCount - 1;
+	}
+	if($DT_AFKListCount $= 0) //Wont set IDLE until all List Clients are off the server
+		$DT_AFKStatus = "IDLE";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+   
+function DT_AFKtimeoutLoop()
+{	
+	//echo($DT_AFKStatus);
+	
+	switch$($DT_AFKStatus)
+	{
+		case ACTIVE:
+		  if($dtVar::AFKtime != 0 && !$Host::TournamentMode)
+		  { //0 minutes disables
+			 if($dtVar::ListOnly)
+			 {
+				for(%i = 0; %i < ClientGroup.getCount(); %i ++) 
+				{
+				   %client = ClientGroup.getObject(%i);
+				   for(%x = 1; %x <= $AFKCount; %x++) 
+				   {
+					  %guid = $dtVar::AFKList[%x];
+					  if(!%client.isAIControlled() && isObject(%client.player) && %client.player.getState() !$= "Dead" )
+					  {
+						 if(%client.guid $= %guid && %guid !$= "")
+							AFKChk(%client);
+					  }
+				   }
+				}
+			 }
+			 else
+			 {
+				for(%i = 0; %i < ClientGroup.getCount(); %i ++) 
+				{
+				   %client = ClientGroup.getObject(%i);
+					if(!%client.isAIControlled() && isObject(%client.player) && %client.player.getState() !$= "Dead")
+						AFKChk(%client);
+				}
+			 }
+		  }
+		case IDLE:				
+			//Do Nothing
+	}
+  
+	if(isEventPending($dtVar::AFKloopSchedule)) 
+		cancel($dtVar::AFKloopSchedule);
+
+	$dtVar::AFKloopSchedule = schedule($dtVar::AFKloop, 0, "DT_AFKtimeoutLoop");	
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 function AFKChk(%client)
 {
-   if(%client.player.curTransform  $= %client.player.getTransform())//checks to see if there position and rotation are the same. 
-   {
-      //echo("is not moving");
-      // error(%client.player.curTransform  SPC %client.player.getTransform());
-      %client.player.afkTimer += $dtVar::AFKloop;
+   if(%client.player.curTransform  $= %client.player.getTransform())
+   {//checks to see if there position and rotation are the same. 
+	  %client.player.afkTimer += $dtVar::AFKloop;
       if(%client.player.afkTimer >= $dtVar::AFKtime)
-      {
-         Game.AFKForceObserver(%client);
-         return;
+	  {
+          Game.AFKForceObserver(%client);
+          return;
       }
    }
    else
    {
-      //echo("is moving");
       %client.player.afkTimer = 0;//reset if moving
    }
    
    %client.player.curTransform = %client.player.getTransform();//save current transform 
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 function DefaultGame::AFKForceObserver(%game, %client)
 {
@@ -106,7 +188,7 @@ function DefaultGame::AFKForceObserver(%game, %client)
 
    
    %client.camera.getDataBlock().setMode( %client.camera, "observerFly" );
-   messageClient(%client, 'MsgClientJoinTeam', '\c2You have been placed into observer mode due to inactivity.', %client.name, %game.getTeamName(0), %client, 0 );
+   messageClient(%client, 'MsgClientJoinTeam', '\c2You have been placed into observer mode due to inactivity.', %client.name, game.getTeamName(0), %client, 0 );
    logEcho(%client.nameBase@" (cl "@%client@") was forced into observer mode due to inactivity");
    %client.lastTeam = %client.team;
    
@@ -141,7 +223,7 @@ function DefaultGame::AFKForceObserver(%game, %client)
    //displayObserverHud(%client, 0);
    updateObserverFlyHud(%client);
    
-   messageAllExcept(%client, -1, 'MsgClientJoinTeam', '\c2%1 has been placed into observer mode due to inactivity.', %client.name, %game.getTeamName(0), %client, 0 );
+   messageAllExcept(%client, -1, 'MsgClientJoinTeam', '\c2%1 has been placed into observer mode due to inactivity.', %client.name, game.getTeamName(0), %client, 0 );
    
    updateCanListenState( %client );
    

@@ -13,51 +13,47 @@
 function CheckAntiCloak( %game )
 {
 	//CTF only
-	if( $Host::AntiCloakEnable && $CurrentMissionType $= "CTF" )
+	if( $Host::AntiCloakEnable && $CurrentMissionType $= "CTF" && !$Host::TournamentMode )
 	{
 		//echo("TotalTeamPlayerCount " @ $TotalTeamPlayerCount);
 		//echo("AntiCloakPlayerCount " @ $AntiCloakPlayerCount);
 	
-		//If server is in Tourny mode and the team population is lower than the AntiCloakPlayerCount cloak is not selectable.
-		if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::AntiCloakPlayerCount )
+		if( $TotalTeamPlayerCount < $Host::AntiCloakPlayerCount )
 		{
-			if( $AntiCloakRunOnce !$= 0 )
-			{
-				$InvBanList[CTF, "CloakingPack"] = 1;
-			
-				if(!isActivePackage(DisableCloakPack))
-					activatePackage(DisableCloakPack);
-			
-				$AntiCloakRunOnce = 0;
-			}
+			if( $AntiCloakStatus !$= "ACTIVEON" )
+			$AntiCloakStatus = "ON";
 		}
 		//Off
 		else
 		{
-			if( $AntiCloakRunOnce !$= 1 )
-			{
-				$InvBanList[CTF, "CloakingPack"] = 0;
-			
-				if(isActivePackage(DisableCloakPack))
-					deactivatePackage(DisableCloakPack);
-			
-				$AntiCloakRunOnce = 1;
-			}
+			if( $AntiCloakStatus !$= "ACTIVEOFF" )
+				$AntiCloakStatus = "OFF";
 		}
 	}
-	//All other cases outside of CTF.
+	//All other cases outside of CTF
 	else
 	{
-		if( $AntiCloakRunOnce !$= 1 )	
-		{
+		if( $AntiCloakStatus !$= "ACTIVEOFF" )
+			$AntiCloakStatus = "OFF";
+	}
+
+	switch$($AntiCloakStatus)
+	{
+		case ON:
+			$InvBanList[CTF, "CloakingPack"] = 1;
+			if(!isActivePackage(DisableCloakPack))
+				activatePackage(DisableCloakPack);
+			$AntiCloakStatus = "ACTIVEON";
+		case OFF:
 			$InvBanList[CTF, "CloakingPack"] = 0;
-			
 			if(isActivePackage(DisableCloakPack))
 				deactivatePackage(DisableCloakPack);
-			
-			$AntiCloakRunOnce = 1;
-		}
-	}	
+			$AntiCloakStatus = "ACTIVEOFF";
+		case ACTIVEON:				
+			//Do Nothing
+		case ACTIVEOFF:				
+			//Do Nothing
+	}
 }
 
 // So if the player is able to get a cloakpack, he cant use it

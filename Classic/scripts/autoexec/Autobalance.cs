@@ -15,6 +15,12 @@ $AllModeThreshold = 400;
 // Run from TeamBalanceNotify.cs via UnbalancedSound( %game )
 function Autobalance( %game, %AutobalanceSafetynetTrys )
 {	
+	if(isEventPending($AutoBalanceSchedule)) 
+		cancel($AutoBalanceSchedule);
+	
+	if( $TBNStatus !$= "NOTIFY" ) //If Status has changed to EVEN or anything else (GameOver reset).
+		return;
+	
 	//Debug: Uncomment to enable
 	//%AutobalanceDebug = true;
 	
@@ -43,7 +49,8 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	//If even, stop.
 	if( %team1difference == 1 || %team2difference == 1 || $PlayerCount[1] == $PlayerCount[2] )
 	{
-		$StatsMsgPlayed = 0;
+		//Reset TBN
+		ResetTBNStatus();
 		return;
 	}
 	//Determine bigTeam
@@ -95,21 +102,14 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	%team = %teamcanidate[%bigTeam].team;
 	%otherTeam = ( %team == 1 ) ? 2 : 1;
 			
-	if( %teamcanidate[%bigTeam].team $= %bigTeam )
-	{
-		// Fire Autobalance
-		Game.clientChangeTeam( %client, %otherTeam, 0 );
-		messageAll('MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
-	}
-	else
-		messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: Team %1 mismatch.', %bigTeam );
-			
+	// Fire Autobalance
+	Game.clientChangeTeam( %client, %otherTeam, 0 );
+	messageAll('MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
 			
 	//Trigger GetCounts
-	ResetClientChangedTeams();
-	//Reset Unbalanced
-	$UnbalancedMsgPlayed = 0;
-	return;
+	ResetGetCountsStatus();
+	//Reset TBN
+	ResetTBNStatus();
 }
 
 function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys, %UseAllMode)
@@ -129,7 +129,7 @@ function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %tea
 			messageAll('MsgTeamBalanceNotify', '\c0Autobalance error: %1', %error );
 				
 		//Trigger GetCounts
-		ResetClientChangedTeams();
+		ResetGetCountsStatus();
 		//Rerun in 10 secs
 		schedule(10000, 0, "Autobalance", %game, %AutobalanceSafetynetTrys );
 	}

@@ -24,7 +24,7 @@ for(%x = 1; %x <= $MRC::PastMapsDepth; %x++)
 function MapRepetitionChecker( %game )
 {
 	//Debug
-	%MapRepetitionCheckerDebug = true;
+	//%MapRepetitionCheckerDebug = true;
 	
 	if(isEventPending($MapRepetitionSchedule)) 
 		cancel($MapRepetitionSchedule);

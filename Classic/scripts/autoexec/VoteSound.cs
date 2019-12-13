@@ -10,7 +10,7 @@
 
 function VoteSound( %game, %typename, %arg1, %arg2, %VoteSoundRandom )
 {	
-	if( $VoteSoundInProgress && $Host::EnableVoteSound && $VoteSoundRandom $= %VoteSoundRandom ) 
+	if( Game.scheduleVote !$= "" && $Host::EnableVoteSound && $VoteSoundRandom $= %VoteSoundRandom ) //Game.scheduleVote !$= "" is if vote is active
 	{
 		%votemsg = "Press Insert for Yes or Delete for No.";
 		

@@ -3,28 +3,34 @@
 // To help decrease the chances of a repeated map in the map rotation by correcting repeated maps thru script
 //
 // Runs at the beginning of every map change
-// Keeps track of maps played (Last 4)
+// Keeps track of maps played (Last [$MRC::PastMapsDepth] Maps)
 // If any are repeating it picks a new map
 //
 // $EvoCachedNextMission = "RoundTheMountain";
 // $EvoCachedNextMission = "Arrakis";
 // $EvoCachedNextMission = "RoundTheMountainLT";
 // $EvoCachedNextMission = "ArenaDomeDM";
-//
 
+// How many previous maps you want to compare TheNextCached Map to
+$MRC::PastMapsDepth = 6;
 
-$PreviousMission4back = "";
-$PreviousMission3back = "";		
-$PreviousMission2back = "";
-$PreviousMission1back = "";
+for(%x = 1; %x <= $MRC::PastMapsDepth; %x++) 
+{
+	$MRC::PrevMap[%x] = "";
+	//echo("PM" @ %x @ ": " @ $MRC::PrevMap[%x]);
+}
 
 //Ran in MissionTypeOptions.cs
 function MapRepetitionChecker( %game )
 {
 	//Debug
-	//%MapRepetitionCheckerDebug = true;
-		
-	if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
+	%MapRepetitionCheckerDebug = true;
+	
+	if(isEventPending($MapRepetitionSchedule)) 
+		cancel($MapRepetitionSchedule);
+	
+	//Make sure GetRandomMaps.cs is present	
+	if(!$GetRandomMapsLoaded)
 		return;
 		
 	if($EvoCachedNextMission $= "")
@@ -32,32 +38,41 @@ function MapRepetitionChecker( %game )
 	
 	if(!$Host::TournamentMode && $Host::EnableMapRepetitionChecker)
 	{	
-		//Do work
-		if( $PreviousMission1back $= $EvoCachedNextMission || $PreviousMission2back $= $EvoCachedNextMission || 
-			$PreviousMission3back $= $EvoCachedNextMission || $PreviousMission4back $= $EvoCachedNextMission ||
-			$CurrentMission $= $EvoCachedNextMission )
-			MapRepetitionCheckerFindRandom();
+		//Do work	
+		for(%x = 1; %x <= $MRC::PastMapsDepth; %x++) 
+		{
+			if( $MRC::PrevMap[%x] !$= "" && $MRC::PrevMap[%x] $= $EvoCachedNextMission )
+				MapRepetitionCheckerFindRandom();
+		}
 			
 		//Set vars	
-		if($PreviousMission3back !$= "") $PreviousMission4back = $PreviousMission3back;
-		if($PreviousMission2back !$= "") $PreviousMission3back = $PreviousMission2back;		
-		if($PreviousMission1back !$= "") $PreviousMission2back = $PreviousMission1back;
-										 $PreviousMission1back = $CurrentMission;
-				
+		for(%x = $MRC::PastMapsDepth; %x >= 1; %x = %x - 1) 
+		{
+			if(%x > 1)
+			{
+				if($MRC::PrevMap[%x - 1] !$= "")
+					$MRC::PrevMap[%x] = $MRC::PrevMap[%x - 1];
+			}
+			else if(%x $= 1)
+				$MRC::PrevMap[%x] = $CurrentMission;
+		}
+		
 		//Debug
 		if(%MapRepetitionCheckerDebug)	
-		{
-			if($PreviousMission1back !$= "") echo("PM1: " @ $PreviousMission1back);
-			if($PreviousMission2back !$= "") echo("PM2: " @ $PreviousMission2back);
-			if($PreviousMission3back !$= "") echo("PM3: " @ $PreviousMission3back);
-			if($PreviousMission4back !$= "") echo("PM4: " @ $PreviousMission4back);
+		{		
+			for(%x = 1; %x <= $MRC::PastMapsDepth; %x++) 
+			{
+				if( $MRC::PrevMap[%x] !$= "" )
+					echo("PM" @ %x @ ": " @ $MRC::PrevMap[%x]);
+			}
 		}
 	}
 }
 
 function MapRepetitionCheckerFindRandom()
 {
-	if(!$GetRandomMapsLoaded) //Make sure GetRandomMaps.cs is present
+	//Make sure GetRandomMaps.cs is present
+	if(!$GetRandomMapsLoaded)
 		return;
 
 	//Backup
@@ -68,9 +83,14 @@ function MapRepetitionCheckerFindRandom()
 	$EvoCachedNextMission = getRandomMap();
 	
 	//Make sure new map still complies
-	if( $EvoCachedNextMission $= $PreviousMission1back || $EvoCachedNextMission $= $PreviousMission2back || 
-	    $EvoCachedNextMission $= $PreviousMission3back || $EvoCachedNextMission $= $PreviousMission4back ||
-		$CurrentMission $= $EvoCachedNextMission )
+	%redo = 0;
+	for(%x = 1; %x <= $MRC::PastMapsDepth; %x++) 
+	{
+		if($MRC::PrevMap[%x] !$= "" && $MRC::PrevMap[%x] $= $EvoCachedNextMission)
+			%redo = 1;
+	}
+	
+	if( %redo )
 		MapRepetitionCheckerFindRandom();
 	else
 	{	

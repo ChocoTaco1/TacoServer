@@ -17,30 +17,37 @@ package MissionTypeOptions
 
 function loadMissionStage2()
 {
-	if( $CurrentMissionType !$= "LakRabbit" ) 
+	switch$($Host::PUGpasswordAlwaysOn)
 	{
-		if( $Host::TournamentMode && $Host::PUGautoPassword )
+		case 0:
+			if( $CurrentMissionType !$= "LakRabbit" ) 
+			{
+				if( $Host::TournamentMode && $Host::PUGautoPassword )
+					$Host::Password = $Host::PUGPassword;
+				else if( !$Host::TournamentMode )
+					$Host::Password = "";
+
+				//Set server mode to SPEED
+				$Host::HiVisibility = "0";
+			}
+			else if( $CurrentMissionType $= "LakRabbit" ) 
+			{
+				$Host::Password = "";
+				$Host::TournamentMode = 0;
+
+				//Set server mode to DISTANCE
+				$Host::HiVisibility = "1";
+			}
+		case 1:
 			$Host::Password = $Host::PUGPassword;
-		else if( !$Host::TournamentMode )
-			$Host::Password = "";
-		
-		//Set server mode to SPEED
-		$Host::HiVisibility = "0";
-	}
-	else if( $CurrentMissionType $= "LakRabbit" ) 
-	{
-		$Host::Password = "";
-		$Host::TournamentMode = 0;
-		
-		//Set server mode to DISTANCE
-		$Host::HiVisibility = "1";
+			$Host::HiVisibility = "0"; //always SPEED
 	}
 	
-	if( $Host::PUGpasswordAlwaysOn )
-		$Host::Password = $Host::PUGPassword;
+	if(isEventPending($MapRepetitionSchedule)) 
+		cancel($MapRepetitionSchedule);
 	
 	//Start MapRepetitionChecker
-	schedule(20000, 0, "MapRepetitionChecker", %game);
+	$MapRepetitionSchedule = schedule(20000, 0, "MapRepetitionChecker", %game);
    
     parent::loadMissionStage2();
 }

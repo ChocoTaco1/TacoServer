@@ -80,7 +80,6 @@ function DefaultGame::gameOver(%game)
 function StartVOTimeVote(%game)
 {
 	$VOStatus = "Starting";
-	$VoteSoundInProgress = true;
 }
 
 // Tribes wont change the time after its reached zero and you cant change it again afterwards until a gameover/map change.
@@ -88,14 +87,12 @@ function StartVOTimeVote(%game)
 function ResetVOTimeChanged(%game)
 {
 	$VOStatus = "TimeChanged";
-	$VoteSoundInProgress = false;
 }
 
 // Reset everything. So everything functions normally after a map change.
 function ResetVOall(%game)
 {
 	$VOStatus = "Normal";
-	$VoteSoundInProgress = false;
 }
 
 

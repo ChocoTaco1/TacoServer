@@ -70,6 +70,15 @@ if( $Host::LoadScreenColor2 $= " " ) $Host::LoadScreenColor2 = "29DEE7";
 if( $Host::LoadScreenColor3 $= " " ) $Host::LoadScreenColor3 = "33CCCC";
 if( $Host::Info !$= " " ) 			$Host::Info = " ";
 
+// So ServerDefaults wont replace a "" value when meant to be blank
+for(%x = 1; %x <= 4; %x++) 
+{
+	if( $Host::LoadScreenMOTD[%x] $= "")
+	{
+		$Host::LoadScreenMOTD[%x] = " ";
+	}
+}
+
 
 // Keep it in a package to be neat and organized!
 package LoadScreenPackage
@@ -268,7 +277,6 @@ function ALTsendModInfoToClient(%client)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:12><color:" @ $Host::LoadScreenColor2 @ "><Font:Univers Condensed Bold:28>Info:";
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %line1;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %line2;
@@ -276,6 +284,7 @@ function ALTsendModInfoToClient(%client)
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:32><Font:univers:18><color:" @ $Host::LoadScreenColor2 @ ">Please use /report or /msg, to report bugs, glitches, problems, suggestions, or just leave a message.";
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+
 
 
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:12><Font:Univers Condensed Bold:28><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::GameName @ ":";
@@ -340,20 +349,17 @@ function sendLoadscreen(%client)
 	%MOTDMsg3 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD3;
 	%MOTDMsg4 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD4;
 
-	if($Host::LoadScreenMOTD1 !$= " ")
+	//MOTD Loop
+	//Leave line " " in ServerPrefs to not show a line
+	for(%x = 1; %x <= 4; %x++) 
 	{
-		messageClient(%client, 'MsgDebriefAddLine', "", %MOTDHeader);	
-		messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg1); 
-		if($Host::LoadScreenMOTD2 !$= " ")
+		if( $Host::LoadScreenMOTD[%x] !$= " " && %x $= 1 )
 		{
-			messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg2);
-			if($Host::LoadScreenMOTD3 !$= " ")
-			{
-				messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg3);
-				if($Host::LoadScreenMOTD4 !$= " ")
-					messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg4);
-			}
+			messageClient(%client, 'MsgDebriefAddLine', "", %MOTDHeader);	
+			messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg[%x]); 
 		}
+		else if( $Host::LoadScreenMOTD[%x] !$= " " )
+			messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg[%x]); 
 	}
 	
     // Normal Screen Always in the Background

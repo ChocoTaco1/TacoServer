@@ -348,18 +348,22 @@ function sendLoadscreen(%client)
 	%MOTDMsg2 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD2;
 	%MOTDMsg3 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD3;
 	%MOTDMsg4 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD4;
-
+	
 	//MOTD Loop
 	//Leave line " " in ServerPrefs to not show a line
 	for(%x = 1; %x <= 4; %x++) 
 	{
-		if( $Host::LoadScreenMOTD[%x] !$= " " && %x $= 1 )
+		if($Host::LoadScreenMOTD[%x] !$= " " && $Host::LoadScreenMOTD[%x] !$= "")
 		{
-			messageClient(%client, 'MsgDebriefAddLine', "", %MOTDHeader);	
-			messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg[%x]); 
+			if(%x $= 1)
+			{
+				messageClient(%client, 'MsgDebriefAddLine', "", %MOTDHeader);
+				messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg[%x]);
+				%header = 1; //No other lines without the header
+			}
+			else if(%header)
+				messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg[%x]);
 		}
-		else if( $Host::LoadScreenMOTD[%x] !$= " " )
-			messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg[%x]); 
 	}
 	
     // Normal Screen Always in the Background

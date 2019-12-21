@@ -18,14 +18,14 @@ function VoteSound( %game, %typename, %arg1, %arg2, %VoteSoundRandom )
 		{
 			case "VoteChangeMission":
 				messageAll('', '\c1Vote in Progress: \c0To change the mission to %1 (%2). %3~wgui/objective_notification.wav', %arg1, %arg2, %votemsg );
-			
+				echo("Vote in Progress: To change the mission to" SPC %arg1 SPC "(" @ %arg2 @ ").");
 			case "VoteSkipMission":
 				messageAll('', '\c1Vote in Progress: \c0To skip the mission to %1. %2~wgui/objective_notification.wav', $EvoCachedNextMission, %votemsg  );
-			
+				echo("Vote in Progress: To skip the mission to" SPC $EvoCachedNextMission @ ".");
 			case "VoteChangeTimeLimit":
 				if(%arg1 $= "999") %arg1 = "unlimited";
 				messageAll('', '\c1Vote in Progress: \c0To change the time limit to %1. %2~wgui/objective_notification.wav', %arg1, %votemsg );
-				
+				echo("Vote in Progress: To change the time limit to" SPC %arg1 @ ".");
 			case "VoteKickPlayer":			
 				if(%arg1.team != 0 && Game.numTeams > 1) //Not observer
 				{
@@ -48,8 +48,10 @@ function VoteSound( %game, %typename, %arg1, %arg2, %VoteSoundRandom )
 				}
 				else //Is observer
 					messageAll('', '\c1Vote in Progress: \c0To kick player %1. %3~wgui/objective_notification.wav', %arg1.name, %votemsg );
+				echo("Vote in Progress: To kick player" SPC %arg1.name @ ".");
 			case "VoteTournamentMode":
 				messageAll('', '\c1Vote in Progress: \c0To change the mission to Tournament Mode (%1). %3~wgui/objective_notification.wav', %arg1, %arg2, %votemsg );
+				echo("Vote in Progress: To change the mission to Tournament Mode" SPC "(" @ %arg1 @ ").");
 		}
 
 		if(isEventPending($VoteSoundSchedule)) 

@@ -24,6 +24,11 @@
 // "8 32" or "-1 -1" or "-1 16" will also work. Just dont forget the quotes.
 // As the list goes down %min %max will stay the same unless you change them (a new %min = ? %max = ?) etc
 
+// This is done so a crash cant occur using local variables
+// Using exec( $Host::EvoCustomMapLimitsFile ); in console
+function setmaps()
+{
+
 //   _____ _______ ______ 
 //  / ____|__   __|  ____|
 // | |       | |  | |__   
@@ -559,3 +564,8 @@ $Host::MapPlayerLimitsFourSquareDM_DM = %min SPC %max;
 //$Host::MapPlayerLimitsIsleofman_Siege = %min SPC %max;
 //$Host::MapPlayerLimitsTrident_Siege = %min SPC %max;
 //$Host::MapPlayerLimitsAlcatraz_Siege = %min SPC %max;
+
+}
+
+// Run our function
+setmaps();

@@ -41,7 +41,7 @@
 
 $Host::MapPlayerLimitsSmallCrossing_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTWL2_CanyonCrusadeDeluxe_CTF = %min SPC %max;
-$Host::MapPlayerLimitsRoundTheMountain_CTF = %min SPC %max;
+$Host::MapPlayerLimitsRoundTheMountain_CTF = %min SPC "14";
 $Host::MapPlayerLimitsoasisintensity_CTF = %min SPC "12";
 $Host::MapPlayerLimitsMinotaur_CTF = %min SPC %max;
 $Host::MapPlayerLimitsIsland_CTF = %min SPC %max;

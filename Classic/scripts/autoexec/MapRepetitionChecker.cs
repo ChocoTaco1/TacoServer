@@ -89,6 +89,12 @@ function MapRepetitionCheckerFindRandom()
 		if($MRC::PrevMap[%x] !$= "" && $MRC::PrevMap[%x] $= $EvoCachedNextMission)
 			%redo = 1;
 	}
+	//Make sure its within maplimits
+	%newmaplimits = $Host::MapPlayerLimits[$EvoCachedNextMission, $CurrentMissionType];
+	%min = getWord(%newmaplimits,0);
+	%max = getWord(%newmaplimits,1);
+	if(%min > $AllPlayerCount || $AllPlayerCount > %max)
+		%redo = 1;
 	
 	if( %redo )
 		MapRepetitionCheckerFindRandom();

@@ -49,11 +49,11 @@ addRotationMap(SmallCrossing, CTF, 1, 1);
 addRotationMap(TWL2_CanyonCrusadeDeluxe, CTF, 1, 1);
 addRotationMap(RoundTheMountain, CTF, 1, 1);
 addRotationMap(oasisintensity, CTF, 1, 1);
-addRotationMap(Minotaur, CTF, 1, 1);
-addRotationMap(Island, CTF, 1, 1);
+addRotationMap(Minotaur, CTF, 1, 0);
+addRotationMap(Island, CTF, 1, 0);
 addRotationMap(TitForTat, CTF, 1, 0);
 addRotationMap(SmallMelee, CTF, 1, 0);
-addRotationMap(SuperHappyBouncyFunTime, CTF, 1, 1);
+addRotationMap(SuperHappyBouncyFunTime, CTF, 1, 0);
 addRotationMap(Machineeggs, CTF, 1, 1);
 addRotationMap(Mac_FlagArena, CTF, 1, 1);
 addRotationMap(SmallTimeCTF, CTF, 1, 1);
@@ -80,11 +80,6 @@ addRotationMap(berlard, CTF, 1, 1);
 addRotationMap(S8_Opus, CTF, 1, 1);
 addRotationMap(BeggarsRun, CTF, 1, 1);
 addRotationMap(Signal, CTF, 1, 1);
-addRotationMap(Headstone, CTF, 1, 1);
-addRotationMap(S5_Centaur, CTF, 1, 1);
-addRotationMap(S8_Cardiac, CTF, 1, 1);
-addRotationMap(CirclesEdge, CTF, 1, 1);
-addRotationMap(S5_Icedance, CTF, 1, 1);
 addRotationMap(Bulwark, CTF, 1, 1);
 addRotationMap(S5_Woodymyrk, CTF, 1, 1);
 addRotationMap(Discord, CTF, 1, 1);
@@ -101,6 +96,12 @@ addRotationMap(Disjointed, CTF, 1, 1);
 addRotationMap(TWL2_MuddySwamp, CTF, 1, 1);
 addRotationMap(Blink, CTF, 1, 1);
 addRotationMap(HighAnxiety, CTF, 1, 1);
+addRotationMap(Headstone, CTF, 1, 1);
+addRotationMap(S5_Centaur, CTF, 1, 1);
+addRotationMap(S8_Cardiac, CTF, 1, 1);
+addRotationMap(CirclesEdge, CTF, 1, 1);
+addRotationMap(S5_Icedance, CTF, 1, 1);
+addRotationMap(Surreal, CTF, 1, 1);
 
 //Voteable but Not in Rotation
 /////////////////////////////////////////////////////////////////////
@@ -124,7 +125,6 @@ addRotationMap(Confusco, CTF, 1, 0);
 addRotationMap(Fallout, CTF, 1, 0);
 addRotationMap(TheClocktower, CTF, 1, 0);
 addRotationMap(SoylentGreen, CTF, 1, 0);
-addRotationMap(Surreal, CTF, 1, 0);
 addRotationMap(TWL2_MidnightMayhemDeluxe, CTF, 1, 0);
 addRotationMap(Nightdance, CTF, 1, 0);
 addRotationMap(Ramparts, CTF, 1, 0);
@@ -155,12 +155,12 @@ addRotationMap(Vauban, CTF, 1, 1);
 addRotationMap(WindyGap, CTF, 1, 1);
 addRotationMap(Surro, CTF, 1, 1);
 addRotationMap(HarvestDance, CTF, 1, 1);
-addRotationMap(SubZeroV, CTF, 1, 1);
 
 //Vehicle Maps: Voteable, But Not in Rotation
 /////////////////////////////////////////////////////////////////////
 
-addRotationMap(TWL2_RoughLand, CTF, 1, 0);
+addRotationMap(SubZeroV, CTF, 1, 0);
+addRotationMap(TWL2_RoughLand, CTF, 1, 1);
 addRotationMap(S8_Geothermal, CTF, 1, 0);
 addRotationMap(Lakefront, CTF, 1, 0);
 addRotationMap(ShockRidge, CTF, 1, 0);
@@ -290,7 +290,7 @@ addRotationMap(Raindance_nefLak, LakRabbit, 1, 1);
 addRotationMap(SunDriedLak, LakRabbit, 1, 1);
 addRotationMap(SkinnyDipLak, LakRabbit, 1, 1);
 addRotationMap(SaddiesHill, LakRabbit, 1, 1);
-addRotationMap(HavenLak, LakRabbit, 1, 1);
+addRotationMap(HavenLak, LakRabbit, 1, 0);
 addRotationMap(LushLak, LakRabbit, 1, 1);
 addRotationMap(BoxLak, LakRabbit, 1, 1);
 addRotationMap(TitaniaLak, LakRabbit, 1, 1);
@@ -299,7 +299,7 @@ addRotationMap(InfernusLak, LakRabbit, 1, 1);
 addRotationMap(S8_GeothermalLak, LakRabbit, 1, 1);
 addRotationMap(CankerLak, LakRabbit, 1, 1);
 addRotationMap(DustRunLak, LakRabbit, 1, 1);
-addRotationMap(CrossfiredLak, LakRabbit, 1, 1);
+addRotationMap(CrossfiredLak, LakRabbit, 1, 0);
 
 //Voteable, But not in rotation
 /////////////////////////////////////////////////////////////////////

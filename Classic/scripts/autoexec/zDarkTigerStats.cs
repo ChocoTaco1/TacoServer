@@ -4081,16 +4081,16 @@ function statsMenu(%client,%game){
             for(%z = %in - 1; %z > 0; %z--){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
                %map = %vClient.dtStats.gameStats["map",%z,%game];
-               messageClient( %client, 'SetLineHud', "", %tag, %index++,' <color:0befe7>%4 - %2<lmargin:250><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:300><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>',%vClient,%timeDate,%z,%map,%game);
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,' <color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>',%vClient,%timeDate,%z,%map,%game);
             }
             for(%b = %vClient.dtStats.gameCount[%game]; %b >= %in; %b--){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%b,%game];
                %map = %vClient.dtStats.gameStats["map",%b,%game];
                if(%b == %in){
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, ' <color:0befe7>%4 - %2<lmargin:250><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:300><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a><color:02d404> - Overwritten',%vClient,%timeDate,%b,%map,%game);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, ' <color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>',%vClient,%timeDate,%b,%map,%game);
                }
                else{
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++,' <color:0befe7>%4 - %2<lmargin:250><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:300><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>',%vClient,%timeDate,%b,%map,%game);
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++,' <color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>',%vClient,%timeDate,%b,%map,%game);
                }
             }
             
@@ -4099,7 +4099,7 @@ function statsMenu(%client,%game){
             for(%z = %vClient.dtStats.gameCount[%game]; %z >= 1; %z--){
                %timeDate = %vClient.dtStats.gameStats["timeStamp",%z,%game];
                %map = %vClient.dtStats.gameStats["map",%z,%game];
-               messageClient( %client, 'SetLineHud', "", %tag, %index++,' <color:0befe7>%4 - %2<lmargin:250><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:300><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>',%vClient,%timeDate,%z,%map,%game);
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,' <color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>',%vClient,%timeDate,%z,%map,%game);
             }
          }
       case "KDA":

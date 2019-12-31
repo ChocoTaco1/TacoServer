@@ -17,6 +17,9 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.36 Dec 2019
+// Boundary bounce speed limit
+//
 // v3.35 April 2019
 // Added Not enough players flag message delay
 // Shock in the back bonus 2 > 1.5
@@ -2082,7 +2085,7 @@ function plzBounceOffGrid(%obj, %bounceForce, %count)
 		%vec = VectorNormalize(%vec);
 		%vec = VectorScale(%vec, 25);
 	}
-	else
+	else if (%oldSpeed < 300)
 		%vec = VectorScale(%vec, 1.15);
 
 	// apply the impulse to the object

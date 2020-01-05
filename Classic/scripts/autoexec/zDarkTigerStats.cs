@@ -3150,10 +3150,11 @@ function rayTest(%targetObject,%dis){
    return %ground; 
 }
 function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%amount){
+   if(%damageType == $DamageType::Lightning || %damageType == $DamageType::Ground){return;} 
    %t = %s = 0;
    if(isObject(%sourceObject)){      
       if(%sourceObject.getClassName() !$= "Player"){
-         %client = %sourceObject.getControllingClient();
+         %client = %sourceObject.getControllingClient(); 
          %s = 1;
       }
       else{
@@ -3207,7 +3208,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
          case $DamageType::Blaster:
             %client.blasterDmg += %amount;
             %client.blasterDirectHits++;
-            %client.blasterACC = (%client.blasterDirectHits / %client.blasterShotsFired) * 100;
+            %client.blasterACC =  %client.blasterDirectHits / (%client.blasterShotsFired+0.5) * 100;
             if(%t){
                %targetClient.blasterDmgTaken += %amount;
                if(%targetClient != %client && rayTest(%targetObject,5)){%client.blasterMA++;}
@@ -3215,7 +3216,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
          case $DamageType::Plasma:
             %client.plasmaInDmg += %amount;
             %client.plasmaIndirectHits++;
-            %client.plasmaACC = (%client.plasmaIndirectHits / %client.plasmaShotsFired) * 100;
+            %client.plasmaACC = %client.plasmaIndirectHits / (%client.plasmaShotsFired+0.5) * 100;
             if(%t){
                %targetClient.plasmaInDmgTaken += %amount;
                if(%targetClient != %client && rayTest(%targetObject,PlasmaBolt.damageRadius+1)){%client.plasmaMA++;}
@@ -3223,7 +3224,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
          case $DamageType::Bullet:
             %client.cgDmg += %amount;
             %client.cgDirectHits++;
-            %client.cgACC = (%client.cgDirectHits / %client.cgShotsFired) * 100;
+            %client.cgACC = %client.cgDirectHits / (%client.cgShotsFired+0.5) * 100;
             if(%t){
                %targetClient.cgDmgTaken += %amount;
                if(%targetClient != %client && rayTest(%targetObject,5)){%client.cgMA++;}
@@ -3231,7 +3232,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
          case $DamageType::Disc:
             %client.discInDmg += %amount;
             %client.discIndirectHits++;
-            %client.discACC = (%client.discIndirectHits / %client.discShotsFired) * 100;
+            %client.discACC = %client.discIndirectHits / (%client.discShotsFired+0.5) * 100;
             if(%t){
                %targetClient.discInDmgTaken += %amount;
                if(%targetClient.md == 1){%client.minePlusDisc++;}
@@ -3243,7 +3244,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
             if($dtObjExplode.dtNade){
                %client.hGrenadeInDmg += %amount;
                %client.hGrenadeInHits++;
-               %client.hGrenadeACC = (%client.hGrenadeInHits / %client.hGrenadeShotsFired) * 100;
+               %client.hGrenadeACC = %client.hGrenadeInHits / (%client.hGrenadeShotsFired+0.5) * 100;
                if(%t){
                   %targetClient.hGrenadeInDmgTaken += %amount;
                   if(%targetClient != %client && rayTest(%targetObject,GrenadeThrown.damageRadius+1)){%client.hGrenadeMA++;}
@@ -3252,7 +3253,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
             else{
                %client.grenadeInDmg += %amount;
                %client.grenadeIndirectHits++;
-               %client.grenadeACC = (%client.grenadeIndirectHits / %client.grenadeShotsFired) * 100;
+               %client.grenadeACC = %client.grenadeIndirectHits / (%client.grenadeShotsFired+0.5) * 100;
                if(%t){
                   %targetClient.grenadeInDmgTaken += %amount;
                   if(%targetClient != %client && rayTest(%targetObject,BasicGrenade.damageRadius+1)){ %client.grenadeMA++;}
@@ -3261,7 +3262,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
          case $DamageType::Laser:
             %client.laserDmg += %amount;
             %client.laserDirectHits++;
-            %client.laserACC = (%client.laserDirectHits / %client.laserShotsFired) * 100;
+            %client.laserACC = %client.laserDirectHits / (%client.laserShotsFired+0.5) * 100;
             if(%t){
                %targetClient.laserDmgTaken += %amount;
                if(%targetClient != %client && rayTest(%targetObject,5)){%client.laserMA++;}
@@ -3269,7 +3270,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
          case $DamageType::Mortar:
             %client.mortarInDmg += %amount;
             %client.mortarIndirectHits++;
-            %client.mortarACC = (%client.mortarIndirectHits / %client.mortarShotsFired) * 100;
+            %client.mortarACC = %client.mortarIndirectHits / (%client.mortarShotsFired+0.5) * 100;
             if(%t){
                %targetClient.mortarInDmgTaken += %amount;
                if(%targetClient != %client && rayTest(%targetObject,MortarShot.damageRadius+1)){%client.mortarMA++;}
@@ -3277,7 +3278,7 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
          case $DamageType::Missile:
             %client.missileInDmg += %amount;
             %client.missileIndirectHits++;
-            %client.missileACC = (%client.missileIndirectHits / %client.missileShotsFired) * 100;
+            %client.missileACC = %client.missileIndirectHits / (%client.missileShotsFired+0.5) * 100;
             if(%t){
                %targetClient.missileInDmgTaken += %amount;
                if(%targetClient != %client && rayTest(%targetObject,ShoulderMissile.damageRadius+1)){%client.missileMA++;}            
@@ -3285,15 +3286,15 @@ function clientDmgStats(%data,%pos,%sourceObject, %targetObject, %damageType,%am
          case $DamageType::ShockLance:
             %client.shockLanceInDmg += %amount;
             %client.shockLanceIndirectHits++;
-            %client.shockACC = (%client.shockLanceIndirectHits / %client.shockLanceShotsFired) * 100;
+            %client.shockACC = %client.shockLanceIndirectHits / (%client.shockLanceShotsFired+0.5) * 100;
             if(%t){
                %targetClient.shockLanceInDmgTaken += %amount;
-               if(%targetClient != %client && rayTest(%targetObject,5)){ %client.shockLanceMA++;}
+               if(%targetClient != %client && rayTest(%targetObject,5)){ %client.shockMA++;}
             }
          case $DamageType::Mine:
             %client.mineInDmg += %amount;
             %client.mineIndirectHits++;
-            %client.mineACC = (%client.mineIndirectHits / %client.mineShotsFired) * 100;
+            %client.mineACC = %client.mineIndirectHits / (%client.mineShotsFired+0.5) * 100;
             if(%t){
                %targetClient.mineInDmgTaken += %amount;
                if(%targetClient.md == 2){
@@ -4328,12 +4329,13 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"armorHHD",%game,%inc),getGameTotal(%vClient,"armorHHD",%game),getGameTotalAvg(%vClient,"armorHHD",%game),%vClient.armorHHD);
       case "LIVE":
          %inc = %client.GlArg4;
+         %cycle = %client.GlArg5;
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Live Stats");
          if(%inc $= "pin"){
-            messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> - <a:gamelink\tStats\tLIVE\t%1\t-1>Unpin Screen</a> - Games Played: %2',%vClient,%vClient.dtStats.totalGames[%game]);
+            messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> - <a:gamelink\tStats\tLIVE\t%1\t-1>Unpin Screen</a> - Games Played: %2',%vClient,%vClient.dtStats.gameStats["totalGames","g",%game]);
          }
          else{
-            messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> - <a:gamelink\tStats\tLIVE\t%1\tpin>Pin Screen</a> - Games Played: %2',%vClient,%vClient.dtStats.totalGames[%game]);
+            messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> - <a:gamelink\tStats\tLIVE\t%1\tpin>Pin Screen</a> - Games Played: %2',%vClient,%vClient.dtStats.gameStats["totalGames","g",%game]);
          }
          //%i1=%i2=%i3=%i4=%i5=%i6=%i7=%i8=%i9=0;  
          //%line = '<color:0befe7>  PastGames<lmargin:100>%1<lmargin:150>%2<lmargin:200>%3<lmargin:250>%4<lmargin:300>%5<lmargin:350>%6<lmargin:400>%7<lmargin:450>%8<lmargin:500>%9';
@@ -4348,8 +4350,8 @@ function statsMenu(%client,%game){
          
          %i1 = "KDR:" SPC kdr(%vClient.kills,%vClient.deaths) @ "%"; 
          %i2 = "KillStreak:" SPC %vClient.killStreak;
-         %i3 = "Combos:" SPC %vClient.comboCount;
-         %i4 = %vClient.plasmaMA + %vClient.discMA + %vClient.mineMA + %vClient.grenadeMA + %vClient.hGrenadeMA + %vClient.mortarMA + %vClient.shockLanceMA + %vClient.laserMA +
+         %i3 = "MineDisc:" SPC %vClient.minePlusDisc;
+         %i4 = %vClient.plasmaMA + %vClient.discMA + %vClient.mineMA + %vClient.grenadeMA + %vClient.hGrenadeMA + %vClient.mortarMA + %vClient.shockMA + %vClient.laserMA +
          %vClient.laserHeadShot + %vClient.shockRearShot + %vClient.comboPT + %vClient.assist +
          (%vClient.plasmaMax/500) + (%vClient.discMax/500) + (%vClient.mineMax/200) + (%vClient.grenadeMax/300) + (%vClient.hGrenadeMax/200) + (%vClient.mortarMax/200)+
          (%vClient.plasmaT/100) + (%vClient.discT/100) + (%vClient.mineT/100) + (%vClient.grenadeT/100) + (%vClient.hGrenadeT/100) + (%vClient.mortarT/100) + (%vClient.shockT/50) + (%vClient.laserT/100);
@@ -4363,7 +4365,7 @@ function statsMenu(%client,%game){
          %i1 = "Damage:" SPC numReduce(%dmg,1);
          %i2 = "Speed:" SPC  mFloatLength(%vClient.avgSpeed,1) + 0;
          %i3 = "Shots Fired:" SPC numReduce(%vClient.shotsFired,2); //"RelSpeed:" SPC mFloatLength(%vClient.maxRV,1)+0;
-         %i4 = "Dist Moved:" SPC numReduce(%vClient.distT,1); // %vClient.dtStats.totalGames[%game];
+         %i4 = "Dist Moved:" SPC numReduce(%vClient.distT,1); // %vClient.dtStats.gameStats["totalGames","g",%game];
          %line = '<color:0befe7>  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4);
          
@@ -4376,14 +4378,14 @@ function statsMenu(%client,%game){
 
          messageClient( %client, 'SetLineHud', "", %tag, %index++, ""); 
 
-         %header = '<color:0befe7>  Weapon<lmargin:140>K:D<lmargin:212>MidAirs<lmargin:284>Accuracy<lmargin:356>DmgAvg<lmargin:428>Speed<lmargin:500>MaxDis';
+         %header = '<color:0befe7>  Weapon<lmargin:140>K:D<lmargin:212>MidAirs<lmargin:284>Accuracy<lmargin:356>Combos<lmargin:428>Speed<lmargin:500>MaxDis';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          
          %i1=%i2=%i3=%i4=%i5=%i6=%i7=0;    
          %i1 = %vClient.blasterKills @ ":" @ %vClient.blasterDeaths;
          %i2 = %vClient.blasterMA;
          %i3 = mFloatLength(%vClient.blasterACC,1) + 0 @ "%";   
-         %i4 = mFloatLength((%vClient.blasterDmg/%vClient.blasterShotsFired),2) + 0;
+         %i4 = %vClient.blasterCom;
          %i5 = mFloatLength(%vClient.blasterT,1)+0;           
          %i6 = mCeil(%vClient.blasterMax) @ "m";
          %line = '<color:0befe7>  Blaster<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4391,7 +4393,7 @@ function statsMenu(%client,%game){
          %i1 = %vClient.plasmaKills @ ":" @ %vClient.plasmaDeaths;
          %i2 = %vClient.plasmaMA;   
          %i3 = mFloatLength(%vClient.plasmaACC,1) + 0 @ "%";
-         %i4 = mFloatLength((%vClient.plasmaInDmg/%vClient.plasmaShotsFired),2) + 0; 
+         %i4 = %vClient.plasmaCom;  
          %i5 = mFloatLength(%vClient.plasmaT,1)+0;          
          %i6 = mCeil(%vClient.plasmaMax) @ "m";
          %line = '<color:0befe7>  Plasma Rifle<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4399,7 +4401,7 @@ function statsMenu(%client,%game){
          %i1 = %vClient.cgKills @ ":" @ %vClient.cgDeaths;
          %i2 = %vClient.cgMA;
          %i3 = mFloatLength(%vClient.cgACC,1) + 0 @ "%";
-         %i4 = mFloatLength((%vClient.cgDmg/%vClient.cgShotsFired),2) + 0;   
+         %i4 = %vClient.cgCom;    
          %i5 = mFloatLength(%vClient.cgT,1)+0;           
          %i6 = mCeil(%vClient.cgMax) @ "m";     
          %line = '<color:0befe7>  Chaingun<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4407,7 +4409,7 @@ function statsMenu(%client,%game){
          %i1 = %vClient.discKills @ ":" @ %vClient.discDeaths;
          %i2 = %vClient.discMA; 
          %i3 = mFloatLength(%vClient.discACC,1) + 0 @ "%";
-         %i4 = mFloatLength((%vClient.discInDmg/%vClient.discShotsFired),2) + 0;  
+         %i4 =  %vClient.discCom;  
          %i5 = mFloatLength(%vClient.discT,1)+0;           
          %i6 = mCeil(%vClient.discMax) @ "m";
          %line = '<color:0befe7>  Spinfusor<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4415,7 +4417,7 @@ function statsMenu(%client,%game){
          %i1 = %vClient.grenadeKills @ ":" @ %vClient.grenadeDeaths;
          %i2 = %vClient.grenadeMA; 
          %i3 = mFloatLength(%vClient.grenadeACC,1) + 0 @ "%";
-         %i4 = mFloatLength((%vClient.grenadeInDmg/%vClient.grenadeShotsFired),2) + 0;
+         %i4 = %vClient.grenadeCom; 
          %i5 = mFloatLength(%vClient.grenadeT,1)+0;           
          %i6 = mCeil(%vClient.grenadeMax) @ "m";         
          %line = '<color:0befe7>  Grenade Launcher<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4423,7 +4425,7 @@ function statsMenu(%client,%game){
          %i1 = %vClient.laserKills @ ":" @ %vClient.laserDeaths;
          %i2 = %vClient.laserMA;
          %i3 = mFloatLength(%vClient.laserACC,1) + 0 @ "%";   
-         %i4 = mFloatLength((%vClient.laserDmg/%vClient.laserShotsFired),2) + 0;
+         %i4 = %vClient.laserCom;
          %i5 = mFloatLength(%vClient.laserT,1)+0;           
          %i6 = mCeil(%vClient.laserMax) @ "m";         
          %line = '<color:0befe7>  Laser Rifle<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4431,7 +4433,7 @@ function statsMenu(%client,%game){
          %i1 = %vClient.mortarKills @ ":" @ %vClient.mortarDeaths;
          %i2 = %vClient.mortarMA;  
          %i3 = mFloatLength(%vClient.mortarACC,1) + 0 @ "%";
-         %i4 = mFloatLength((%vClient.mortarInDmg/%vClient.mortarShotsFired),2) + 0;
+         %i4 = %vClient.mortarCom;
          %i5 = mFloatLength(%vClient.mortarT,1)+0;           
          %i6 = mCeil(%vClient.mortarMax) @ "m";         
          %line = '<color:0befe7>  Fusion Mortar<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4439,15 +4441,15 @@ function statsMenu(%client,%game){
          %i1 = %vClient.missileKills @ ":" @ %vClient.missileDeaths;
          %i2 =  %vClient.missileMA;  
          %i3 = mFloatLength(%vClient.missileACC,1) + 0 @ "%";         
-         %i4 = mFloatLength((%vClient.missileInDmg/%vClient.missileShotsFired),2) + 0;
+         %i4 = %vClient.missileCom;
          %i5 = mFloatLength(%vClient.missileShotsFired,1)+0;           
          %i6 = mCeil(%vClient.missileMax) @ "m";         
          %line = '<color:0befe7>  Missile Launcher<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.shockLanceKills @ ":" @ %vClient.shockLanceDeaths;
-         %i2 = %vClient.shockLanceMA;
+         %i2 = %vClient.shockMA;
          %i3 = mFloatLength(%vClient.shockACC,1) + 0 @ "%";   
-         %i4 = mFloatLength((%vClient.shocklanceInDmg/%vClient.shockLanceShotsFired),2) + 0;
+         %i4 = %vClient.shockCom;
          %i5 = mFloatLength(%vClient.shockT,1)+0;           
          %i6 =  mCeil(%vClient.shockMax) @ "m";         
          %line = '<color:0befe7>  Shocklance<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4455,7 +4457,7 @@ function statsMenu(%client,%game){
          %i1 = %vClient.mineKills @ ":" @ %vClient.mineDeaths;
          %i2 =  %vClient.mineMA;  
          %i3 = mFloatLength(%vClient.mineACC,1) + 0 @ "%";          
-         %i4 = mFloatLength((%vClient.mineInDmg/%vClient.mineIndirectHits),2) + 0;
+         %i4 = %vClient.mineCom;
          %i5 = mFloatLength(%vClient.mineT,1)+0;        
          %i6 = mCeil(%vClient.mineMax) @ "m";         
          %line = '<color:0befe7>  Mine<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
@@ -4463,7 +4465,7 @@ function statsMenu(%client,%game){
          %i1 = %vClient.hGrenadeKills @ ":" @ %vClient.hGrenadeDeaths;
          %i2 =  %vClient.hGrenadeMA;  
          %i3 = mFloatLength(%vClient.hGrenadeACC,1) + 0 @ "%";           
-         %i4 = mFloatLength((%vClient.hGrenadeInDmg/%vClient.hGrenadeInHits),2) + 0;
+         %i4 = %vClient.hGrenadeCom;
          %i5 = mFloatLength(%vClient.hGrenadeT,1)+0;           
          %i6 = mCeil(%vClient.hGrenadeMax) @ "m";         
          %line = '<color:0befe7>  Hand Grenade<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';

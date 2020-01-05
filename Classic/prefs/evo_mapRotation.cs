@@ -89,7 +89,7 @@ addRotationMap(Prismatic, CTF, 1, 1);
 addRotationMap(TWL_WilderZone, CTF, 1, 1);
 addRotationMap(Mirage, CTF, 1, 1);
 addRotationMap(S5_Mimicry, CTF, 1, 1);
-addRotationMap(TWL_Snowblind, CTF, 1, 1);
+addRotationMap(TWL_Snowblind, CTF, 1, 0);
 addRotationMap(ShortFall, CTF, 1, 1);
 addRotationMap(IceRidge_nef, CTF, 1, 1);
 addRotationMap(Disjointed, CTF, 1, 1);
@@ -97,7 +97,7 @@ addRotationMap(TWL2_MuddySwamp, CTF, 1, 1);
 addRotationMap(Blink, CTF, 1, 1);
 addRotationMap(HighAnxiety, CTF, 1, 1);
 addRotationMap(Headstone, CTF, 1, 1);
-addRotationMap(S5_Centaur, CTF, 1, 1);
+addRotationMap(S5_Centaur, CTF, 1, 0);
 addRotationMap(S8_Cardiac, CTF, 1, 1);
 addRotationMap(CirclesEdge, CTF, 1, 1);
 addRotationMap(S5_Icedance, CTF, 1, 1);
@@ -112,7 +112,7 @@ addRotationMap(S5_HawkingHeat, CTF, 1, 0);
 addRotationMap(JadeValley, CTF, 1, 0);
 addRotationMap(S5_Sherman, CTF, 1, 0);
 addRotationMap(S5_Silenus, CTF, 1, 0);
-addRotationMap(TWL2_FrozenHope, CTF, 1, 0);
+addRotationMap(TWL2_FrozenHope, CTF, 1, 1);
 addRotationMap(TWL2_IceDagger, CTF, 1, 0);
 addRotationMap(S5_Reynard, CTF, 1, 0);
 addRotationMap(TWL_Cinereous, CTF, 1, 0);
@@ -135,6 +135,7 @@ addRotationMap(NatureMagic, CTF, 1, 0);
 addRotationMap(TWL_Damnation, CTF, 1, 0);
 addRotationMap(TWL_DangerousCrossing, CTF, 1, 0);
 addRotationMap(TWL_DeadlyBirdsSong, CTF, 1, 0);
+addRotationMap(Vauban, CTF, 1, 0);
 
 //Vehicle Maps
 /////////////////////////////////////////////////////////////////////
@@ -151,19 +152,18 @@ addRotationMap(TWL2_FrozenGlory, CTF, 1, 1);
 addRotationMap(LandingParty, CTF, 1, 1);
 addRotationMap(TitanV, CTF, 1, 1);
 addRotationMap(TWL_Crossfire, CTF, 1, 1);
-addRotationMap(Vauban, CTF, 1, 1);
-addRotationMap(WindyGap, CTF, 1, 1);
+addRotationMap(WindyGap, CTF, 1, 0);
 addRotationMap(Surro, CTF, 1, 1);
 addRotationMap(HarvestDance, CTF, 1, 1);
 
 //Vehicle Maps: Voteable, But Not in Rotation
 /////////////////////////////////////////////////////////////////////
 
-addRotationMap(SubZeroV, CTF, 1, 0);
-addRotationMap(TWL2_RoughLand, CTF, 1, 1);
+addRotationMap(SubZeroV, CTF, 1, 1);
+addRotationMap(TWL2_RoughLand, CTF, 1, 0);
 addRotationMap(S8_Geothermal, CTF, 1, 0);
 addRotationMap(Lakefront, CTF, 1, 0);
-addRotationMap(ShockRidge, CTF, 1, 0);
+addRotationMap(ShockRidge, CTF, 1, 1);
 addRotationMap(TWL2_BlueMoon, CTF, 1, 0);
 addRotationMap(FullCircle, CTF, 1, 0);
 addRotationMap(TWL_Katabatic, CTF, 1, 0);
@@ -182,8 +182,8 @@ addRotationMap(Glade, CTF, 1, 0);
 //BIG Vehicle Maps
 /////////////////////////////////////////////////////////////////////
 
-addRotationMap(Fenix, CTF, 1, 0);
-addRotationMap(Hillside, CTF, 1, 0);
+addRotationMap(Fenix, CTF, 1, 1);
+addRotationMap(Hillside, CTF, 1, 1);
 addRotationMap(Sangre_de_Grado, CTF, 1, 0);
 addRotationMap(Slapdash, CTF, 1, 0);
 addRotationMap(BerylBasin, CTF, 1, 1);

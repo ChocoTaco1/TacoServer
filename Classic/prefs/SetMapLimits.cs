@@ -59,6 +59,7 @@ $Host::MapPlayerLimitsSmallTimeCTF_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTWL2_Hildebrand_CTF = %min SPC %max;
 $Host::MapPlayerLimitsArenaDome_CTF = %min SPC "10";
 $Host::MapPlayerLimitsFirestorm_CTF = %min SPC %max;
+$Host::MapPlayerLimitsBulwark_CTF = %min SPC "12";
 
 //Medium Maps
 /////////////////////////////////////////////////////////////////////
@@ -88,7 +89,6 @@ $Host::MapPlayerLimitsS5_Centaur_CTF = %min SPC %max;
 $Host::MapPlayerLimitsS8_Cardiac_CTF = %min SPC %max;
 $Host::MapPlayerLimitsCirclesEdge_CTF = %min SPC %max;
 $Host::MapPlayerLimitsS5_Icedance_CTF = %min SPC %max;
-$Host::MapPlayerLimitsBulwark_CTF = %min SPC %max;
 $Host::MapPlayerLimitsS5_Woodymyrk_CTF = %min SPC %max;
 $Host::MapPlayerLimitsDiscord_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTenebrousCTF_CTF = %min SPC %max;
@@ -142,6 +142,7 @@ $Host::MapPlayerLimitsNatureMagic_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTWL_Damnation_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTWL_DangerousCrossing_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTWL_DeadlyBirdsSong_CTF = %min SPC %max;
+$Host::MapPlayerLimitsVauban_CTF = %min SPC %max;
 
 //Vehicle Maps
 /////////////////////////////////////////////////////////////////////
@@ -162,7 +163,6 @@ $Host::MapPlayerLimitsTWL2_FrozenGlory_CTF = %min SPC %max;
 $Host::MapPlayerLimitsLandingParty_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTitanV_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTWL_Crossfire_CTF = %min SPC %max;
-$Host::MapPlayerLimitsVauban_CTF = %min SPC %max;
 $Host::MapPlayerLimitsWindyGap_CTF = %min SPC %max;
 $Host::MapPlayerLimitsSurro_CTF = %min SPC %max;
 $Host::MapPlayerLimitsHarvestDance_CTF = %min SPC %max;
@@ -201,8 +201,8 @@ $Host::MapPlayerLimitsGlade_CTF = %min SPC %max;
 %min = 14;
 %max = 32;
 
-$Host::MapPlayerLimitsFenix_CTF = %min SPC %max;
-$Host::MapPlayerLimitsHillside_CTF = %min SPC %max;
+$Host::MapPlayerLimitsFenix_CTF = "18" SPC %max;
+$Host::MapPlayerLimitsHillside_CTF = "18" SPC %max;
 $Host::MapPlayerLimitsSangre_de_Grado_CTF = %min SPC %max;
 $Host::MapPlayerLimitsSlapdash_CTF = %min SPC %max;
 $Host::MapPlayerLimitsTWL2_Bleed_CTF = %min SPC %max;

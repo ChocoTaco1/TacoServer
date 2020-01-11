@@ -167,6 +167,7 @@ $Host::MapPlayerLimitsWindyGap_CTF = %min SPC %max;
 $Host::MapPlayerLimitsSurro_CTF = %min SPC %max;
 $Host::MapPlayerLimitsHarvestDance_CTF = %min SPC %max;
 $Host::MapPlayerLimitsSubZeroV_CTF = %min SPC %max;
+$Host::MapPlayerLimitsThe_Calm_CTF = %min SPC %max;
 
 //Vehicle Maps: Voteable, But Not in Rotation
 /////////////////////////////////////////////////////////////////////

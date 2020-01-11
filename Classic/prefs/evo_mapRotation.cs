@@ -155,6 +155,7 @@ addRotationMap(TWL_Crossfire, CTF, 1, 1);
 addRotationMap(WindyGap, CTF, 1, 0);
 addRotationMap(Surro, CTF, 1, 1);
 addRotationMap(HarvestDance, CTF, 1, 1);
+addRotationMap(The_Calm, CTF, 1, 1);
 
 //Vehicle Maps: Voteable, But Not in Rotation
 /////////////////////////////////////////////////////////////////////

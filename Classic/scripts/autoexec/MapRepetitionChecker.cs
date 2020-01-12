@@ -37,14 +37,14 @@ function MapRepetitionChecker( %game )
 		return;
 	
 	if(!$Host::TournamentMode && $Host::EnableMapRepetitionChecker)
-	{	
+	{
 		//Do work	
 		for(%x = 1; %x <= $MRC::PastMapsDepth; %x++) 
 		{
-			if( $MRC::PrevMap[%x] !$= "" && $MRC::PrevMap[%x] $= $EvoCachedNextMission )
+			if( $MRC::PrevMap[%x] !$= "" && $MRC::PrevMap[%x] $= $EvoCachedNextMission || $CurrentMission $= $EvoCachedNextMission )
 				MapRepetitionCheckerFindRandom();
 		}
-			
+		
 		//Set vars	
 		for(%x = $MRC::PastMapsDepth; %x >= 1; %x = %x - 1) 
 		{
@@ -69,14 +69,15 @@ function MapRepetitionChecker( %game )
 	}
 }
 
-function MapRepetitionCheckerFindRandom()
+function MapRepetitionCheckerFindRandom(%redone)
 {
 	//Make sure GetRandomMaps.cs is present
 	if(!$GetRandomMapsLoaded)
 		return;
 
 	//Backup
-	$SetNextMissionRestore = $EvoCachedNextMission;
+	if(%redone $="")
+		$SetNextMissionRestore = $EvoCachedNextMission;
 	
 	//Do work
 	//getRandomMap() is in GetRandomMaps.cs
@@ -89,15 +90,19 @@ function MapRepetitionCheckerFindRandom()
 		if($MRC::PrevMap[%x] !$= "" && $MRC::PrevMap[%x] $= $EvoCachedNextMission)
 			%redo = 1;
 	}
+	
 	//Make sure its within maplimits
 	%newmaplimits = $Host::MapPlayerLimits[$EvoCachedNextMission, $CurrentMissionType];
 	%min = getWord(%newmaplimits,0);
 	%max = getWord(%newmaplimits,1);
-	if(%min > $AllPlayerCount || $AllPlayerCount > %max)
+	if((%min > $AllPlayerCount || $AllPlayerCount > %max) && $AllPlayerCount > 2 )
 		%redo = 1;
-	
-	if( %redo )
-		MapRepetitionCheckerFindRandom();
+
+	if( %redo && %redone < 3 )
+	{
+		%redone++;
+		MapRepetitionCheckerFindRandom(%redone);
+	}
 	else
 	{	
 		error(formatTimeString("HH:nn:ss") SPC "Map Repetition Corrected from" SPC $SetNextMissionRestore SPC "to" SPC $EvoCachedNextMission @ "." );

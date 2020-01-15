@@ -513,6 +513,7 @@ $Host::MapPlayerLimitsRampartsDM_DM = %min SPC %max;
 $Host::MapPlayerLimitsShrineDM_DM = %min SPC %max;
 $Host::MapPlayerLimitsLiveBaitDM_DM = %min SPC %max;
 $Host::MapPlayerLimitsFourSquareDM_DM = %min SPC %max;
+$Host::MapPlayerLimitsBrigDM_DM = %min SPC %max;
 
 
 

@@ -91,7 +91,7 @@ addRotationMap(Mirage, CTF, 1, 1);
 addRotationMap(S5_Mimicry, CTF, 1, 1);
 addRotationMap(TWL_Snowblind, CTF, 1, 0);
 addRotationMap(ShortFall, CTF, 1, 1);
-addRotationMap(IceRidge_nef, CTF, 1, 1);
+addRotationMap(IceRidge_nef, CTF, 1, 0);
 addRotationMap(Disjointed, CTF, 1, 0);
 addRotationMap(TWL2_MuddySwamp, CTF, 1, 0);
 addRotationMap(Blink, CTF, 1, 1);
@@ -101,7 +101,7 @@ addRotationMap(S5_Centaur, CTF, 1, 0);
 addRotationMap(S8_Cardiac, CTF, 1, 1);
 addRotationMap(CirclesEdge, CTF, 1, 1);
 addRotationMap(S5_Icedance, CTF, 1, 1);
-addRotationMap(Surreal, CTF, 1, 1);
+addRotationMap(Surreal, CTF, 1, 0);
 
 //Voteable but Not in Rotation
 /////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ addRotationMap(S5_HawkingHeat, CTF, 1, 0);
 addRotationMap(JadeValley, CTF, 1, 0);
 addRotationMap(S5_Sherman, CTF, 1, 0);
 addRotationMap(S5_Silenus, CTF, 1, 0);
-addRotationMap(TWL2_FrozenHope, CTF, 1, 1);
+addRotationMap(TWL2_FrozenHope, CTF, 1, 0);
 addRotationMap(TWL2_IceDagger, CTF, 1, 0);
 addRotationMap(S5_Reynard, CTF, 1, 0);
 addRotationMap(TWL_Cinereous, CTF, 1, 0);
@@ -153,7 +153,7 @@ addRotationMap(LandingParty, CTF, 1, 1);
 addRotationMap(TitanV, CTF, 1, 1);
 addRotationMap(TWL_Crossfire, CTF, 1, 1);
 addRotationMap(WindyGap, CTF, 1, 0);
-addRotationMap(Surro, CTF, 1, 1);
+addRotationMap(Surro, CTF, 1, 0);
 addRotationMap(HarvestDance, CTF, 1, 1);
 addRotationMap(The_Calm, CTF, 1, 1);
 
@@ -164,7 +164,7 @@ addRotationMap(SubZeroV, CTF, 1, 1);
 addRotationMap(TWL2_RoughLand, CTF, 1, 0);
 addRotationMap(S8_Geothermal, CTF, 1, 0);
 addRotationMap(Lakefront, CTF, 1, 0);
-addRotationMap(ShockRidge, CTF, 1, 1);
+addRotationMap(ShockRidge, CTF, 1, 0);
 addRotationMap(TWL2_BlueMoon, CTF, 1, 0);
 addRotationMap(FullCircle, CTF, 1, 0);
 addRotationMap(TWL_Katabatic, CTF, 1, 0);

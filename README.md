@@ -1,4 +1,4 @@
-![Tribes 2](http://magaimg.net/img/79hn.png)  
+![Tribes 2](https://cdn.discordapp.com/attachments/521797012014759970/678460505597149214/TacoServer.png)  
 
 # TacoServer
 ## A Tribes 2 server with competative features that is also open-source.

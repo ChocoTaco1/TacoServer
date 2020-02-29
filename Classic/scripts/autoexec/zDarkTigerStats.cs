@@ -108,7 +108,7 @@ $dtStats::sm  = 1;
 $dtStats::expire = 60;  
 
 //Record stats if player is here for x percentage of the game, set to 0 to rec every game
-$dtStats::fgPercentage["CTFGame"] = 0;
+$dtStats::fgPercentage["CTFGame"] = 25;
 //0 score based, 1 time based, 2 the closer one to finishing the game
 $dtStats::fgPercentageType["CTFGame"] =2;
 
@@ -4755,60 +4755,60 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"score",%game,%inc),getGameTotal(%vClient,"score",%game),getGameTotalAvg(%vClient,"score",%game),%vClient.score);
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"kills",%game,%inc),getGameTotal(%vClient,"kills",%game),getGameTotalAvg(%vClient,"kills",%game),%vClient.kills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"deaths",%game,%inc),getGameTotal(%vClient,"deaths",%game),getGameTotalAvg(%vClient,"deaths",%game),%vClient.deaths);
-         %line1 = '<color:0befe7> Suicides<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Suicides<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Suicides<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Suicides<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"suicides",%game,%inc),getGameTotal(%vClient,"suicides",%game),getGameTotalAvg(%vClient,"suicides",%game),%vClient.suicides);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mas",%game,%inc),getGameTotal(%vClient,"mas",%game),getGameTotalAvg(%vClient,"mas",%game),%vClient.mas);
-         %line1 = '<color:0befe7> Flag Grabs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Grabs<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Grabs<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagGrabs",%game,%inc),getGameTotal(%vClient,"flagGrabs",%game),getGameTotalAvg(%vClient,"flagGrabs",%game),%vClient.flagGrabs);
-         %line1 = '<color:0befe7> Midair Flag Grabs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midair Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midair Flag Grabs<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midair Flag Grabs<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"MidairflagGrabs",%inc,%game,%inc),getGameTotal(%vClient,"MidairflagGrabs",%game),getGameTotalAvg(%vClient,"MidairflagGrabs",%game),%vClient.MidairflagGrabs);
-         %line1 = '<color:0befe7> Midair Flag Grab Points<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midair Flag Grab Points<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midair Flag Grab Points<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midair Flag Grab Points<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"MidairflagGrabPoints",%inc,%game,%inc),getGameTotal(%vClient,"MidairflagGrabPoints",%game),getGameTotalAvg(%vClient,"MidairflagGrabPoints",%game),%vClient.MidairflagGrabPoints);
-         %line1 = '<color:0befe7> Flag Time Minutes<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Time Minutes<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Time Minutes<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Time Minutes<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagTimeMin",%game,%inc),getGameTotal(%vClient,"flagTimeMin",%game),getGameTotalAvg(%vClient,"flagTimeMin",%game),%vClient.flagTimeMin);
-         %line1 = '<color:0befe7> Bonus Points<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Bonus Points<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Bonus Points<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Bonus Points<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"morepoints",%game,%inc),getGameTotal(%vClient,"morepoints",%game),getGameTotalAvg(%vClient,"morepoints",%game),%vClient.morepoints);
-         %line1 = '<color:0befe7> Mine + Disc<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Mine + Disc<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Mine + Disc<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"minedisc",%game,%inc),getGameTotal(%vClient,"minePlusDisc",%game),getGameTotalAvg(%vClient,"minePlusDisc",%game),%vClient.minePlusDisc);
-         %line1 = '<color:0befe7> Total Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Total Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Total Distance<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Total Distance<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"totalDistance",%game,%inc),getGameTotal(%vClient,"totalDistance",%game),getGameTotalAvg(%vClient,"totalDistance",%game),%vClient.totalDistance);
-         %line1 = '<color:0befe7> Total Shock Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Total Shock Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Total Shock Hits<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Total Shock Hits<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"totalShockHits",%game,%inc),getGameTotal(%vClient,"totalShockHits",%game),getGameTotalAvg(%vClient,"totalShockHits",%game),%vClient.totalShockHits);
-         %line1 = '<color:0befe7> Total Shocks<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Total Shocks<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Total Shocks<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Total Shocks<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"totalShocks",%game,%inc),getGameTotal(%vClient,"totalShocks",%game),getGameTotalAvg(%vClient,"totalShocks",%game),%vClient.totalShocks);
       case "DMGame":
@@ -4825,20 +4825,16 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
-         %line = (%inc != -1) ? %line2 : %line1;
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, "",%vClient,getGameData(%vClient,"score",%game,%inc),getGameTotal(%vClient,"score",%game),getGameTotalAvg(%vClient,"score",%game),%vClient.score);
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"kills",%game,%inc),getGameTotal(%vClient,"kills",%game),getGameTotalAvg(%vClient,"kills",%game),%vClient.kills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"deaths",%game,%inc),getGameTotal(%vClient,"deaths",%game),getGameTotalAvg(%vClient,"deaths",%game),%vClient.deaths);
-         %line1 = '<color:0befe7> Suicides<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Suicides<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Suicides<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Suicides<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"suicides",%game,%inc),getGameTotal(%vClient,"suicides",%game),getGameTotalAvg(%vClient,"suicides",%game),%vClient.suicides);
          
@@ -4857,48 +4853,48 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"score",%game,%inc),getGameTotal(%vClient,"score",%game),getGameTotalAvg(%vClient,"score",%game),%vClient.score);
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"kills",%game,%inc),getGameTotal(%vClient,"kills",%game),getGameTotalAvg(%vClient,"kills",%game),%vClient.kills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"deaths",%game,%inc),getGameTotal(%vClient,"deaths",%game),getGameTotalAvg(%vClient,"deaths",%game),%vClient.deaths);
-         %line1 = '<color:0befe7> Suicides<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Suicides<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Suicides<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Suicides<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"suicides",%game,%inc),getGameTotal(%vClient,"suicides",%game),getGameTotalAvg(%vClient,"suicides",%game),%vClient.suicides);
-         %line1 = '<color:0befe7> Team Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Team Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Team Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Team Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"teamKills",%game,%inc),getGameTotal(%vClient,"teamKills",%game),getGameTotalAvg(%vClient,"teamKills",%game),%vClient.teamKills);
-         %line1 = '<color:0befe7> Snipe Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Snipe Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Snipe Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Snipe Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"snipeKills",%game,%inc),getGameTotal(%vClient,"snipeKills",%game),getGameTotalAvg(%vClient,"roundsWon",%game),%vClient.roundsWon);
-         %line1 = '<color:0befe7> Rounds Won<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Rounds Won<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Rounds Won<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Rounds Won<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"roundsWon",%game,%inc),getGameTotal(%vClient,"roundsWon",%game),getGameTotalAvg(%vClient,"suicides",%game),%vClient.suicides);
-         %line1 = '<color:0befe7> Rounds Lost<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Rounds Lost<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Rounds Lost<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Rounds Lost<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"roundsLost",%game,%inc),getGameTotal(%vClient,"roundsLost",%game),getGameTotalAvg(%vClient,"roundsLost",%game),%vClient.roundsLost);
-         %line1 = '<color:0befe7> Assists<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Assists<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Assists<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Assists<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"assists",%game,%inc),getGameTotal(%vClient,"assists",%game),getGameTotalAvg(%vClient,"assists",%game),%vClient.assists);
-         %line1 = '<color:0befe7> Round Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Round Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Round Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Round Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"roundKills",%game,%inc),getGameTotal(%vClient,"roundKills",%game),getGameTotalAvg(%vClient,"roundKills",%game),%vClient.roundKills);
-         %line1 = '<color:0befe7> Hat Tricks<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hat Tricks<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hat Tricks<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hat Tricks<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hatTricks",%game,%inc),getGameTotal(%vClient,"hatTricks",%game),getGameTotalAvg(%vClient,"hatTricks",%game),%vClient.hatTricks);
          
@@ -4916,16 +4912,16 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Score<<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"score",%game,%inc),getGameTotal(%vClient,"score",%game),getGameTotalAvg(%vClient,"score",%game),%vClient.score);
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"kills",%game,%inc),getGameTotal(%vClient,"kills",%game),getGameTotalAvg(%vClient,"kills",%game),%vClient.kills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"deaths",%game,%inc),getGameTotal(%vClient,"deaths",%game),getGameTotalAvg(%vClient,"deaths",%game),%vClient.deaths);
                  
@@ -4943,8 +4939,8 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Win %6<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Win %6<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Win %6<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Win %6<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          
          %wlPCT =  getGameRunWinLossAvg(%client,%game);
@@ -4958,60 +4954,60 @@ function statsMenu(%client,%game){
          %totalAvg = mFloor((%winTotal / %totalWinLoss)* 100) @ "%";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%runAvg,%total,%totalAvg,%vClient.winCount,"%");
          
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"kills",%game,%inc),getGameTotal(%vClient,"kills",%game),getGameTotalAvg(%vClient,"kills",%game),%vClient.kills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"deaths",%game,%inc),getGameTotal(%vClient,"deaths",%game),getGameTotalAvg(%vClient,"deaths",%game),%vClient.deaths);
-         %line1 = '<color:0befe7> Mid-Air<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Mid-Air<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Mid-Air<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Mid-Air<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoreMidAir",%game,%inc),getGameTotal(%vClient,"scoreMidAir",%game),getGameTotalAvg(%vClient,"scoreMidAir",%game),%vClient.scoreMidAir);
-         %line1 = '<color:0befe7> Mine + Disc<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Mine + Disc<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Mine + Disc<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"minePlusDisc",%game,%inc),getGameTotal(%vClient,"minePlusDisc",%game),getGameTotalAvg(%vClient,"minePlusDisc",%game),%vClient.minePlusDisc);
-         %line1 = '<color:0befe7> Flag Caps<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Caps<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Caps<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Caps<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagCaps",%game,%inc),getGameTotal(%vClient,"flagCaps",%game),getGameTotalAvg(%vClient,"flagCaps",%game),%vClient.flagCaps);
-         %line1 = '<color:0befe7> Flag Grabs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Grabs<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Grabs<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagGrabs",%game,%inc),getGameTotal(%vClient,"flagGrabs",%game),getGameTotalAvg(%vClient,"flagGrabs",%game),%vClient.flagGrabs);
-         %line1 = '<color:0befe7> Carrier Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Carrier Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Carrier Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Carrier Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"carrierKills",%game,%inc),getGameTotal(%vClient,"carrierKills",%game),getGameTotalAvg(%vClient,"carrierKills",%game),%vClient.carrierKills);
-         %line1 = '<color:0befe7> Flag Returns<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Returns<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Returns<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Returns<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagReturns",%game,%inc),getGameTotal(%vClient,"flagReturns",%game),getGameTotalAvg(%vClient,"flagReturns",%game),%vClient.flagReturns);
-         %line1 = '<color:0befe7> Flag Defends<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Defends<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Defends<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Defends<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagDefends",%game,%inc),getGameTotal(%vClient,"flagDefends",%game),getGameTotalAvg(%vClient,"flagDefends",%game),%vClient.flagDefends);
-         %line1 = '<color:0befe7> Offense Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Offense Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Offense Score<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Offense Score<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"offenseScore",%game,%inc),getGameTotal(%vClient,"offenseScore",%game),getGameTotalAvg(%vClient,"offenseScore",%game),%vClient.offenseScore);
-         %line1 = '<color:0befe7> Defense Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Defense Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Defense Score<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Defense Score<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"defenseScore",%game,%inc),getGameTotal(%vClient,"defenseScore",%game),getGameTotalAvg(%vClient,"defenseScore",%game),%vClient.defenseScore);
-         %line1 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"score",%game,%inc),getGameTotal(%vClient,"score",%game),getGameTotalAvg(%vClient,"score",%game),%vClient.score);
-         %line1 = '<color:0befe7> Backshots<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Backshots<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Backshots<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Backshots<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoreRearshot",%game,%inc),getGameTotal(%vClient,"scoreRearshot",%game),getGameTotalAvg(%vClient,"scoreRearshot",%game),%vClient.scoreRearshot);
-         %line1 = '<color:0befe7> Headshots<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Headshots<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Headshots<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Headshots<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoreHeadshot",%game,%inc),getGameTotal(%vClient,"scoreHeadshot",%game),getGameTotalAvg(%vClient,"scoreHeadshot",%game),%vClient.scoreHeadshot);
       
@@ -5044,60 +5040,60 @@ function statsMenu(%client,%game){
          %totalAvg = mFloor((%winTotal / %totalWinLoss)* 100) @ "%";
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%runAvg,%total,%totalAvg,%vClient.winCount,"%");
          
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"kills",%game,%inc),getGameTotal(%vClient,"kills",%game),getGameTotalAvg(%vClient,"kills",%game),%vClient.kills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"deaths",%game,%inc),getGameTotal(%vClient,"deaths",%game),getGameTotalAvg(%vClient,"deaths",%game),%vClient.deaths);
-         %line1 = '<color:0befe7> Mid-Air<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Mid-Air<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Mid-Air<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Mid-Air<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoreMidAir",%game,%inc),getGameTotal(%vClient,"scoreMidAir",%game),getGameTotalAvg(%vClient,"scoreMidAir",%game),%vClient.scoreMidAir);
-         %line1 = '<color:0befe7> Mine + Disc<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Mine + Disc<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Mine + Disc<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"minePlusDisc",%game,%inc),getGameTotal(%vClient,"minePlusDisc",%game),getGameTotalAvg(%vClient,"minePlusDisc",%game),%vClient.minePlusDisc);
-         %line1 = '<color:0befe7> Flag Caps<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Caps<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Caps<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Caps<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagCaps",%game,%inc),getGameTotal(%vClient,"flagCaps",%game),getGameTotalAvg(%vClient,"flagCaps",%game),%vClient.flagCaps);
-         %line1 = '<color:0befe7> Flag Grabs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Grabs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Grabs<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Grabs<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagGrabs",%game,%inc),getGameTotal(%vClient,"flagGrabs",%game),getGameTotalAvg(%vClient,"flagGrabs",%game),%vClient.flagGrabs);
-         %line1 = '<color:0befe7> Carrier Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Carrier Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Carrier Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Carrier Kills<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"carrierKills",%game,%inc),getGameTotal(%vClient,"carrierKills",%game),getGameTotalAvg(%vClient,"carrierKills",%game),%vClient.carrierKills);
-         %line1 = '<color:0befe7> Flag Returns<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Returns<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Returns<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Returns<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagReturns",%game,%inc),getGameTotal(%vClient,"flagReturns",%game),getGameTotalAvg(%vClient,"flagReturns",%game),%vClient.flagReturns);
-         %line1 = '<color:0befe7> Flag Defends<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Flag Defends<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Flag Defends<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Flag Defends<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"flagDefends",%game,%inc),getGameTotal(%vClient,"flagDefends",%game),getGameTotalAvg(%vClient,"flagDefends",%game),%vClient.flagDefends);
-         %line1 = '<color:0befe7> Offense Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Offense Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Offense Score<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Offense Score<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"offenseScore",%game,%inc),getGameTotal(%vClient,"offenseScore",%game),getGameTotalAvg(%vClient,"offenseScore",%game),%vClient.offenseScore);
-         %line1 = '<color:0befe7> Defense<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Defense<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Defense<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Defense<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"defenseScore",%game,%inc),getGameTotal(%vClient,"defenseScore",%game),getGameTotalAvg(%vClient,"defenseScore",%game),%vClient.defenseScore);
-         %line1 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Score<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Score<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"score",%game,%inc),getGameTotal(%vClient,"score",%game),getGameTotalAvg(%vClient,"score",%game),%vClient.wildCrash);
-         %line1 = '<color:0befe7> Backshots<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Backshots<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Backshots<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Backshots<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoreRearshot",%game,%inc),getGameTotal(%vClient,"scoreRearshot",%game),getGameTotalAvg(%vClient,"scoreRearshot",%game),%vClient.scoreRearshot);
-         %line1 = '<color:0befe7> Headshots<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Headshots<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Headshots<font:univers condensed:18><color:33CCCC><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Headshots<font:univers condensed:18><color:33CCCC><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoreHeadshot",%game,%inc),getGameTotal(%vClient,"scoreHeadshot",%game),getGameTotalAvg(%vClient,"scoreHeadshot",%game),%vClient.scoreHeadshot);
       case "HISTORY":// Past Games
@@ -5116,18 +5112,6 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>The oldest game will be overwritten.");
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
          if(%vClient.dtStats.gameStats["fullSet","g",%game]){
-            if(%page == 1){
-               %line = '<color:0befe7></a><lmargin:200><a:gamelink\tStats\tHISTORY\t%1\t%2> Next Page ></a>';
-               messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page + 1);
-            }
-            else if(%page * %perPage > $dtStats::MaxNumOfGames){
-               %line = '<color:0befe7></a><lmargin:200><a:gamelink\tStats\tHISTORY\t%1\t%2> < Back Page</a>';
-               messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page - 1);
-            }
-            else if(%page > 1){
-               %line = '<color:0befe7><lmargin:200><a:gamelink\tStats\tHISTORY\t%1\t%2> < Back Page </a>|<a:gamelink\tStats\tHISTORY\t%1\t%3> Next Page ></a>';
-                messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page - 1,%page + 1);
-            }
             %x = ($dtStats::MaxNumOfGames-1) - %vClient.dtStats.gameStats["statsOverWrite","g",%game];//offset 
             for (%i = ($dtStats::MaxNumOfGames-1)-((%page - 1) * %perPage); %i > ($dtStats::MaxNumOfGames-1)-(%page  * %perPage) && %i >=0; %i--){  
                %v = %i - %x; //3 2 1 0
@@ -5138,29 +5122,42 @@ function statsMenu(%client,%game){
                if(%i == 0){
                   %timeDate = getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%v);
                   %map = getField(%vClient.dtStats.gameStats["map","g",%game],%v);
-                  %line =  '<color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a><color:02d404> - Overwritten';
+                  %line =  '<lmargin:10><color:0befe7>%4 - %2<color:02d404> - Overwritten<color:0befe7><lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>';
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%timeDate,%v,%map,%game); 
                }
                else{
                   %timeDate = getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%v);
                   %map = getField(%vClient.dtStats.gameStats["map","g",%game],%v);
-                  %line = '<color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>';
+                  %line = '<lmargin:10><color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>';
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%timeDate,%v,%map,%game);  
                }
+            }
+			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+		    if(%page == 1){
+               %line = '<color:0befe7></a><lmargin:200><just:right><a:gamelink\tStats\tHISTORY\t%1\t%2>Next</a>';
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page + 1);
+            }
+            else if(%page * %perPage > $dtStats::MaxNumOfGames){
+               %line = '<color:0befe7></a><lmargin:200><just:right><a:gamelink\tStats\tHISTORY\t%1\t%2>Previous</a>';
+               messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page - 1);
+            }
+            else if(%page > 1){
+               %line = '<color:0befe7><lmargin:200><just:right><a:gamelink\tStats\tHISTORY\t%1\t%2>Previous</a> | <a:gamelink\tStats\tHISTORY\t%1\t%3>Next</a>';
+                messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page - 1,%page + 1);
             }
          }
          else{
             if(%vClient.dtStats.gameStats["statsOverWrite","g",%game] > 9){
                if(%page == 1){
-                  %line = '<color:0befe7></a><lmargin:300><a:gamelink\tStats\tHISTORY\t%1\t%2> Next Page ></a>';
+                  %line = '<color:0befe7></a><lmargin:300><a:gamelink\tStats\tHISTORY\t%1\t%2>Next</a>';
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page + 1);
                }
                else if(%page * %perPage > %vClient.dtStats.gameStats["statsOverWrite","g",%game]){
-                  %line = '<color:0befe7></a><lmargin:300><a:gamelink\tStats\tHISTORY\t%1\t%2> < Back Page</a>';
+                  %line = '<color:0befe7></a><lmargin:300><a:gamelink\tStats\tHISTORY\t%1\t%2>Previous</a>';
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page - 1);
                }
                else if(%page > 1){
-                  %line = '<color:0befe7><lmargin:250><a:gamelink\tStats\tHISTORY\t%1\t%2> < Back Page </a>|<lmargin:300><a:gamelink\tStats\tHISTORY\t%1\t%3> Next Page ></a>';
+                  %line = '<color:0befe7><lmargin:250><a:gamelink\tStats\tHISTORY\t%1\t%2>Previous</a> | <lmargin:300><a:gamelink\tStats\tHISTORY\t%1\t%3>Next</a>';
                    messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%page - 1,%page + 1);
                }
                %gc = %vClient.dtStats.gameStats["statsOverWrite","g",%game];
@@ -5168,7 +5165,7 @@ function statsMenu(%client,%game){
                   %v = %gc - %z;//temp fix just inverts it becuase.... im lazy 
                   %timeDate = getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%v);
                   %map = getField(%vClient.dtStats.gameStats["map","g",%game],%v);
-                  %line = '<color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>';
+                  %line = '<lmargin:10><color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>';
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%timeDate,%v,%map,%game);
                }
             }
@@ -5176,7 +5173,7 @@ function statsMenu(%client,%game){
                 for(%z =%vClient.dtStats.gameStats["statsOverWrite","g",%game]; %z >= 0; %z--){
                   %timeDate = getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%z);
                   %map = getField(%vClient.dtStats.gameStats["map","g",%game],%z);
-                  %line = '<color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>';
+                  %line = '<lmargin:10><color:0befe7>%4 - %2<lmargin:350><a:gamelink\tStats\t%5\t%1\t%3> + Match</a><lmargin:400><a:gamelink\tStats\tWEAPON\t%1\t%3> + Weapon</a>';
                   messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,%timeDate,%z,%map,%game);
                }
             }
@@ -5419,39 +5416,39 @@ function statsMenu(%client,%game){
          //%line = '<color:0befe7>  PastGames<lmargin:100>%1<lmargin:150>%2<lmargin:200>%3<lmargin:250>%4<lmargin:300>%5<lmargin:350>%6<lmargin:400>%7<lmargin:450>%8<lmargin:500>%9';
          //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7,%i8,%i9);  
          
-         %i1 = "Score:" SPC %vClient.score; 
-         %i2 = "Kills:" SPC %vClient.kills;
-         %i3 = "Deaths:" SPC %vClient.deaths; 
-         %i4 = "Assists:" SPC %vClient.assist;
-         %line = '<color:0befe7>  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';
+         %i1 = "<color:0befe7><font:univers condensed:18>Score:<color:03d597>" SPC %vClient.score; 
+         %i2 = "<color:0befe7><font:univers condensed:18>Kills:<color:03d597>" SPC %vClient.kills;
+         %i3 = "<color:0befe7><font:univers condensed:18>Deaths:<color:03d597>" SPC %vClient.deaths; 
+         %i4 = "<color:0befe7><font:univers condensed:18>Assists:<color:03d597>" SPC %vClient.assist;
+         %line = '  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4);         
          
-         %i1 = "KDR:" SPC kdr(%vClient.kills,%vClient.deaths) @ "%"; 
-         %i2 = "KillStreak:" SPC %vClient.killStreak;
-         %i3 = "MineDisc:" SPC %vClient.minePlusDisc;
+         %i1 = "<color:0befe7><font:univers condensed:18>KDR:<color:03d597>" SPC kdr(%vClient.kills,%vClient.deaths) @ "%"; 
+         %i2 = "<color:0befe7><font:univers condensed:18>KillStreak:<color:03d597>" SPC %vClient.killStreak;
+         %i3 = "<color:0befe7><font:univers condensed:18>MineDisc:<color:03d597>" SPC %vClient.minePlusDisc;
          %i4 = %vClient.plasmaMA + %vClient.discMA + %vClient.mineMA + %vClient.grenadeMA + %vClient.hGrenadeMA + %vClient.mortarMA + %vClient.shockMA + %vClient.laserMA +
          %vClient.laserHeadShot + %vClient.shockRearShot + %vClient.comboPT + %vClient.assist +
          (%vClient.plasmaKillMaxDist/500) + (%vClient.discKillMaxDist/500) + (%vClient.mineKillMaxDist/200) + (%vClient.grenadeKillMaxDist/300) + (%vClient.hGrenadeKillMaxDist/200) + (%vClient.mortarKillMaxDist/200)+
          (%vClient.plasmaKillRV/100) + (%vClient.discKillRV/100) + (%vClient.mineKillRV/100) + (%vClient.grenadeKillRV/100) + (%vClient.hGrenadeKillRV/100) + (%vClient.mortarKillRV/100) + (%vClient.shockKillRV/50) + (%vClient.laserKillRV/100);
-         %i4 = "Shot Rating:" SPC mFloatLength(%i4/26,2) + 0; //
-         %line = '<color:0befe7>  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';         
+         %i4 = "<color:0befe7><font:univers condensed:18>Shot Rating:<color:03d597>" SPC mFloatLength(%i4/26,2) + 0; //
+         %line = '  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';         
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4);
 
 
          %dmg =  %vClient.blasterDmg + %vClient.plasmaInDmg + %vClient.grenadeInDmg + %vClient.hGrenadeInDmg + %vClient.cgDmg + 
          %vClient.discInDmg + %vClient.laserDmg + %vClient.mortarInDmg + %vClient.missileInDmg + %vClient.shockLanceInDmg + %vClient.mineInDmg;
-         %i1 = "Damage:" SPC numReduce(%dmg,1);
-         %i2 = "Speed:" SPC  mFloatLength(%vClient.avgSpeed,1) + 0;
-         %i3 = "Shots Fired:" SPC numReduce(%vClient.shotsFired,2); //"RelSpeed:" SPC mFloatLength(%vClient.maxRV,1)+0;
-         %i4 = "Dist Moved:" SPC numReduce(%vClient.distMov,1); // %vClient.dtStats.gameStats["totalGames","g",%game];
-         %line = '<color:0befe7>  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';
+         %i1 = "<color:0befe7><font:univers condensed:18>Damage:<color:03d597>" SPC numReduce(%dmg,1);
+         %i2 = "<color:0befe7><font:univers condensed:18>Speed:<color:03d597>" SPC  mFloatLength(%vClient.avgSpeed,1) + 0;
+         %i3 = "<color:0befe7><font:univers condensed:18>Shots Fired:<color:03d597>" SPC numReduce(%vClient.shotsFired,2); //"RelSpeed:" SPC mFloatLength(%vClient.maxRV,1)+0;
+         %i4 = "<color:0befe7><font:univers condensed:18>Dist Moved:<color:03d597>" SPC numReduce(%vClient.distMov,1); // %vClient.dtStats.gameStats["totalGames","g",%game];
+         %line = '  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4);
          
-         %i1 = "Lt Kills:" SPC %vClient.armorL;
-         %i2 = "Med Kills:" SPC %vClient.armorM;
-         %i3 = "Hvy Kills:"SPC %vClient.armorH;
-         %i4 = "Survival:" SPC secToMinSec(%vClient.timeTL);   
-         %line = '<color:0befe7>  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';
+         %i1 = "<color:0befe7><font:univers condensed:18>Lt Kills:<color:03d597>" SPC %vClient.armorL;
+         %i2 = "<color:0befe7><font:univers condensed:18>Med Kills:<color:03d597>" SPC %vClient.armorM;
+         %i3 = "<color:0befe7><font:univers condensed:18>Hvy Kills:<color:03d597>"SPC %vClient.armorH;
+         %i4 = "<color:0befe7><font:univers condensed:18>Survival:<color:03d597>" SPC secToMinSec(%vClient.timeTL);   
+         %line = '  <lmargin:0>%1<lmargin:145>%2<lmargin:290>%3<lmargin:435>%4';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4);
 
          messageClient( %client, 'SetLineHud', "", %tag, %index++, ""); 
@@ -5466,7 +5463,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.blasterCom;
          %i5 = mFloatLength(%vClient.blasterKillRV,1)+0;           
          %i6 = mCeil(%vClient.blasterKillMaxDist) @ "m";
-         %line = '<color:0befe7>  Blaster<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Blaster<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.plasmaKills @ ":" @ %vClient.plasmaDeaths;
          %i2 = %vClient.plasmaMA;   
@@ -5474,7 +5471,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.plasmaCom;  
          %i5 = mFloatLength(%vClient.plasmaKillRV,1)+0;          
          %i6 = mCeil(%vClient.plasmaKillMaxDist) @ "m";
-         %line = '<color:0befe7>  Plasma Rifle<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Plasma Rifle<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.cgKills @ ":" @ %vClient.cgDeaths;
          %i2 = %vClient.cgMA;
@@ -5482,7 +5479,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.cgCom;    
          %i5 = mFloatLength(%vClient.cgKillRV,1)+0;           
          %i6 = mCeil(%vClient.cgKillMaxDist) @ "m";     
-         %line = '<color:0befe7>  Chaingun<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Chaingun<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.discKills @ ":" @ %vClient.discDeaths;
          %i2 = %vClient.discMA; 
@@ -5490,7 +5487,7 @@ function statsMenu(%client,%game){
          %i4 =  %vClient.discCom;  
          %i5 = mFloatLength(%vClient.discKillRV,1)+0;           
          %i6 = mCeil(%vClient.discKillMaxDist) @ "m";
-         %line = '<color:0befe7>  Spinfusor<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Spinfusor<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.grenadeKills @ ":" @ %vClient.grenadeDeaths;
          %i2 = %vClient.grenadeMA; 
@@ -5498,7 +5495,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.grenadeCom; 
          %i5 = mFloatLength(%vClient.grenadeKillRV,1)+0;           
          %i6 = mCeil(%vClient.grenadeKillMaxDist) @ "m";         
-         %line = '<color:0befe7>  Grenade Launcher<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Grenade Launcher<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.laserKills @ ":" @ %vClient.laserDeaths;
          %i2 = %vClient.laserMA;
@@ -5506,7 +5503,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.laserCom;
          %i5 = mFloatLength(%vClient.laserKillRV,1)+0;           
          %i6 = mCeil(%vClient.laserKillMaxDist) @ "m";         
-         %line = '<color:0befe7>  Laser Rifle<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Laser Rifle<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.mortarKills @ ":" @ %vClient.mortarDeaths;
          %i2 = %vClient.mortarMA;  
@@ -5514,7 +5511,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.mortarCom;
          %i5 = mFloatLength(%vClient.mortarKillRV,1)+0;           
          %i6 = mCeil(%vClient.mortarKillMaxDist) @ "m";         
-         %line = '<color:0befe7>  Fusion Mortar<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Fusion Mortar<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.missileKills @ ":" @ %vClient.missileDeaths;
          %i2 =  %vClient.missileMA;  
@@ -5522,7 +5519,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.missileCom;
          %i5 = mFloatLength(%vClient.missileShotsFired,1)+0;           
          %i6 = mCeil(%vClient.missileKillMaxDist) @ "m";         
-         %line = '<color:0befe7>  Missile Launcher<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Missile Launcher<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.shockLanceKills @ ":" @ %vClient.shockLanceDeaths;
          %i2 = %vClient.shockMA;
@@ -5530,7 +5527,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.shockCom;
          %i5 = mFloatLength(%vClient.shockKillRV,1)+0;           
          %i6 =  mCeil(%vClient.shockKillMaxDist) @ "m";         
-         %line = '<color:0befe7>  Shocklance<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Shocklance<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7);
          %i1 = %vClient.mineKills @ ":" @ %vClient.mineDeaths;
          %i2 =  %vClient.mineMA;  
@@ -5538,7 +5535,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.mineCom;
          %i5 = mFloatLength(%vClient.mineKillRV,1)+0;        
          %i6 = mCeil(%vClient.mineKillMaxDist) @ "m";         
-         %line = '<color:0befe7>  Mine<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Mine<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7); 
          %i1 = %vClient.hGrenadeKills @ ":" @ %vClient.hGrenadeDeaths;
          %i2 =  %vClient.hGrenadeMA;  
@@ -5546,7 +5543,7 @@ function statsMenu(%client,%game){
          %i4 = %vClient.hGrenadeCom;
          %i5 = mFloatLength(%vClient.hGrenadeKillRV,1)+0;           
          %i6 = mCeil(%vClient.hGrenadeKillMaxDist) @ "m";         
-         %line = '<color:0befe7>  Hand Grenade<lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
+         %line = '<color:0befe7>  Hand Grenade<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7); 
       case "Vehicles":
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Vehicle Stats");
@@ -5721,7 +5718,7 @@ function statsMenu(%client,%game){
       case "Blaster":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Blaster Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Blaster Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -5732,54 +5729,54 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterKills",%game,%inc),getGameTotal(%vClient,"blasterKills",%game),getGameTotalAvg(%vClient,"blasterKills",%game),%vClient.blasterKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterDeaths",%game,%inc),getGameTotal(%vClient,"blasterDeaths",%game),getGameTotalAvg(%vClient,"blasterDeaths",%game),%vClient.blasterDeaths);
-         %line1 = '<color:0befe7> Direct Damage<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Direct Damage<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Direct Damage<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterDmg",%game,%inc),getGameTotal(%vClient,"blasterDmg",%game),getGameTotalAvg(%vClient,"blasterDmg",%game),mFloatLength(%vClient.blasterDmg,2)+0);
-         %line1 = '<color:0befe7> Direct Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Direct Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Direct Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterDmgTaken",%game,%inc),getGameTotal(%vClient,"blasterDmgTaken",%game),getGameTotalAvg(%vClient,"blasterDmgTaken",%game),mFloatLength(%vClient.blasterDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterDirectHits",%game,%inc),getGameTotal(%vClient,"blasterDirectHits",%game),getGameTotalAvg(%vClient,"blasterDirectHits",%game),%vClient.blasterDirectHits);
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterShotsFired",%game,%inc),getGameTotal(%vClient,"blasterShotsFired",%game),getGameTotalAvg(%vClient,"blasterShotsFired",%game),%vClient.blasterShotsFired);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterKillMaxDist",%game,%inc),getGameTotal(%vClient,"blasterKillMaxDist",%game),getGameTotalAvg(%vClient,"blasterKillMaxDist",%game),mFloatLength(%vClient.blasterKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterKillRV",%game,%inc),getGameTotal(%vClient,"blasterKillRV",%game),getGameTotalAvg(%vClient,"blasterKillRV",%game),mFloatLength(%vClient.blasterKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterCom",%game,%inc),getGameTotal(%vClient,"blasterCom",%game),getGameTotalAvg(%vClient,"blasterCom",%game),%vClient.blasterCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterMA",%game,%inc),getGameTotal(%vClient,"blasterMA",%game),getGameTotalAvg(%vClient,"blasterMA",%game),%vClient.blasterMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"blasterACC",%game,%inc),getGameTotal(%vClient,"blasterACC",%game),getGameTotalAvg(%vClient,"blasterACC",%game),mFloatLength(%vClient.blasterACC,2)+0);
       case "Spinfusor":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Spinfusor Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Spinfusor Stats");
            messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -5790,58 +5787,58 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discKills",%game,%inc),getGameTotal(%vClient,"discKills",%game),getGameTotalAvg(%vClient,"discKills",%game),%vClient.discKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discDeaths",%game,%inc),getGameTotal(%vClient,"discDeaths",%game),getGameTotalAvg(%vClient,"discDeaths",%game),%vClient.discDeaths);
-         %line1 = '<color:0befe7> Damage Dealt <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Dealt <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discInDmg",%game,%inc),getGameTotal(%vClient,"discInDmg",%game),getGameTotalAvg(%vClient,"discInDmg",%game),mFloatLength(%vClient.discInDmg,2)+0);
-         %line1 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discInDmgTaken",%game,%inc),getGameTotal(%vClient,"discInDmgTaken",%game),getGameTotalAvg(%vClient,"discInDmgTaken",%game),mFloatLength(%vClient.discInDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discIndirectHits",%game,%inc),getGameTotal(%vClient,"discIndirectHits",%game),getGameTotalAvg(%vClient,"discIndirectHits",%game),%vClient.discIndirectHits);
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discShotsFired",%game,%inc),getGameTotal(%vClient,"discShotsFired",%game),getGameTotalAvg(%vClient,"discShotsFired",%game),%vClient.discShotsFired);
-         %line1 = '<color:0befe7> Mine + Disc<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Mine + Disc<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Mine + Disc<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Mine + Disc<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"minePlusDisc",%game,%inc),getGameTotal(%vClient,"minePlusDisc",%game),getGameTotalAvg(%vClient,"minePlusDisc",%game),%vClient.minePlusDisc);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discKillMaxDist",%game,%inc),getGameTotal(%vClient,"discKillMaxDist",%game),getGameTotalAvg(%vClient,"discKillMaxDist",%game),mFloatLength(%vClient.discKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discKillRV",%game,%inc),getGameTotal(%vClient,"discKillRV",%game),getGameTotalAvg(%vClient,"discKillRV",%game),mFloatLength(%vClient.discKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discCom",%game,%inc),getGameTotal(%vClient,"discCom",%game),getGameTotalAvg(%vClient,"discCom",%game),%vClient.discCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discMA",%game,%inc),getGameTotal(%vClient,"discMA",%game),getGameTotalAvg(%vClient,"discMA",%game),%vClient.discMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"discACC",%game,%inc),getGameTotal(%vClient,"discACC",%game),getGameTotalAvg(%vClient,"discACC",%game),mFloatLength(%vClient.discACC,2)+0);
       case "Chaingun":
           %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Chaingun Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Chaingun Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -5852,54 +5849,54 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgKills",%game,%inc),getGameTotal(%vClient,"cgKills",%game),getGameTotalAvg(%vClient,"cgKills",%game),%vClient.cgKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgDeaths",%game,%inc),getGameTotal(%vClient,"cgDeaths",%game),getGameTotalAvg(%vClient,"cgDeaths",%game),%vClient.cgDeaths);
-         %line1 = '<color:0befe7> Direct Damage<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Direct Damage<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Direct Damage<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgDmg",%game,%inc),getGameTotal(%vClient,"cgDmg",%game),getGameTotalAvg(%vClient,"cgDmg",%game),mFloatLength(%vClient.cgDmg,2)+0);
-         %line1 = '<color:0befe7> Direct Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Direct Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Direct Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgDmgTaken",%game,%inc),getGameTotal(%vClient,"cgDmgTaken",%game),getGameTotalAvg(%vClient,"cgDmgTaken",%game),mFloatLength(%vClient.cgDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgDirectHits",%game,%inc),getGameTotal(%vClient,"cgDirectHits",%game),getGameTotalAvg(%vClient,"cgDirectHits",%game),%vClient.cgDirectHits);
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgShotsFired",%game,%inc),getGameTotal(%vClient,"cgShotsFired",%game),getGameTotalAvg(%vClient,"cgShotsFired",%game),%vClient.cgShotsFired);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgKillMaxDist",%game,%inc),getGameTotal(%vClient,"cgKillMaxDist",%game),getGameTotalAvg(%vClient,"cgKillMaxDist",%game),mFloatLength(%vClient.cgKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgKillRV",%game,%inc),getGameTotal(%vClient,"cgKillRV",%game),getGameTotalAvg(%vClient,"cgKillRV",%game),mFloatLength(%vClient.cgKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgCom",%game,%inc),getGameTotal(%vClient,"cgCom",%game),getGameTotalAvg(%vClient,"cgCom",%game),%vClient.cgCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgMA",%game,%inc),getGameTotal(%vClient,"cgMA",%game),getGameTotalAvg(%vClient,"cgMA",%game),%vClient.cgMA);  
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"cgACC",%game,%inc),getGameTotal(%vClient,"cgACC",%game),getGameTotalAvg(%vClient,"cgACC",%game),mFloatLength(%vClient.cgACC,2)+0);
       case "GrenadeLauncher":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Grenade Launcher Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Grenade Launcher Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -5910,54 +5907,54 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeKills",%game,%inc),getGameTotal(%vClient,"grenadeKills",%game),getGameTotalAvg(%vClient,"grenadeKills",%game),%vClient.grenadeKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeDeaths",%game,%inc),getGameTotal(%vClient,"grenadeDeaths",%game),getGameTotalAvg(%vClient,"grenadeDeaths",%game),%vClient.grenadeDeaths);
-         %line1 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeInDmg",%game,%inc),getGameTotal(%vClient,"grenadeInDmg",%game),getGameTotalAvg(%vClient,"grenadeInDmg",%game),mFloatLength(%vClient.grenadeInDmg,2)+0);
-         %line1 = '<color:0befe7> Damage Taken <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Taken <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Taken <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Taken <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeInDmgTaken",%game,%inc),getGameTotal(%vClient,"grenadeInDmgTaken",%game),getGameTotalAvg(%vClient,"grenadeInDmgTaken",%game),mFloatLength(%vClient.grenadeInDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeIndirectHits",%game,%inc),getGameTotal(%vClient,"grenadeIndirectHits",%game),getGameTotalAvg(%vClient,"grenadeIndirectHits",%game),%vClient.grenadeIndirectHits);
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeShotsFired",%game,%inc),getGameTotal(%vClient,"grenadeShotsFired",%game),getGameTotalAvg(%vClient,"grenadeShotsFired",%game),%vClient.grenadeShotsFired);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeKillMaxDist",%game,%inc),getGameTotal(%vClient,"grenadeKillMaxDist",%game),getGameTotalAvg(%vClient,"grenadeKillMaxDist",%game),mFloatLength(%vClient.grenadeKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeKillRV",%game,%inc),getGameTotal(%vClient,"grenadeKillRV",%game),getGameTotalAvg(%vClient,"grenadeKillRV",%game),mFloatLength(%vClient.grenadeKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeCom",%game,%inc),getGameTotal(%vClient,"grenadeCom",%game),getGameTotalAvg(%vClient,"grenadeCom",%game),%vClient.grenadeCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeMA",%game,%inc),getGameTotal(%vClient,"grenadeMA",%game),getGameTotalAvg(%vClient,"grenadeMA",%game),%vClient.grenadeMA);      
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"grenadeACC",%game,%inc),getGameTotal(%vClient,"grenadeACC",%game),getGameTotalAvg(%vClient,"grenadeACC",%game),mFloatLength(%vClient.grenadeACC,2)+0);
       case "LaserRifle":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Laser Rifle Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Laser Rifle Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -5968,58 +5965,58 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserKills",%game,%inc),getGameTotal(%vClient,"laserKills",%game),getGameTotalAvg(%vClient,"laserKills",%game),%vClient.laserKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserDeaths",%game,%inc),getGameTotal(%vClient,"laserDeaths",%game),getGameTotalAvg(%vClient,"laserDeaths",%game),%vClient.laserDeaths);
-         %line1 = '<color:0befe7> Direct Damage<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Direct Damage<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Direct Damage<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Direct Damage<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserDmg",%game,%inc),getGameTotal(%vClient,"laserDmg",%game),getGameTotalAvg(%vClient,"laserDmg",%game),mFloatLength(%vClient.laserDmg,2)+0);
-         %line1 = '<color:0befe7> Direct Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Direct Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Direct Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Direct Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserDmgTaken",%game,%inc),getGameTotal(%vClient,"laserDmgTaken",%game),getGameTotalAvg(%vClient,"laserDmgTaken",%game),mFloatLength(%vClient.laserDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Hits <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserDirectHits",%game,%inc),getGameTotal(%vClient,"laserDirectHits",%game),getGameTotalAvg(%vClient,"laserDirectHits",%game),%vClient.laserDirectHits);
-         %line1 = '<color:0befe7> Shots Fired <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserShotsFired",%game,%inc),getGameTotal(%vClient,"laserShotsFired",%game),getGameTotalAvg(%vClient,"laserShotsFired",%game),%vClient.laserShotsFired);
-         %line1 = '<color:0befe7> Headshots<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Headshots<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Headshots<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Headshots<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserHeadShot",%game,%inc),getGameTotal(%vClient,"laserHeadShot",%game),getGameTotalAvg(%vClient,"laserHeadShot",%game),%vClient.laserHeadShot);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserKillMaxDist",%game,%inc),getGameTotal(%vClient,"laserKillMaxDist",%game),getGameTotalAvg(%vClient,"laserKillMaxDist",%game),mFloatLength(%vClient.laserKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserKillRV",%game,%inc),getGameTotal(%vClient,"laserKillRV",%game),getGameTotalAvg(%vClient,"laserKillRV",%game),mFloatLength(%vClient.laserKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserCom",%game,%inc),getGameTotal(%vClient,"laserCom",%game),getGameTotalAvg(%vClient,"laserCom",%game),%vClient.laserCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserMA",%game,%inc),getGameTotal(%vClient,"laserMA",%game),getGameTotalAvg(%vClient,"laserMA",%game),%vClient.laserMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"laserACC",%game,%inc),getGameTotal(%vClient,"laserACC",%game),getGameTotalAvg(%vClient,"laserACC",%game),mFloatLength(%vClient.laserACC,2)+0);
       case "FusionMortar":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Fusion Mortar Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Fusion Mortar Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -6030,54 +6027,54 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarKills",%game,%inc),getGameTotal(%vClient,"mortarKills",%game),getGameTotalAvg(%vClient,"mortarKills",%game),%vClient.mortarKills);
-         %line1 = '<color:0befe7> Deaths <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarDeaths",%game,%inc),getGameTotal(%vClient,"mortarDeaths",%game),getGameTotalAvg(%vClient,"mortarDeaths",%game),%vClient.mortarDeaths);
-         %line1 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarInDmg",%game,%inc),getGameTotal(%vClient,"mortarInDmg",%game),getGameTotalAvg(%vClient,"mortarInDmg",%game),mFloatLength(%vClient.mortarInDmg,2)+0);
-         %line1 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarInDmgTaken",%game,%inc),getGameTotal(%vClient,"mortarInDmgTaken",%game),getGameTotalAvg(%vClient,"mortarInDmgTaken",%game),mFloatLength(%vClient.mortarInDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarIndirectHits",%game,%inc),getGameTotal(%vClient,"mortarIndirectHits",%game),getGameTotalAvg(%vClient,"mortarIndirectHits",%game),%vClient.mortarIndirectHits);
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarShotsFired",%game,%inc),getGameTotal(%vClient,"mortarShotsFired",%game),getGameTotalAvg(%vClient,"mortarShotsFired",%game),%vClient.mortarShotsFired);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarKillMaxDist",%game,%inc),getGameTotal(%vClient,"mortarKillMaxDist",%game),getGameTotalAvg(%vClient,"mortarKillMaxDist",%game),mFloatLength(%vClient.mortarKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarKillRV",%game,%inc),getGameTotal(%vClient,"mortarKillRV",%game),getGameTotalAvg(%vClient,"mortarKillRV",%game),mFloatLength(%vClient.mortarKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarCom",%game,%inc),getGameTotal(%vClient,"mortarCom",%game),getGameTotalAvg(%vClient,"mortarCom",%game),%vClient.mortarCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarMA",%game,%inc),getGameTotal(%vClient,"mortarMA",%game),getGameTotalAvg(%vClient,"mortarMA",%game),%vClient.mortarMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mortarACC",%game,%inc),getGameTotal(%vClient,"mortarACC",%game),getGameTotalAvg(%vClient,"mortarACC",%game),mFloatLength(%vClient.mortarACC,2)+0);
       case "MissileLauncher":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Missile Launcher Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Missile Launcher Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -6088,54 +6085,54 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileKills",%game,%inc),getGameTotal(%vClient,"missileKills",%game),getGameTotalAvg(%vClient,"missileKills",%game),%vClient.missileKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileDeaths",%game,%inc),getGameTotal(%vClient,"missileDeaths",%game),getGameTotalAvg(%vClient,"missileDeaths",%game),%vClient.missileDeaths);
-         %line1 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileInDmg",%game,%inc),getGameTotal(%vClient,"missileInDmg",%game),getGameTotalAvg(%vClient,"missileInDmg",%game),mFloatLength(%vClient.missileInDmg,2)+0);
-         %line1 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileInDmgTaken",%game,%inc),getGameTotal(%vClient,"missileInDmgTaken",%game),getGameTotalAvg(%vClient,"missileInDmgTaken",%game),mFloatLength(%vClient.missileInDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileIndirectHits",%game,%inc),getGameTotal(%vClient,"missileIndirectHits",%game),getGameTotalAvg(%vClient,"missileIndirectHits",%game),mFloatLength(%vClient.missileIndirectHits,2)+0);
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileShotsFired",%game,%inc),getGameTotal(%vClient,"missileShotsFired",%game),getGameTotalAvg(%vClient,"missileShotsFired",%game),%vClient.missileShotsFired);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileKillMaxDist",%game,%inc),getGameTotal(%vClient,"missileKillMaxDist",%game),getGameTotalAvg(%vClient,"missileKillMaxDist",%game),mFloatLength(%vClient.missileKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileKillRV",%game,%inc),getGameTotal(%vClient,"missileKillRV",%game),getGameTotalAvg(%vClient,"missileKillRV",%game),mFloatLength(%vClient.missileKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileCom",%game,%inc),getGameTotal(%vClient,"missileCom",%game),getGameTotalAvg(%vClient,"missileCom",%game),%vClient.missileCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileMA",%game,%inc),getGameTotal(%vClient,"missileMA",%game),getGameTotalAvg(%vClient,"missileMA",%game),%vClient.missileMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"missileACC",%game,%inc),getGameTotal(%vClient,"missileACC",%game),getGameTotalAvg(%vClient,"missileACC",%game),mFloatLength(%vClient.missileACC,2)+0);
       case "Shocklance":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Shocklance Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Shocklance Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -6146,58 +6143,58 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockLanceKills",%game,%inc),getGameTotal(%vClient,"shockLanceKills",%game),getGameTotalAvg(%vClient,"shockLanceKills",%game),%vClient.shockLanceKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockLanceDeaths",%game,%inc),getGameTotal(%vClient,"shockLanceDeaths",%game),getGameTotalAvg(%vClient,"shockLanceDeaths",%game),%vClient.shockLanceDeaths);
-         %line1 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockLanceInDmg",%game,%inc),getGameTotal(%vClient,"shockLanceInDmg",%game),getGameTotalAvg(%vClient,"shockLanceInDmg",%game),mFloatLength(%vClient.shockLanceInDmg,20)+0);
-         %line1 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockLanceInDmgTaken",%game,%inc),getGameTotal(%vClient,"shockLanceInDmgTaken",%game),getGameTotalAvg(%vClient,"shockLanceInDmgTaken",%game),mFloatLength(%vClient.shockLanceInDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Direct Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Direct Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Direct Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Direct Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockLanceIndirectHits",%game,%inc),getGameTotal(%vClient,"shockLanceIndirectHits",%game),getGameTotalAvg(%vClient,"shockLanceIndirectHits",%game),%vClient.shockLanceIndirectHits);
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockLanceShotsFired",%game,%inc),getGameTotal(%vClient,"shockLanceShotsFired",%game),getGameTotalAvg(%vClient,"shockLanceShotsFired",%game),%vClient.shockLanceShotsFired);
-         %line1 = '<color:0befe7> Backshots<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Backshots<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Backshots<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Backshots<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockRearShot",%game,%inc),getGameTotal(%vClient,"shockRearShot",%game),getGameTotalAvg(%vClient,"shockRearShot",%game),%vClient.shockRearShot);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockKillMaxDist",%game,%inc),getGameTotal(%vClient,"shockKillMaxDist",%game),getGameTotalAvg(%vClient,"shockKillMaxDist",%game),mFloatLength(%vClient.shockKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockKillRV",%game,%inc),getGameTotal(%vClient,"shockKillRV",%game),getGameTotalAvg(%vClient,"shockKillRV",%game),mFloatLength(%vClient.shockKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockCom",%game,%inc),getGameTotal(%vClient,"shockCom",%game),getGameTotalAvg(%vClient,"shockCom",%game),%vClient.shockCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockMA",%game,%inc),getGameTotal(%vClient,"shockMA",%game),getGameTotalAvg(%vClient,"shockMA",%game),%vClient.shockMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shockACC",%game,%inc),getGameTotal(%vClient,"shockACC",%game),getGameTotalAvg(%vClient,"shockACC",%game),mFloatLength(%vClient.shockACC,2)+0);
       case "PlasmaRifle":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Plasma Rifle Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Plasma Rifle Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -6208,54 +6205,54 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaKills",%game,%inc),getGameTotal(%vClient,"plasmaKills",%game),getGameTotalAvg(%vClient,"plasmaKills",%game),%vClient.plasmaKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaDeaths",%game,%inc),getGameTotal(%vClient,"plasmaDeaths",%game),getGameTotalAvg(%vClient,"plasmaDeaths",%game),%vClient.plasmaDeaths);
-         %line1 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaInDmg",%game,%inc),getGameTotal(%vClient,"plasmaInDmg",%game),getGameTotalAvg(%vClient,"plasmaInDmg",%game),mFloatLength(%vClient.plasmaInDmg,2)+0);
-         %line1 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaInDmgTaken",%game,%inc),getGameTotal(%vClient,"plasmaInDmgTaken",%game),getGameTotalAvg(%vClient,"plasmaInDmgTaken",%game),mFloatLength(%vClient.plasmaInDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaIndirectHits",%game,%inc),getGameTotal(%vClient,"plasmaIndirectHits",%game),getGameTotalAvg(%vClient,"plasmaIndirectHits",%game),mFloatLength(%vClient.plasmaIndirectHits,2)+0);
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaShotsFired"),getGameTotal(%vClient,"plasmaShotsFired",%game),getGameTotalAvg(%vClient,"plasmaShotsFired",%game),%vClient.plasmaShotsFired);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaKillMaxDist",%game,%inc),getGameTotal(%vClient,"plasmaKillMaxDist",%game),getGameTotalAvg(%vClient,"plasmaKillMaxDist",%game),mFloatLength(%vClient.plasmaKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaKillRV",%game,%inc),getGameTotal(%vClient,"plasmaKillRV",%game),getGameTotalAvg(%vClient,"plasmaKillRV",%game),mFloatLength(%vClient.plasmaKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaCom",%game,%inc),getGameTotal(%vClient,"plasmaCom",%game),getGameTotalAvg(%vClient,"plasmaCom",%game),%vClient.plasmaCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaMA",%game,%inc),getGameTotal(%vClient,"plasmaMA",%game),getGameTotalAvg(%vClient,"plasmaMA",%game),%vClient.plasmaMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"plasmaACC",%game,%inc),getGameTotal(%vClient,"plasmaACC",%game),getGameTotalAvg(%vClient,"plasmaACC",%game),mFloatLength(%vClient.plasmaACC,2)+0);
       case "ELF":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>ELF Projector Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>ELF Projector Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -6266,14 +6263,14 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Shots Fired<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Shots Fired<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"elfShotsFired",%game,%inc),getGameTotal(%vClient,"elfShotsFired",%game),getGameTotalAvg(%vClient,"elfShotsFired",%game),%vClient.elfShotsFired);
       case "Mine":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Mine Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Mine Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -6284,54 +6281,54 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineKills",%game,%inc),getGameTotal(%vClient,"mineKills",%game),getGameTotalAvg(%vClient,"mineKills",%game),%vClient.mineKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineDeaths",%game,%inc),getGameTotal(%vClient,"mineDeaths",%game),getGameTotalAvg(%vClient,"mineDeaths",%game),%vClient.mineDeaths);
-         %line1 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineInDmg",%game,%inc),getGameTotal(%vClient,"mineInDmg",%game),getGameTotalAvg(%vClient,"mineInDmg",%game),mFloatLength(%vClient.mineInDmg,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineIndirectHits",%game,%inc),getGameTotal(%vClient,"mineIndirectHits",%game),getGameTotalAvg(%vClient,"mineIndirectHits",%game),%vClient.mineIndirectHits);
-         %line1 = '<color:0befe7> Mines Thrown<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Mines Thrown<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Mines Thrown<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Mines Thrown<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineShotsFired",%game,%inc),getGameTotal(%vClient,"mineShotsFired",%game),getGameTotalAvg(%vClient,"mineShotsFired",%game),%vClient.mineShotsFired);
-         %line1 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineInDmgTaken",%game,%inc),getGameTotal(%vClient,"mineInDmgTaken",%game),getGameTotalAvg(%vClient,"mineInDmgTaken",%game),mFloatLength(%vClient.mineInDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineKillMaxDist",%game,%inc),getGameTotal(%vClient,"mineKillMaxDist",%game),getGameTotalAvg(%vClient,"mineKillMaxDist",%game),mFloatLength(%vClient.mineKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineKillRV",%game,%inc),getGameTotal(%vClient,"mineKillRV",%game),getGameTotalAvg(%vClient,"mineKillRV",%game),mFloatLength(%vClient.mineKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineCom",%game,%inc),getGameTotal(%vClient,"mineCom",%game),getGameTotalAvg(%vClient,"mineCom",%game),%vClient.mineCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineMA",%game,%inc),getGameTotal(%vClient,"mineMA",%game),getGameTotalAvg(%vClient,"mineMA",%game),%vClient.mineMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mineACC",%game,%inc),getGameTotal(%vClient,"mineACC",%game),getGameTotalAvg(%vClient,"mineACC",%game),mFloatLength(%vClient.mineACC,2)+0);
       case "HandGrenade":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Hand Grenade Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Hand Grenade Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -6343,54 +6340,54 @@ function statsMenu(%client,%game){
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
 
-         %line1 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeKills",%game,%inc),getGameTotal(%vClient,"hGrenadeKills",%game),getGameTotalAvg(%vClient,"hGrenadeKills",%game),%vClient.hGrenadeKills);
-         %line1 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeDeaths",%game,%inc),getGameTotal(%vClient,"hGrenadeDeaths",%game),getGameTotalAvg(%vClient,"hGrenadeDeaths",%game),%vClient.hGrenadeDeaths);
-         %line1 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Dealt<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Dealt<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeInDmg",%game,%inc),getGameTotal(%vClient,"hGrenadeInDmg",%game),getGameTotalAvg(%vClient,"hGrenadeInDmg",%game),mFloatLength(%vClient.hGrenadeInDmg,2)+0);
-         %line1 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeInHits",%game,%inc),getGameTotal(%vClient,"hGrenadeInHits",%game),getGameTotalAvg(%vClient,"hGrenadeInHits",%game),%vClient.hGrenadeInHits);
-         %line1 = '<color:0befe7> Grenades Thrown<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Grenades Thrown<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Grenades Thrown<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Grenades Thrown<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeShotsFired",%game,%inc),getGameTotal(%vClient,"hGrenadeShotsFired",%game),getGameTotalAvg(%vClient,"hGrenadeShotsFired",%game),%vClient.hGrenadeShotsFired);
-         %line1 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeInDmgTaken",%game,%inc),getGameTotal(%vClient,"hGrenadeInDmgTaken",%game),getGameTotalAvg(%vClient,"hGrenadeInDmgTaken",%game),mFloatLength(%vClient.hGrenadeInDmgTaken,2)+0);
-         %line1 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Max Distance<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Max Distance<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeKillMaxDist",%game,%inc),getGameTotal(%vClient,"hGrenadeKillMaxDist",%game),getGameTotalAvg(%vClient,"hGrenadeKillMaxDist",%game),mFloatLength(%vClient.hGrenadeKillMaxDist,2)+0);
-         %line1 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Relative Velocity<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Relative Velocity<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeKillRV",%game,%inc),getGameTotal(%vClient,"hGrenadeKillRV",%game),getGameTotalAvg(%vClient,"hGrenadeKillRV",%game),mFloatLength(%vClient.hGrenadeKillRV,2)+0);
-         %line1 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Weapon Combos<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Weapon Combos<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeCom",%game,%inc),getGameTotal(%vClient,"hGrenadeCom",%game),getGameTotalAvg(%vClient,"hGrenadeCom",%game),%vClient.hGrenadeCom);
-         %line1 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Midairs<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Midairs<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeMA",%game,%inc),getGameTotal(%vClient,"hGrenadeMA",%game),getGameTotalAvg(%vClient,"hGrenadeMA",%game),%vClient.hGrenadeMA);
-         %line1 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Accuracy<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Accuracy<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hGrenadeACC",%game,%inc),getGameTotal(%vClient,"hGrenadeACC",%game),getGameTotalAvg(%vClient,"hGrenadeACC",%game),mFloatLength(%vClient.hGrenadeACC,2)+0);
       case "SatchelCharge":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
-            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Satchel Charge Stats" @ getField(%vClient.dtStats.gameStats["map","g",%game],%inc) SPC getField(%vClient.dtStats.gameStats["timeDayMonth","g",%game],%inc));
+            messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Satchel Charge Stats");
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tWEAPON\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%inc);
             %header = "<color:0befe7><lmargin:180>Stats<lmargin:310>Totals<lmargin:440>Total Avg";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
@@ -6401,24 +6398,24 @@ function statsMenu(%client,%game){
             %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
          }
-         %line1 = '<color:0befe7> Kills <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Kills <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Kills <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Kills <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"satchelChargeKills",%game,%inc),getGameTotal(%vClient,"satchelChargeKills",%game),getGameTotalAvg(%vClient,"satchelChargeKills",%game),%vClient.satchelChargeKills);
-         %line1 = '<color:0befe7> Deaths <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Deaths <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Deaths <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Deaths <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"satchelChargeDeaths",%game,%inc),getGameTotal(%vClient,"satchelChargeDeaths",%game),getGameTotalAvg(%vClient,"satchelChargeDeaths",%game),%vClient.satchelChargeDeaths);
-         %line1 = '<color:0befe7> Splash Damage <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Splash Damage <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Splash Damage <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Splash Damage <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"SatchelInDmg",%game,%inc),getGameTotal(%vClient,"SatchelInDmg",%game),getGameTotalAvg(%vClient,"SatchelInDmg",%game),mFloatLength(%vClient.SatchelInDmg,2)+0);
-         %line1 = '<color:0befe7> Hits <color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Hits <color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Hits <color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Hits <color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"SatchelInHits",%game,%inc),getGameTotal(%vClient,"SatchelInHits",%game),getGameTotalAvg(%vClient,"SatchelInHits",%game),%vClient.SatchelInHits);
-         %line1 = '<color:0befe7> Splash Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         %line2 = '<color:0befe7> Splash Damage Taken<color:00dcd4><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
+         %line1 = '<color:0befe7> Splash Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
+         %line2 = '<color:0befe7> Splash Damage Taken<color:33CCCC><font:univers condensed:18><lmargin:180>%2<lmargin:310>%3<lmargin:440>%4';         
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"SatchelInDmgTaken",%game,%inc),getGameTotal(%vClient,"SatchelInDmgTaken",%game),getGameTotalAvg(%vClient,"SatchelInDmgTaken",%game),mFloatLength(%vClient.SatchelInDmgTaken,2)+0);
 case "LBOARDS":
@@ -6477,7 +6474,7 @@ case "LBOARDS":
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
             
             messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
             //error(%mon SPC %page SPC $lData::monCount[%game,%lType]);
             if($lData::monCount[%game,%lType] > 1){
                if(%page == 1){
@@ -6509,9 +6506,21 @@ case "LBOARDS":
          %year = getField($lData::mon[%lType, %game, %page],1);
          %client.backPage = "GLBOARDS";
          %NA = "N/A";
-		 if(%game $= "CTFGame") %gametype = "CTF";
-		 else if(%game $= "SCtFGame") %gametype = "LCTF";
-		 else if(%game $= "LakRabbitGame") %gametype = "Lak";
+		 switch$(%game)
+		 {
+			case "CTFGame":
+				%gametype = "CTF";
+			case "SCtfGame":
+				%gametype = "LCTF";
+			case "LakRabbitGame":
+				%gametype = "Lak";
+			case "DMGame":
+				%gametype = "DM";
+			case "ArenaGame":
+				%gametype = "Arena";
+			case "DuelGame":
+				%gametype = "Duel";
+		 }
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %gametype SPC "Greatest Hits");
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLBOARDS\t%1\t%3\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,$dtStats::topAmount,%lType,%page);
             //exec("scripts/autoexec/zDarktigerStats.cs");
@@ -6601,6 +6610,7 @@ case "LBOARDS":
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Time Played: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Multi Kills: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"totalTime-Time Played-Total Minutes","multiKills-Multi Kills-Total",%vClient);
 			
+			messageClient( %client, 'SetLineHud', "", %tag, %index++, '');
 			messageClient( %client, 'SetLineHud', "", %tag, %index++, '<just:center>Click on player name to view the top %1 players', $dtStats::topAmount);
       case "WLBOARDS":
          %lType = %client.curLType;
@@ -6755,7 +6765,7 @@ case "LBOARDS":
          %field      = getField(%GlArg4,0);
          %name       = getField(%GlArg4,1);
          %fieldName  = getField(%GlArg4,2);
-         messageClient( %client, 'SetScoreHudHeader', "", '<just:center>Top %1 Players',$dtStats::topAmount);
+         messageClient( %client, 'SetScoreHudHeader', "", '<just:center>%2 (Top %1 Players)',$dtStats::topAmount, %name);
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\t%3\t%1\t%2>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,%lType,%client.backPage);
         
          %header = '<color:0befe7> <lmargin:50>#. <lmargin:75>%1<lmargin:250>%2';
@@ -6764,7 +6774,7 @@ case "LBOARDS":
             %scoreName  = getField($lData::name[%field,%game,%lType,%mon,%year],%i);
             %gameScore  = getField($lData::data[%field,%game,%lType,%mon,%year],%i);
             if(%gameScore){  
-               %line = '<color:0befe7> <lmargin:50>%1. <lmargin:75><clip:138>%2</clip><lmargin:250>%3';
+               %line = '<color:33CCCC><font:univers condensed:18> <lmargin:50>%1. <lmargin:75><clip:138>%2</clip><lmargin:250><color:03d597>%3';
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i+1,%scoreName,mFloor(%gameScore + 0.5));
             }
          }
@@ -6825,7 +6835,6 @@ case "LBOARDS":
             %line = '<color:0befe7><lmargin:50><a:gamelink\tStats\tLB\t%1\t%3\t0>%2</a><lmargin:250>%4';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%var,%var @"-"@ %var @ "-Value",%name);
          }
-
       default://fail safe / reset
          %client.viewMenu   = 0;
          %client.viewClient = 0;

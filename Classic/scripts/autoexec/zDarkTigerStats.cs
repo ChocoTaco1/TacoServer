@@ -297,6 +297,7 @@ $dtStats::FV[$dtStats::FC["LakRabbitGame"]++,"LakRabbitGame"] = "totalShocks";
 $dtStats::FV[$dtStats::FC["LakRabbitGame"]++,"LakRabbitGame"] = "MidairflagGrabs";
 $dtStats::FV[$dtStats::FC["LakRabbitGame"]++,"LakRabbitGame"] = "MidairflagGrabPoints";
 $dtStats::uFC["LakRabbitGame"] = 0;
+$dtStats::uFV[$dtStats::uFC["LakRabbitGame"]++,"LakRabbitGame"] = "flagTimeMS";
 ///////////////////////////////////////////////////////////////////////////////
 //                            	 DMGame								   		
 ///////////////////////////////////////////////////////////////////////////////

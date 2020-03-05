@@ -74,8 +74,15 @@
 //    Added a handfull of new varables to track, too many to list.
 //    Surival time is now acurite also simplified the code  
 //    Removed turrets stats other then kills death
-//    
+//
+//    6.5 Fixes
+//    Misc fixes from 6.0 additions/changes 
+//    Added option to view the other game types within the leaderboard stuff 
+//    Bumped up distance for mortar midAirs so it's just outside its damage radius something strange is going on there
+//    Added game type arrays for display and processing
+//
 //    7.0 ToDos
+//       Replace or rework overallACC
 //       Add option to load stats after players first game to reduce any sort of impact on the server
 //       Remove or condense vehicle stats into one page kind of like the live screen and remove unused stuff
 //       Armor stats to be reworked or removed undecided yet
@@ -216,6 +223,21 @@ $dtStats::gameType[3] = "SCtFGame";
 $dtStats::gameType[4] = "ArenaGame"; 
 $dtStats::gameType[5] = "DuelGame"; 
 $dtStats::gameTypeCount = 6;
+//short hand name
+$dtStats::gtNameShort["CTFGame"] = "CTF";
+$dtStats::gtNameShort["LakRabbitGame"] = "LakRabbit";
+$dtStats::gtNameShort["DMGame"] = "DM";
+$dtStats::gtNameShort["SCtFGame"] = "LCTF";
+$dtStats::gtNameShort["ArenaGame"] = "Arena"; 
+$dtStats::gtNameShort["DuelGame"] = "Duel"; 
+//Display name 
+$dtStats::gtNameLong["CTFGame"] = "Capture the Flag";
+$dtStats::gtNameLong["LakRabbitGame"] = "LakRabbit";
+$dtStats::gtNameLong["DMGame"] = "Deathmatch";
+$dtStats::gtNameLong["SCtFGame"] = "Spawn CTF";
+$dtStats::gtNameLong["ArenaGame"] = "Arena"; 
+$dtStats::gtNameLong["DuelGame"] = "Duel MOD"; 
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             		CTF
@@ -948,7 +970,7 @@ $dtStats::uFC["dtStats"] = 0; // not saved but used to calculate other stats tha
    $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "missileACC\tmissileACCAVG";
    $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "score\tscoreAVG";
    $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "kills\tkillsAVG";
-   $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "timeTL\tteamTLAVG";
+   $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "timeTL\ttimeTLAVG";
    $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "overallACC\toverallACCAVG";
    //$dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "airTime\tairTimeAvg"; 
    //$dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "groundTime\tgroundTimeAvg";
@@ -2706,6 +2728,7 @@ function LakRabbitHud(%game, %client, %tag){
 function dtStatsMissionDropReady(%game, %client){ // called when client has finished loading
    if($dtStats::debugEchos){error("dtStatsMissionDropReady GUID = "  SPC %client.guid);}  
    %client.lp = "";//last position for distMove
+   %client.lgame = %game.class;
    %foundOld = 0;
    %mrx = setGUIDName(%client);// make sure we  have a guid if not make one
    if(!isObject(%client.dtStats)){
@@ -2747,7 +2770,6 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
 		   resetDtStats(%client,%game.class,1);
 		   if(!$dtStats::loadAfter){
             loadGameStats(%client.dtStats,%game.class);
-            %dtStats.isLoaded = 1;		   
 		   }
 		   else{
             %dtStats.isLoaded = 0;
@@ -2769,7 +2791,6 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    }
    else if(!%client.dtStats.isLoaded ){
        loadGameStats(%client.dtStats,%game.class);
-       %client.dtStats.isLoaded = 1;
    }
 }
 function dtStatsClientLeaveGame(%game, %client){
@@ -3286,8 +3307,8 @@ function monthString(%num){
 ////////////////////////////////////////////////////////////////////////////////
 function loadGameStats(%dtStats,%game,%total){// called when client joins server.cs onConnect
    if($dtStats::debugEchos){error("loadGameStats GUID = "  SPC %dtStats.guid);} 
+   %dtStats.isLoaded = 1;
    if(%dtStats.guid !$= "" && !$dtStats::Basic){
-
       loadGameTotalStats(%dtStats,%game);
       %filename = "serverStats/stats/" @ %game @ "/" @ %dtStats.guid  @ "g.cs";
       if(isFile(%filename)){
@@ -3444,7 +3465,8 @@ function saveTotalStats(%dtStats,%game){ // saved by the main save function
 function incGameStats(%dtStats,%game) {// record that games stats and inc by one
    if($dtStats::debugEchos){error("incGameStats GUID = "  SPC %dtStats.guid);} 
    if(!%dtStats.isLoaded) // if not loaded load total stats so we can save 
-      loadGameTotalStats(%dtStats,%game);
+      loadGameStats(%dtStats,%game);
+      
    %dtStats.client.viewMenu = "Reset";
    
    %c = %dtStats.gameStats["statsOverWrite","g",%game]++;
@@ -3631,7 +3653,7 @@ function incBakGameStats(%dtStats,%game) {// record that games stats and inc by 
    if($dtStats::debugEchos){error("incBakGameStats GUID = "  SPC %dtStats.guid);}    
    
    if(!%dtStats.isLoaded)  
-      loadGameTotalStats(%dtStats,%game);
+      loadGameStats(%dtStats,%game);
       
    %c = %dtStats.gameStats["statsOverWrite","g",%game]++;
    if(%dtStats.gameStats["statsOverWrite","g",%game]  > $dtStats::MaxNumOfGames-1 || %dtStats.gameStats["statsOverWrite","g",%game]  > 99){
@@ -4303,7 +4325,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
             if(%client.weaponHitMaxDist < %dis){%client.weaponHitMaxDist = %dis;}
             if(%t){
                %targetClient.mortarInDmgTaken += %amount;
-               if(%targetClient != %client && rayTest(%targetObject,MortarShot.damageRadius+1)){%client.mortarMA++;}
+               if(%targetClient != %client && rayTest(%targetObject,MortarShot.damageRadius+2)){%client.mortarMA++;}
             }
          case $DamageType::Missile:
             %client.missileInDmg += %amount;
@@ -4593,15 +4615,15 @@ function statsMenu(%client,%game){
                   if($dtStats::Hist)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tHISTORY\t%1\t1>  + Previous CTF Games</a>',%vClient);
                   if($dtStats::day > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday\t0>  + CTF Daily Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday-%2\t0>  + CTF Daily Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::week > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek\t0>  + CTF Weekly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek-%2\t0>  + CTF Weekly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::month > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth\t0>  + CTF Monthly Leaderboards *Beta',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth-%2\t0>  + CTF Monthly Leaderboards *Beta',%vClient,%game);
                   if($dtStats::quarter > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter\t0>  + CTF Quarterly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter-%2\t0>  + CTF Quarterly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::year > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear\t0>  + CTF Yearly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear-%2\t0>  + CTF Yearly Leaderboards *Beta</a>',%vClient,%game);
                }
             case "LakRabbitGame":
                if($dtStats::Live)
@@ -4618,15 +4640,15 @@ function statsMenu(%client,%game){
                   if($dtStats::Hist)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tHISTORY\t%1\t1>  + Previous Lak Games</a>',%vClient);
                   if($dtStats::day > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday\t0>  + LakRabbit Daily Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday-%2\t0>  + LakRabbit Daily Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::week > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek\t0>  + LakRabbit Weekly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek-%2\t0>  + LakRabbit Weekly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::month > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth\t0>  + LakRabbit Monthly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth-%2\t0>  + LakRabbit Monthly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::quarter > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter\t0>  + LakRabbit Quarterly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter-%2\t0>  + LakRabbit Quarterly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::year > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear\t0>  + LakRabbit Yearly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear-%2\t0>  + LakRabbit Yearly Leaderboards *Beta</a>',%vClient,%game);
                }
             case "DMGame":
                if($dtStats::Live)
@@ -4641,15 +4663,15 @@ function statsMenu(%client,%game){
                   if($dtStats::Hist)
                    messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tHISTORY\t%1\t1>  + Previous Deathmatch Games</a>',%vClient);
                   if($dtStats::day > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday\t0>  + Deathmatch Daily Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday-%2\t0>  + Deathmatch Daily Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::week > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek\t0>  + Deathmatch Weekly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek-%2\t0>  + Deathmatch Weekly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::month > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth\t0>  + Deathmatch Monthly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth-%2\t0>  + Deathmatch Monthly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::quarter > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter\t0>  + Deathmatch Quarterly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter-%2\t0>  + Deathmatch Quarterly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::year > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear\t0>  + Deathmatch Yearly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear-%2\t0>  + Deathmatch Yearly Leaderboards *Beta</a>',%vClient,%game);
                }            
             case "DuelGame":
                if($dtStats::Live)
@@ -4665,15 +4687,15 @@ function statsMenu(%client,%game){
                   if($dtStats::Hist)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tHISTORY\t%1\t1>  + Previous Duel Mod Games</a>',%vClient);
                   if($dtStats::day > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday\t0>  + Duel Mod Daily Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday-%2\t0>  + Duel Mod Daily Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::week > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek\t0>  + Duel Mod Weekly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek-%2\t0>  + Duel Mod Weekly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::month > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth\t0>  + Duel Mod Monthly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth-%2\t0>  + Duel Mod Monthly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::quarter > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter\t0>  + Duel Mod Quarterly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter-%2\t0>  + Duel Mod Quarterly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::year > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear\t0>  + Duel Mod Yearly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear-%2\t0>  + Duel Mod Yearly Leaderboards *Beta</a>',%vClient,%game);
                }               
             case "SCtFGame":// LCTF
                if($dtStats::Live)
@@ -4691,15 +4713,15 @@ function statsMenu(%client,%game){
                   if($dtStats::Hist)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tHISTORY\t%1\t1>  + Previous LCTF Games</a>',%vClient);
                   if($dtStats::day > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday\t0>  + LCTF Daily Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday-%2\t0>  + LCTF Daily Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::week > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek\t0>  + LCTF Weekly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek-%2\t0>  + LCTF Weekly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::month > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth\t0>  + LCTF Monthly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth-%2\t0>  + LCTF Monthly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::quarter > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter\t0>  + LCTF Quarterly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter-%2\t0>  + LCTF Quarterly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::year > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear\t0>  + LCTF Yearly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear-%2\t0>  + LCTF Yearly Leaderboards *Beta</a>',%vClient,%game);
                }
             case "ArenaGame":
                if($dtStats::Live)
@@ -4714,15 +4736,15 @@ function statsMenu(%client,%game){
                   if($dtStats::Hist)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tHISTORY\t%1\t1>  + Previous Arena Games</a>',%vClient);
                   if($dtStats::day > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday\t0>  + Arena Daily Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tday-%2\t0>  + Arena Daily Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::week > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek\t0>  + Arena Weekly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tweek-%2\t0>  + Arena Weekly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::month > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth\t0>  + Arena Monthly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tmonth-%2\t0>  + Arena Monthly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::quarter > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter\t0>  + Arena Quarterly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tquarter-%2\t0>  + Arena Quarterly Leaderboards *Beta</a>',%vClient,%game);
                   if($dtStats::year > 1)
-                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear\t0>  + Arena Yearly Leaderboards *Beta</a>',%vClient);
+                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tLBOARDS\t%1\tyear-%2\t0>  + Arena Yearly Leaderboards *Beta</a>',%vClient,%game);
                }
          }
          %m = 13 - %index;
@@ -6420,14 +6442,18 @@ function statsMenu(%client,%game){
          %line = (%inc != -1) ? %line2 : %line1;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"SatchelInDmgTaken",%game,%inc),getGameTotal(%vClient,"SatchelInDmgTaken",%game),getGameTotalAvg(%vClient,"SatchelInDmgTaken",%game),mFloatLength(%vClient.SatchelInDmgTaken,2)+0);
 case "LBOARDS":
-         %lType = %client.GlArg4;
+         %lType = getField(strreplace(%client.GlArg4,"-","\t"),0);
+         %client.lgame = getField(strreplace(%client.GlArg4,"-","\t"),1);
          %page = %client.GlArg5;
-         if($lData::hasData[%lType,%game]){// see if have data
-            if(!%page){
-               %page = 1;  
-            }
-            %mon = getField($lData::mon[%lType, %game, %page],0);
-            %year = getField($lData::mon[%lType, %game, %page],1);
+         if(%client.lgame $= ""){
+          %client.lgame = %game;  
+         }
+         if(!%page){
+            %page = 1;  
+         }
+         if($lData::hasData[%lType,%client.lgame]){// see if have data
+            %mon = getField($lData::mon[%lType, %client.lgame, %page],0);
+            %year = getField($lData::mon[%lType, %client.lgame, %page],1);
             %client.curMon = %mon;
             %client.curYear = %year;
             %client.curLType = %lType;            
@@ -6457,38 +6483,57 @@ case "LBOARDS":
   
             }
             %header = '<color:0befe7> <lmargin:50># <lmargin:65>%2<lmargin:200>Score<lmargin:320>Weapons<lmargin:460>Score';
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, %header,%vClient,$MissionTypeDisplayName);
+            messageClient( %client, 'SetLineHud', "", %tag, %index++, %header,%vClient,$dtStats::gtNameLong[%client.lgame]);
             
             for(%i = 0; %i < 10; %i++){
-               %scoreName  = getField($lData::name["score",%game,%lType,%mon,%year],%i);
-               %gameScore  = getField($lData::data["score",%game,%lType,%mon,%year],%i);
-               %wepName  = getField($lData::name["weaponScore",%game,%lType,%mon,%year],%i);
-               %wepScore  = getField($lData::data["weaponScore",%game,%lType,%mon,%year],%i);
-               %line = '<font:univers condensed:18> <lmargin:50>%3. <lmargin:65><color:0befe7><clip:138>%1</clip><color:03d597><lmargin:200>%4<lmargin:320><color:0befe7><clip:138>%2</clip><color:03d597><lmargin:460>%5';
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%scoreName,%wepName,%i+1,%gameScore,mFloor(%wepScore+0.5));
+               %scoreName  = getField($lData::name["score",%client.lgame,%lType,%mon,%year],%i);
+               %gameScore  = getField($lData::data["score",%client.lgame,%lType,%mon,%year],%i);
+               %wepName  = getField($lData::name["weaponScore",%client.lgame,%lType,%mon,%year],%i);
+               %wepScore  = getField($lData::data["weaponScore",%client.lgame,%lType,%mon,%year],%i);
+               if(%gameScore){
+                  %line = '<font:univers condensed:18> <lmargin:50>%3. <lmargin:65><color:0befe7><clip:138>%1</clip><color:03d597><lmargin:200>%4<lmargin:320><color:0befe7><clip:138>%2</clip><color:03d597><lmargin:460>%5';
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%scoreName,%wepName,%i+1,%gameScore,mFloor(%wepScore+0.5));
+               }
+               else{
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+               }
             }
             messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
             
             %line = '<just:center><color:0befe7><a:gamelink\tStats\tGLBOARDS\t%1>View More %2 Categories</a>';
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,$MissionTypeDisplayName);
+            messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,$dtStats::gtNameLong[%client.lgame]);
             %line = '<just:center><color:0befe7><a:gamelink\tStats\tWLBOARDS\t%1>View More Weapons Categories</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient);
-            
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-			messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-            //error(%mon SPC %page SPC $lData::monCount[%game,%lType]);
-            if($lData::monCount[%game,%lType] > 1){
-               if(%page == 1){
-                   %line = '<just:center>Click on category to view more<just:right><color:0befe7><a:gamelink\tStats\tLBOARDS\t%1\t%2\t%3>Previous</a>';
-                   messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%lType,%page+1); 
+            %hasCount = 0;  %line = "";
+            for(%i = 0; %i < $dtStats::gameTypeCount; %i++){
+               if($lData::hasData[%lType,$dtStats::gameType[%i]] && $dtStats::gameType[%i] !$= %client.lgame){
+                  %hasCount++; 
+                  %line = %line @ "<a:gamelink\tStats\tLBOARDS\t" @ %vClient @ "\t" @ %lType @ "-" @  $dtStats::gameType[%i] @ "\t0>[" @ $dtStats::gtNameShort[$dtStats::gameType[%i]]  @ "] </a>"; 
                }
-               else if(%page >= $lData::monCount[%game,%lType]){
-                  %line = '<just:center>Click on top category to view more<just:right><color:0befe7><a:gamelink\tStats\tLBOARDS\t%1\t%2\t%3>Next</a>';
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%lType,%page-1);
+            }
+            //error(%client.lgame SPC %game SPC %hasCount );
+            if(%hasCount > 0){
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>Switch Game Type" SPC %line);
+            }
+            else{
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+            }
+            
+            
+			   messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+            //error(%mon SPC %page SPC $lData::monCount[%client.lgame,%lType]);
+            if($lData::monCount[%client.lgame,%lType] > 1){
+               if(%page == 1){
+                   %line = '<just:center>Click on category to view more<just:right><color:0befe7><a:gamelink\tStats\tLBOARDS\t%1\t%2-%4\t%3>Previous</a>';
+                   messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%lType,%page+1,%client.lgame); 
+               }
+               else if(%page >= $lData::monCount[%client.lgame,%lType]){
+                  %line = '<just:center>Click on top category to view more<just:right><color:0befe7><a:gamelink\tStats\tLBOARDS\t%1\t%2-%4\t%3>Next</a>';
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%lType,%page-1,%client.lgame);
                }
                else{
-                  %line = '<just:center>Click on category to view more<a:gamelink\tStats\tLBOARDS\t%1\t%2\t%3>Back</a><just:right><color:0befe7><a:gamelink\tStats\tLBOARDS\t%1\t%2\t%4>Previous</a>';
-                  messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%lType,%page+1,%page-1); 
+                  %line = '<just:center>Click on category to view more<just:right><a:gamelink\tStats\tLBOARDS\t%1\t%2-%5\t%3>Next</a> | <color:0befe7><a:gamelink\tStats\tLBOARDS\t%1\t%2-%5\t%4>Previous</a>';
+                  messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%lType,%page-1,%page+1,%client.lgame); 
                }
             }
             else{
@@ -6496,18 +6541,31 @@ case "LBOARDS":
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line);
             }
          }
-         else{
+         else{//no data for selected game type
             %header = '<color:0befe7><just:center>No data at this time, check in 24 hours';
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, %header,%i1,%i2,%i3,%i4++,%i5,%i6,%i7);   
+            messageClient( %client, 'SetLineHud', "", %tag, %index++, %header,%i1,%i2,%i3,%i4++,%i5,%i6,%i7); 
+            
+            %hasCount = 0;  %line = "";
+            for(%i = 0; %i < $dtStats::gameTypeCount; %i++){
+               if($lData::hasData[%lType,$dtStats::gameType[%i]] && $dtStats::gameType[%i] !$= %client.lgame){
+                  %hasCount++; 
+                  %line = %line @ "<a:gamelink\tStats\tLBOARDS\t" @ %vClient @ "\t" @ %lType @ "-" @  $dtStats::gameType[%i] @ "\t0>" @ $dtStats::gtNameShort[$dtStats::gameType[%i]]  @ " </a>"; 
+               }
+            }  
+            if(%hasCount > 0){
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, '<just:center>View other gametypes');
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, "<just:center>" @ %line);
+            }
          }
       case "GLBOARDS":
          %lType = %client.curLType;
          %page = %client.curPage;
-         %mon = getField($lData::mon[%lType, %game, %page],0);
-         %year = getField($lData::mon[%lType, %game, %page],1);
+         %mon = getField($lData::mon[%lType, %client.lgame, %page],0);
+         %year = getField($lData::mon[%lType, %client.lgame, %page],1);
          %client.backPage = "GLBOARDS";
          %NA = "N/A";
-		 switch$(%game)
+		 switch$(%client.lgame)
 		 {
 			case "CTFGame":
 				%gametype = "CTF";
@@ -6523,91 +6581,91 @@ case "LBOARDS":
 				%gametype = "Duel";
 		 }
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>" @ %gametype SPC "Greatest Hits");
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLBOARDS\t%1\t%3\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,$dtStats::topAmount,%lType,%page);
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLBOARDS\t%1\t%3-%5\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,$dtStats::topAmount,%lType,%page,%client.lgame);
             //exec("scripts/autoexec/zDarktigerStats.cs");
-			if(%game $= "CTFGame" || %game $= "SCtFGame"){ 
+			if(%client.lgame $= "CTFGame" || %client.lgame $= "SCtFGame"){ 
 			%line = "<color:0befe7><just:center>" @ %gametype SPC "Specific";
 			messageClient( %client, 'SetLineHud', "", %tag, %index++, %line);    
 
-			%i1 = getField($lData::data["winCount",%game,%lType,%mon,%year],0) ? getField($lData::name["winCount",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["destruction",%game,%lType,%mon,%year],0) ? getField($lData::name["destruction",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["winCount",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["winCount",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["destruction",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["destruction",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Win Count: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Destruction Count: <color:03d597>%2</a>';
 			messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"winCount-Win Count-Total","destruction-Destruction Count-Total",%vClient);
 
-			%i1 = getField($lData::data["offenseScore",%game,%lType,%mon,%year],0) ? getField($lData::name["offenseScore",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["defenseScore",%game,%lType,%mon,%year],0) ? getField($lData::name["defenseScore",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["offenseScore",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["offenseScore",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["defenseScore",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["defenseScore",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Offense Score: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Defense Score: <color:03d597>%2</a>';
 			messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"offenseScore-Offense Score-Total","defenseScore-Defense Score-Total",%vClient);
 			
-			%i1 = getField($lData::data["flagDefends",%game,%lType,%mon,%year],0) ? getField($lData::name["flagDefends",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["flagReturns",%game,%lType,%mon,%year],0) ? getField($lData::name["flagReturns",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["flagDefends",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["flagDefends",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["flagReturns",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["flagReturns",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Flag Defends: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Flag Returns: <color:03d597>%2</a>';
 			messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"flagDefends-Flag Defends-Total","flagReturns-Flag Returns-Total",%vClient);
 			
-			%i1 = getField($lData::data["flagCaps",%game,%lType,%mon,%year],0) ? getField($lData::name["flagCaps",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["flagGrabs",%game,%lType,%mon,%year],0) ? getField($lData::name["flagGrabs",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["flagCaps",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["flagCaps",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["flagGrabs",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["flagGrabs",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Flags Caps: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Flag Grabs: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"flagCaps-Flag Caps-Total","flagGrabs-Flag Grabs-Total",%vClient);
             
-			%i1 = getField($lData::data["carrierKills",%game,%lType,%mon,%year],0) ? getField($lData::name["carrierKills",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["escortAssists",%game,%lType,%mon,%year],0) ? getField($lData::name["escortAssists",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["carrierKills",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["carrierKills",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["escortAssists",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["escortAssists",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Carrier Kills: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Escort Assists: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"carrierKills-Carrier Kills-Total","escortAssists-Escort Assists-Total",%vClient);
          }
-         else if(%game $= "LakRabbitGame"){  
+         else if(%client.lgame $= "LakRabbitGame"){  
             %line = "<color:0befe7><just:center>" @ %gametype SPC "Specific";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line);
 			
-			%i1 = getField($lData::data["flagGrabs",%game,%lType,%mon,%year],0) ? getField($lData::name["flagGrabs",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["flagTimeMin",%game,%lType,%mon,%year],0) ? getField($lData::name["flagTimeMin",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["flagGrabs",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["flagGrabs",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["flagTimeMin",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["flagTimeMin",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Flag Grabs: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Flag Time: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"flagGrabs-Flag Grabs-Total","flagTimeMin-Flag Time-Total Minutes",%vClient);
 
-            %i1 = getField($lData::data["MidairflagGrabs",%game,%lType,%mon,%year],0) ? getField($lData::name["MidairflagGrabs",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["mas",%game,%lType,%mon,%year],0) ? getField($lData::name["mas",%game,%lType,%mon,%year],0) : %NA;
+            %i1 = getField($lData::data["MidairflagGrabs",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["MidairflagGrabs",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["mas",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["mas",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Midair Flag Grabs: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Midairs Hits: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"MidairflagGrabs-Midair Flag Grabs-Total","mas-Midairs Hits-Total",%vClient);   
          }
             %line = "<color:0befe7><just:center>" @ %gametype SPC "Misc";
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line);
             
-            %i1 = getField($lData::data["Kills",%game,%lType,%mon,%year],0) ? getField($lData::name["Kills",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["killStreakMax",%game,%lType,%mon,%year],0) ? getField($lData::name["killStreakMax",%game,%lType,%mon,%year],0) : %NA;
+            %i1 = getField($lData::data["Kills",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["Kills",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["killStreakMax",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["killStreakMax",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Total Kills: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Kill Streak: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"kills-Total Kills-Total","killStreakMax-Kill Streak-Amount",%vClient);
            
-            %i1 = getField($lData::data["scoreAVG",%game,%lType,%mon,%year],0) ? getField($lData::name["scoreAVG",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["scoreMax",%game,%lType,%mon,%year],0) ? getField($lData::name["scoreMax",%game,%lType,%mon,%year],0) : %NA;
+            %i1 = getField($lData::data["scoreAVG",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["scoreAVG",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["scoreMax",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["scoreMax",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Highest Score: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Score Average: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"scoreAVG-Score Average-Amount","scoreMax-Highest Score-Amount",%vClient);
 		        
-            %i1 = getField($lData::data["EVKills",%game,%lType,%mon,%year],0) ? getField($lData::name["EVKills",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["overallACCAVG",%game,%lType,%mon,%year],0) ? getField($lData::name["overallACCAVG",%game,%lType,%mon,%year],0) : %NA;
+            %i1 = getField($lData::data["EVKills",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["EVKills",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["overallACCAVG",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["overallACCAVG",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Environmental Kills: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Overall Accuracy: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"EVKills-Enviro Assisted Kills-Total","overallACCAVG-Overall Accuracy-Percentage",%vClient);
             
-            %i1 = getField($lData::data["teamTLAVG",%game,%lType,%mon,%year],0) ? getField($lData::name["teamTLAVG",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["distMov",%game,%lType,%mon,%year],0) ? getField($lData::name["distMov",%game,%lType,%mon,%year],0) : %NA;
+            %i1 = getField($lData::data["timeTLAVG",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["timeTLAVG",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["distMov",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["distMov",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Avg Survival Time: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Distance Traveled: <color:03d597>%2</a>';
-            messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"teamTLAVG-Average Survival Time-Seconds","distMov-Distance Traveled-Amount In Meters",%vClient);
+            messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"timeTLAVG-Average Survival Time-Seconds","distMov-Distance Traveled-Amount In Meters",%vClient);
             
-			%i1 = getField($lData::data["airTime",%game,%lType,%mon,%year],0) ? getField($lData::name["airTime",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["groundTime",%game,%lType,%mon,%year],0) ? getField($lData::name["groundTime",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["airTime",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["airTime",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["groundTime",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["groundTime",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Air Time: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Ground Time: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"airTime-Air Time-EST Minutes ","groundTime-Ground Time-EST Minutes",%vClient);
 			
-			%i1 = getField($lData::data["killAir",%game,%lType,%mon,%year],0) ? getField($lData::name["killAir",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["killGround",%game,%lType,%mon,%year],0) ? getField($lData::name["killGround",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["killAir",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["killAir",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["killGround",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["killGround",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Midair Kills: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Ground Kills: <color:03d597>%2</a>';
 			messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"killAir-Midair Kills-Total","killGround-Ground Kills-Total",%vClient);
       
-			%i1 = getField($lData::data["totalMA",%game,%lType,%mon,%year],0) ? getField($lData::name["totalMA",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["inDirectHits",%game,%lType,%mon,%year],0) ? getField($lData::name["inDirectHits",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["totalMA",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["totalMA",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["inDirectHits",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["inDirectHits",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Total Midairs: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Total Hits: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"totalMA-Total Midairs-Total","inDirectHits-Total Indirect/Direct Hits-Total",%vClient);
          
-			%i1 = getField($lData::data["totalTime",%game,%lType,%mon,%year],0) ? getField($lData::name["totalTime",%game,%lType,%mon,%year],0) : %NA; 
-			%i2 = getField($lData::data["multiKills",%game,%lType,%mon,%year],0) ? getField($lData::name["multiKills",%game,%lType,%mon,%year],0) : %NA;
+			%i1 = getField($lData::data["totalTime",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["totalTime",%client.lgame,%lType,%mon,%year],0) : %NA; 
+			%i2 = getField($lData::data["multiKills",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["multiKills",%client.lgame,%lType,%mon,%year],0) : %NA;
 			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Time Played: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Multi Kills: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"totalTime-Time Played-Total Minutes","multiKills-Multi Kills-Total",%vClient);
 			
@@ -6616,141 +6674,141 @@ case "LBOARDS":
       case "WLBOARDS":
          %lType = %client.curLType;
          %page = %client.curPage;
-         %mon = getField($lData::mon[%lType, %game, %page],0);
-         %year = getField($lData::mon[%lType, %game, %page],1);
+         %mon = getField($lData::mon[%lType, %client.lgame, %page],0);
+         %year = getField($lData::mon[%lType, %client.lgame, %page],1);
          %client.backPage = "WLBOARDS";
          %NA = "N/A";
          messageClient( %client, 'SetScoreHudHeader', "", '<just:center>Weapons Greatest Hits');
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLBOARDS\t%1\t%3\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,$dtStats::topAmount,%lType,%page);
+         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLBOARDS\t%1\t%3-%5\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,$dtStats::topAmount,%lType,%page,%client.lgame);
 
-		 %i1 = getField($lData::data["minePlusDisc",%game,%lType,%mon,%year],0) ? getField($lData::name["minePlusDisc",%game,%lType,%mon,%year],0) : %NA; 
-		 %i2 = getField($lData::data["discACC",%game,%lType,%mon,%year],0) ? getField($lData::name["discACC",%game,%lType,%mon,%year],0) : %NA;
+		 %i1 = getField($lData::data["minePlusDisc",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["minePlusDisc",%client.lgame,%lType,%mon,%year],0) : %NA; 
+		 %i2 = getField($lData::data["discACC",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["discACC",%client.lgame,%lType,%mon,%year],0) : %NA;
 		 %line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Mine Disc: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Disc Accuracy: <color:03d597>%2</a>';
 		 messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"minePlusDisc-Mine + Disc-Amount","discACCAVG-Spinfusor Accuracy-Percentage",%vClient);
 		 
-		 %i1 = getField($lData::data["weaponHitMaxDistMax",%game,%lType,%mon,%year],0) ? getField($lData::name["weaponHitMaxDistMax",%game,%lType,%mon,%year],0) : %NA; 
-		 %i2 = getField($lData::data["maxSpeedMax",%game,%lType,%mon,%year],0) ? getField($lData::name["maxSpeedMax",%game,%lType,%mon,%year],0) : %NA;
+		 %i1 = getField($lData::data["weaponHitMaxDistMax",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["weaponHitMaxDistMax",%client.lgame,%lType,%mon,%year],0) : %NA; 
+		 %i2 = getField($lData::data["maxSpeedMax",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["maxSpeedMax",%client.lgame,%lType,%mon,%year],0) : %NA;
 		 %line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Longest Shot: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Highest Speed: <color:03d597>%2</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"weaponHitMaxDistMax-Longest Shot-Max Distance","maxSpeedMax-Highest Speed-Speed km/h",%vClient);
 
-		 %i1 = getField($lData::data["discInDmg",%game,%lType,%mon,%year],0) ? getField($lData::name["discInDmg",%game,%lType,%mon,%year],0) : %NA; 
-		 %i2 = getField($lData::data["shotsFired",%game,%lType,%mon,%year],0) ? getField($lData::name["shotsFired",%game,%lType,%mon,%year],0) : %NA;
+		 %i1 = getField($lData::data["discInDmg",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["discInDmg",%client.lgame,%lType,%mon,%year],0) : %NA; 
+		 %i2 = getField($lData::data["shotsFired",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["shotsFired",%client.lgame,%lType,%mon,%year],0) : %NA;
 		 %line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Most Damage: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Rounds Fired: <color:03d597>%2</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"discInDmg-Most Damage-Total","shotsFired-Most Rounds Fired-Total",%vClient);
 
-		 %i1 = getField($lData::data["shockRearShot",%game,%lType,%mon,%year],0) ? getField($lData::name["shockRearShot",%game,%lType,%mon,%year],0) : %NA; 
-		 %i2 = getField($lData::data["laserHeadShot",%game,%lType,%mon,%year],0) ? getField($lData::name["laserHeadShot",%game,%lType,%mon,%year],0) : %NA;
+		 %i1 = getField($lData::data["shockRearShot",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["shockRearShot",%client.lgame,%lType,%mon,%year],0) : %NA; 
+		 %i2 = getField($lData::data["laserHeadShot",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["laserHeadShot",%client.lgame,%lType,%mon,%year],0) : %NA;
 		 %line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Rearshots: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Headshots: <color:03d597>%2</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"shockRearShot-Rear Shocklance-Total","laserHeadShot-Laser Rifle Head Shots-Total",%vClient);
          
          %header = '<color:0befe7>  Weapon<lmargin:140>Kills<lmargin:290>MidAirs<lmargin:440>Combos';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
-         %i1 = getField($lData::name["blasterKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["blasterMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["blasterCom",%game,%lType,%mon,%year],0); 
-         %d1 = getField($lData::data["blasterKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["blasterMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["blasterCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["blasterKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["blasterMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["blasterCom",%client.lgame,%lType,%mon,%year],0); 
+         %d1 = getField($lData::data["blasterKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["blasterMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["blasterCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA;  
          %line = '<color:0befe7>  Blaster<lmargin:140><a:gamelink\tStats\tLB\t%7\t%4><color:33CCCC><font:univers condensed:18>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"blasterKills-Blaster Kills-Total","blasterMA-Blaster MidAirs-Total","blasterCom-Blaster Combos-Total",%vClient);
          
-         %i1 = getField($lData::name["plasmaKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["plasmaMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["plasmaCom",%game,%lType,%mon,%year],0); 
-         %d1 = getField($lData::data["plasmaKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["plasmaMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["plasmaCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["plasmaKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["plasmaMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["plasmaCom",%client.lgame,%lType,%mon,%year],0); 
+         %d1 = getField($lData::data["plasmaKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["plasmaMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["plasmaCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA;  
          %line = '<color:0befe7>  Plasma Rifle<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"plasmaKills-Plasma Rifle Kills-Total","plasmaMA-Plasma Rifle MidAirs-Total","plasmaCom-Plasma Rifle Combos-Total",%vClient);
           
-         %i1 = getField($lData::name["cgKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["cgMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["cgCom",%game,%lType,%mon,%year],0);
-         %d1 = getField($lData::data["cgKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["cgMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["cgCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["cgKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["cgMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["cgCom",%client.lgame,%lType,%mon,%year],0);
+         %d1 = getField($lData::data["cgKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["cgMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["cgCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA;
          %line = '<color:0befe7>  Chaingun<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"cgKills-Chaingun Kills-Total","cgMA-Chaingun MidAirsTotal","cgCom-Chaingun Combos-Total",%vClient);
          
-         %i1 = getField($lData::name["discKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["discMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["discCom",%game,%lType,%mon,%year],0);
-         %d1 = getField($lData::data["discKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["discMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["discCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["discKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["discMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["discCom",%client.lgame,%lType,%mon,%year],0);
+         %d1 = getField($lData::data["discKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["discMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["discCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA;  
          %line = '<color:0befe7>  Spinfusor<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"discKills-Spinfusor Kills-Total","discMA-Spinfusor MidAirs-Total","discCom-Spinfusor Combos-Total",%vClient);
            
-         %i1 = getField($lData::name["grenadeKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["grenadeMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["grenadeCom",%game,%lType,%mon,%year],0);  
-         %d1 = getField($lData::data["grenadeKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["grenadeMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["grenadeCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["grenadeKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["grenadeMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["grenadeCom",%client.lgame,%lType,%mon,%year],0);  
+         %d1 = getField($lData::data["grenadeKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["grenadeMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["grenadeCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA;  
          %line = '<color:0befe7>  Grenade Launcher<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"grenadeKills-Grenade Launcher Kills-Total","grenadeMA-Grenade Launcher MidAirs-Total","grenadeCom-Grenade Launcher Combos-Total",%vClient);
          
-         %i1 = getField($lData::name["laserKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["laserMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["laserCom",%game,%lType,%mon,%year],0);   
-         %d1 = getField($lData::data["laserKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["laserMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["laserCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["laserKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["laserMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["laserCom",%client.lgame,%lType,%mon,%year],0);   
+         %d1 = getField($lData::data["laserKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["laserMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["laserCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA; 
          %line = '<color:0befe7>  Laser Rifle<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"laserKills-Laser Rifle Kills-Total","laserMA-Laser Rifle MidAirs-Total","laserCom-Laser Rifle Combos-Total",%vClient);
          
-         %i1 = getField($lData::name["mortarKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["mortarMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["mortarCom",%game,%lType,%mon,%year],0);  
-         %d1 = getField($lData::data["mortarKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["mortarMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["mortarKills",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["mortarKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["mortarMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["mortarCom",%client.lgame,%lType,%mon,%year],0);  
+         %d1 = getField($lData::data["mortarKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["mortarMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["mortarCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA; 
          %line = '<color:0befe7>  Fusion Mortar<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"mortarKills-Fusion Mortar Kills-Total","mortarMA-Fusion Mortar MidAirs-Total","mortarCom-Fusion Mortar Combos-Total",%vClient);
          
-         %i1 = getField($lData::name["missileKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["missileMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["missileCom",%game,%lType,%mon,%year],0);  
-         %d1 = getField($lData::data["missileKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["missileMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["missileCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["missileKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["missileMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["missileCom",%client.lgame,%lType,%mon,%year],0);  
+         %d1 = getField($lData::data["missileKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["missileMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["missileCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA;  
          %line = '<color:0befe7>  Missile Launcher<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"missileKills-Missile Launcher Kills-Total","missileMA-Missile Launcher MidAirs-Total","missileCom-Missile Launcher Combos-Total",%vClient); 
          
-         %i1 = getField($lData::name["shockLanceKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["shockMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["shockCom",%game,%lType,%mon,%year],0); 
-         %d1 = getField($lData::data["shockLanceKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["shockMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["shockCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["shockLanceKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["shockMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["shockCom",%client.lgame,%lType,%mon,%year],0); 
+         %d1 = getField($lData::data["shockLanceKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["shockMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["shockCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA;  
          %line = '<color:0befe7>  Shocklance<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"shockLanceKills-Shocklance Kills-Total","shockMA-Shocklance MidAirs-Total","shockCom-Shocklance Combos-Total",%vClient); 
          
-         %i1 = getField($lData::name["mineKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["mineMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["mineCom",%game,%lType,%mon,%year],0);  
-         %d1 = getField($lData::data["mineKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["mineMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["mineCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["mineKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["mineMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["mineCom",%client.lgame,%lType,%mon,%year],0);  
+         %d1 = getField($lData::data["mineKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["mineMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["mineCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA;  
          %line = '<color:0befe7>  Mine<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"mineKills-Mine Kills-Total","mineMA-Mine MidAirs-Total","mineCom-Mine Combos-Total",%vClient); 
          
-         %i1 = getField($lData::name["hGrenadeKills",%game,%lType,%mon,%year],0);   
-         %i2 = getField($lData::name["hGrenadeMA",%game,%lType,%mon,%year],0);   
-         %i3 = getField($lData::name["hGrenadeCom",%game,%lType,%mon,%year],0);   
-         %d1 = getField($lData::data["hGrenadeKills",%game,%lType,%mon,%year],0);         
-         %d2 = getField($lData::data["hGrenadeMA",%game,%lType,%mon,%year],0);
-         %d3 = getField($lData::data["hGrenadeCom",%game,%lType,%mon,%year],0);
+         %i1 = getField($lData::name["hGrenadeKills",%client.lgame,%lType,%mon,%year],0);   
+         %i2 = getField($lData::name["hGrenadeMA",%client.lgame,%lType,%mon,%year],0);   
+         %i3 = getField($lData::name["hGrenadeCom",%client.lgame,%lType,%mon,%year],0);   
+         %d1 = getField($lData::data["hGrenadeKills",%client.lgame,%lType,%mon,%year],0);         
+         %d2 = getField($lData::data["hGrenadeMA",%client.lgame,%lType,%mon,%year],0);
+         %d3 = getField($lData::data["hGrenadeCom",%client.lgame,%lType,%mon,%year],0);
          %i1 = %d1 ? %i1 : %NA; %i2 = %d2 ? %i2 : %NA; %i3 = %d3 ? %i3 : %NA; 
          %line = '<color:0befe7>  Hand Grenade<lmargin:140><font:univers condensed:18><color:33CCCC><a:gamelink\tStats\tLB\t%7\t%4>%1</a><lmargin:290><a:gamelink\tStats\tLB\t%7\t%5>%2</a><lmargin:440><a:gamelink\tStats\tLB\t%7\t%6>%3</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,"hGrenadeKills-Hand Grenade Kills-Total","hGrenadeMA-Hand Grenade MidAirs-Total","hGrenadeCom-Hand Grenade Combos-Total",%vClient); 
@@ -6759,8 +6817,8 @@ case "LBOARDS":
       case "LB"://listBoards
          %lType = %client.curLType;
          %page = %client.curPage;
-         %mon = getField($lData::mon[%lType, %game, %page],0);
-         %year = getField($lData::mon[%lType, %game, %page],1);
+         %mon = getField($lData::mon[%lType, %client.lgame, %page],0);
+         %year = getField($lData::mon[%lType, %client.lgame, %page],1);
          
          %GlArg4      = strreplace(%client.GlArg4,"-","\t");
          %field      = getField(%GlArg4,0);
@@ -6772,8 +6830,8 @@ case "LBOARDS":
          %header = '<color:0befe7> <lmargin:50>#. <lmargin:75>%1<lmargin:250>%2';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header,%name,%fieldName);
          for(%i = 0; %i < $dtStats::topAmount; %i++){
-            %scoreName  = getField($lData::name[%field,%game,%lType,%mon,%year],%i);
-            %gameScore  = getField($lData::data[%field,%game,%lType,%mon,%year],%i);
+            %scoreName  = getField($lData::name[%field,%client.lgame,%lType,%mon,%year],%i);
+            %gameScore  = getField($lData::data[%field,%client.lgame,%lType,%mon,%year],%i);
             if(%gameScore){  
                %line = '<color:33CCCC><font:univers condensed:18> <lmargin:50>%1. <lmargin:75><clip:138>%2</clip><lmargin:250><color:03d597>%3';
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i+1,%scoreName,mFloor(%gameScore + 0.5));
@@ -6783,8 +6841,8 @@ case "LBOARDS":
          %vLPage = %client.GlArg4;
          %lType = %client.curLType;
          %pagex = %client.curPage;
-         %mon = getField($lData::mon[%lType, %game, %pagex],0);
-         %year = getField($lData::mon[%lType, %game, %pagex],1);
+         %mon = getField($lData::mon[%lType, %client.lgame, %pagex],0);
+         %year = getField($lData::mon[%lType, %client.lgame, %pagex],1);
          %client.backPage = "VARLIST";
          %mon = %client.curMon;
          if(%vLPage == 0){ // back button was hit
@@ -6795,44 +6853,44 @@ case "LBOARDS":
          }
          %client.varListPage =  %vLPage; // update with current page
          %perPage = 15;// num of games listed per page 
-         if(!$dtStats::varCount[%game]){
-            $dtStats::varCount[%game] =  -1;   
-            for(%i = 1; %i <= $dtStats::FC[%game]; %i++){
-               %val = $dtStats::FV[%i,%game];
-               $dtStats::varList[%game,$dtStats::varCount[%game]++] = %val;
+         if(!$dtStats::varCount[%client.lgame]){
+            $dtStats::varCount[%client.lgame] =  -1;   
+            for(%i = 1; %i <= $dtStats::FC[%client.lgame]; %i++){
+               %val = $dtStats::FV[%i,%client.lgame];
+               $dtStats::varList[%client.lgame,$dtStats::varCount[%client.lgame]++] = %val;
             }
             for(%i = 1; %i <= $dtStats::FC["dtStats"]; %i++){
                %val = $dtStats::FV[%i,"dtStats"];
-               $dtStats::varList[%game,$dtStats::varCount[%game]++] = %val;
+               $dtStats::varList[%client.lgame,$dtStats::varCount[%client.lgame]++] = %val;
             }
             for(%i = 1; %i <= $dtStats::FC["max"]; %i++){
                %val = getField($dtStats::FV[%i,"max"],1);
-               $dtStats::varList[%game,$dtStats::varCount[%game]++] = %val;
+               $dtStats::varList[%client.lgame,$dtStats::varCount[%client.lgame]++] = %val;
             }
             for(%i = 1; %i <= $dtStats::FC["avg"]; %i++){
                %val = getField($dtStats::FV[%i,"avg"],1);
-               $dtStats::varList[%game,$dtStats::varCount[%game]++] = %val;
+               $dtStats::varList[%client.lgame,$dtStats::varCount[%client.lgame]++] = %val;
             }
          }
          messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Variable List"); 
         // messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tLBOARDS\t%1\t%3>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient,$dtStats::topAmount,%lType);
          if(%vLPage == 1){
-            %line = '<a:gamelink\tStats\tLBOARDS\t%1\t%3\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> - <a:gamelink\tStats\tVARLIST\t%1\t%2> Next Page ></a>';
-            messageClient( %client, 'SetScoreHudSubheader', "",%line,%vClient,%vLPage + 1, %lType, %pagex);
+            %line = '<a:gamelink\tStats\tLBOARDS\t%1\t%3-%5\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> - <a:gamelink\tStats\tVARLIST\t%1\t%2> Next Page ></a>';
+            messageClient( %client, 'SetScoreHudSubheader', "",%line,%vClient,%vLPage + 1, %lType, %pagex,%client.lgame);
          }
-         else if(%vLPage * %perPage > $dtStats::varCount[%game]){
-            %line = '<a:gamelink\tStats\tLBOARDS\t%1\t%3\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> - <a:gamelink\tStats\tVARLIST\t%1\t%2> < Back Page</a>    <a:gamelink\tStats\tVARLIST\t%1\t1><Reset></a>';
-            messageClient( %client, 'SetScoreHudSubheader', "",%line,%vClient,%vLPage - 1, %lType, %pagex);
+         else if(%vLPage * %perPage > $dtStats::varCount[%client.lgame]){
+            %line = '<a:gamelink\tStats\tLBOARDS\t%1\t%3-%5\t%4>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> - <a:gamelink\tStats\tVARLIST\t%1\t%2> < Back Page</a>    <a:gamelink\tStats\tVARLIST\t%1\t1><Reset></a>';
+            messageClient( %client, 'SetScoreHudSubheader', "",%line,%vClient,%vLPage - 1, %lType, %pagex,%client.lgame);
          }
          else if(%vLPage > 1){
-            %line = '<a:gamelink\tStats\tLBOARDS\t%1\t%4\t%5>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> -<a:gamelink\tStats\tVARLIST\t%1\t%2\> < Back Page </a>|<a:gamelink\tStats\tVARLIST\t%1\t%3> Next Page ></a>    <a:gamelink\tStats\tVARLIST\t%1\t1><Reset></a>';
-            messageClient( %client, 'SetScoreHudSubheader', "",%line,%vClient,%vLPage - 1,%vLPage + 1, %lType, %pagex);
+            %line = '<a:gamelink\tStats\tLBOARDS\t%1\t%4-%6\t%5>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a> -<a:gamelink\tStats\tVARLIST\t%1\t%2\> < Back Page </a>|<a:gamelink\tStats\tVARLIST\t%1\t%3> Next Page ></a>    <a:gamelink\tStats\tVARLIST\t%1\t1><Reset></a>';
+            messageClient( %client, 'SetScoreHudSubheader', "",%line,%vClient,%vLPage - 1,%vLPage + 1, %lType, %pagex,%client.lgame);
          }
-         %gc = $dtStats::varCount[%game];
+         %gc = $dtStats::varCount[%client.lgame];
          error(%vLPage);
          for(%z = (%vLPage - 1) * %perPage; %z < %vLPage * %perPage && %z <= %gc; %z++){
-            %var = $dtStats::varList[%game,%z];
-            %name = getField($lData::name[%var,%game,%lType,%mon,%year],0);  
+            %var = $dtStats::varList[%client.lgame,%z];
+            %name = getField($lData::name[%var,%client.lgame,%lType,%mon,%year],0);  
             %line = '<color:0befe7><lmargin:50><a:gamelink\tStats\tLB\t%1\t%3\t0>%2</a><lmargin:250>%4';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%var,%var @"-"@ %var @ "-Value",%name);
          }
@@ -6841,6 +6899,7 @@ case "LBOARDS":
          %client.viewClient = 0;
          %client.viewStats  = 0;
          %client.lastPage   = 1;
+         %client.lgame = %game;
    }
 }
 ////////////////////////////////////////////////////////////////////////////////

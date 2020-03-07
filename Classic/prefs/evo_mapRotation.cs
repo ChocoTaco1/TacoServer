@@ -54,12 +54,12 @@ addRotationMap(Island, CTF, 1, 0);
 addRotationMap(TitForTat, CTF, 1, 0);
 addRotationMap(SmallMelee, CTF, 1, 0);
 addRotationMap(SuperHappyBouncyFunTime, CTF, 1, 0);
-addRotationMap(Machineeggs, CTF, 1, 1);
-addRotationMap(Mac_FlagArena, CTF, 1, 1);
+addRotationMap(Machineeggs, CTF, 1, 0);
+addRotationMap(Mac_FlagArena, CTF, 1, 0);
 addRotationMap(SmallTimeCTF, CTF, 1, 1);
 addRotationMap(TWL2_Hildebrand, CTF, 1, 1);
 addRotationMap(ArenaDome, CTF, 1, 0);
-addRotationMap(Firestorm, CTF, 1, 1);
+addRotationMap(Firestorm, CTF, 1, 0);
 
 //Medium Maps
 /////////////////////////////////////////////////////////////////////
@@ -70,33 +70,33 @@ addRotationMap(S5_Damnation, CTF, 1, 1);
 addRotationMap(TWL2_JaggedClaw, CTF, 1, 1);
 addRotationMap(S5_Massive, CTF, 1, 1);
 addRotationMap(TWL_Stonehenge, CTF, 1, 1);
-addRotationMap(TWL_Feign, CTF, 1, 1);
+addRotationMap(TWL_Feign, CTF, 1, 0);
 addRotationMap(TheFray, CTF, 1, 1);
 addRotationMap(DangerousCrossing_nef, CTF, 1, 1);
 addRotationMap(TWL2_Skylight, CTF, 1, 1);
 addRotationMap(TWL2_Ocular, CTF, 1, 1);
-addRotationMap(Dire, CTF, 1, 1);
+addRotationMap(Dire, CTF, 1, 0);
 addRotationMap(berlard, CTF, 1, 1);
-addRotationMap(S8_Opus, CTF, 1, 1);
-addRotationMap(BeggarsRun, CTF, 1, 1);
+addRotationMap(S8_Opus, CTF, 1, 0);
+addRotationMap(BeggarsRun, CTF, 1, 0);
 addRotationMap(Signal, CTF, 1, 1);
 addRotationMap(Bulwark, CTF, 1, 1);
 addRotationMap(S5_Woodymyrk, CTF, 1, 1);
 addRotationMap(Discord, CTF, 1, 1);
 addRotationMap(TenebrousCTF, CTF, 1, 1);
 addRotationMap(Pariah, CTF, 1, 1);
-addRotationMap(Prismatic, CTF, 1, 1);
+addRotationMap(Prismatic, CTF, 1, 0);
 addRotationMap(TWL_WilderZone, CTF, 1, 1);
 addRotationMap(Mirage, CTF, 1, 1);
 addRotationMap(S5_Mimicry, CTF, 1, 1);
 addRotationMap(TWL_Snowblind, CTF, 1, 0);
-addRotationMap(ShortFall, CTF, 1, 1);
+addRotationMap(ShortFall, CTF, 1, 0);
 addRotationMap(IceRidge_nef, CTF, 1, 0);
 addRotationMap(Disjointed, CTF, 1, 0);
 addRotationMap(TWL2_MuddySwamp, CTF, 1, 0);
 addRotationMap(Blink, CTF, 1, 1);
 addRotationMap(HighAnxiety, CTF, 1, 1);
-addRotationMap(Headstone, CTF, 1, 1);
+addRotationMap(Headstone, CTF, 1, 0);
 addRotationMap(S5_Centaur, CTF, 1, 0);
 addRotationMap(S8_Cardiac, CTF, 1, 1);
 addRotationMap(CirclesEdge, CTF, 1, 1);
@@ -146,21 +146,21 @@ addRotationMap(TWL2_Magnum, CTF, 1, 1);
 addRotationMap(Logans_Run, CTF, 1, 1);
 addRotationMap(Rollercoaster_nef, CTF, 1, 1);
 addRotationMap(MoonDance, CTF, 1, 1);
-addRotationMap(Raindance_nef, CTF, 1, 1);
-addRotationMap(TWL_Magamatic, CTF, 1, 1);
+addRotationMap(Raindance_nef, CTF, 1, 0);
+addRotationMap(TWL_Magmatic, CTF, 1, 0);
 addRotationMap(TWL2_FrozenGlory, CTF, 1, 1);
 addRotationMap(LandingParty, CTF, 1, 1);
-addRotationMap(TitanV, CTF, 1, 1);
+addRotationMap(TitanV, CTF, 1, 0);
 addRotationMap(TWL_Crossfire, CTF, 1, 1);
 addRotationMap(WindyGap, CTF, 1, 0);
 addRotationMap(Surro, CTF, 1, 0);
-addRotationMap(HarvestDance, CTF, 1, 1);
-addRotationMap(The_Calm, CTF, 1, 1);
+addRotationMap(HarvestDance, CTF, 1, 0);
+addRotationMap(The_Calm, CTF, 1, 0);
 
 //Vehicle Maps: Voteable, But Not in Rotation
 /////////////////////////////////////////////////////////////////////
 
-addRotationMap(SubZeroV, CTF, 1, 1);
+addRotationMap(SubZeroV, CTF, 1, 0);
 addRotationMap(TWL2_RoughLand, CTF, 1, 0);
 addRotationMap(S8_Geothermal, CTF, 1, 0);
 addRotationMap(Lakefront, CTF, 1, 0);
@@ -183,11 +183,11 @@ addRotationMap(Glade, CTF, 1, 0);
 //BIG Vehicle Maps
 /////////////////////////////////////////////////////////////////////
 
-addRotationMap(Fenix, CTF, 1, 1);
-addRotationMap(Hillside, CTF, 1, 1);
+addRotationMap(Fenix, CTF, 1, 0);
+addRotationMap(Hillside, CTF, 1, 0);
 addRotationMap(Sangre_de_Grado, CTF, 1, 0);
 addRotationMap(Slapdash, CTF, 1, 0);
-addRotationMap(BerylBasin, CTF, 1, 1);
+addRotationMap(BerylBasin, CTF, 1, 0);
 addRotationMap(TWL_Frozen, CTF, 1, 0);
 addRotationMap(TWL_Harvester, CTF, 1, 0);
 addRotationMap(Archipelago, CTF, 1, 0);

@@ -1309,67 +1309,64 @@ package dtStatsGame{
       parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
    }
    //0 Fire 1 ??? 2 jump 3 jet 4 gernade 5 mine
-   // function Armor::onTrigger(%data, %player, %triggerNum, %val){
-      // parent::onTrigger(%data, %player, %triggerNum, %val);
-      // return;
+   function Armor::onTrigger(%data, %player, %triggerNum, %val){
+      parent::onTrigger(%data, %player, %triggerNum, %val);
       //echo(%triggerNum SPC %val);
-      // if($dtStats::Enable){
-         // if(isObject(%player) && !%player.getObjectMount()){
-            // if(%val){// cuts  the amount of tiggers by half
-               // %client = %player.client;
-               // %speed = mFloor(vectorLen(%player.getVelocity()) * 3.6);
-               
-               // if(%client.maxSpeed < %speed){%client.maxSpeed = %speed;}
-               // %client.avgTSpeed += %speed; %client.avgSpeedCount++;
-               // %client.avgSpeed = %client.avgTSpeed/%client.avgSpeedCount;
-               // if(%client.avgSpeedCount >= 500){%client.avgSpeedCount=%client.avgTSpeed=0;}   
-               
-               // dist moved
-               // %xypos = getWords(%player.getPosition(),0,1) SPC 0;
-               // if(%client.lp !$= ""){%client.distMov = mFloor(%client.distMov + vectorDist(%client.lp,%xypos));}
-                  // %client.lp = %xypos;
-            // }
-               
-            // if (%triggerNum == 3){ //jet triggers 
-               // if(%val){
-                  // if(isEventPending(%player.jetTimeTest)){
-                     // cancel(%player.jetTimeTest);
-                  // }
-                   // %client.jetTrigCount++;
-                  // if(%client.ground){
-                     // if(%client.gt > 0){
-                        // %client.groundTime += ((getSimTime() - %client.gt)/1000)/60;
-                     // }
-                     // %client.at =  getSimTime();
-                  // }
-                  // %client.ground = 0;
-               // }
-               // else{
-                   // if(!isEventPending(%player.jetTimeTest)){
-                     // %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
-                     // %rayStart = %player.getWorldBoxCenter();
-                     // %rayEnd = VectorAdd(%rayStart,"0 0" SPC (10000 * -1));
-                     // %raycast = ContainerRayCast(%rayStart, %rayEnd, %mask, %player);  
-                     // %groundPos = getWords(%raycast, 1, 3);
-                     // %dis = vectorDist(%player.getPosition(),%groundPos);
-                     // %zv = getWord(%player.getVelocity(),2);
-                     // %player.testDis = %player.getPosition();
-                     // %a = getVecAngle(%player.getForwardVector(),vectorNormalize(%player.getVelocity()),%zv);
-                     // %hv = vectorLen(%player.getVelocity());
-                     // %range = %hv * mCos(%a * 3.14159/180) * (%hv * mSin(%a * 3.14159/180) + mSqrt(mPow((%hv * mSin(%a * 3.14159/180)),2) + 2 * mAbs(getGravity()) * %dis)) / mAbs(getGravity());
-                     // %time = (((%zv + mSqrt(mPow((%zv),2) + 2 * mAbs(getGravity()) * %dis)) / mAbs(getGravity()))* 1000); // not perfect but close enough with out getting too crazy and facy
-                    // error(%dis SPC %time SPC %range);
-                     // %player.jetTimeTest = schedule(%time,0,"chkGrounded",%player);
-                  // }  
-               // }
-            // }
-         // }
-         // else{
-            // %client.lp = "";
-            // %client.gt = %client.at = 0; 
-         // }
-      // }
-   //}
+      if(isObject(%player) && !%player.getObjectMount()){
+         if(%val){// cuts  the amount of tiggers by half
+            %client = %player.client;
+            %speed = vectorLen(%player.getVelocity());
+            
+            if(%client.maxSpeed < %speed){%client.maxSpeed = %speed;}
+            %client.avgTSpeed += %speed; %client.avgSpeedCount++;
+            %client.avgSpeed = %client.avgTSpeed/%client.avgSpeedCount;
+            if(%client.avgSpeedCount >= 500){%client.avgSpeedCount=%client.avgTSpeed=0;}   
+            
+            //dist moved
+            %xypos = getWords(%player.getPosition(),0,1) SPC 0;
+            if(%client.lp !$= ""){%client.distMov = mFloor(%client.distMov + vectorDist(%client.lp,%xypos));}
+               %client.lp = %xypos;
+         }
+            
+         if (%triggerNum == 3){ //jet triggers 
+            if(%val){
+               if(isEventPending(%player.jetTimeTest)){
+                  cancel(%player.jetTimeTest);
+               }
+                %client.jetTrigCount++;
+               if(%client.ground){
+                  if(%client.gt > 0){
+                     %client.groundTime += ((getSimTime() - %client.gt)/1000)/60;
+                  }
+                  %client.at =  getSimTime();
+               }
+               %client.ground = 0;
+            }
+            else{
+                if(!isEventPending(%player.jetTimeTest)){
+                  %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+                  %rayStart = %player.getWorldBoxCenter();
+                  %rayEnd = VectorAdd(%rayStart,"0 0" SPC (10000 * -1));
+                  %raycast = ContainerRayCast(%rayStart, %rayEnd, %mask, %player);  
+                  %groundPos = getWords(%raycast, 1, 3);
+                  %dis = vectorDist(%player.getPosition(),%groundPos);
+                  %zv = getWord(%player.getVelocity(),2);
+                  //%player.testDis = %player.getPosition();
+                  //%a = getVecAngle(%player.getForwardVector(),vectorNormalize(%player.getVelocity()),%zv);
+                  //%hv = vectorLen(%player.getVelocity());
+                  //%range = %hv * mCos(%a * 3.14159/180) * (%hv * mSin(%a * 3.14159/180) + mSqrt(mPow((%hv * mSin(%a * 3.14159/180)),2) + 2 * mAbs(getGravity()) * %dis)) / mAbs(getGravity());
+                  %time = (((%zv + mSqrt(mPow((%zv),2) + 2 * mAbs(getGravity()) * %dis)) / mAbs(getGravity()))* 1000); // not perfect but close enough with out getting too crazy and facy
+                 // error(%dis SPC %time SPC %range);
+                  %player.jetTimeTest = schedule(%time,0,"chkGrounded",%player);
+               }  
+            }
+         }
+      }
+      else{
+         %client.lp = "";
+         %client.gt = %client.at = 0; 
+      }
+   }
    function StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType){
       if($dtStats::Enable)
          clientDmgStats(%data,%position,%sourceObject,%targetObject, %damageType,%amount);
@@ -2766,7 +2763,12 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          if(%mrx){%dtStats.mrxUID = 1;}
          else{%dtStats.mrxUID = 0;}
          %dtStats.guid = %client.guid;
-         %dtStats.name =  stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9" );
+         %authInfo = %client.getAuthInfo();
+         %realName = getField( %authInfo, 0 );
+         if(%realName !$= "")
+            %dtStats.name = %realName;
+         else
+            %dtStats.name =  stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9" );
          %dtStats.clientLeft = 0;
          %dtStats.markForDelete = 0;
          %client.joinTime = getSimTime();
@@ -2825,9 +2827,8 @@ function dtStatsGameOver( %game ){
             schedule(%time ,0,"saveGameStats",%dtStats,%game.class); //
          }
          else{
-            %dtStats.markForDelete = 1;
             %time +=  $dtStats::slowSaveTime; // this will chain them
-            schedule(%time ,0,"saveGameStats",%dtStats,%game.class); //
+            %dtStats.schedule(%time, "delete");
          }
       }
    }

@@ -81,6 +81,12 @@
 //    Bumped up distance for mortar midAirs so it's just outside its damage radius something strange is going on there
 //    Added game type arrays for display and processing
 //
+//    6.6
+//    Added game id to track individual games 
+//    Removed misc turret stuff
+//    Removed vehicle menus 
+//    Misc fixes
+//
 //    7.0 ToDos
 //       Replace or rework overallACC
 //       Add option to load stats after players first game to reduce any sort of impact on the server
@@ -145,7 +151,7 @@ $dtStats::Basic = 0;
 $dtStats::Live = 1;  
 $dtStats::KD = 1;
 $dtStats::Hist =1;
-$dtStats::Vehicle = 0; 
+//$dtStats::Vehicle = 0; 
 $dtStats::Armor = 0; 
 $dtStats::Match = 0;
 $dtStats::Weapon = 0;
@@ -607,37 +613,33 @@ $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "shockHitMaxDist";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorM";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorH";
    
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLD";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMD";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHD";
    
-  // if($dtStats::Armor){
- 
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLD";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMD";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHD";
-      
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLL";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLM";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLH";
-      
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorML";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMM";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMH";
-      
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHL";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHM";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHH";
-      
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLLD";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLMD";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLHD";
-      
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMLD";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMMD";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMHD";
-      
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHLD";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHMD";
-      $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHHD";
-   //}
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLL";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLM";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLH";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorML";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMM";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMH";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHL";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHM";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHH";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLLD";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLMD";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorLHD";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMLD";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMMD";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorMHD";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHLD";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHMD";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "armorHHD";
 
    //max kill distance
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "cgKillMaxDist";
@@ -707,22 +709,28 @@ $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "shockHitMaxDist";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "missileMA";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "mineMA";
 
-if($dtStats::Vehicle){
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "ShrikeBlasterDmg";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "ShrikeBlasterDirectHits";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "ShrikeBlasterDmgTaken";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BellyTurretDmg";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BellyTurretDirectHits";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BellyTurretDmgTaken";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankChaingunDmg";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankChaingunDirectHits";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankChaingunDmgTaken";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BomberBombsInDmg";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BomberBombsInHits";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BomberBombsInDmgTaken";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankMortarInDmg";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankMortarInHits";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankMortarInDmgTaken";
+
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "ShrikeBlasterDmg";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "ShrikeBlasterDirectHits";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "ShrikeBlasterDmgTaken";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BellyTurretDmg";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BellyTurretDirectHits";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BellyTurretDmgTaken";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankChaingunDmg";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankChaingunDirectHits";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankChaingunDmgTaken";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BomberBombsInDmg";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BomberBombsInHits";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BomberBombsInDmgTaken";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankMortarInDmg";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankMortarInHits";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankMortarInDmgTaken";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "ShrikeBlasterFired";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BellyTurretFired";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BomberBombsFired";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankChaingunFired";
+   //$dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankMortarFired";
+   
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "wildRK";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "assaultRK";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "mobileBaseRK";
@@ -747,19 +755,7 @@ if($dtStats::Vehicle){
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "scoutFlyerEK";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "bomberFlyerEK";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "hapcFlyerEK";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "PlasmaTurretFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "AATurretFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "MortarTurretFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "MissileTurretFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "IndoorDepTurretFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "OutdoorDepTurretFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "SentryTurretFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "ShrikeBlasterFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BellyTurretFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "BomberBombsFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankChaingunFired";
-   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "TankMortarFired";
-}
+
 ///////////////////////////////////////////////////////////////////
 $dtStats::uFC["dtStats"] = 0; // not saved but used to calculate other stats that are saved
    
@@ -1311,60 +1307,61 @@ package dtStatsGame{
    //0 Fire 1 ??? 2 jump 3 jet 4 gernade 5 mine
    function Armor::onTrigger(%data, %player, %triggerNum, %val){
       parent::onTrigger(%data, %player, %triggerNum, %val);
-      //echo(%triggerNum SPC %val);
-      if(isObject(%player) && !%player.getObjectMount()){
-         if(%val){// cuts  the amount of tiggers by half
-            %client = %player.client;
-            %speed = vectorLen(%player.getVelocity());
-            
-            if(%client.maxSpeed < %speed){%client.maxSpeed = %speed;}
-            %client.avgTSpeed += %speed; %client.avgSpeedCount++;
-            %client.avgSpeed = %client.avgTSpeed/%client.avgSpeedCount;
-            if(%client.avgSpeedCount >= 500){%client.avgSpeedCount=%client.avgTSpeed=0;}   
-            
-            //dist moved
-            %xypos = getWords(%player.getPosition(),0,1) SPC 0;
-            if(%client.lp !$= ""){%client.distMov = mFloor(%client.distMov + vectorDist(%client.lp,%xypos));}
-               %client.lp = %xypos;
-         }
-            
-         if (%triggerNum == 3){ //jet triggers 
-            if(%val){
-               if(isEventPending(%player.jetTimeTest)){
-                  cancel(%player.jetTimeTest);
-               }
-                %client.jetTrigCount++;
-               if(%client.ground){
-                  if(%client.gt > 0){
-                     %client.groundTime += ((getSimTime() - %client.gt)/1000)/60;
+      if($dtStats::Enable){
+         if(isObject(%player) && !%player.getObjectMount()){
+            if(%val){// cuts  the amount of tiggers by half
+               %client = %player.client;
+               %speed = vectorLen(%player.getVelocity());
+               
+               if(%client.maxSpeed < %speed){%client.maxSpeed = %speed;}
+               %client.avgTSpeed += %speed; %client.avgSpeedCount++;
+               %client.avgSpeed = %client.avgTSpeed/%client.avgSpeedCount;
+               if(%client.avgSpeedCount >= 500){%client.avgSpeedCount=%client.avgTSpeed=0;}   
+               
+               //dist moved
+               %xypos = getWords(%player.getPosition(),0,1) SPC 0;
+               if(%client.lp !$= ""){%client.distMov = mFloor(%client.distMov + vectorDist(%client.lp,%xypos));}
+                  %client.lp = %xypos;
+            }
+               
+            if (%triggerNum == 3){ //jet triggers 
+               if(%val){
+                  if(isEventPending(%player.jetTimeTest)){
+                     cancel(%player.jetTimeTest);
                   }
-                  %client.at =  getSimTime();
+                   %client.jetTrigCount++;
+                  if(%client.ground){
+                     if(%client.gt > 0){
+                        %client.groundTime += ((getSimTime() - %client.gt)/1000)/60;
+                     }
+                     %client.at =  getSimTime();
+                  }
+                  %client.ground = 0;
                }
-               %client.ground = 0;
-            }
-            else{
-                if(!isEventPending(%player.jetTimeTest)){
-                  %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
-                  %rayStart = %player.getWorldBoxCenter();
-                  %rayEnd = VectorAdd(%rayStart,"0 0" SPC (10000 * -1));
-                  %raycast = ContainerRayCast(%rayStart, %rayEnd, %mask, %player);  
-                  %groundPos = getWords(%raycast, 1, 3);
-                  %dis = vectorDist(%player.getPosition(),%groundPos);
-                  %zv = getWord(%player.getVelocity(),2);
-                  //%player.testDis = %player.getPosition();
-                  //%a = getVecAngle(%player.getForwardVector(),vectorNormalize(%player.getVelocity()),%zv);
-                  //%hv = vectorLen(%player.getVelocity());
-                  //%range = %hv * mCos(%a * 3.14159/180) * (%hv * mSin(%a * 3.14159/180) + mSqrt(mPow((%hv * mSin(%a * 3.14159/180)),2) + 2 * mAbs(getGravity()) * %dis)) / mAbs(getGravity());
-                  %time = (((%zv + mSqrt(mPow((%zv),2) + 2 * mAbs(getGravity()) * %dis)) / mAbs(getGravity()))* 1000); // not perfect but close enough with out getting too crazy and facy
-                 // error(%dis SPC %time SPC %range);
-                  %player.jetTimeTest = schedule(%time,0,"chkGrounded",%player);
-               }  
+               else{
+                   if(!isEventPending(%player.jetTimeTest)){
+                     %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+                     %rayStart = %player.getWorldBoxCenter();
+                     %rayEnd = VectorAdd(%rayStart,"0 0" SPC (10000 * -1));
+                     %raycast = ContainerRayCast(%rayStart, %rayEnd, %mask, %player);  
+                     %groundPos = getWords(%raycast, 1, 3);
+                     %dis = vectorDist(%player.getPosition(),%groundPos);
+                     %zv = getWord(%player.getVelocity(),2);
+                     //%player.testDis = %player.getPosition();
+                     //%a = getVecAngle(%player.getForwardVector(),vectorNormalize(%player.getVelocity()),%zv);
+                     //%hv = vectorLen(%player.getVelocity());
+                     //%range = %hv * mCos(%a * 3.14159/180) * (%hv * mSin(%a * 3.14159/180) + mSqrt(mPow((%hv * mSin(%a * 3.14159/180)),2) + 2 * mAbs(getGravity()) * %dis)) / mAbs(getGravity());
+                     %time = (((%zv + mSqrt(mPow((%zv),2) + 2 * mAbs(getGravity()) * %dis)) / mAbs(getGravity()))* 1000); // not perfect but close enough with out getting too crazy and facy
+                    // error(%dis SPC %time SPC %range);
+                     %player.jetTimeTest = schedule(%time,0,"chkGrounded",%player);
+                  }  
+               }
             }
          }
-      }
-      else{
-         %client.lp = "";
-         %client.gt = %client.at = 0; 
+         else{
+            %client.lp = "";
+            %client.gt = %client.at = 0; 
+         }
       }
    }
    function StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType){
@@ -2469,7 +2466,7 @@ function LakRabbitHud(%game, %client, %tag){
             }
          }
          messageClient( %client, 'SetScoreHudSubheader', "",
-         '<tab:25,325>\tPLAYERS (%1)<rmargin:260><just:right>%4%3<rmargin:560><just:left>\tPLAYERS (%2)<just:right>%5%3', $TeamRank[1, count], $TeamRank[2, count], (%ShowScores?'SCORE':''),%PingString[1],%PingString[2]);
+         '<tab:15,314>\tPLAYERS (%1)<rmargin:265><clip:100><just:right>%4</clip>%3<rmargin:565><just:left>\tPLAYERS (%2)<clip:100><just:right>%5</clip>%3', $TeamRank[1, count], $TeamRank[2, count], (%ShowScores?'SCORE':''),%PingString[1],%PingString[2]);
          
          %index = 0;
          while(true)
@@ -2814,6 +2811,8 @@ function dtStatsClientLeaveGame(%game, %client){
 }
 function dtStatsGameOver( %game ){
    $dtStats::LastMission = $MissionDisplayName;
+   $dtGlobal::gameID++;
+   export( "$dtGlobal::*", "serverStats/saveVars.cs", false );
    if($dtStats::debugEchos){error("dtStatsGameOver");}
    %timeNext =0;
    for (%i = 0; %i < statsGroup.getCount(); %i++){// see if we have any old clients data
@@ -3414,6 +3413,7 @@ function saveGameStats(%dtStats,%game){
          %file.writeLine("dateStamp" @ "%t" @ strreplace(%dtStats.gameStats["dateStamp","g",%game],"\t","%t"));
          %file.writeLine("timeDayMonth" @ "%t" @ strreplace(%dtStats.gameStats["timeDayMonth","g",%game],"\t","%t"));
          %file.writeLine("map" @ "%t" @ strreplace(%dtStats.gameStats["map","g",%game],"\t","%t"));
+         %file.writeLine("gameID" @ "%t" @ strreplace(%dtStats.gameStats["gameID","g",%game],"\t","%t"));
          for(%i = 1; %i <= $dtStats::FC[%game]; %i++){
             %val = $dtStats::FV[%i,%game];
             %var = %dtStats.gameStats[%val,"g",%game];
@@ -3500,6 +3500,7 @@ function incGameStats(%dtStats,%game) {// record that games stats and inc by one
    setValueField(%dtStats,"dateStamp","g",%game,%c,formattimestring("yy-mm-dd hh:nn:ss"));
    setValueField(%dtStats,"timeDayMonth","g",%game,%c,formattimestring("hh:nn a, mm-dd"));
    setValueField(%dtStats,"map","g",%game,%c,$dtStats::LastMission);
+   setValueField(%dtStats,"gameID","g",%game,%c,$dtGlobal::gameID);
    for(%i = 1; %i <= $dtStats::FC[%game]; %i++){
       %val = $dtStats::FV[%i,%game];
       %var = getDynamicField(%dtStats.client,%val);
@@ -3683,6 +3684,7 @@ function incBakGameStats(%dtStats,%game) {// record that games stats and inc by 
    setValueField(%dtStats,"dateStamp","g",%game,%c,formattimestring("yy-mm-dd hh:nn:ss"));  
    setValueField(%dtStats,"timeDayMonth","g",%game,%c,formattimestring("hh:nn a, mm-dd"));
    setValueField(%dtStats,"map","g",%game,%c,$dtStats::LastMission);
+   setValueField(%dtStats,"gameID","g",%game,%c,$dtGlobal::gameID);
    for(%i = 1; %i <= $dtStats::FC[%game]; %i++){
       %val = $dtStats::FV[%i,%game];
       %var = %dtStats.gameStats[%val,"b",%game];
@@ -4372,36 +4374,36 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
             %client.SatchelInHits++;
             if(%t)
                %targetClient.SatchelInDmgTaken += %amount;
-         case $DamageType::BomberBombs:
-            %client.BomberBombsInDmg +=  %amount;
-            %client.BomberBombsInHits++;
-            if(%t)
-               %targetClient.BomberBombsInDmgTaken += %amount;
-         case $DamageType::TankMortar:
-            %client.TankMortarInDmg +=  %amount;
-            %client.TankMortarInHits++;
-            if(%t)
-               %targetClient.TankMortarInDmgTaken += %amount;
-         case $DamageType::MPBMissile:
-            %client.MPBMissileInDmg +=  %amount;
-            %client.MPBMissileInHits++;
-            if(%t)
-               %targetClient.MPBMissileInDmgTaken += %amount;
-         case $DamageType::ShrikeBlaster:
-            %client.ShrikeBlasterDmg += %amount;
-            %client.ShrikeBlasterDirectHits++;
-            if(%t)
-               %targetClient.ShrikeBlasterDmgTaken += %amount;
-         case $DamageType::BellyTurret:
-            %client.BellyTurretDmg += %amount;
-            %client.BellyTurretDirectHits++;
-            if(%t)
-               %targetClient.BellyTurretDmgTaken += %amount;
-         case $DamageType::TankChaingun:
-            %client.TankChaingunDmg += %amount;
-            %client.TankChaingunDirectHits++;
-            if(%t)
-               %targetClient.TankChaingunDmgTaken += %amount;
+         //case $DamageType::BomberBombs:
+            //%client.BomberBombsInDmg +=  %amount;
+            //%client.BomberBombsInHits++;
+            //if(%t)
+               //%targetClient.BomberBombsInDmgTaken += %amount;
+         //case $DamageType::TankMortar:
+            //%client.TankMortarInDmg +=  %amount;
+            //%client.TankMortarInHits++;
+            //if(%t)
+               //%targetClient.TankMortarInDmgTaken += %amount;
+         //case $DamageType::MPBMissile:
+            //%client.MPBMissileInDmg +=  %amount;
+            //%client.MPBMissileInHits++;
+            //if(%t)
+               //%targetClient.MPBMissileInDmgTaken += %amount;
+         //case $DamageType::ShrikeBlaster:
+            //%client.ShrikeBlasterDmg += %amount;
+            //%client.ShrikeBlasterDirectHits++;
+            //if(%t)
+               //%targetClient.ShrikeBlasterDmgTaken += %amount;
+         //case $DamageType::BellyTurret:
+            //%client.BellyTurretDmg += %amount;
+            //%client.BellyTurretDirectHits++;
+            //if(%t)
+               //%targetClient.BellyTurretDmgTaken += %amount;
+         //case $DamageType::TankChaingun:
+            //%client.TankChaingunDmg += %amount;
+            //%client.TankChaingunDirectHits++;
+            //if(%t)
+               //%targetClient.TankChaingunDmgTaken += %amount;
       }
    }
 
@@ -4449,32 +4451,18 @@ function clientShotsFired(%data, %sourceObject, %projectile){ // could do a fov 
          %client.blasterACC = (%client.blasterDirectHits / (%client.blasterShotsFired ? %client.blasterShotsFired : 1)) * 100;
       case $DamageType::ELF:
          %client.elfShotsFired++;
-      case $DamageType::PlasmaTurret:
-         %client.PlasmaTurretFired++;
-      case $DamageType::AATurret:
-         %client.AATurretFired++;
-      case $DamageType::MortarTurret:
-         %client.MortarTurretFired++;
-      case $DamageType::MissileTurret:
-         %client.MissileTurretFired++;
-      case $DamageType::IndoorDepTurret:
-         %client.IndoorDepTurretFired++;
-      case $DamageType::OutdoorDepTurret:
-         %client.OutdoorDepTurretFired++;
-      case $DamageType::SentryTurret:
-         %client.SentryTurretFired++;
-      case $DamageType::ShrikeBlaster:
-         %client.ShrikeBlasterFired++;
-      case $DamageType::BellyTurret:
-         %client.BellyTurretFired++;
-      case $DamageType::BomberBombs:
-         %client.BomberBombsFired++;
-      case $DamageType::TankChaingun:
-         %client.TankChaingunFired++;
-      case $DamageType::TankMortar:
-         %client.TankMortarFired++;
-      case $DamageType::MPBMissile:
-         %client.MPBMissileFired++;
+      //case $DamageType::ShrikeBlaster:
+         //%client.ShrikeBlasterFired++;
+      //case $DamageType::BellyTurret:
+         //%client.BellyTurretFired++;
+      //case $DamageType::BomberBombs:
+         //%client.BomberBombsFired++;
+      //case $DamageType::TankChaingun:
+         //%client.TankChaingunFired++;
+      //case $DamageType::TankMortar:
+         //%client.TankMortarFired++;
+      //case $DamageType::MPBMissile:
+         //%client.MPBMissileFired++;
    }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -4609,8 +4597,8 @@ function statsMenu(%client,%game){
                if(%isTargetSelf || %isAdmin) {
 				  if($dtStats::Weapon)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + CTF Weapon Stats </a>',%vClient);
-                  if($dtStats::Vehicle)
-                     messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tVehicles\t%1>  + CTF Vehicle Stats</a>',%vClient);
+                  //if($dtStats::Vehicle)
+                  //   messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tVehicles\t%1>  + CTF Vehicle Stats</a>',%vClient);
                   if($dtStats::Armor)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tARMOR\t%1>  + CTF Armor Stats</a>',%vClient); 
                   if($dtStats::KD)
@@ -4709,8 +4697,8 @@ function statsMenu(%client,%game){
                if(%isTargetSelf || %isAdmin) {
 				  if($dtStats::Weapon)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tWEAPON\t%1\t-1>  + LCTF Weapon Stats</a>',%vClient);
-                  if($dtStats::Vehicle)
-                     messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tVehicles\t%1>  + CTF Vehicle Stats</a>',%vClient);
+                  //if($dtStats::Vehicle)
+                  //   messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tVehicles\t%1>  + CTF Vehicle Stats</a>',%vClient);
                   if($dtStats::KD)
                      messageClient( %client, 'SetLineHud', "", %tag, %index++, '<a:gamelink\tStats\tKDA\t%1>  + LCTF Kills/Deaths</a>',%vClient);
                   
@@ -5573,176 +5561,7 @@ function statsMenu(%client,%game){
          %i6 = mCeil(%vClient.hGrenadeKillMaxDist) @ "m";         
          %line = '<color:0befe7>  Hand Grenade<color:33CCCC><font:univers condensed:18><lmargin:140>%1<lmargin:212>%2<lmargin:284>%3<lmargin:356>%4<lmargin:428>%5<lmargin:500>%6';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4,%i5,%i6,%i7); 
-      case "Vehicles":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Vehicle Stats");
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tView\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient);
-         
-         %line = '<color:00dcd4><a:gamelink\tStats\tWildCat\t%1>  + WildCat Grav Cycle Stats</a>';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line, %vClient);
-         %line = '<color:00dcd4><a:gamelink\tStats\tSHRIKE\t%1>  + Shrike Scout Flier</a>';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line, %vClient);
-         %line = '<color:00dcd4><a:gamelink\tStats\tBEOWULF\t%1>  + Beowulf Assault Tank</a>';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line, %vClient);
-         %line = '<color:00dcd4><a:gamelink\tStats\tTHUNDERSWORD\t%1>  + ThunderSword Bomber</a>';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line, %vClient);
-         %line = '<color:00dcd4><a:gamelink\tStats\tHAVOC\t%1>  + Havoc Heavy Transport Flier</a>';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line, %vClient);
-         %line = '<color:00dcd4><a:gamelink\tStats\tMPB\t%1>  + Jericho Forward Base(MPB)</a>';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line, %vClient);
-      case "WildCat":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>WildCat Grav Cycle Stats");
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tVehicles\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient);
-         
-         %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
-         
-         %line = '<color:0befe7> Road Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"wildRK",%game,%inc),getGameTotal(%vClient,"wildRK",%game),getGameTotalAvg(%vClient,"wildRK",%game),%vClient.wildRK);
-         %line = '<color:0befe7> Road Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"wildRD",%game,%inc),getGameTotal(%vClient,"wildRD",%game),getGameTotalAvg(%vClient,"wildRD",%game),%vClient.wildRD);
-         %line = '<color:0befe7> Runaway Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"wildEK",%game,%inc),getGameTotal(%vClient,"wildEK",%game),getGameTotalAvg(%vClient,"wildEK",%game),%vClient.wildEK);
-         %line = '<color:0befe7> Crashes<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"wildCrash",%game,%inc),getGameTotal(%vClient,"wildCrash",%game),getGameTotalAvg(%vClient,"wildCrash",%game),%vClient.wildCrash);
-         
-      case "SHRIKE":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Shrike Scout Flier Stats");
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tVehicles\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient);
-         
-         %header = '<color:0befe7><lmargin:190>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
-         
-         %line = '<color:0befe7> Shrike Blaster Kills<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shrikeBlasterKills",%game,%inc),getGameTotal(%vClient,"shrikeBlasterKills",%game),getGameTotalAvg(%vClient,"shrikeBlasterKills",%game),%vClient.shrikeBlasterKills);
-         %line = '<color:0befe7> Shrike Blaster Deaths<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"shrikeBlasterDeaths",%game,%inc),getGameTotal(%vClient,"shrikeBlasterDeaths",%game),getGameTotalAvg(%vClient,"shrikeBlasterDeaths",%game),%vClient.shrikeBlasterDeaths);
-         %line = '<color:0befe7> Shrike Blaster Damage<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"ShrikeBlasterDmg",%game,%inc),getGameTotal(%vClient,"ShrikeBlasterDmg",%game),getGameTotalAvg(%vClient,"ShrikeBlasterDmg",%game),mFloatLength(%vClient.ShrikeBlasterDmg,2)+0);
-         %line = '<color:0befe7> Shrike Blaster Hits<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"ShrikeBlasterDirectHits",%game,%inc),getGameTotal(%vClient,"ShrikeBlasterDirectHits",%game),getGameTotalAvg(%vClient,"ShrikeBlasterDirectHits",%game),%vClient.ShrikeBlasterDirectHits);
-         %line = '<color:0befe7> Shrike Blaster Dmg Taken<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"ShrikeBlasterDmgTaken",%game,%inc),getGameTotal(%vClient,"ShrikeBlasterDmgTaken",%game),getGameTotalAvg(%vClient,"ShrikeBlasterDmgTaken",%game),mFloatLength(%vClient.ShrikeBlasterDmgTaken,2)+0);
-         %line = '<color:0befe7> Shrike Blaster  Fired<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"ShrikeBlasterFired",%game,%inc),getGameTotal(%vClient,"ShrikeBlasterFired",%game),getGameTotalAvg(%vClient,"ShrikeBlasterFired",%game),%vClient.ShrikeBlasterFired);
-         %line = '<color:0befe7> Road Kills<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoutFlyerRK",%game,%inc),getGameTotal(%vClient,"scoutFlyerRK",%game),getGameTotalAvg(%vClient,"scoutFlyerRK",%game),%vClient.scoutFlyerRK);
-         %line = '<color:0befe7> Road Deaths<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoutFlyerRD",%game,%inc),getGameTotal(%vClient,"scoutFlyerRD",%game),getGameTotalAvg(%vClient,"scoutFlyerRD",%game),%vClient.scoutFlyerRD);
-         %line = '<color:0befe7> Runaway Deaths<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoutFlyerEK",%game,%inc),getGameTotal(%vClient,"scoutFlyerEK",%game),getGameTotalAvg(%vClient,"scoutFlyerEK",%game),%vClient.scoutFlyerEK);
-         %line = '<color:0befe7> Crashes<color:00dcd4><lmargin:190>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"scoutFlyerCrash",%game,%inc),getGameTotal(%vClient,"scoutFlyerCrash",%game),getGameTotalAvg(%vClient,"scoutFlyerCrash",%game),%vClient.scoutFlyerCrash);
-         
-      case "BEOWULF":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Beowulf Assault Tank Stats");
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tVehicles\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient);
-         
-         %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
-         
-         %line = '<color:0befe7> Tank Chaingun Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"tankChaingunKills",%game,%inc),getGameTotal(%vClient,"tankChaingunKills",%game),getGameTotalAvg(%vClient,"tankChaingunKills",%game),%vClient.tankChaingunKills);
-         %line = '<color:0befe7> Tank Chaingun Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"tankChaingunDeaths",%game,%inc),getGameTotal(%vClient,"tankChaingunDeaths",%game),getGameTotalAvg(%vClient,"tankChaingunDeaths",%game),%vClient.tankChaingunDeaths);
-         %line = '<color:0befe7> Chaingun Damage<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"TankChaingunDmg",%game,%inc),getGameTotal(%vClient,"TankChaingunDmg",%game),getGameTotalAvg(%vClient,"TankChaingunDmg",%game),mFloatLength(%vClient.TankChainGunDmg,2)+0);
-         %line = '<color:0befe7> Chaingun Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"TankChaingunDirectHits",%game,%inc),getGameTotal(%vClient,"TankChaingunDirectHits",%game),getGameTotalAvg(%vClient,"TankChaingunDirectHits",%game),%vClient.TankChaingunDirectHits);
-         %line = '<color:0befe7> Chaingun Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"TankChaingunDmgTaken",%game,%inc),getGameTotal(%vClient,"TankChaingunDmgTaken",%game),getGameTotalAvg(%vClient,"TankChaingunDmgTaken",%game),mFloatLength(%vClient.TankChaingunDmgTaken,2)+0);
-         %line = '<color:0befe7> Chaingun Rounds Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"TankChaingunFired",%game,%inc),getGameTotal(%vClient,"TankChaingunFired",%game),getGameTotalAvg(%vClient,"TankChaingunFired",%game),%vClient.TankChaingunFired);
-         %line = '<color:0befe7> Mortar Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"tankMortarKills",%game,%inc),getGameTotal(%vClient,"tankMortarKills",%game),getGameTotalAvg(%vClient,"tankMortarKills",%game),%vClient.tankMortarKills);
-         %line = '<color:0befe7> Mortar Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"tankMortarDeaths",%game,%inc),getGameTotal(%vClient,"tankMortarDeaths",%game),getGameTotalAvg(%vClient,"tankMortarDeaths",%game),%vClient.tankMortarDeaths);
-         %line = '<color:0befe7> Splash Damage<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"TankMortarInDmg",%game,%inc),getGameTotal(%vClient,"TankMortarInDmg",%game),getGameTotalAvg(%vClient,"TankMortarInDmg",%game),mFloatLength(%vClient.TankMortarInDmg,2)+0);
-         %line = '<color:0befe7> Mortar Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"TankMortarInHits",%game,%inc),getGameTotal(%vClient,"TankMortarInHits",%game),getGameTotalAvg(%vClient,"TankMortarInHits",%game),%vClient.TankMortarInHits);
-         %line = '<color:0befe7> Mortar Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"TankMortarInDmgTaken",%game,%inc),getGameTotal(%vClient,"TankMortarInDmgTaken",%game),getGameTotalAvg(%vClient,"TankMortarInDmgTaken",%game),mFloatLength(%vClient.TankMortarInDmgTaken,2)+0);
-         %line = '<color:0befe7> Mortar Rounds Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"TankMortarFired",%game,%inc),getGameTotal(%vClient,"TankMortarFired",%game),getGameTotalAvg(%vClient,"TankMortarFired",%game),%vClient.TankMortarFired);
-         %line = '<color:0befe7> Road Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"assaultRK",%game,%inc),getGameTotal(%vClient,"assaultRK",%game),getGameTotalAvg(%vClient,"assaultRK",%game),%vClient.assaultRK);
-         %line = '<color:0befe7> Road Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"assaultRD",%game,%inc),getGameTotal(%vClient,"assaultRD",%game),getGameTotalAvg(%vClient,"assaultRD",%game),%vClient.assaultRD);
-         %line = '<color:0befe7> Runaway Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"assaultEK",%game,%inc),getGameTotal(%vClient,"assaultEK",%game),getGameTotalAvg(%vClient,"assaultEK",%game),%vClient.assaultEK);
-         %line = '<color:0befe7> Crashes<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"assaultCrash",%game,%inc),getGameTotal(%vClient,"assaultCrash",%game),getGameTotalAvg(%vClient,"assaultCrash",%game),%vClient.assaultCrash);
-         
-      case "THUNDERSWORD":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>ThunderSword Bomber Stats");
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tVehicles\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient);
-         
-         %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
-         
-         %line = '<color:0befe7> BellyTurret Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"bellyTurretKills",%game,%inc),getGameTotal(%vClient,"bellyTurretKills",%game),getGameTotalAvg(%vClient,"bellyTurretKills",%game),%vClient.bellyTurretKills);
-         %line = '<color:0befe7> BellyTurret  Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"bellyTurretDeaths",%game,%inc),getGameTotal(%vClient,"bellyTurretDeaths",%game),getGameTotalAvg(%vClient,"bellyTurretDeaths",%game),%vClient.bellyTurretDeaths);
-         %line = '<color:0befe7> BellyTurret Damage<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"BellyTurretDmg",%game,%inc),getGameTotal(%vClient,"BellyTurretDmg",%game),getGameTotalAvg(%vClient,"BellyTurretDmg",%game),mFloatLength(%vClient.BellyTurretDmg,2)+0);
-         %line = '<color:0befe7> BellyTurret Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"BellyTurretDirectHits",%game,%inc),getGameTotal(%vClient,"BellyTurretDirectHits",%game),getGameTotalAvg(%vClient,"BellyTurretDirectHits",%game),%vClient.BellyTurretDirectHits);
-         %line = '<color:0befe7> BellyTurret Dmg Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"BellyTurretDmgTaken",%game,%inc),getGameTotal(%vClient,"BellyTurretDmgTaken",%game),getGameTotalAvg(%vClient,"BellyTurretDmgTaken",%game),mFloatLength(%vClient.BellyTurretDmgTaken,2)+0);
-         %line = '<color:0befe7> BellyTurret Rounds Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"BellyTurretFired",%game,%inc),getGameTotal(%vClient,"BellyTurretFired",%game),getGameTotalAvg(%vClient,"BellyTurretFired",%game),%vClient.BellyTurretFired);
-         %line = '<color:0befe7> Bomb Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"bomberBombsKills",%game,%inc),getGameTotal(%vClient,"bomberBombsKills",%game),getGameTotalAvg(%vClient,"bomberBombsKills",%game),%vClient.bomberBombsKills);
-         %line = '<color:0befe7> Bomb Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"bomberBombsDeaths",%game,%inc),getGameTotal(%vClient,"bomberBombsDeaths",%game),getGameTotalAvg(%vClient,"bomberBombsDeaths",%game),%vClient.bomberBombsDeaths);
-         %line = '<color:0befe7> Bomb Damage<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"BomberBombsInDmg",%game,%inc),getGameTotal(%vClient,"BomberBombsInDmg",%game),getGameTotalAvg(%vClient,"BomberBombsInDmg",%game),mFloatLength(%vClient.BomberBombsInDmg,2)+0);
-         %line = '<color:0befe7> Bomb Hits<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"BomberBombsInHits",%game,%inc),getGameTotal(%vClient,"BomberBombsInHits",%game),getGameTotalAvg(%vClient,"BomberBombsInHits",%game),%vClient.BomberBombsInHits);
-         %line = '<color:0befe7> Bomb Damage Taken<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"BomberBombsInDmgTaken",%game,%inc),getGameTotal(%vClient,"BomberBombsInDmgTaken",%game),getGameTotalAvg(%vClient,"BomberBombsInDmgTaken",%game),mFloatLength(%vClient.BomberBombsInDmgTaken,2)+0);
-         %line = '<color:0befe7> Bomb Rounds Fired<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"BomberBombsFired",%game,%inc),getGameTotal(%vClient,"BomberBombsFired",%game),getGameTotalAvg(%vClient,"BomberBombsFired",%game),%vClient.BomberBombsFired);
-         %line = '<color:0befe7> Road Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"bomberFlyerRK",%game,%inc),getGameTotal(%vClient,"bomberFlyerRK",%game),getGameTotalAvg(%vClient,"bomberFlyerRK",%game),%vClient.bomberFlyerRK);
-         %line = '<color:0befe7> Road Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"bomberFlyerRD",%game,%inc),getGameTotal(%vClient,"bomberFlyerRD",%game),getGameTotalAvg(%vClient,"bomberFlyerRD",%game),%vClient.bomberFlyerRD);
-         %line = '<color:0befe7> Runaway Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"bomberFlyerEK",%game,%inc),getGameTotal(%vClient,"bomberFlyerEK",%game),getGameTotalAvg(%vClient,"bomberFlyerEK",%game),%vClient.bomberFlyerEK);
-         %line = '<color:0befe7> Crashes<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"bomberFlyerCrash",%game,%inc),getGameTotal(%vClient,"bomberFlyerCrash",%game),getGameTotalAvg(%vClient,"bomberFlyerCrash",%game),%vClient.bomberFlyerCrash);
-      case "HAVOC":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Havoc Heavy Transport Flier Stats");
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tVehicles\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient);
-         
-         %header = '<color:0befe7><lmargin:180>Live<lmargin:270>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
-         
-         %line = '<color:0befe7> Road Kills<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hapcFlyerRK",%game,%inc),getGameTotal(%vClient,"hapcFlyerRK",%game),getGameTotalAvg(%vClient,"hapcFlyerRK",%game),%vClient.hapcFlyerRK);
-         %line = '<color:0befe7> Road Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hapcFlyerRD",%game,%inc),getGameTotal(%vClient,"hapcFlyerRD",%game),getGameTotalAvg(%vClient,"hapcFlyerRD",%game),%vClient.hapcFlyerRD);
-         %line = '<color:0befe7> Runaway Deaths<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hapcFlyerEK",%game,%inc),getGameTotal(%vClient,"hapcFlyerEK",%game),getGameTotalAvg(%vClient,"hapcFlyerEK",%game),%vClient.hapcFlyerEK);
-         %line = '<color:0befe7> Crashes<color:00dcd4><lmargin:180>%5<lmargin:270>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"hapcFlyerCrash",%game,%inc),getGameTotal(%vClient,"hapcFlyerCrash",%game),getGameTotalAvg(%vClient,"hapcFlyerCrash",%game),%vClient.hapcFlyerCrash);
-         
-      case "MPB":
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Jericho Forward Base(MPB) Stats");
-         messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tStats\tVehicles\t%1>  Back</a>  -  <a:gamelink\tStats\tReset\t%1>Return To Score Screen</a>',%vClient);
-         
-         %header = '<color:0befe7><lmargin:180>Live<lmargin:250>Moving Avg<lmargin:370>Totals<lmargin:470>Total Avg';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %header);
-         %line = '<color:0befe7> Road Kills<color:00dcd4><lmargin:180>%5<lmargin:250>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mobileBaseRK",%game,%inc),getGameTotal(%vClient,"mobileBaseRK",%game),getGameTotalAvg(%vClient,"mobileBaseRK",%game),%vClient.mobileBaseRK);
-         %line = '<color:0befe7> Road Deaths<color:00dcd4><lmargin:180>%5<lmargin:250>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mobileBaseRD",%game,%inc),getGameTotal(%vClient,"mobileBaseRD",%game),getGameTotalAvg(%vClient,"mobileBaseRD",%game),%vClient.mobileBaseRD);
-         %line = '<color:0befe7> Runaway Deaths<color:00dcd4><lmargin:180>%5<lmargin:250>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mobileBaseEK",%game,%inc),getGameTotal(%vClient,"mobileBaseEK",%game),getGameTotalAvg(%vClient,"mobileBaseEK",%game),%vClient.mobileBaseEK);
-         %line = '<color:0befe7> Crashes<color:00dcd4><lmargin:180>%5<lmargin:250>%2<lmargin:370>%3<lmargin:470>%4';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,getGameData(%vClient,"mobileBaseCrash",%game,%inc),getGameTotal(%vClient,"mobileBaseCrash",%game),getGameTotalAvg(%vClient,"mobileBaseCrash",%game),%vClient.mobileBaseCrash);
-         
+
       case "Blaster":
          %inc = %client.GlArg4;
          if(%inc != -1){//History
@@ -7115,6 +6934,8 @@ function loadLeaderboards(%reset){ // loads up leaderboards
          $dtStats::buildEvent = schedule(getTimeDif($dtStats::buildSetTime),0,"lStatsCycle",1);
    }
    markNewDay();//called when server starts and when build completes
+   if(isFile("serverStats/saveVars.cs"))
+      exec("serverStats/saveVars.cs");
    %oldFileCount = 0; 
    %file = new FileObject(); 
    %folderPath = "serverStats/LData/*.cs";
@@ -7173,7 +6994,7 @@ function loadLeaderboards(%reset){ // loads up leaderboards
    }
 }schedule(5000,0,"loadLeaderboards",0);// delay this so supporting functions are exec first
 
-function sortMon(%lType, %game){  
+function sortMon(%lType, %game){   
    %n = $lData::monCount[%game,%lType];
    if(%n > 1){//make sure we have enough elments worth sorting 
       for (%i = 1; %i <= %n-1; %i++){//sort by %ltype first   

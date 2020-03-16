@@ -78,8 +78,14 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 		if(%UseAllMode)
 		{
 			//Try to pick any player
-			if(%autobalanceRandom == %autobalanceLoop || %lastclient[%team] $= "") 
-				%teamcanidate[%team] = %client; 
+			if(%autobalanceRandom == %autobalanceLoop || %lastclient[%team] $= "")
+			{
+				//If random player has the flag pick the next person
+				if(!%client.player.holdingFlag)
+					%teamcanidate[%team] = %client;
+				else
+					%autobalanceRandom = %autobalanceRandom + 1;
+			}
 			
 			%autobalanceLoop++;
 		}
@@ -87,8 +93,11 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 		{
 			//Normal circumstances
 			//Try to pick a low scoring player
-			if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "") 
-				%teamcanidate[%team] = %client;
+			if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "")
+			{
+				if(!%client.player.holdingFlag)
+					%teamcanidate[%team] = %client;
+			}
 		}
 
 		%lastclient[%team] = %client;

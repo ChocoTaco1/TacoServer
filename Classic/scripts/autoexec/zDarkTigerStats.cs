@@ -6,8 +6,8 @@
 //  Version 2.0 - Code refactor / optimizing/fixes																	
 //  Version 3.0 - DM / LCTF added
 //  Version 4.0 - Code refactor / optimizing / fixes
-//	 Version 5.0 - DuleMod and Arena support / optimizing / fixes / misc stuff		
-//	 Version 6.0 - Lan & Bot Support / Leaderboard / Stats Storage Overhaul / Optimization / Fixes 										
+//	Version 5.0 - DuleMod and Arena support / optimizing / fixes / misc stuff		
+//	Version 6.0 - Lan & Bot Support / Leaderboard / Stats Storage Overhaul / Optimization / Fixes 										
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //ChangeLog
 //    4.0
@@ -1222,7 +1222,7 @@ package dtStats{
       if(!$dtStats::Enable)
          parent::resetScore(%game, %client);
    }
-///////////////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////////
    function DefaultGame::forceObserver( %game, %client, %reason ){
       parent::forceObserver( %game, %client, %reason );
       if($dtStats::Enable){
@@ -1246,7 +1246,7 @@ package dtStats{
          }
       }
    }
-//////////////////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////////////////
    function DefaultGame::activatePackages(%game){
          parent::activatePackages(%game);
          if(isActivePackage(dtStatsGame)){
@@ -1262,7 +1262,39 @@ package dtStats{
       if(isActivePackage(dtStatsGame))
          deactivatePackage(dtStatsGame);
    }
-//////////////////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////////////////
+   // Flag Escort Fixes
+   function CTFGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc){ 
+       parent::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc);
+       if ((%clVictim.player.holdingFlag !$= "") && (%clVictim.team != %clAttacker.team))
+       %clAttacker.dmgdFlagTime = getSimTime();  
+	}
+	function CTFGame::testEscortAssist(%game, %victimID, %killerID){
+	   if((getSimTime() - %victimID.dmgdFlagTime) < %game.TIME_CONSIDERED_FLAGCARRIER_THREAT && %killerID.player.holdingFlag $= "")
+		  return true;
+	   return false;
+	}
+	function SCtFGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc){ 
+	   parent::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc);
+	   if ((%clVictim.player.holdingFlag !$= "") && (%clVictim.team != %clAttacker.team))
+		  %clAttacker.dmgdFlagTime = getSimTime();  
+	}
+	function SCtFGame::testEscortAssist(%game, %victimID, %killerID){
+	   if((getSimTime() - %victimID.dmgdFlagTime) < %game.TIME_CONSIDERED_FLAGCARRIER_THREAT && %killerID.player.holdingFlag $= "")
+		  return true;
+	   return false;
+	}
+	function PracticeCTFGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc){ 
+	   parent::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc);
+	   if ((%clVictim.player.holdingFlag !$= "") && (%clVictim.team != %clAttacker.team))
+		  %clAttacker.dmgdFlagTime = getSimTime();  
+	}
+	function PracticeCTFGame::testEscortAssist(%game, %victimID, %killerID){
+	   if((getSimTime() - %victimID.dmgdFlagTime) < %game.TIME_CONSIDERED_FLAGCARRIER_THREAT && %killerID.player.holdingFlag $= "")
+		  return true;
+	   return false;
+	}
+    //////////////////////////////////////////////////////////////////////////////////
 };
 //helps with game types that override functions and dont use parent
 // that way we get called first then the gametype can do whatever 

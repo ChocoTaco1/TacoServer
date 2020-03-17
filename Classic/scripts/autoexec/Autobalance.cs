@@ -31,8 +31,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	//Team Count code by Keen
 	$PlayerCount[0] = 0;
 	$PlayerCount[1] = 0;
-	$PlayerCount[2] = 0;
-			
+	$PlayerCount[2] = 0;		
 
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{

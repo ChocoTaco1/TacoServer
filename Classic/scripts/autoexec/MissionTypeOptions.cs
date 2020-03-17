@@ -48,6 +48,11 @@ function loadMissionStage2()
 	
 	//Start MapRepetitionChecker
 	$MapRepetitionSchedule = schedule(20000, 0, "MapRepetitionChecker", %game);
+	
+	if( $CurrentMissionType $= "Siege" ) 
+		$Host::EvoNoBaseRapeEnabled = 0;
+	else
+		$Host::EvoNoBaseRapeEnabled = 1;
    
     parent::loadMissionStage2();
 }

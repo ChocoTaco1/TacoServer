@@ -49,10 +49,15 @@ function loadMissionStage2()
 	//Start MapRepetitionChecker
 	$MapRepetitionSchedule = schedule(20000, 0, "MapRepetitionChecker", %game);
 	
+	//Siege NoBaseRape Fix
 	if( $CurrentMissionType $= "Siege" ) 
 		$Host::EvoNoBaseRapeEnabled = 0;
 	else
 		$Host::EvoNoBaseRapeEnabled = 1;
+	
+	//Fix for Lak to CTF transition (Uneven Teams)
+	if(Game.numTeams > 1 && ($TeamRank[1, count] > $TeamRank[2, count] + 2) && $previousMissionType $= "LakRabbit")
+		Game.setupClientTeams();
    
     parent::loadMissionStage2();
 }

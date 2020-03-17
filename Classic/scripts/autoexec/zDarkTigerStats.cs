@@ -86,6 +86,12 @@
 //    Removed misc turret stuff
 //    Removed vehicle menus 
 //    Misc fixes
+//    
+//    6.7
+//    Escort fix moved
+//    Stats now allways save no matter the condition, this should reduce some edge cases problems and to have a more complete data set
+//    Added gamePCT becuase of the change to always save to track witch maps/games were cut short or joined in the middle of a match   
+//    MapID Gen to track map specific stats 
 //
 //    7.0 ToDos
 //       Replace or rework overallACC
@@ -110,8 +116,9 @@ $dtStats::viewSelf = 0;
 //Note only tested to 100 games, hard cap at 300
 $dtStats::MaxNumOfGames = 100;
 //Value at witch total stats should cap out
-//Note 32bit int cap is 2,147,483,647; so nothing byeond that
+//Note 32bit int cap is 2,147,483,647 so nothing byeond that
 $dtStats::ValMax = 2000000000;
+$dtStats::invertVal = 1000000;
 //This will load player stats after their first game, to reduce any impact on the server.
 $dtStats::loadAfter = 0;//keep 0 not finished 
 //enables self maintainer to deletes old files see $dtStats::expire
@@ -123,20 +130,12 @@ $dtStats::expire = 60;
 //Record stats if player is here for x percentage of the game, set to 0 to rec every game
 $dtStats::fgPercentage["CTFGame"] = 25;
 //0 score based, 1 time based, 2 the closer one to finishing the game
-$dtStats::fgPercentageType["CTFGame"] =2;
 
 $dtStats::fgPercentage["LakRabbitGame"] = 25;
-$dtStats::fgPercentageType["LakRabbitGame"] = 2;
-
 $dtStats::fgPercentage["DMGame"] = 25;
-$dtStats::fgPercentageType["DMGame"] = 2;
-
 $dtStats::fgPercentage["SCtFGame"] = 25;
-$dtStats::fgPercentageType["SCtFGame"] = 2;
-
 // $dtStats::fgPercentage["ArenaGame"]/RoundsLimit * 100
 $dtStats::fgPercentage["ArenaGame"] =20; 
-
 //keep 0 as there is no measure of when a game is done
 $dtStats::fgPercentage["DuelGame"] =0; 
 
@@ -269,6 +268,8 @@ $dtStats::FV[$dtStats::FC["CTFGame"]++,"CTFGame"] = "flagDefends";
 $dtStats::FV[$dtStats::FC["CTFGame"]++,"CTFGame"] = "winCount"; // in this script only
 $dtStats::FV[$dtStats::FC["CTFGame"]++,"CTFGame"] = "lossCount";
 $dtStats::FV[$dtStats::FC["CTFGame"]++,"CTFGame"] = "destruction";
+$dtStats::FV[$dtStats::FC["CTFGame"]++,"CTFGame"] = "heldTime";
+$dtStats::FV[$dtStats::FC["CTFGame"]++,"CTFGame"] = "grabSpeed";
 ////////////////////////////Unused CTF Vars/////////////////////////////////////
 $dtStats::uFC["CTFGame"] = 0;
 $dtStats::uFV[$dtStats::uFC["CTFGame"]++,"CTFGame"] = "tkDestroys";
@@ -949,6 +950,7 @@ $dtStats::uFC["dtStats"] = 0; // not saved but used to calculate other stats tha
    $dtStats::FV[$dtStats::FC["max"]++,"max"] = "kills\tkillsMax";
    $dtStats::FV[$dtStats::FC["max"]++,"max"] = "killStreak\tkillStreakMax";
    $dtStats::FV[$dtStats::FC["max"]++,"max"] = "maxSpeed\tmaxSpeedMax";
+   $dtStats::FV[$dtStats::FC["max"]++,"max"] = "grabSpeed\tgrabSpeedMax";
    
 
    //saves only the avg were total value does not make sence
@@ -968,6 +970,7 @@ $dtStats::uFC["dtStats"] = 0; // not saved but used to calculate other stats tha
    $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "kills\tkillsAVG";
    $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "timeTL\ttimeTLAVG";
    $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "overallACC\toverallACCAVG";
+   $dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "heldTime\theldTimeAVG";
    //$dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "airTime\tairTimeAvg"; 
    //$dtStats::FV[$dtStats::FC["avg"]++,"avg"] = "groundTime\tgroundTimeAvg";
    
@@ -1445,6 +1448,47 @@ package dtStatsGame{
          %obj.client.vehDBName = %vehicle.getDataBlock().getName();
          %obj.client.gt = %obj.client.at = 0;// resets fly/ground time
       }
+   }
+   ////////////////////////////////////////////////////////////////////////////////
+   function CTFGame::playerDroppedFlag(%game, %player){
+      if($dtStats::Enable){
+         %flag = %player.holdingFlag;
+         %game.dtFlagTime[%flag] = 0;
+      }
+      parent::playerDroppedFlag(%game, %player);
+   }
+   function CTFGame::boundaryLoseFlag(%game, %player){
+     if($dtStats::Enable){
+         %flag = %player.holdingFlag;
+         %game.dtFlagTime[%flag] = 0;
+     }
+     parent::boundaryLoseFlag(%game, %player); 
+   }
+   function CTFGame::playerTouchEnemyFlag(%game, %player, %flag){
+      if($dtStats::Enable){
+         if(%flag.isHome){
+            %game.dtFlagTime[%flag] = getSimTime();
+         }
+         if(!%player.flagStatsWait){
+            %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
+            if(%grabSpeed > %player.client.grabSpeed){
+               %player.client.grabSpeed  = %grabSpeed;
+            }
+         }  
+      }
+      parent::playerTouchEnemyFlag(%game, %player, %flag);
+   }
+   function CTFGame::flagCap(%game, %player){
+      if($dtStats::Enable){
+         %flag = %player.holdingFlag;
+         if(%game.dtFlagTime[%flag]){
+            %heldTime = getSimTime() - %game.dtFlagTime[%flag];
+            if(%heldTime < %player.client.heldTime || !%player.client.heldTime){
+                  %player.client.heldTime  = %heldTime;
+            }
+         }
+      }
+      parent::flagCap(%game, %player);
    }
 };
 
@@ -2759,15 +2803,12 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    %client.lp = "";//last position for distMove
    %client.lgame = %game.class;
    %foundOld = 0;
+   %client.joinPCT = %game.getGamePct();
    %mrx = setGUIDName(%client);// make sure we  have a guid if not make one
    if(!isObject(%client.dtStats)){
       for (%i = 0; %i < statsGroup.getCount(); %i++){ // check to see if my old data is still there
          %dtStats = statsGroup.getObject(%i);
-         if(%dtStats.guid == %client.guid && %dtStats.markForDelete == 0)
-         {
-            if(Game.getGamePct() <= (100 - $dtStats::fgPercentage[%game.class])){// see if they will be here long enough to count as a full game
-               %client.dtStats.dtGameCounter++;
-            }
+         if(%dtStats.guid == %client.guid && %dtStats.markForDelete == 0){
             %client.dtStats = %dtStats;
             %dtStats.client = %client;
             %dtStats.clientLeft = 0;
@@ -2789,8 +2830,6 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          %dtStats.gameStats["statsOverWrite","g",%game.class] = -1;
          %dtStats.gameStats["fullSet","g",%game.class] = 0;
          %dtStats.client =%client;
-         if(%mrx){%dtStats.mrxUID = 1;}
-         else{%dtStats.mrxUID = 0;}
          %dtStats.guid = %client.guid;
          %authInfo = %client.getAuthInfo();
          %realName = getField( %authInfo, 0 );
@@ -2809,10 +2848,6 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
             %dtStats.isLoaded = 0;
 		   }
          %client.dtStats.gameData[%game.class] = 1;
-         %client.dtStats.dtGameCounter = 0;
-         if(Game.getGamePct() <= (100 - $dtStats::fgPercentage[%game.class])){// see if they will be here long enough to count as a full game
-            %client.dtStats.dtGameCounter++;
-         }
       }
    }
    else if(isObject(%client.dtStats) && %client.dtStats.gameData[%game.class] != 1){ // game type change
@@ -2829,7 +2864,7 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
 }
 function dtStatsClientLeaveGame(%game, %client){
    if(isObject(%client.dtStats)){
-      if(%client.score < 1 && %client.score > -1 ){ // if(%num < 1 && %num > -1 ){
+      if(%client.score < 1 && %client.score > -1 ){ 
          if(isObject(%client.dtStats)){
             %client.dtStats.delete();
          }
@@ -2838,47 +2873,36 @@ function dtStatsClientLeaveGame(%game, %client){
       %client.dtStats.clientLeft = 1;
       %game.postGameStats(%client);
       bakGameStats(%client,%game.class);//back up there current game in case they lost connection
-      %client.dtStats.leftPCT = %game.getGamePct();
    }
 }
 function dtStatsGameOver( %game ){
-   $dtStats::LastMission = $MissionDisplayName;
+   $dtStats::LastMissionDN = $MissionDisplayName;
+   $dtStats::LastMissionCM = $CurrentMission;
    $dtGlobal::gameID++;
+   if($dtGlobal::gameID > 999999){ $dtGlobal::gameID = 1;}
    export( "$dtGlobal::*", "serverStats/saveVars.cs", false );
    if($dtStats::debugEchos){error("dtStatsGameOver");}
    %timeNext =0;
    for (%i = 0; %i < statsGroup.getCount(); %i++){// see if we have any old clients data
       %dtStats = statsGroup.getObject(%i);
       if(%dtStats.clientLeft){ // find any that left during the match and
-         if(%dtStats.leftPCT >= $dtStats::fgPercentage[%game.class]){ // if they where here for most of it and left at the end save it
-            %dtStats.markForDelete = 1;
-             %time += $dtStats::slowSaveTime; // this will chain them
-             schedule(%time ,0,"incBakGameStats",%dtStats,%game.class);
-            %time += $dtStats::slowSaveTime; // this will chain them
-            schedule(%time ,0,"saveGameStats",%dtStats,%game.class); //
-         }
-         else{
-            %time +=  $dtStats::slowSaveTime; // this will chain them
-            %dtStats.schedule(%time, "delete");
-         }
+         %dtStats.markForDelete = 1;
+         %time += $dtStats::slowSaveTime; // this will chain them
+         schedule(%time ,0,"incBakGameStats",%dtStats,%game.class);
+         %time += $dtStats::slowSaveTime; // this will chain them
+         schedule(%time ,0,"saveGameStats",%dtStats,%game.class); 
       }
    }
    for (%z = 0; %z < ClientGroup.getCount(); %z++){
       %client = ClientGroup.getObject(%z);
       %client.viewMenu = %client.viewClient = %client.viewStats = 0;//reset hud
+      %client.lastPage   = 1; %client.lgame = %game;
       if(isObject(%client.dtStats)){
          %game.postGameStats(%client);
-         //make sure the game was long enough, in case admin changes maps 
-         if(%game.getGamePct() >= $dtStats::fgPercentage[%game.class]  && %client.dtstats.dtGameCounter > 0){
-            %time += $dtStats::slowSaveTime; // this will chain them
-            schedule(%time ,0,"incGameStats",%client.dtStats,%game.class); //resetDtStats after incGame
-              %time += $dtStats::slowSaveTime;
-            schedule(%time,0,"saveGameStats",%client.dtStats,%game.class); //
-         }
-         else{
-            %client.dtStats.dtGameCounter++;
-            resetDtStats(%client,%game.class,1);
-         }
+         %time += $dtStats::slowSaveTime; // this will chain them
+         schedule(%time ,0,"incGameStats",%client.dtStats,%game.class); //resetDtStats after incGame
+         %time += $dtStats::slowSaveTime;
+         schedule(%time,0,"saveGameStats",%client.dtStats,%game.class); //
       }
    }
 }
@@ -2888,6 +2912,9 @@ function dtStatsGameOver( %game ){
 ////////////////////////////////////////////////////////////////////////////////
 function DefaultGame::postGameStats(%game,%client){ //stats to add up at the end of the match 
 
+   %client.gamePCT = mFloor(%game.getGamePct() - %client.joinPCT);
+
+ 
    %client.totalTime = ((getSimTime() - %client.joinTime)/1000)/60;//convert it to min
    
    %client.cgScore         = %client.cgKill       + %client.cgMA       + %client.cgKillAir        + (%client.cgKillMaxDist/100)      + %client.cgCom;
@@ -3080,19 +3107,12 @@ function CTFGame::getGamePct(%game)
    else
       %scorePct =  ($TeamScore[2] / %scoreLimit) * 100;
    
-   switch$($dtStats::fgPercentageType[%game.class]){
-      case 0:
-         return %scorePct;
-      case 1:
-         return %timePct;
-      case 2:
-         if(%scorePct > %timePct)
-            return %scorePct;
-         else
-            return %timePct;
-      default:
-            return %timePct;
-   }
+
+   if(%scorePct > %timePct)
+      return %scorePct;
+   else
+      return %timePct;
+
 }
 
 function LakRabbitGame::getGamePct(%game)
@@ -3115,19 +3135,11 @@ function LakRabbitGame::getGamePct(%game)
    }
    %scorePct =  (%lScore / %scoreLimit) * 100;
    
-   switch$($dtStats::fgPercentageType[%game.class]){
-      case 0:
-         return %scorePct;
-      case 1:
-         return %timePct;
-      case 2:
-         if(%scorePct > %timePct)
-            return %scorePct;
-         else
-            return %timePct;
-      default:
-            return %timePct;
-   }
+   if(%scorePct > %timePct)
+      return %scorePct;
+   else
+      return %timePct;
+
    
 }
 function DMGame::getGamePct(%game)
@@ -3150,20 +3162,11 @@ function DMGame::getGamePct(%game)
    }
    %scorePct =  (%lScore / %scoreLimit) * 100;
    
-   switch$($dtStats::fgPercentageType[%game.class]){
-      case 0:
-         return %scorePct;
-      case 1:
-         return %timePct;
-      case 2:
-         if(%scorePct > %timePct)
-            return %scorePct;
-         else
-            return %timePct;
-      default:
-          return %timePct;
- 
-   }
+
+   if(%scorePct > %timePct)
+      return %scorePct;
+   else
+      return %timePct;
    
 }
 function SCtFGame::getGamePct(%game)
@@ -3183,25 +3186,11 @@ function SCtFGame::getGamePct(%game)
    else
       %scorePct =  ($TeamScore[2] / %scoreLimit) * 100;
    
-   switch$($dtStats::fgPercentageType[%game.class]){
-      case 0:
-         return %scorePct;
-      case 1:
-         return %timePct;
-      case 2:
-         if(%scorePct > %timePct)
-            return %scorePct;
-         else
-            return %timePct;
-      case 3:
-         %mixPct =  (%scorePct + %timePct) / 2;
-         return %mixPct;
-         default:
-         if(%scorePct > %timePct)
-            return %scorePct;
-         else
-            return %timePct;
-   }
+
+   if(%scorePct > %timePct)
+      return %scorePct;
+   else
+      return %timePct;
 }
 function msToMinSec(%time)
 {
@@ -3302,6 +3291,20 @@ function setGUIDName(%client){
           %client.guid = $guidGEN::ID[%name];
       }
       return 1;
+   }
+}
+function getMapID(%map,%game){ 
+   if(isFile("serverStats/mapIDList.cs") && $genMapId != 1){
+      exec("serverStats/mapIDList.cs");
+     $genMapId = 1; 
+   }
+   if($mapID::ID[%map,%game]){
+      return $mapID::ID[%map,%game];
+   }
+   else{
+      $mapID::ID[%map,%game] = $mapID::Count++;
+      export( "$mapID::*", "serverStats/mapIDList.cs", false );
+      return $mapID::ID[%map,%game];
    }
 }
 function getDayNum(){
@@ -3445,7 +3448,9 @@ function saveGameStats(%dtStats,%game){
          %file.writeLine("dateStamp" @ "%t" @ strreplace(%dtStats.gameStats["dateStamp","g",%game],"\t","%t"));
          %file.writeLine("timeDayMonth" @ "%t" @ strreplace(%dtStats.gameStats["timeDayMonth","g",%game],"\t","%t"));
          %file.writeLine("map" @ "%t" @ strreplace(%dtStats.gameStats["map","g",%game],"\t","%t"));
+         %file.writeLine("mapID" @ "%t" @ strreplace(%dtStats.gameStats["mapID","g",%game],"\t","%t"));
          %file.writeLine("gameID" @ "%t" @ strreplace(%dtStats.gameStats["gameID","g",%game],"\t","%t"));
+         %file.writeLine("gamePCT" @ "%t" @ strreplace(%dtStats.gameStats["gamePCT","g",%game],"\t","%t"));
          for(%i = 1; %i <= $dtStats::FC[%game]; %i++){
             %val = $dtStats::FV[%i,%game];
             %var = %dtStats.gameStats[%val,"g",%game];
@@ -3463,7 +3468,6 @@ function saveGameStats(%dtStats,%game){
       if(%dtStats.markForDelete){
          %dtStats.delete();
       }
-     // if($dtStats::saveDailies){saveDailyStats(%dtStats,%game);}
 }
 function saveTotalStats(%dtStats,%game){ // saved by the main save function
    if($dtStats::debugEchos){error("saveTotalStats GUID = "  SPC %dtStats.guid);}
@@ -3531,8 +3535,10 @@ function incGameStats(%dtStats,%game) {// record that games stats and inc by one
    setValueField(%dtStats,"dayStamp","g",%game,%c,$dtStats::curDay);   
    setValueField(%dtStats,"dateStamp","g",%game,%c,formattimestring("yy-mm-dd hh:nn:ss"));
    setValueField(%dtStats,"timeDayMonth","g",%game,%c,formattimestring("hh:nn a, mm-dd"));
-   setValueField(%dtStats,"map","g",%game,%c,$dtStats::LastMission);
+   setValueField(%dtStats,"map","g",%game,%c,$dtStats::LastMissionDN);
+   setValueField(%dtStats,"mapID","g",%game,%c,getMapID($dtStats::LastMissionCM,%game));
    setValueField(%dtStats,"gameID","g",%game,%c,$dtGlobal::gameID);
+   setValueField(%dtStats,"gamePCT","g",%game,%c,%dtStats.client.gamePCT);
    for(%i = 1; %i <= $dtStats::FC[%game]; %i++){
       %val = $dtStats::FV[%i,%game];
       %var = getDynamicField(%dtStats.client,%val);
@@ -3711,12 +3717,14 @@ function incBakGameStats(%dtStats,%game) {// record that games stats and inc by 
    setValueField(%dtStats,"gameCount","t",%game,7,%c90++);
    %c365 = getField(%dtStats.gameStats["gameCount","t",%game],9);
    setValueField(%dtStats,"gameCount","t",%game,9,%c365++);
-   
+    
    setValueField(%dtStats,"dayStamp","g",%game,%c,$dtStats::curDay);   
    setValueField(%dtStats,"dateStamp","g",%game,%c,formattimestring("yy-mm-dd hh:nn:ss"));  
    setValueField(%dtStats,"timeDayMonth","g",%game,%c,formattimestring("hh:nn a, mm-dd"));
-   setValueField(%dtStats,"map","g",%game,%c,$dtStats::LastMission);
+   setValueField(%dtStats,"map","g",%game,%c,$dtStats::LastMissionDN);
+   setValueField(%dtStats,"mapID","g",%game,%c,getMapID($dtStats::LastMissionCM));
    setValueField(%dtStats,"gameID","g",%game,%c,$dtGlobal::gameID);
+   setValueField(%dtStats,"gamePCT","g",%game,%c,%dtStats.gameStats["gamePCT","b",%game]);
    for(%i = 1; %i <= $dtStats::FC[%game]; %i++){
       %val = $dtStats::FV[%i,%game];
       %var = %dtStats.gameStats[%val,"b",%game];
@@ -3812,6 +3820,7 @@ function bakGameStats(%client,%game) {//back up clients current stats in case th
       %var = getDynamicField(%client,%val);
       %client.dtStats.gameStats[%val,"b",%game] = %var;
    }
+   %client.dtStats.gameStats["gamePCT","b",%game] = %client.gamePCT;
 }
 
 function resGameStats(%client,%game){// copy data back over to client

@@ -28,7 +28,7 @@
 function checkVer_showBanner(%client)
 {
 	// customize me
-	commandToClient(%client, 'CenterPrint', "<font:Sui Generis:22><color:3cb4b4>Version Check Failed!\n<font:Univers:16><color:3cb4b4>You need the latest TribesNext patch and TourneyNetClient2 to play.\n Download it from t2discord.tk and drop it into your GameData/Base folder.", 10, 3);
+	commandToClient(%client, 'CenterPrint', "<font:Sui Generis:22><color:3cb4b4>Version Check Failed!\n<font:Univers:16><color:3cb4b4>You need the latest TribesNext patch and TourneyNetClient2 to play.\n Download it from playt2.com and drop it into your GameData/Base folder.", 10, 3);
 }
 
 package checkver

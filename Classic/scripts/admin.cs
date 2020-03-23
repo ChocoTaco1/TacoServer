@@ -23,7 +23,7 @@ $VoteMessage["VoteArmorLimits", 1] = "disable armor limiting";
 $VoteMessage["VoteAntiTurtleTime"] = "change the anti turtle time to";
 $VoteMessage["VoteArmorClass"] = "change the armor class to";
 $VoteMessage["VoteClearServer"] = "clear server for match";
-$VoteMessage["VoteSkipMission"] = "skip the mission to";
+$VoteMessage["VoteSkipMission"] = "skip the mission";
 
 function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %playerVote)
 {
@@ -146,6 +146,9 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 						%clientsVoting++;
 					}
                   }
+				  %VoteSoundRandom = getRandom(1,100);
+				  $VoteSoundRandom = %VoteSoundRandom;
+				  $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
                }
                else
                {
@@ -158,6 +161,9 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                         %clientsVoting++;
                      }
                   }
+				  %VoteSoundRandom = getRandom(1,100);
+				  $VoteSoundRandom = %VoteSoundRandom;
+				  $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
                }
             }
             else
@@ -173,6 +179,21 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                }
             }   
          }
+		 else if ( %typeName $= "VoteSkipMission" )
+	     {
+			for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
+			{
+				%cl = ClientGroup.getObject( %idx );
+				if ( !%cl.isAIControlled() )
+				{
+					messageClient( %cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg, %arg1.name); 
+					%clientsVoting++;
+				}
+			}
+			%VoteSoundRandom = getRandom(1,100);
+			$VoteSoundRandom = %VoteSoundRandom;
+			$VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
+	     }
          else if ( %typeName $= "VoteChangeMission" )
          {
             for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
@@ -184,6 +205,9 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                   %clientsVoting++;
                }
             }
+			%VoteSoundRandom = getRandom(1,100);
+			$VoteSoundRandom = %VoteSoundRandom;
+			$VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
          }
          else if (%arg1 !$= 0)
          {
@@ -203,6 +227,9 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                            %clientsVoting++;
                         }
                      }
+				    %VoteSoundRandom = getRandom(1,100);
+				    $VoteSoundRandom = %VoteSoundRandom;
+				    $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
                   }
                   else
                   {   
@@ -225,7 +252,10 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
             }
             else
             {
-               for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
+			   if( %arg1 == 999 )
+				 %arg1 = "unlimited";
+			   
+			   for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
                {
                   %cl = ClientGroup.getObject( %idx );
                   if ( !%cl.isAIControlled() )
@@ -234,6 +264,9 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                      %clientsVoting++;
                   }
                }
+			   %VoteSoundRandom = getRandom(1,100);
+			   $VoteSoundRandom = %VoteSoundRandom;
+			   $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
             }
          }
          else

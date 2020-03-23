@@ -10,8 +10,8 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
 
 
 ### Features
- - Improved NoBaseRape asset handling
- - An independant team population counter
+ - Improved NoBaseRape Asset handling
+ - An Independant Team Population Counter
  - Team-balance notifys
  - NoBaseRape notifys
  - Team Autobalancing
@@ -45,15 +45,12 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
 
 ### Prerequisites
  - Classic 1.5.2
- - Evolution Admin Mod Classic Version
 
 
 ### Setup
  - Meant to be installed on top of Classic 1.5.2
  - If the file isnt on this github it is unmodified in Classic 1.5.2
  - Place github server files in Classic folder
- - Place github evo files in Evo admin mod .vl2
- - Place Evo .vl2 in Classic folder
  - Run once to create Serverprefs
  - Open Classic/Pref/Serverpref.cs and modify to your wishes
  - Run using Classic_dedicated_server.bat

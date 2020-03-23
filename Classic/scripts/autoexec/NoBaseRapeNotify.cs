@@ -9,10 +9,10 @@
 // Called in GetTeamCounts.cs
 function NBRStatusNotify( %game )
 {	
-	if( $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled )
+	if( $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::NoBaseRapeEnabled )
 	{	
 		//On
-		if( $Host::EvoNoBaseRapeClassicPlayerCount > $TotalTeamPlayerCount )
+		if( $Host::NoBaseRapePlayerCount > $TotalTeamPlayerCount )
 		{
 			if( $NBRStatus !$= "PLAYEDON" )
 				$NBRStatus = "ON";
@@ -64,9 +64,9 @@ if (!isActivePackage(ResetNBRNotify))
 function NBRAssetSound( %game, %sourceObject )
 {
 	//Wont play again until the schedule is done
-	if(!isEventPending(%sourceObject.NBRAssetSoundSchedule) && $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::EvoNoBaseRapeEnabled )
+	if(!isEventPending(%sourceObject.NBRAssetSoundSchedule) && $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::NoBaseRapeEnabled )
 	{
-		messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '\c2No Base Rape is enabled until %1 players.', $Host::EvoNoBaseRapeClassicPlayerCount );
+		messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '\c2No Base Rape is enabled until %1 players.', $Host::NoBaseRapePlayerCount );
 		%sourceObject.NBRAssetSoundSchedule = schedule(10000, 0, "ResetNBRAssetSound", %sourceObject );
 	}
 }

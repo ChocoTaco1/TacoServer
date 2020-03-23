@@ -2831,7 +2831,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 
    %targetClient.lastDamagedBy = %damagingClient;
    %targetClient.lastDamaged = getSimTime();
-   
+
    //now call the "onKilled" function if the client was... you know...  
    if(%targetObject.getState() $= "Dead")
    {

@@ -1,4 +1,4 @@
-$Host::useCustomSkins = 0;
+$Host::useCustomSkins = 1;
 
 $Host::teamSkin[0] = "blank";
 $Host::teamSkin[1] = "base";
@@ -26,10 +26,11 @@ $Host::holoName[6] = "Harbinger";
 
 // -----------------------------------------
 // z0dd - ZOD, 9/29/02. Removed T2 demo code
-$Host::GameName = "Tribes 2 Classic Server";
-$Host::Info = "This is a Tribes 2 Classic Server.";
-$Host::Map = "Katabatic";
-$Host::MaxPlayers = 64;
+$Host::GameName = "Tribes 2 Test";
+$Host::Info = " ";
+$Host::Map = "VaubanLak";
+$Host::MaxPlayers = 30;
+$Host::MissionType = "LakRabbit";
 // -----------------------------------------
 
 // ------------------------------------------------
@@ -77,6 +78,7 @@ $Host::ClassicLoadBlasterChanges = 0;                 // Blaster shoots 6 projec
 $Host::ClassicLoadPlayerChanges = 0;                  // Load up new gameplay changes allowing players to be shot while in vehicles.
 $Host::ClassicLoadMineChanges = 0;                    // Enable/Disable mine disc.
 $Host::ClassicLoadVRamChanges = 0;                    // Vehicles take damage when ramming players.
+
 // ------------------------------------------------
 
 $Host::AdminList = "";       // all players that will be automatically an admin upon joining server
@@ -84,15 +86,14 @@ $Host::SuperAdminList = "";  // all players that will be automatically a super a
 $Host::BindAddress = "";     // set to an ip address if the server wants to specify which NIC/IP to use                        
 $Host::Port = 28000;
 $Host::Password = "";
-$Host::PureServer = 1;
+$Host::PureServer = 0;
 $Host::Dedicated = 0;
-$Host::MissionType = "CTF";
-$Host::TimeLimit = 30;
-$Host::BotCount = 2;
+$Host::TimeLimit = 45;
+$Host::BotCount = 0;
 $Host::BotsEnabled = 0;
 $Host::MinBotDifficulty = 0.5;
 $Host::MaxBotDifficulty = 0.75;
-$Host::NoSmurfs = 0;
+$Host::NoSmurfs = 1;
 $Host::VoteTime = 30;               // amount of time before votes are calculated
 $Host::VotePassPercent = 60;        // percent needed to pass a vote
 $Host::KickBanTime = 300;           // specified in seconds
@@ -100,11 +101,11 @@ $Host::BanTime = 1800;              // specified in seconds
 $Host::PlayerRespawnTimeout = 60;   // time before a dead player is forced into observer mode
 $Host::warmupTime = 20;
 $Host::TournamentMode = 0;
-$Host::allowAdminPlayerVotes = 1;
+$Host::allowAdminPlayerVotes = 0;
 $Host::FloodProtectionEnabled = 1;
 $Host::MaxMessageLen = 120;
 $Host::VoteSpread = 20;
-$Host::TeamDamageOn = 0;
+$Host::TeamDamageOn = 1;
 $Host::Siege::Halftime = 20000;
 $Host::CRCTextures = 0;
 
@@ -119,11 +120,9 @@ $Audio::maxVoiceChannels = 2;
 $Host::EmptyServerReset = 1;					//To control whether the server auto resets when empty
 $Host::EmptyServerResetTime = 120;				//Time in Minutes to reset an empty server
 $Host::EnableAutobalance = 1;					//Will autobalance when teams are uneven.
-$Host::EnableMapRepetitionChecker = 1;			//Enable or Disable the Map Repetition Checker
 $Host::EnableMortarTurret = 0; 					//Enable or Disable Mortar Turret
-$Host::EnableNetTourneyClient = 1; 				//Enable or Disable Tourney Net Client checking
+$Host::EnableNetTourneyClient = 0; 				//Enable or Disable Tourney Net Client checking
 $Host::EnableNoBaseRapeNotify = 1; 				//Get a base rape notification
-$Host::EnableSetNextMission = 1;				//Let admins set the next mission thru the vote menu
 $Host::EnableTeamBalanceNotify = 1; 			//Get a teambalance notification
 $Host::EnableTurretPlayerCount = 10; 			//How many to enable turrets
 $Host::EnableVoteSound = 1;						//If you want a sound chime during voting
@@ -132,10 +131,9 @@ $Host::AntiCloakPlayerCount = 6; 				//How many to enable Cloak
 $Host::PUGautoPassword = 0; 					//Auto enable a password in tournament mode
 $Host::PUGPassword = "pickup"; 					//PUG password, Auto or enable/disable thru admin menu
 $Host::PUGpasswordAlwaysOn = 0;					//If you want the pug password Always on
-$Host::EmptyServerReset = 1;					//Whether or not you want the server to reset when its empty
 $Host::DMSLOnlyMode = 0;						//Shocklance Only Mode for Deathmatch
 $Host::SCtFProMode = 0;							//Pro mode for LCTF
-$Host::LoadingScreenUseDebrief = 0;				//Enable Debrief Style Loading screen; Gives you more lines and MOTD
+$Host::LoadingScreenUseDebrief = 1;				//Enable Debrief Style Loading screen; Gives you more lines and MOTD
 $Host::LoadScreenColor1 = "05edad";				//Loading Screen color; First Column
 $Host::LoadScreenColor2 = "29DEE7";				//Loading Screen color; Second Column
 $Host::LoadScreenColor3 = "33CCCC";				//Loading Screen color; Accents
@@ -155,9 +153,38 @@ $Host::LoadScreenMOTD1 = "Blaster is here to stay!";								//MOTD or Events Lin
 $Host::LoadScreenMOTD2 = "Come play Arena on Wednesday Nights!";					//MOTD or Events Line 2 Message (Debrief LoadScreen Only)
 $Host::LoadScreenMOTD3 = "Lak crowd early evenings after work during the week.";	//MOTD or Events Line 3 Message (Debrief LoadScreen Only)
 $Host::LoadScreenMOTD4 = "Big CTF games Fridays, Saturdays, and Sundays!";			//MOTD or Events Line 4 Message	(Debrief LoadScreen Only)
-$Host::EvoAdminSwitchTeams = 1;														//Enable or Disable an admins ability to switch other players teams.
-$Host::EvoCustomMapLimitsFile = "prefs/SetMapLimits.cs";							//Exec custom limits file
+$Host::ClassicAdminLog = 1;
+$Host::ClassicAdminLogPath = "logs/Admin/log.txt";
+$Host::ClassicConnectLog = 1;
+$Host::ClassicConnLogPath = "logs/Connect/log.txt";
+$Host::ClassicMOTD = "<color:3cb4b4><font:Sui Generis:22>Discord PUB\n<color:3cb4b4><font:Univers:16>Server Hosted/Provided by Branzone/Ravin\n<color:3cb4b4><font:Univers:16>Get Mappacks at https://playt2.com/";
+$Host::ClassicMOTDLines = 3;
+$Host::ClassicMOTDTime = 6;
+$Host::ClassicRotationCustom = 1;
+$Host::ClassicRotationFile = "prefs/mapRotation.cs";
+$Host::ClassicEvoStats = 1;
+$Host::ClassicStatsType = 2;
+$Host::ServerRules1 = "\c2if\c4(\c3%client.fun == \c5true \c4&& \c3%client.Llama_Grabs \c4< \c51\c4)";
+$Host::ServerRules2 = "    \c1Be_Courteous\c4(\c2%client, %game\c4);";
+$Host::ServerRules3 = "\c2else if\c4(\c3%client.attitude \c4!$ = \c5%client.fun\c4)";
+$Host::ServerRules4 = "    \c1Try_2_Have_Fun\c4(\c2%client, %attitude\c4);";
+$Host::AnimateWithTransitions = 1;
+$Host::AllowAdmin2Admin = 0;
+$Host::AllowAdminBan = 0;
+$Host::AllowAdminPassVote = 1;
+$Host::AllowAdminStopVotes = 1;
+$Host::AllowAdminVotes = 1;
+$Host::AllowPlayerVoteChangeMission = 1;
+$Host::AllowPlayerVoteSkipMission = 1;
+$Host::AllowPlayerVoteTimeLimit = 1;
+$Host::AllowPlayerVoteTournamentMode = 0;
+$Host::NoBaseRapeEnabled = 1;
+$Host::NoBaseRapePlayerCount = 14;
+$Host::AveragePings = 1;
+$Host::GuidCheck = 1;
+$Host::MinFlagRecordPlayerCount = 6;
+
 //LakRabbit
-$Host::EnableLakUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
-$Host::LakRabbitNoSplashDamage = 0;				//Splash Damage enabled or not
-$Host::ShowFlagIcon = 1;						//Show flag Icon in lak
+$Host::LakRabbitUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled
+$Host::LakRabbitNoSplashDamage = 1;				//Splash Damage disabled or not
+$Host::LakRabbitShowFlagIcon = 1;				//Show flag Icon in lak

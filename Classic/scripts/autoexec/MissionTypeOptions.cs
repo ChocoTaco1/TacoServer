@@ -43,21 +43,11 @@ function loadMissionStage2()
 			$Host::HiVisibility = "0"; //always SPEED
 	}
 	
-	if(isEventPending($MapRepetitionSchedule)) 
-		cancel($MapRepetitionSchedule);
-	
-	//Start MapRepetitionChecker
-	$MapRepetitionSchedule = schedule(20000, 0, "MapRepetitionChecker", %game);
-	
 	//Siege NoBaseRape Fix
 	if( $CurrentMissionType $= "Siege" ) 
-		$Host::EvoNoBaseRapeEnabled = 0;
+		$Host::NoBaseRapeEnabled = 0;
 	else
-		$Host::EvoNoBaseRapeEnabled = 1;
-	
-	//Fix for Lak to CTF transition (Uneven Teams)
-	if(Game.numTeams > 1 && ($TeamRank[1, count] > $TeamRank[2, count] + 2) && $previousMissionType $= "LakRabbit")
-		Game.setupClientTeams();
+		$Host::NoBaseRapeEnabled = 1;
    
     parent::loadMissionStage2();
 }

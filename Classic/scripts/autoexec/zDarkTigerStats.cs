@@ -1236,7 +1236,7 @@ package dtStats{
       parent::missionLoadDone(%game);
           //check to see if we are running evo or not, if not then lets just enable these 
          if(!isFile("scripts/autoexec/evolution.cs")){
-            $Host::EvoAveragePings = $Host::ShowIngamePlayerScores = 1;
+            $Host::AveragePings = $Host::ShowIngamePlayerScores = 1;
          }
    }
    function serverCmdShowHud(%client, %tag){ // to refresh screen when client opens it up
@@ -2503,7 +2503,7 @@ function LakRabbitHud(%game, %client, %tag){
             $TeamRank[2, count] = 0;
          }
          
-         if ( $Host::EvoAveragePings )
+         if ( $Host::AveragePings )
          {
             for ( %count = 0; %count <= Game.numteams; %count++ )
             {

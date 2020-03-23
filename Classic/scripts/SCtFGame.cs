@@ -750,9 +750,16 @@ function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
    %player.holdingFlag = %flag;  //%player has this flag
    %flag.carrier = %player;  //this %flag is carried by %player
 
+   // attach the camera to the flag.carrier
+   for(%i = 0; %i < ClientGroup.getCount(); %i++)
+   {
+      %cl = ClientGroup.getObject(%i);
+      if(%cl.team <= 0 && %cl.observingFlag && %cl.flagObsTeam == %flag.team)
+         observeFlag(%cl, %player.client, 2, %flag.team);
+   }
    %player.mountImage(FlagImage, $FlagSlot, true, %game.getTeamSkin(%flag.team));
-
    %game.playerGotFlagTarget(%player);
+   
    //only cancel the return timer if the player is in bounds...
    if (!%client.outOfBounds)
    {
@@ -774,8 +781,32 @@ function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
 
       if (%startStalemate)
          %game.stalemateSchedule = %game.schedule(%game.stalemateTimeMS, beginStalemate);
-   
+	 
+	  if($Host::ClassicEvoStats && !$Host::TournamentMode)
+      {
+         $stats::grabs[%client]++;
+         if($stats::grabs[%client] > $stats::grabs_counter)
+         {
+            $stats::grabs_counter = $stats::grabs[%client];
+            $stats::grabs_client = getTaggedString(%client.name);
+         }
+      }
+	  
+	  if($Host::ClassicEvoStats)
+         %game.totalFlagHeldTime[%flag] = getSimTime();
    }
+   
+   if($Host::ClassicEvoStats && !%player.flagStatsWait && !$Host::TournamentMode)
+   {
+      %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
+	   	
+      if(%grabspeed > $stats::MaxGrabSpeed || ($stats::MaxGrabSpeed $= ""))
+      {
+         $stats::MaxGrabSpeed = %grabspeed;
+   		$stats::Grabber = getTaggedString(%client.name);
+      }
+   }
+   
    %flag.hide(true);
    %flag.startFade(0, 0, false);         
    %flag.isHome = false;
@@ -832,13 +863,23 @@ function SCtFGame::playerDroppedFlag(%game, %player)
    %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
      
    %game.playerLostFlagTarget(%player);
+   
+   if($Host::ClassicEvoStats)
+      %game.totalFlagHeldTime[%flag] = 0;
 
    %player.holdingFlag = ""; //player isn't holding a flag anymore
    %flag.carrier = "";  //flag isn't held anymore 
    $flagStatus[%flag.team] = "<In the Field>";
    
+   // attach the camera again to the flag
+   for(%i = 0; %i < ClientGroup.getCount(); %i++)
+   {
+      %cl = ClientGroup.getObject(%i);
+      if(%cl.team <= 0 && %cl.observingFlag && %cl.flagObsTeam == %flag.team)
+	   observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
+   }
    %player.unMountImage($FlagSlot);   
-   %flag.hide(false); //Does the throwItem function handle this?
+   %flag.hide(false); //Does the throwItem function handle this?   
 
    %teamName = %game.getTeamName(%flag.team);
    messageTeamExcept(%client, 'MsgCTFFlagDropped', '\c2Teammate %1 dropped the %2 flag. (Held: %4)~wfx/misc/flag_drop.wav', %client.name, %teamName, %flag.team, %held); // z0dd - ZOD, 8/15/02. How long flag was held
@@ -866,6 +907,72 @@ function SCtFGame::flagCap(%game, %player)
    %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
 
    %game.playerLostFlagTarget(%player);
+   
+   if($Host::ClassicEvoStats)
+   {
+	  %held2 = getSimTime() - %game.totalFlagHeldTime[%flag];
+	  %realtime = %game.formatTime(%held2, true);
+	  %record = false;
+	  if(%game.totalFlagHeldTime[%flag])
+	  {
+		 if(%client.team == 1)
+		 {
+			if((%held2 < $flagstats::heldTeam1) || $flagstats::heldTeam1 == 0)
+			{
+			   if($HostGamePlayerCount >= $Host::MinFlagRecordPlayerCount)
+			   {
+				   $flagstats::heldTeam1 = %held2;
+				   $flagstats::realTeam1 = %realTime;
+				   $flagstats::nickTeam1 = %client.nameBase;
+			   }
+			   %record = true;
+			}
+		 }
+		 else if(%client.team == 2)
+		 {
+			if((%held2 < $flagstats::heldTeam2) || $flagstats::heldTeam2 == 0)
+			{
+			   if($HostGamePlayerCount >= $Host::MinFlagRecordPlayerCount)
+			   {
+				   $flagstats::heldTeam2 = %held2;
+				   $flagstats::realTeam2 = %realTime;
+				   $flagstats::nickTeam2 = %client.nameBase;
+			   }
+			   %record = true;
+			}
+		 }
+
+		 if(%record == true)
+		 {
+			if($HostGamePlayerCount >= $Host::MinFlagRecordPlayerCount)
+			{
+				%fileOut = "stats/maps/classic/" @ $CurrentMissionType @ "/" @ $CurrentMission @ ".txt";
+				export("$flagstats::*", %fileOut, false);
+				schedule(4000, 0, "messageAll", 'MsgCTFNewRecord', "\c2It's a new record! Time: \c3"@%realtime@"\c2.~wfx/misc/hunters_horde.wav");	
+			}
+			else
+				schedule(4000, 0, "messageClient", %client, '', "\c2Minimum of" SPC $Host::MinFlagRecordPlayerCount SPC "Players to set a new flag record.");
+		 }
+	  }
+
+	 if(!$Host::TournamentMode)
+		bottomprint(%client, "You captured the flag in " @ %realTime @ " seconds", 3);
+
+	 $stats::caps[%client]++;
+	 if($stats::caps[%client] > $stats::caps_counter)
+	 {
+		$stats::caps_counter = $stats::caps[%client];
+		$stats::caps_client = getTaggedString(%client.name);
+	 }
+	
+	 if(%held2 < $stats::fastestCap || !$stats::fastestCap)
+	 {
+		$stats::fastestCap = %held2;
+		$stats::fastcap_time = %realTime;
+		$stats::fastcap_client = getTaggedString(%client.name);
+	 }
+   }
+   
    //award points to player and team
    %teamName = %game.getTeamName(%flag.team);
    messageTeamExcept(%client, 'MsgCTFFlagCapped', '\c2%1 captured the %2 flag! (Held: %5)~wfx/misc/flag_capture.wav', %client.name, %teamName, %flag.team, %client.team, %held);
@@ -916,6 +1023,23 @@ function SCtFGame::flagReturn(%game, %flag, %player)
    else
       %otherTeam = 1;
    %teamName = %game.getTeamName(%flag.team);
+   
+   // when the flag return, stop observing the flag, and go in observerFly mode
+   for(%i = 0; %i < ClientGroup.getCount(); %i++)
+   {
+      %cl = ClientGroup.getObject(%i);
+      if(%cl.team <= 0 && %cl.observingFlag && %cl.flagObsTeam == %flag.team)
+	{
+	   %cl.camera.mode = "observerFly";
+	   %cl.camera.setFlyMode();
+	   updateObserverFlyHud(%cl);
+
+	   %cl.observingFlag = false;
+	   %cl.flagObserved = "";
+	   %cl.flagObsTeam = "";
+      }
+   }
+   
    if (%player !$= "")
    {
       //a player returned it
@@ -1814,7 +1938,10 @@ function SCtFGame::boundaryLoseFlag(%game, %player)
    %flag.setCollisionTimeout(%player);
 
    %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
-
+   
+   if($Host::ClassicEvoStats)
+      %game.totalFlagHeldTime[%flag] = 0;
+   
    %game.playerDroppedFlag(%player);
 
    // now for the tricky part -- throwing the flag back into the mission area

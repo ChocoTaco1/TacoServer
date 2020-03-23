@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-// Team Rabbit script
+// Lak Rabbit script
 // -------------------------------------------------------------------
 
 // DisplayName = LakRabbit
@@ -19,6 +19,7 @@
 //
 // v3.36 Dec 2019
 // Boundary bounce speed limit
+// Unified Lakrabbit Vars
 //
 // v3.35 April 2019
 // Added Not enough players flag message delay
@@ -124,7 +125,7 @@
 // v1 - See game rules.
 
 // Vars:
-// $Host::ShowFlagIcon
+// $Host::LakRabbitShowFlagIcon
 //   0 - Don't show any
 //   1 - Show flag icon when flag dropped only
 //   2 - Show flag icon on rabbit
@@ -138,14 +139,14 @@
 //   1 - Enable Duel Mode
 //
 // $Host::LakRabbitNoSplashDamage
-//   0 - Disable No Splash Dame
+//   0 - Disable No Splash Damage
 //   1 - Enable No Splash Damage
 //
-// $Host::ShowFlagTask
+// $Host::LakRabbitShowFlagTask
 //   0 - Do not show flag task
 //   1 - Show the flag when dropped as a task
 //
-// $Host::EnableLakUnlimitedDJ
+// $Host::LakRabbitUnlimitedDJ
 //   0 - Players only get one DiscJump
 //   1 - Players get 999 or unlimited DiscJumps
 //
@@ -162,7 +163,7 @@ function Flag::objectiveInit(%data, %flag)
    %flag.rotate = true;
 
    // ilys -- add the icon to the flag
-   if( $Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2 )
+   if( $Host::LakRabbitShowFlagIcon == 1 || $Host::LakRabbitShowFlagIcon == 2 )
    {
       %flag.scopeWhenSensorVisible(true);
       setTargetSensorGroup(%flag.getTarget(), $NonRabbitTeam);
@@ -171,7 +172,7 @@ function Flag::objectiveInit(%data, %flag)
    }
    
    // create a waypoint to the flag's starting place
-   if( $Host::ShowFlagIcon == 0 )
+   if( $Host::LakRabbitShowFlagIcon == 0 )
    {
 		%flagWaypoint = new WayPoint()
 		{
@@ -1468,7 +1469,7 @@ function LakRabbitGame::playerSpawned(%game, %player)
 
    //now set a waypoint just for that client...
    // ilys -- show client waypoint if not showing flag icon
-   if($Host::ShowFlagIcon == 0 && $Host::ShowFlagTask)
+   if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
    {
       cancel(%player.client.waypointSchedule);
       if (isObject(%clRabbit) && !%player.client.isAIControlled())
@@ -1498,7 +1499,7 @@ function LakRabbitGame::playerSpawned(%game, %player)
    %player.schedule(250,"selectWeaponSlot", 0);
    %player.setEnergyLevel(%player.getDatablock().maxEnergy);
    	
-	if($Host::EnableLakUnlimitedDJ == 1)
+	if($Host::LakRabbitUnlimitedDJ == 1)
 		%player.freeDJ = 999; // free diskjump
 	else
 		%player.freeDJ = 1; // free diskjump
@@ -1655,7 +1656,7 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
    %player.unmountImage($FlagSlot);
    %flag.hide(false);
    // ilys -- remove flag icon from player
-   if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
+   if($Host::LakRabbitShowFlagIcon == 1 || $Host::LakRabbitShowFlagIcon == 2)
    {
       setTargetSensorGroup(%flag.getTarget(), $Observer);
       %player.scopeWhenSensorVisible(true);
@@ -1665,9 +1666,9 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
    }
 
    //just always true
-   //if( $Host::ShowFlagIcon == 1 )
+   //if( $Host::LakRabbitShowFlagIcon == 1 )
       //%flag.scopeWhenSensorVisible(true);
-   //else if($Host::ShowFlagIcon == 2)
+   //else if($Host::LakRabbitShowFlagIcon == 2)
       //%flag.scopeWhenSensorVisible(false);
 
    // borlak -- throw the flag, don't just drop it like dead weight
@@ -1691,7 +1692,7 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
    %flag.setCollisionTimeout(%player);
 
    // ilys -- hide waypoint if not showing flag icon
-   if($Host::ShowFlagIcon == 0 && $Host::ShowFlagTask)
+   if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
    {
       cancel(%game.waypointSchedule);
       %game.hideRabbitWaypoint(%player.client);
@@ -1828,7 +1829,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
       cancel(%flag.returnThread);
       %flag.hide(true);
       // ilys -- add flag icon to player
-      if( $Host::ShowFlagIcon == 2 )
+      if( $Host::LakRabbitShowFlagIcon == 2 )
       {
          setTargetSensorGroup(%flag.getTarget(), $RabbitTeam);
          %player.scopeWhenSensorVisible(true);
@@ -1869,7 +1870,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
       //show the rabbit waypoint
       %game.rabbitDamageTime = 0;
       // ilys -- waypoint if not showing flag icon
-      if($Host::ShowFlagIcon == 0 && $Host::ShowFlagTask)
+      if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
       {
          cancel(%game.waypointSchedule);
          %game.showRabbitWaypoint(%player.client);
@@ -1922,7 +1923,7 @@ function LakRabbitGame::resetFlag(%game, %flag)
    %flag.hide(false);
    
    //so flag turns back green
-   if($Host::ShowFlagIcon == 1 || $Host::ShowFlagIcon == 2)
+   if($Host::LakRabbitShowFlagIcon == 1 || $Host::LakRabbitShowFlagIcon == 2)
    {
       setTargetSensorGroup(%flag.getTarget(), $NonRabbitTeam);
    }
@@ -1978,13 +1979,13 @@ function LakRabbitGame::gameOver(%game)
       %client = ClientGroup.getObject(%i);
       %game.resetScore(%client);
       // ilys -- cancel waypoint if not showing flag icon
-      if($Host::ShowFlagIcon == 0 && $Host::ShowFlagTask)
+      if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
          cancel(%client.waypointSchedule);
       cancel(%client.duelTimer);
    }
 
    // ilys -- cancel waypoint if not showing flag icon
-   if($Host::ShowFlagIcon == 0 && $Host::ShowFlagTask)
+   if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
       cancel(%game.waypointSchedule);
    
 // borlak -- delete variables

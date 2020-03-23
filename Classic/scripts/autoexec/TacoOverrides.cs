@@ -103,22 +103,6 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
 }
 
-//Admin Next Mission Message at beginning of matches
-function DefaultGame::startMatch(%game)
-{
-	Parent::startMatch(%game);
-	
-	for(%idx = 0; %idx < ClientGroup.getCount(); %idx++) 
-	{
-		%cl = ClientGroup.getObject(%idx);
-					  
-		if(%cl.isAdmin)
-		{ 
-			messageClient( %cl, 'MsgNotifyEvoNextMission', '\crNext Mission: %1', $EvoCachedNextMission);
-		}
-	}
-}
-
 };
 
 // Prevent package from being activated if it is already

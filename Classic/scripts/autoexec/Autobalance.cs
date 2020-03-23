@@ -27,26 +27,13 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	//Reset
 	%lastclient1 = "";
 	%lastclient2 = "";
-		
-	//Team Count code by Keen
-	$PlayerCount[0] = 0;
-	$PlayerCount[1] = 0;
-	$PlayerCount[2] = 0;		
-
-	for(%i = 0; %i < ClientGroup.getCount(); %i++)
-	{
-		%client = ClientGroup.getObject(%i);
-			
-		//if(!%client.isAIControlled())
-			$PlayerCount[%client.team]++;
-	}
 	
 	//Difference Variables
-	%team1difference = $PlayerCount[1] - $PlayerCount[2];
-	%team2difference = $PlayerCount[2] - $PlayerCount[1];
+	%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
+	%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
 	
 	//If even, stop.
-	if( %team1difference == 1 || %team2difference == 1 || $PlayerCount[1] == $PlayerCount[2] )
+	if( %team1difference == 1 || %team2difference == 1 || $TeamRank[1, count] == $TeamRank[2, count] )
 	{
 		//Reset TBN
 		ResetTBNStatus();
@@ -112,7 +99,8 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 			
 	// Fire Autobalance
 	Game.clientChangeTeam( %client, %otherTeam, 0 );
-	messageAll('MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
+	messageClient(%client, 'MsgTeamBalanceNotify', "\c0You were switched to the other team for balancing.~wfx/powered/vehicle_screen_on.wav");
+	messageAllExcept(%client, -1, 'MsgTeamBalanceNotify', "~wfx/powered/vehicle_screen_on.wav");
 			
 	//Trigger GetCounts
 	ResetGetCountsStatus();

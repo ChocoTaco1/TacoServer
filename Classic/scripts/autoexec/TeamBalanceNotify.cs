@@ -14,7 +14,7 @@
 // Called in GetTeamCounts.cs
 function TeamBalanceNotify( %game, %team1difference, %team2difference )
 {	
-	if( ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "sctf") && $TotalTeamPlayerCount !$= 0 && !$Host::TournamentMode )
+	if( Game.numTeams > 1 && $TotalTeamPlayerCount !$= 0 && !$Host::TournamentMode )
 	{	
 		//echo ("%Team1Difference " @ %Team1Difference);
 		//echo ("%Team2Difference " @ %Team2Difference);

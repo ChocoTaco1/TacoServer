@@ -168,7 +168,7 @@ function ALTsendModInfoToClient(%client)
 
 	if($Host::TimeLimit $= "999" || $Host::TimeLimit $= "unlimited") %timeloadingvar = "Unlimited"; else %timeloadingvar = $Host::TimeLimit;
 	
-	if($Host::EvoKickObservers $= 0) %obskickvar = "Off"; else %obskickvar = ($Host::EvoKickObservers / 60)  @ " Minutes";
+	if($Host::KickObserverTimeout $= 0) %obskickvar = "Off"; else %obskickvar = ($Host::KickObserverTimeout / 60)  @ " Minutes";
 
 	%time = "<color:" @ $Host::LoadScreenColor1 @ ">Time limit: <color:" @ $Host::LoadScreenColor2 @ ">" @ %timeloadingvar;
 	%max = "<color:" @ $Host::LoadScreenColor1 @ ">Max players: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::MaxPlayers;
@@ -183,30 +183,14 @@ function ALTsendModInfoToClient(%client)
 	//%crc = 	"<color:" @ $Host::LoadScreenColor1 @ ">CRC checking: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::CRCTextures ? "On" : "Off");
 	//%pure = 	"<color:" @ $Host::LoadScreenColor1 @ ">Pure server: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::PureServer ? "On" : "Off");
 
-	if($Host::EvoNoBaseRapeEnabled)
-		%rapeppl = "<color:" @ $Host::LoadScreenColor1 @ ">Min No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::EvoNoBaseRapeClassicPlayerCount;
+	if($Host::NoBaseRapeEnabled)
+		%rapeppl = "<color:" @ $Host::LoadScreenColor1 @ ">Min No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::NoBaseRapePlayerCount;
 
 	%turrets = "<color:" @ $Host::LoadScreenColor1 @ ">Min Turrets: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::EnableTurretPlayerCount;
 
-	if($Host::EvoStats && (!$Host::TournamentMode || ($Host::TournamentMode && $Host::EvoStatsTourney)) && $Host::EvoStatsType != 0)
-		%stats = "<color:" @ $Host::LoadScreenColor1 @ ">Stats based on: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::EvoStatsType == 1 ? "Kills" : "Damage");
+	if($Host::ClassicEvoStats && $Host::ClassicStatsType > 0)
+		%stats = "<color:" @ $Host::LoadScreenColor1 @ ">Stats based on: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::ClassicStatsType == 1 ? "Kills" : "Damage");
 
-	if($Evo::ETMMode && $ETMmode::CurrentMap <= $ETMmode::Counter)
-	{
-		%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ $ETMmode::MapDisplayName[$ETMmode::CurrentMap];
-	}
-	else
-	{
-		%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ findNextCycleMission();
-		if ( $Host::ClassicRandomMissions )
-		{
-			%nmis = %nmis SPC "(Random)";
-		}
-		if($Host::EvoTourneySameMap && $Host::TournamentMode)
-		{
-		%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ $CurrentMission @ " (Same)";
-		}
-	}
 
 	%currentmis = "<color:" @ $Host::LoadScreenColor1 @ ">Current mission: <color:" @ $Host::LoadScreenColor2 @ ">" @  $MissionDisplayName @ " (" @ $MissionTypeDisplayName @ ")";
 
@@ -300,7 +284,7 @@ function ALTsendModInfoToClient(%client)
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %turrets;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %obskick;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %stats;
-	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %nmis;
+	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><bitmap:bullet_2>" @ %currentmis;
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 
 	//$dtLoadingScreen::LoadScreenMessage[$dmlP++] = %rape;
@@ -396,30 +380,30 @@ function NORMALsendModInfoToClient(%client)
 	//%pure = 	"<color:" @ $Host::LoadScreenColor1 @ ">Pure server: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::PureServer ? "On" : "Off");
 
 
-	if($Host::EvoNoBaseRapeEnabled)
-		%rapeppl = "<color:" @ $Host::LoadScreenColor1 @ ">Min No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::EvoNoBaseRapeClassicPlayerCount;
+	if($Host::NoBaseRapeEnabled)
+		%rapeppl = "<color:" @ $Host::LoadScreenColor1 @ ">Min No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::NoBaseRapePlayerCount;
 
 	%turrets = "<color:" @ $Host::LoadScreenColor1 @ ">Min Turrets: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::EnableTurretPlayerCount;
 
-	if($Host::EvoStats && (!$Host::TournamentMode || ($Host::TournamentMode && $Host::EvoStatsTourney)) && $Host::EvoStatsType != 0)
-		%stats = "<color:" @ $Host::LoadScreenColor1 @ ">Stats based on: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::EvoStatsType == 1 ? "Kills" : "Damage");
+	if($Host::ClassicEvoStats && $Host::ClassicStatsType > 0)
+		%stats = "<color:" @ $Host::LoadScreenColor1 @ ">Stats based on: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::ClassicStatsType == 1 ? "Kills" : "Damage");
 
-	if($Evo::ETMMode && $ETMmode::CurrentMap <= $ETMmode::Counter)
-	{
-		%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ $ETMmode::MapDisplayName[$ETMmode::CurrentMap];
-	}
-	else
-	{
-		%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ findNextCycleMission();
-		if ( $Host::ClassicRandomMissions )
-		{
-		%nmis = %nmis SPC "(Random)";
-		}
-		if($Host::EvoTourneySameMap && $Host::TournamentMode)
-		{
-		%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ $CurrentMission @ " (Same)";
-		}
-	}
+	//if($Evo::ETMMode && $ETMmode::CurrentMap <= $ETMmode::Counter)
+	//{
+	//	%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ $ETMmode::MapDisplayName[$ETMmode::CurrentMap];
+	//}
+	//else
+	//{
+		//%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ findNextCycleMission();
+		//if ( $Host::ClassicRandomMissions )
+		//{
+		//%nmis = %nmis SPC "(Random)";
+		//}
+		//if($Host::EvoTourneySameMap && $Host::TournamentMode)
+		//{
+		//%nmis = "<color:" @ $Host::LoadScreenColor1 @ ">Next mission: <color:" @ $Host::LoadScreenColor2 @ ">" @ $CurrentMission @ " (Same)";
+		//}
+	//}
 
 	%currentmis = "<color:" @ $Host::LoadScreenColor1 @ ">Current mission: <color:" @ $Host::LoadScreenColor2 @ ">" @  $MissionDisplayName @ " (" @ $MissionTypeDisplayName @ ")";
 
@@ -449,7 +433,7 @@ function NORMALsendModInfoToClient(%client)
 	%ServerTextLine[4] = %rapeppl;
 	%ServerTextLine[5] = %turrets;
 	%ServerTextLine[6] = %stats;
-	%ServerTextLine[7] = %nmis;
+	%ServerTextLine[7] = %currentmis;
 
 	//%serverTextLine[2] = %td;
 	//%serverTextLine[3] = %crc;

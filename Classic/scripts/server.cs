@@ -305,7 +305,7 @@ function getValidMap(%misType)
 
 function findNextCycleMission(%type)
 {
-   %numPlayers = ClientGroup.getCount();
+   %numPlayers = 1;
    if($Host::ClassicCycleMisTypes || $Host::ClassicRandomMisTypes)
    {
       %tempMission = getValidMap(%type);
@@ -323,6 +323,11 @@ function findNextCycleMission(%type)
    {
       %nextMissionIndex = getNextMission(%tempMission, %type);
       %nextPotentialMission = $HostMissionFile[%nextMissionIndex];
+      // Eolk
+      $MapPlayed[%nextPotentialMission] = 1;
+      $MapPlayedCount++;
+//      error("SH: "@%type@", "@%nextPotentialMission);
+//      error("POT MAP: "@%nextPotentialMission);
 
       //just cycle to the next if we've gone all the way around...
       if (%nextPotentialMission $= $CurrentMission || %failsafe >= 1000)
@@ -332,20 +337,18 @@ function findNextCycleMission(%type)
          return $HostMissionFile[%nextMissionIndex];         
       }
 
-      //get the player count limits for this mission
-      %limits = $Host::MapPlayerLimits[%nextPotentialMission, %type];
-      if (%limits $= "")
-         return %nextPotentialMission;
-      else
-      {
-         %minPlayers = getWord(%limits, 0);
-         %maxPlayers = getWord(%limits, 1);
+      %numPlayers = ClientGroup.getCount();
+      %minPlayers = $MapCycleMinPlayers[%type, %nextPotentialMission];
+      %maxPlayers = $MapCycleMaxPlayers[%type, %nextPotentialMission];
+//      error("MINPLAYERS: "@%minPlayers@", MAXPLAYERS: "@%maxPlayers);
+      if(%minPlayers $= "" || %maxPlayers $= "")
+         return;
 
-         if ((%minPlayers < 0 || %minPlayers == -1 || %numPlayers >= %minPlayers) && (%maxPlayers < 0 || %maxPlayers == -1 || %numPlayers <= %maxPlayers))
+      if ((%minPlayers < 0 || %minPlayers == -1 || %numPlayers >= %minPlayers) && (%maxPlayers < 0 || %maxPlayers == -1 || %numPlayers <= %maxPlayers))
             return %nextPotentialMission;
-      }
 
       //since we didn't return the mission, we must not have an acceptable number of players - check the next
+      error("SKIPPING MAP, player count unacceptable");
       %tempMission = %nextPotentialMission;
       %failsafe++;
    }
@@ -353,6 +356,9 @@ function findNextCycleMission(%type)
 
 function CycleMissions()
 {
+   if(Game.scheduleVote !$= "") // a vote is still running, stop it
+    stopCurrentVote();
+	
    echo( "cycling mission. " @ ClientGroup.getCount() @ " clients in game." );
    if($Host::ClassicCycleMisTypes && !$Host::ClassicRandomMisTypes)
    {
@@ -899,22 +905,9 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    $HostGamePlayerCount++;
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
 
+   // Eolk - Fix logging.
    if( $Host::ClassicConnectLog )
-   {
-      // z0dd - ZOD, 5/07/04. New logging method based on AurLogging by Aureole
-      %file = $Host::ClassicConnLogPath @"/"@ formatTimeString("mm.dd.yy") @ "Connect.csv";
-      %conn = new FileObject();
-      %conn.openForAppend(%file);
-      %conn.writeLine("\"" @ formatTimeString("mm.dd.yy - h:nn:ss A") @ "\"," @ %client.nameBase @ "\"," @ %client.guid @ "," @ getSubStr(%client.getAddress(), 3, strlen(%client.getAddress())));
-      %conn.close();
-      %conn.delete();
-      echo( "exporting client info to connect.csv..." );
-
-      // z0dd - ZOD - Founder, 5/25/03. Connect log
-      //$conn::new[$ConnectCount++] = "Player: " @ %client.nameBase @ " Real Name: " @ %realName @ " Guid: " @ %client.guid @ " Connected from: " @ %client.getAddress();
-      //%file = formatTimeString("mm.dd.yy") @ "Connect.log";
-      //export("$conn::*", $Host::ClassicConnLogPath @"/"@ %file, true);
-   }
+      connectLog(%client, 0);
 
    // z0dd - ZOD 4/29/02. Activate the clients Classic Huds
    // and start off with 0 SAD access attempts.
@@ -953,12 +946,94 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
          }
       }
    }
+   if($Host::EmptyServerReset && isEventPending($EmptyServerResetSchedule)) 
+   {
+		error(formatTimeString("HH:nn:ss") SPC "Previous Timed Server Reset schedule cancelled..." );
+		cancel($EmptyServerResetSchedule);
+   }
+   
+   if($Host::GuidCheck)
+   {
+	   // If we don't have a GUID try to find one somewhere.
+	   if(! %client.guid || %client.guid $= "") 
+	   {
+			%client.guid = getField(%client.getAuthInfo(),3);
+	   }
+	   // If we don't have a name, try to get one.
+	   if(!%name || %name $= "") 
+	   {
+			%name = getField(%client.getAuthInfo(),0);
+			%client.nameBase = %name;
+	   }
+	   // If we still don't have a GUID or name, time to boot the player (unless a local game).
+	   if(getIPAddress(%client) !$= "Local" && (!%client.guid $= "" || %name $= "")) 
+	   {
+			//statEchoInfo("No name/GUID kick for CID (" @ %client @ ") with IP (" @ getIPAddress(%client) @ ")");
+			KickByCID(%client, "You joined the server with a blank name and/or GUID. Try rejoining.",2);
+			return;
+	   }
+   }
+}
+
+// From Eolks
+// Minor improvement by Teratos
+function getIPAddress(%client)
+{
+    %port = nextToken(nextToken(%client.getAddress(), "ip", ":"), "addr", ":");
+    if(%client.isAIControlled()) {
+        %addr = "bot";
+    }
+    return (%addr $= "" ? "Local" : %addr);
+}
+
+// From Eolks
+// We are not an admin MOD but this comes in handy when name is missing on races.
+function KickByCID(%client, %reason, %time)
+{
+    if(!isObject(%client))
+        return;
+
+    // AI handler
+    if(%client.isAIControlled())
+    {
+        %client.drop();
+        $HostGameBotCount--;
+        if($HostGameBotCount < 0)
+            $HostGameBotCount = 0;
+        return;
+    }
+
+    if (%reason $= "")
+        %reason = "You have been kicked from the server.";
+    // Perhaps we don't want time done.
+    //if (%time < 0 || %time $= "")
+    //    %time = $Host::KickBanTime;
+
+    // Send proper messages
+    messageClient(%client, 'onClientKicked', "");
+    messageAllExcept(%client, -1, 'MsgClientDrop', "", %client.name, %client);
+
+    // Remove their player, if one exists
+    if (isObject(%client.player))
+        %client.player.scriptKill(0);
+
+    // Set reason, schedule removal
+    %client.setDisconnectReason(%reason);
+    %client.schedule(500, "delete");
+
+    // Keep them out
+   // if(%time != 0)
+   //     BanList::add(%client.guid, %client.getAddress(), %time);
 }
 
 function GameConnection::onDrop(%client, %reason)
 {
    if(isObject(Game))
       Game.onClientLeaveGame(%client);
+
+   // Eolk - Fix logging.
+   if( $Host::ClassicConnectLog )
+      connectLog(%client, 1);
 
    // make sure that tagged string of player name is not used
    if ( $CurrentMissionType $= "SinglePlayer" ) 
@@ -980,6 +1055,8 @@ function GameConnection::onDrop(%client, %reason)
 
    echo("CDROP: " @ %client @ " " @ %client.getAddress());
    $HostGamePlayerCount--;
+
+//   schedule(1000, 0, "updateAdminModHud"); // Have to delay this a bit so it actually updates correctly, since the client isn't deleted in this function.
 
    // z0dd - ZOD, 5/05/04. Add a bot for every client drop if balanced bots are set
    if( $Host::BotsEnabled )
@@ -1006,22 +1083,90 @@ function GameConnection::onDrop(%client, %reason)
          AutoPWServer(0);
    }
    // reset the server if everyone has left the game
-   //if( $HostGamePlayerCount - $HostGameBotCount == 0 && $Host::Dedicated && !$resettingServer && !$LoadingMission )
-   //   schedule(0, 0, "resetServerDefaults");
-
-   // ------------------------------------------------------------------------------------------------------------
-   // z0dd - ZOD, 5/12/02. Reset the server if everyone has left the game and set this mission as startup mission.
-   // This helps with $Host::ClassicRandomMissions to keep the random more random.
-   if( $HostGamePlayerCount - $HostGameBotCount == 0 && $Host::Dedicated && !$resettingServer && !$LoadingMission )
-   {
-      $Host::Map = $CurrentMission;
-      export("$Host::*", $serverprefs, false);
-      $Host::MissionType = $CurrentMissionType;
-      export("$Host::*", $serverprefs, false);
-      schedule(10, 0, "resetServerDefaults");
+   if( $HostGamePlayerCount - $HostGameBotCount == 0 && $Host::EmptyServerReset && !$resettingServer && !$LoadingMission && $CurrentMissionType !$= $Host::MissionType )
+   {	 
+	// Timed Server Reset: $Host::EmptyServerReset = 1; --- Time in Minutes $Host::EmptyServerResetTime = 120;
+	if(isEventPending($EmptyServerResetSchedule)) 
+	{
+		error(formatTimeString("HH:nn:ss") SPC "Previous Timed Server Reset schedule cancelled..." );
+		cancel($EmptyServerResetSchedule);
+	}
+	
+	%resettime = $Host::EmptyServerResetTime * 60000;
+	if(%resettime <= 0) %resettime = 1;
+	$EmptyServerResetSchedule = schedule(%resettime, 0, "ResetServerTimed");
+	error(formatTimeString("HH:nn:ss") SPC "Timed Server Reset schedule started..." );
    }
-   // ------------------------------------------------------------------------------------------------------------
+}
 
+function ResetServerTimed()
+{
+	if( $HostGamePlayerCount - $HostGameBotCount == 0 && $Host::EmptyServerReset && !$resettingServer && !$LoadingMission )
+      schedule(10, 0, "resetServerDefaults");
+	  // Instead of simply resetting the defaults, reinitialize the
+	  // entire server...
+	  // ReallyQuit();
+	else
+	  error(formatTimeString("HH:nn:ss") SPC "Timed Server Reset schedule cancelled (Someone on server)..." );
+}
+
+// resetServerDefaults()
+// Info: Re-load the current server prefs and reset some variables
+function resetServerDefaults()
+{
+   $resettingServer = true;
+   echo( "Resetting server defaults..." );
+   
+   if( isObject( Game ) )
+      Game.gameOver();
+   
+   // Override server defaults with prefs:   
+   exec( "scripts/ServerDefaults.cs" );
+   exec( $serverprefs );
+
+   $MaxPlayers = $Host::MaxPlayers;
+   $BackupPassword = $Host::Password;
+   $Host::TimeLimit = $DefaultTimeLimit;
+   $NoBaseRape = 1;
+   $Host::TournamentMode = 0;
+
+   // ---------------------------------------------------
+   // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
+   //convert the team skin and name vars to tags...
+   %index = 0;
+   while ($Host::TeamSkin[%index] !$= "")
+   {
+      $TeamSkin[%index] = addTaggedString($Host::TeamSkin[%index]);
+      %index++;
+   }
+
+   %index = 0;
+   while ($Host::TeamName[%index] !$= "")
+   {
+      $TeamName[%index] = addTaggedString($Host::TeamName[%index]);
+      %index++;
+   }
+   
+   // Get the hologram names from the prefs...
+   %index = 1;
+   while ( $Host::holoName[%index] !$= "" )
+   {
+      $holoName[%index] = $Host::holoName[%index];
+      %index++;
+   }
+   // ---------------------------------------------------
+
+   // kick all bots...
+   removeAllBots();
+   
+   // add bots back if they were there before..
+   if( $Host::botsEnabled ) // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
+      initGameBots( $Host::Map, $Host::MissionType );
+
+   // load the missions
+   loadMission( $Host::Map, $Host::MissionType );
+   $resettingServer = false;
+   echo( "Server reset complete." );
 }
 
 function dismountPlayers()
@@ -1044,10 +1189,10 @@ function loadMission( %missionName, %missionType, %firstMission )
    if ($AutoRestart) // z0dd - ZOD, 3/26/02. Auto restart server after a specified time.
    {
       $AutoRestart = 0;
-      messageAll( 'MsgServerRestart', '\c2SERVER IS AUTO REBOOTING! COME BACK IN 5 MINUTES.~wfx/misc/red_alert.wav');
+      messageAll( 'MsgServerRestart', '\c2SERVER IS NOW AUTO RESTARTING!.~wfx/misc/red_alert.wav');
       logEcho("Auto server restart commencing.");
       //schedule(10000, 0, "CreateServer", %missionName, %missionType); // this wasn't working as a cure for servers with NULLs
-      schedule(10000, 0, quit );
+      schedule(5000, 0, quit );
    }
 
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
@@ -1086,6 +1231,47 @@ function loadMission( %missionName, %missionType, %firstMission )
       %client = ClientGroup.getObject( %cl );
       if ( !%client.isAIControlled() )
          sendLoadInfoToClient( %client );
+   }
+
+   if($Host::ClassicEvoStats)
+   {
+      deleteVariables("$*stats::*");
+      if(%missionType $= "CTF" || %missionType $= "SCtF")
+      {
+         %fileIn = "stats/maps/classic/" @ %missionType @ "/" @ %missionName @ ".txt";
+	  
+         // Initialize the file if not exist
+         if(!isFile(%fileIn))
+         {
+            $flagstats::heldTeam1 = 0;
+            $flagstats::realTeam1 = 0;
+            $flagstats::nickTeam1 = 0;
+            $flagstats::heldTeam2 = 0;
+            $flagstats::realTeam2 = 0;
+            $flagstats::nickTeam2 = 0;
+
+            export("$flagstats::*", %fileIn, false);
+         }
+
+         exec(%fileIn);
+      }
+   }
+
+   // Eolk - Testing new stuff to make map rotation less stale.
+   if($CurrentMissionType !$= %missionType && !%firstMission)
+      deleteVariables("$MapPlayed*");
+  
+   // reset the default time limit if changed
+   if($TimeLimitChanged)
+   {
+      $Host::TimeLimit = $DefaultTimeLimit;
+      $TimeLimitChanged = 0;
+   }
+
+   if(!$MapPlayed[%missionName] && $ReverseMapCycle[%missionName])
+   {
+      $MapPlayed[%missionName] = 1;
+      $MapPlayedCount++;
    }
 
    // allow load condition to exit out
@@ -1379,6 +1565,12 @@ function serverCmdMissionStartPhase3Done(%client, %seq)
 
    %client.isReady = true;
    Game.clientMissionDropReady(%client);
+   
+   if(!%client.seenMOTD && $Host::ClassicMOTD !$= "")
+   {
+      centerPrint(%client, $Host::ClassicMOTD, $Host::ClassicMOTDTime, $Host::ClassicMOTDLines);
+      %client.seenMOTD = true;
+   }
 }
 
 function serverSetClientTeamState( %client )
@@ -1556,7 +1748,7 @@ function serverCmdSAD(%client, %password)
             %client.isAdmin = true;
             %client.isSuperAdmin = true;
             MessageAll( 'MsgSuperAdminPlayer', '\c2%2 has become a Super Admin by force.', %client, %name);
-            logEcho(%client.nameBase @ " has become a Super Admin by force.");
+            ClassicAdminLog("SAD", %client.nameBase @ " has become a Super Admin by force.");
          }
 
       case $Host::AdminPassword:
@@ -1570,7 +1762,7 @@ function serverCmdSAD(%client, %password)
             %client.isAdmin = true;
             %client.isSuperAdmin = false;
             MessageAll( 'MsgAdminForce', '\c2%2 has become a Admin by force.', %client, %name);
-            logEcho(%client.nameBase @ " has become an Admin by force.");
+            ClassicAdminLog("AD", %client.nameBase @ " has become an Admin by force.");
          }
       default:
          messageClient(%client, 'MsgPasswordFailed', '\c2Illegal SAD PW.');
@@ -1589,7 +1781,7 @@ function serverCmdSAD(%client, %password)
             %client.setDisconnectReason( 'For attempting to exploit SAD to gain unauthorized Admin by entering\ntoo many passwords, you are being Banned.' );
             %client.schedule(700, "delete");
             BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
-            logEcho(%client.nameBase @ " " @ %client.guid @ " has been banned for excessive use of SAD");
+            ClassicAdminLog("BAN", %client.nameBase@" has been banned for attempting to exploit the SAD password.");
          }
    }
 }

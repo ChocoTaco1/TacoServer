@@ -47,7 +47,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	%team2difference = $PlayerCount[2] - $PlayerCount[1];
 	
 	//If even, stop.
-	if( %team1difference == 1 || %team2difference == 1 || $TeamRank[1, count] == $TeamRank[2, count] )
+	if( %team1difference == 1 || %team2difference == 1 || $PlayerCount[1] == $PlayerCount[2] )
 	{
 		//Reset TBN
 		ResetTBNStatus();

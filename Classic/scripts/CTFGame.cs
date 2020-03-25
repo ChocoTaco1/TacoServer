@@ -507,11 +507,12 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
 
    if($Host::ClassicEvoStats && !%player.flagStatsWait && !$Host::TournamentMode)
    {
-      %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
+	  // get the grab speed
+	  %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
 	   	
       if(%grabspeed > $stats::MaxGrabSpeed || ($stats::MaxGrabSpeed $= ""))
       {
-         $stats::MaxGrabSpeed = %grabspeed;
+        $stats::MaxGrabSpeed = %grabspeed;
    		$stats::Grabber = getTaggedString(%client.name);
       }
    }
@@ -524,11 +525,22 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
 
    $flagStatus[%flag.team] = %client.nameBase;
    %teamName = %game.getTeamName(%flag.team);
-   messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
-   messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1!~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase);
-   messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
-   messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);     
-   logEcho(%client.nameBase@" (pl "@%player@"/cl "@%client@") took team "@%flag.team@" flag ("@%grabspeed@")"); // MP: 6/15/2011 added grabspeed.
+   
+   if(%grabspeed)
+   {
+      messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+      messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1! (speed: %5Kph)~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase, %grabspeed);
+      messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+      messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+   }
+   else
+   {
+      messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
+      messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1!~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase);
+      messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
+      messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
+   }
+   logEcho(%client.nameBase @ " (pl " @ %player @ "/cl " @ %client @ ") took team " @ %flag.team @ " flag");
    
    //call the AI function
    %game.AIplayerTouchEnemyFlag(%player, %flag);

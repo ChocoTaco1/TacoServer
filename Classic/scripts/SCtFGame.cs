@@ -349,19 +349,7 @@ package SCtFGame
 	
     //Take out anything vehicle related
 	function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
-	{
-		//echo("working");
-		//Other armors get more damage
-		if(%targetObject.client.armor $= "Medium")
-		{
-			%amount *= 1.3;
-		}
-		  
-		if(%targetObject.client.armor $= "Heavy")
-		{
-			%amount *= 1.5;
-		}
-	   
+	{  
 	   //error("Armor::damageObject( "@%data@", "@%targetObject@", "@%sourceObject@", "@%position@", "@%amount@", "@%damageType@", "@%momVec@" )");
 	   if(%targetObject.invincible || %targetObject.getState() $= "Dead")
 		  return;
@@ -798,11 +786,12 @@ function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
    
    if($Host::ClassicEvoStats && !%player.flagStatsWait && !$Host::TournamentMode)
    {
-      %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
+	  // get the grab speed
+	  %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
 	   	
       if(%grabspeed > $stats::MaxGrabSpeed || ($stats::MaxGrabSpeed $= ""))
       {
-         $stats::MaxGrabSpeed = %grabspeed;
+        $stats::MaxGrabSpeed = %grabspeed;
    		$stats::Grabber = getTaggedString(%client.name);
       }
    }
@@ -815,11 +804,22 @@ function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
 
    $flagStatus[%flag.team] = %client.nameBase;
    %teamName = %game.getTeamName(%flag.team);
-   messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
-   messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1!~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase);
-   messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
-   messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);     
-   logEcho(%client.nameBase@" (pl "@%player@"/cl "@%client@") took team "@%flag.team@" flag");
+   
+   if(%grabspeed)
+   {
+      messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+      messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1! (speed: %5Kph)~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase, %grabspeed);
+      messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+      messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+   }
+   else
+   {
+      messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
+      messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1!~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase);
+      messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
+      messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
+   }
+   logEcho(%client.nameBase @ " (pl " @ %player @ "/cl " @ %client @ ") took team " @ %flag.team @ " flag");
    
    //call the AI function
    %game.AIplayerTouchEnemyFlag(%player, %flag);

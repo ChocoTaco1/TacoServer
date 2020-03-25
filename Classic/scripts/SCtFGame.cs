@@ -819,7 +819,7 @@ function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
       messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
       messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
    }
-   logEcho(%client.nameBase @ " (pl " @ %player @ "/cl " @ %client @ ") took team " @ %flag.team @ " flag");
+   logEcho(%client.nameBase@" (pl "@%player@"/cl "@%client@") took team "@%flag.team@" flag ("@%grabspeed@")"); // MP: 6/15/2011 added grabspeed.
    
    //call the AI function
    %game.AIplayerTouchEnemyFlag(%player, %flag);

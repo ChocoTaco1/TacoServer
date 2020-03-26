@@ -1556,10 +1556,15 @@ function CTFGame::awardScoreStaticShapeDestroy(%game, %cl, %obj)
       default:
          return;
    }
-   teamDestroyMessage(%cl, 'MsgDestroyed', %tMsg, %cl.name, %obj.nameTag);
-   messageClient(%cl, %msgType, %clMsg, %value, %dataName);
-   %game.recalcScore(%cl);
-   %game.shareScore(%scorer, %value);
+   if(isObject(%cl))
+   {
+	   teamDestroyMessage(%cl, 'MsgDestroyed', %tMsg, %cl.name, %obj.nameTag);
+	   messageClient(%cl, %msgType, %clMsg, %value, %dataName);
+	   %game.recalcScore(%cl);
+	   %game.shareScore(%scorer, %value);
+   }
+   else //when the asset attacker is unknown
+	  teamDestroyMessage(%cl, 'MsgDestroyed', %tMsg, "A teammate", %obj.nameTag);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

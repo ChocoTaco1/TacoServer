@@ -24,30 +24,12 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	//Debug: Uncomment to enable
 	//%AutobalanceDebug = true;
 	
-	//Reset
-	%lastclient1 = "";
-	%lastclient2 = "";
-	
-	//Team Count code by Keen
-	$PlayerCount[0] = 0;
-	$PlayerCount[1] = 0;
-	$PlayerCount[2] = 0;
-			
-
-	for(%i = 0; %i < ClientGroup.getCount(); %i++)
-	{
-		%client = ClientGroup.getObject(%i);
-			
-		//if(!%client.isAIControlled())
-			$PlayerCount[%client.team]++;
-	}
-	
 	//Difference Variables
-	%team1difference = $PlayerCount[1] - $PlayerCount[2];
-	%team2difference = $PlayerCount[2] - $PlayerCount[1];
+	%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
+	%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
 	
 	//If even, stop.
-	if( %team1difference == 1 || %team2difference == 1 || $PlayerCount[1] == $PlayerCount[2] )
+	if( %team1difference == 1 || %team2difference == 1 || $TeamRank[1, count] == $TeamRank[2, count] )
 	{
 		//Reset TBN
 		ResetTBNStatus();
@@ -63,7 +45,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	
 	//Toggle for All Mode
 	//If a team is behind pick anyone, not just a low scoring player
-	if( $TeamScore[%bigTeam] > ($TeamScore[%littleTeam] + $AllModeThreshold) )
+	if( $TeamScore[%bigTeam] > ($TeamScore[%littleTeam] + $AllModeThreshold))
 	{
 		%UseAllMode = 1;
 		%autobalanceRandom = getRandom(1,($PlayerCount[%bigTeam] - 1));
@@ -75,31 +57,25 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 		%client = ClientGroup.getObject(%i);
 		%team = %client.team;
 		
+		//Holding flag?
+		if(%client.player.holdingFlag !$= "")
+			continue;
+		
 		if(%UseAllMode)
 		{
 			//Try to pick any player
-			if(%autobalanceRandom == %autobalanceLoop || %lastclient[%team] $= "")
-			{
-				//If random player has the flag pick the next person
-				if(!%client.player.holdingFlag)
-					%teamcanidate[%team] = %client;
-				else
-					%autobalanceRandom = %autobalanceRandom + 1;
-			}
+			if(%autobalanceRandom == %AllmodeLoop || %lastclient[%team] $= "")
+				%teamcanidate[%team] = %client;
 			
-			%autobalanceLoop++;
+			%AllmodeLoop++;
 		}
 		else
 		{
 			//Normal circumstances
 			//Try to pick a low scoring player
 			if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "")
-			{
-				if(!%client.player.holdingFlag)
-					%teamcanidate[%team] = %client;
-			}
+				%teamcanidate[%team] = %client;
 		}
-
 		%lastclient[%team] = %client;
 	}
 

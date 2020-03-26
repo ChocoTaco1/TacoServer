@@ -101,7 +101,7 @@ addRotationMap("S5_Centaur",					"CTF",1,0,8,20);
 addRotationMap("S8_Cardiac",					"CTF",1,1,12,24);
 addRotationMap("CirclesEdge",					"CTF",1,1,10,20);
 addRotationMap("S5_Icedance",					"CTF",1,1,8,20);
-addRotationMap("Surreal",						"CTF",1,1,8,20);
+addRotationMap("Surreal",						"CTF",1,1,12,32);
 
 //Voteable but Not in Rotation
 /////////////////////////////////////////////////////////////////////
@@ -406,7 +406,7 @@ addRotationMap("TWL_DangerousCrossing",			"sctf",1,0,-1,32);
 //Not Voteable, Not in rotation
 /////////////////////////////////////////////////////////////////////
 
-//addRotationMap("SurrealLT",					"sctf",1,1,-1,32);
+addRotationMap("SurrealLT",						"sctf",1,1,-1,32);
 //addRotationMap("Coppersky",					"sctf",1,1,-1,32);
 addRotationMap("DuelersDelight",				"sctf",1,0,-1,12);
 //addRotationMap("SuperHappyBouncyFunTime",		"sctf",1,1,-1,32);

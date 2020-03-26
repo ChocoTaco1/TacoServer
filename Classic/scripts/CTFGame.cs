@@ -528,10 +528,13 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
    
    if(%grabspeed)
    {
-      messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
-      messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1! (speed: %5Kph)~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase, %grabspeed);
-      messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
-      messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1! (speed: %5Kph)~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+
+      if(%grabspeed > 300)
+		messageAll('', "~wfx/Bonuses/high-level4-blazing.wav");
    }
    else
    {
@@ -673,7 +676,7 @@ function CTFGame::flagCap(%game, %player)
 				schedule(4000, 0, "messageAll", 'MsgCTFNewRecord', "\c2It's a new record! Time: \c3"@%realtime@"\c2.~wfx/misc/hunters_horde.wav");	
 			}
 			else
-				schedule(4000, 0, "messageClient", %client, '', "\c2Minimum of" SPC $Host::MinFlagRecordPlayerCount SPC "Players to set a new flag record.");
+				schedule(4000, 0, "messageClient", %client, '', "\c2New flag records are disabled until" SPC $Host::MinFlagRecordPlayerCount SPC "players.");
 		 }
 	  }
 

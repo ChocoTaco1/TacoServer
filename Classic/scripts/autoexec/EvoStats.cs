@@ -39,7 +39,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
    Parent::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
    // call the function
    if(!$Host::TournamentMode && $Host::ClassicEvoStats)
-      handleKillStat(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
+      handleKillStat(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
 }
 
 function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
@@ -189,7 +189,7 @@ function handleDamageStat(%data, %targetObject, %sourceObject, %position, %amoun
 // handleKillStat(%clVictim, %clKiller, %damageType, %implement)
 // Info: Calcs: Kills, TeamKills, FC kills
 function handleKillStat(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation)
-{
+{ 
   if(%damageType == 13) // is a roadkill
     %clKiller = %implement.getControllingClient();
 
@@ -208,7 +208,7 @@ function handleKillStat(%game, %clVictim, %clKiller, %damageType, %implement, %d
 
       if($stats::tk[%clKiller] > $stats::tk_counter)
       {
-         $stats::tk_counter = $stats::tk[%clKiller];
+		 $stats::tk_counter = $stats::tk[%clKiller];
          $stats::tk_client  = getTaggedString(%clKiller.name);
       }
    }

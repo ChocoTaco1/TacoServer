@@ -1718,9 +1718,15 @@ function DefaultGame::clientMissionDropReady(%game, %client)
       if( %client.camera.mode $= "observerFly" || %client.camera.mode $= "justJoined")
       {
          %observer = true;
+		 
+		 %client.observingFlag = false;
+		 %client.flagObserved = "";
+		 %client.flagObsTeam = "";
+		 
          %client.observerStartTime = getSimTime();
          commandToClient(%client, 'setHudMode', 'Observer');
          %client.setControlObject( %client.camera );
+		 
          //displayObserverHud( %client, 0 );
          // Eolk - flag stats stuff
          //updateObserverFlyHud(%client);

@@ -102,6 +102,28 @@ function Observer::onTrigger(%data, %obj, %trigger, %state)
    }
 }
 
+function Observer::setMode(%data, %obj, %mode, %targetObj)
+{
+   if(%mode $= "")
+      return;
+
+   %client = %obj.getControllingClient();
+   if(%client $= "")
+      return;
+
+   switch$(%mode)
+   {
+      case "followFlag":
+         %transform = %targetObj.getTransform();
+         // observe the flag 2x more far than the normal
+         %obj.setOrbitMode(%targetObj, %transform, 1.0, 9.0, 9.0);
+
+      default:
+         Parent::setMode(%data, %obj, %mode, %targetObj);
+   }
+   %obj.mode = %mode;   
+}
+
 };
 
 // Prevent package from being activated if it is already
@@ -146,6 +168,9 @@ function serverCmdObserveSecondFlag(%client)
     observeFlag(%client, %player.client, 2, 2);
 }
 
+// observeFlag(%client, %target, %type, %flagTeam)
+// Info: handle the observe flag feature
+// observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
 function observeFlag(%client, %target, %type, %flagTeam)
 {
    if(!isObject(%client) || !isObject(%target) || !isObject(%client.camera))

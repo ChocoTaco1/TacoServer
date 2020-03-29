@@ -906,6 +906,18 @@ function SCtFGame::flagCap(%game, %player)
    %client = %player.client;
    %flag = %player.holdingFlag;
    %flag.carrier = "";
+   
+   // when a player cap the flag, continue observing the player
+   for(%i = 0; %i < ClientGroup.getCount(); %i++)
+   {
+       %cl = ClientGroup.getObject(%i);
+       if(%cl.team <= 0 && %cl.observingFlag && %cl.flagObsTeam == %flag.team)
+	   {
+	     %cl.observingFlag = false;
+	     %cl.flagObserved = "";
+	     %cl.flagObsTeam = "";
+	   }
+   }
 
    %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
 

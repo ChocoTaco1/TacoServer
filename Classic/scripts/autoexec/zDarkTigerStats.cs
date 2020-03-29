@@ -6501,7 +6501,7 @@ case "LBOARDS":
            
             %i1 = getField($lData::data["scoreAVG",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["scoreAVG",%client.lgame,%lType,%mon,%year],0) : %NA; 
 			%i2 = getField($lData::data["scoreMax",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["scoreMax",%client.lgame,%lType,%mon,%year],0) : %NA;
-			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Highest Score: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Score Average: <color:03d597>%2</a>';
+			%line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Score Average: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Highest Score: <color:03d597>%2</a>';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"scoreAVG-Score Average-Amount","scoreMax-Highest Score-Amount",%vClient);
 		        
             %i1 = getField($lData::data["EVKills",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["EVKills",%client.lgame,%lType,%mon,%year],0) : %NA; 

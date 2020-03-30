@@ -155,7 +155,7 @@ function playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %cli
    %client.canVote = false;
    %client.rescheduleVote = schedule(($Host::voteSpread * 1000) + ($Host::voteTime * 1000) , 0, "resetVotePrivs", %client);
    
-   echo("New Vote Initiated by" SPC %client.nameBase SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4);
+   echo("Vote Initiated by" SPC %client.nameBase SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4);
    
    %VoteSoundRandom = getRandom(1,100);
    $VoteSoundRandom = %VoteSoundRandom;
@@ -1047,6 +1047,8 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
             }
             playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
          }
+	  default:
+		return;
    }
 }
 

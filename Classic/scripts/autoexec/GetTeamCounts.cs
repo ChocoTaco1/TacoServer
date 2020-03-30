@@ -22,6 +22,10 @@ function CreateServer( %mission, %missionType )
 	//Call for a GetTeamCount update
 	GetTeamCounts( %game, %client, %respawn );
 	
+	// Set when server starts
+	// Used to reset timelimit (if voted) when map changes
+	$DefaultTimeLimit = $Host::TimeLimit;
+	
 	// Prevent package from being activated if it is already
 	if (!isActivePackage(TeamCountsTriggers))
 		activatePackage(TeamCountsTriggers);

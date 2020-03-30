@@ -9,42 +9,45 @@
 //$Host::AllowPlayerVoteTimeLimit = 1;
 //$Host::AllowPlayerVoteTournamentMode = 1;
 
-$DefaultTimeLimit = $Host::TimeLimit;
-
 // These have been secured against all those wanna-be-hackers. 
-$VoteMessage["VoteAdminPlayer"] = "Admin Player";
-$VoteMessage["VoteKickPlayer"] = "Kick Player";
-$VoteMessage["BanPlayer"] = "Ban Player";
-$VoteMessage["VoteChangeMission"] = "change the mission to";
-$VoteMessage["VoteTeamDamage", 0] = "enable team damage";
-$VoteMessage["VoteTeamDamage", 1] = "disable team damage";
-$VoteMessage["VoteTournamentMode"] = "change the server to";
-$VoteMessage["VoteFFAMode"] = "change the server to";
-$VoteMessage["VoteChangeTimeLimit"] = "change the time limit to";
-$VoteMessage["VoteMatchStart"] = "start the match";
-$VoteMessage["VoteGreedMode", 0] = "enable Hoard Mode";
-$VoteMessage["VoteGreedMode", 1] = "disable Hoard Mode";
-$VoteMessage["VoteHoardMode", 0] = "enable Greed Mode";
-$VoteMessage["VoteHoardMode", 1] = "disable Greed Mode";
+$VoteMessage["VoteAdminPlayer"] 	 = "1";
+$VoteMessage["VoteKickPlayer"] 		 = "1";
+$VoteMessage["BanPlayer"] 			 = "1";
+$VoteMessage["VoteChangeMission"] 	 = "1";
+$VoteMessage["VoteTeamDamage", 0] 	 = "1";
+$VoteMessage["VoteTeamDamage", 1] 	 = "1";
+$VoteMessage["VoteTournamentMode"]	 = "1";
+$VoteMessage["VoteFFAMode"]			 = "1";
+$VoteMessage["VoteChangeTimeLimit"]  = "1";
+$VoteMessage["VoteMatchStart"] 		 = "1";
+$VoteMessage["VoteGreedMode", 0]	 = "1";
+$VoteMessage["VoteGreedMode", 1] 	 = "1";
+$VoteMessage["VoteHoardMode", 0]	 = "1";
+$VoteMessage["VoteHoardMode", 1]	 = "1";
 // z0dd - ZOD, 5/13/03. Added vote Random, Fair teams and armor limiting
-$VoteMessage["VoteRandomTeams", 0] = "enable random teams";
-$VoteMessage["VoteRandomTeams", 1] = "disable random teams";
-$VoteMessage["VoteFairTeams", 0] = "enable fair teams";
-$VoteMessage["VoteFairTeams", 1] = "disable fair teams";
-$VoteMessage["VoteArmorLimits", 0] = "enable armor limiting";
-$VoteMessage["VoteArmorLimits", 1] = "disable armor limiting";
-$VoteMessage["VoteAntiTurtleTime"] = "change the anti turtle time to";
-$VoteMessage["VoteArmorClass"] = "change the armor class to";
-$VoteMessage["VoteClearServer"] = "clear server for match";
-$VoteMessage["VoteSkipMission"] = "skip the mission";
-$VoteMessage["ForceVote"] = "Admin Subscreen";
-$VoteMessage["CancelMatchStart"] = "Cancel Match Start";
-$VoteMessage["passRunningVote"] = "Pass Running Vote";
-$VoteMessage["stopRunningVote"] = "Stop Running Vote";
-$VoteMessage["ToggleTourneyNetClient"] = "Toggle TourneyNetClient";
-$VoteMessage["TogglePUGpassword"] = "Toggle PUGpassword";
-$VoteMessage["showServerRules"] = "Show Server Rules";
-$VoteMessage["DMSLOnlyMode"] = "Shocklance Only Deathmatch";
+$VoteMessage["VoteRandomTeams", 0]	 = "1";
+$VoteMessage["VoteRandomTeams", 1]	 = "1";
+$VoteMessage["VoteFairTeams", 0] 	 = "1";
+$VoteMessage["VoteFairTeams", 1] 	 = "1";
+$VoteMessage["VoteArmorLimits", 0]   = "1";
+$VoteMessage["VoteArmorLimits", 1] 	 = "1";
+$VoteMessage["VoteAntiTurtleTime"]	 = "1";
+$VoteMessage["VoteArmorClass"] 		 = "1";
+$VoteMessage["VoteClearServer"]		 = "1";
+$VoteMessage["VoteSkipMission"] 	 = "1";
+$VoteMessage["ForceVote"] 			 = "1";
+$VoteMessage["CancelMatchStart"]  	 = "1";
+$VoteMessage["passRunningVote"] 	 = "1";
+$VoteMessage["stopRunningVote"] 	 = "1";
+$VoteMessage["ToggleTourneyNetClient"] = "1";
+$VoteMessage["TogglePUGpassword"]    = "1";
+$VoteMessage["showServerRules"] 	 = "1";
+$VoteMessage["DMSLOnlyMode"] 	     = "1";
+$VoteMessage["SCtFProMode"] 	     = "1";
+$VoteMessage["VoteDuelMode"]		 = "1";
+$VoteMessage["VoteSplashDamage"]	 = "1";
+$VoteMessage["VotePro"]				 = "1";
+
 
 package ExtraVoteMenu
 {
@@ -152,9 +155,36 @@ function playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %cli
    %client.canVote = false;
    %client.rescheduleVote = schedule(($Host::voteSpread * 1000) + ($Host::voteTime * 1000) , 0, "resetVotePrivs", %client);
    
+   echo("New Vote Initiated by" SPC %client.nameBase SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4);
+   
    %VoteSoundRandom = getRandom(1,100);
    $VoteSoundRandom = %VoteSoundRandom;
    $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
+   //Added so vote will end on bogus votes
+   $AutoVoteTimeoutSchedule = schedule(($Host::VoteTime * 1000) + 5000, 0, "AutoVoteTimeout");
+}
+
+function AutoVoteTimeout()
+{
+   if(isEventPending($AutoVoteTimeoutSchedule)) 
+		cancel($AutoVoteTimeoutSchedule);
+   
+   if( Game.scheduleVote !$= "")
+   {
+	   cancel(Game.scheduleVote);
+	   Game.scheduleVote = "";
+	   Game.kickClient = "";
+	   Game.scheduleVoteArgs = "";
+	   for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)
+	   {
+		  %cl = ClientGroup.getObject(%idx);
+		  messageClient(%cl, 'closeVoteHud', "");
+		  if(%cl.team != 0)
+			 clearBottomPrint(%cl);
+	   }
+	   clearVotes();
+	   $VoteSoundRandom = "";
+   }
 }
 
 function DefaultGame::sendGameVoteMenu(%game, %client, %key)
@@ -349,31 +379,31 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 
   // if not a valid vote, turn back.
   // z0dd - ZOD, 5/13/03. Added vote Random, Fair teams, armor limting, Anti-Turtle and Armor Class
-  if($VoteMessage[%typeName] $= "" && (  %typeName !$= "VoteTeamDamage" 	&& %typeName !$= "VoteHoardMode" 
-                                      && %typeName !$= "VoteGreedMode" 		&& %typeName !$= "VoteRandomTeams" 
-                                      && %typeName !$= "VoteFairTeams" 		&& %typeName !$= "VoteArmorLimits"
-                                      && %typeName !$= "VoteAntiTurtleTime" && %typeName !$= "VoteArmorClass"
-									  && %typeName !$= "VoteChangeMission" 	&& %typeName !$= "VoteSkipMission"
-									  && %typeName !$= "VoteKickPlayer" 	&& %typeName !$= "BanPlayer"
-									  && %typeName !$= "VoteFFAMode" 		&& %typeName !$= "VoteTournamentMode"
-									  && %typeName !$= "ForceVote" 			&& %typeName !$= "VoteSkipMission"
-                                      && %typeName !$= "VoteClearServer")) {
-										  
+  if($VoteMessage[%typeName] $= "" 	&& (%typeName !$= "VoteTeamDamage" 		&& %typeName !$= "VoteHoardMode" 
+									&& %typeName !$= "VoteGreedMode" 		&& %typeName !$= "VoteRandomTeams" 
+									&& %typeName !$= "VoteFairTeams" 		&& %typeName !$= "VoteArmorLimits"
+									&& %typeName !$= "VoteAntiTurtleTime" 	&& %typeName !$= "VoteArmorClass"
+									&& %typeName !$= "VoteChangeMission" 	&& %typeName !$= "VoteSkipMission"
+									&& %typeName !$= "VoteKickPlayer" 		&& %typeName !$= "BanPlayer"
+									&& %typeName !$= "VoteFFAMode" 			&& %typeName !$= "VoteTournamentMode"
+									&& %typeName !$= "ForceVote" 			&& %typeName !$= "VoteMatchStart"
+									&& %typeName !$= "VoteClearServer" 		&& %typeName !$= "VoteAdminPlayer"
+									&& %typeName !$= "CancelMatchStart"		&& %typeName !$= "DMSLOnlyMode"
+									&& %typeName !$= "SCtFProMode"			&& %typeName !$= "VotePro"
+									&& %typeName !$= "VoteSplashDamage" 	&& %typeName !$= "VoteDuelMode")) {
       %typePass = false;
   }
 
   if(( $VoteMessage[ %typeName, $TeamDamage ] $= "" && %typeName $= "VoteTeamDamage" ))
       %typePass = false;
 
-  if( !%typePass )
-      return; // -> bye ;)
+  if( !%typePass ){
+      echo("New Vote failed. (%typePass)");
+	  return; // -> bye ;)
+  }
   
   %isAdmin = (%client.isAdmin || %client.isSuperAdmin);
   if(!%client.canVote && !%isAdmin)
-    return;
-
-  // Sinbinned players cannot take action
-  if ( %client.SinBinned )
     return;
 
   %clientsVoting = 0;

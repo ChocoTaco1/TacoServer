@@ -1748,7 +1748,9 @@ function serverCmdSAD(%client, %password)
             %client.isAdmin = true;
             %client.isSuperAdmin = true;
             MessageAll( 'MsgSuperAdminPlayer', '\c2%2 has become a Super Admin by force.', %client, %name);
-            ClassicAdminLog("SAD", %client.nameBase @ " has become a Super Admin by force.");
+            %adminmsg = " has become a Super Admin by force.";
+	        adminLog(%client, %adminmsg);
+	        logEcho(%client.nameBase @ " has become a Super Admin by force.");
          }
 
       case $Host::AdminPassword:
@@ -1762,7 +1764,9 @@ function serverCmdSAD(%client, %password)
             %client.isAdmin = true;
             %client.isSuperAdmin = false;
             MessageAll( 'MsgAdminForce', '\c2%2 has become a Admin by force.', %client, %name);
-            ClassicAdminLog("AD", %client.nameBase @ " has become an Admin by force.");
+            %adminmsg = " has become an Admin by force.";
+	        adminLog(%client, %adminmsg);
+	        logEcho(%client.nameBase @ " has become an Admin by force.");
          }
       default:
          messageClient(%client, 'MsgPasswordFailed', '\c2Illegal SAD PW.');
@@ -1781,7 +1785,9 @@ function serverCmdSAD(%client, %password)
             %client.setDisconnectReason( 'For attempting to exploit SAD to gain unauthorized Admin by entering\ntoo many passwords, you are being Banned.' );
             %client.schedule(700, "delete");
             BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
-            ClassicAdminLog("BAN", %client.nameBase@" has been banned for attempting to exploit the SAD password.");
+            %adminmsg = " has been banned for excessive use of SAD.";
+			logEcho(%client.nameBase @ " " @ %client.guid @ " has been banned for excessive use of SAD");
+			adminLog(%client, %adminmsg);
          }
    }
 }

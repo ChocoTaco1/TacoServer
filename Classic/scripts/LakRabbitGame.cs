@@ -1063,6 +1063,9 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 	
 	%isAdmin = ( %client.isAdmin || %client.isSuperAdmin );
 
+	if(!%client.canVote && !%isAdmin)
+      return;
+
 	if( %game.scheduleVote $= "" )
 	{
 		if(!%isAdmin)

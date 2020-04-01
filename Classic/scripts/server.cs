@@ -227,7 +227,23 @@ function CreateServer(%mission, %missionType)
 
    // load the mission...
    loadMission(%mission, %missionType, true);
+   
+   // TraversalRoot Console spam fix
+   if($Host::ClassicSuppressTraversalRootError)
+      suppressTraversalRootPatch();
+}
 
+// Thanks Turkeh
+// TraversalRoot Console spam fix
+function suppressTraversalRootPatch()
+{
+   if($tvpatched)
+      return;
+
+   warn("Patching traversal root error...");
+   memPatch("56AD8A", "90909090909090909090909090909090909090909090");
+   memPatch("56D114", "90909090909090909090909090909090909090909090");
+   $tvpatched = 1;
 }
 
 function initGameBots( %mission, %mType )

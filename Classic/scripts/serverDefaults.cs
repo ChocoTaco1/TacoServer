@@ -164,6 +164,7 @@ $Host::ClassicRotationCustom = 1;
 $Host::ClassicRotationFile = "prefs/mapRotation.cs";
 $Host::ClassicEvoStats = 1;
 $Host::ClassicStatsType = 2;
+$Host::ClassicSuppressTraversalRootError = 1;
 $Host::ServerRules1 = "\c2if\c4(\c3%client.fun == \c5true \c4&& \c3%client.Llama_Grabs \c4< \c51\c4)";
 $Host::ServerRules2 = "    \c1Be_Courteous\c4(\c2%client, %game\c4);";
 $Host::ServerRules3 = "\c2else if\c4(\c3%client.attitude \c4!$ = \c5%client.fun\c4)";

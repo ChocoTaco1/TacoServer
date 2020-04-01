@@ -62,6 +62,7 @@ $Host::ClassicRotationCustom = 1;
 $Host::ClassicRotationFile = "prefs/mapRotation.cs";
 $Host::ClassicStatsType = 2;
 $Host::ClassicSuperAdminPassword = "changeme";
+$Host::ClassicSuppressTraversalRootError = 1;
 $Host::ClassicTelnet = 1;
 $Host::ClassicTelnetListenPass = "changeme";
 $Host::ClassicTelnetPassword = "changeme";

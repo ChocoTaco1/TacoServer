@@ -157,11 +157,15 @@ function playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %cli
    
    echo("Vote Initiated by" SPC %client.nameBase SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4);
    
-   %VoteSoundRandom = getRandom(1,100);
-   $VoteSoundRandom = %VoteSoundRandom;
-   $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
+   if($Host::EnableVoteSoundReminders > 0)
+   {
+		%time = mFloor($Host::VoteTime / ($Host::EnableVoteSoundReminders + 1)) * 1000;
+		//echo(%time);
+		for(%i = 0; %i < $Host::EnableVoteSoundReminders; %i++)
+				Game.voteReminder[%i] = schedule((%time * (%i + 1)), 0, "VoteSound", %game, %typename, %arg1, %arg2);
+   }
    //Added so vote will end on bogus votes
-   $AutoVoteTimeoutSchedule = schedule(($Host::VoteTime * 1000) + 5000, 0, "AutoVoteTimeout");
+   //$AutoVoteTimeoutSchedule = schedule(($Host::VoteTime * 1000) + 1000, 0, "AutoVoteTimeout");
 }
 
 function AutoVoteTimeout()
@@ -416,7 +420,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
   if ( TriconWrapper( %client, %arg1, %typename ) )
 	return;
 
-   switch$(%typename)
+   switch$(%typeName)
    {
       case "VoteKickPlayer":
          if(%isAdmin && %client != %arg1) // client is an admin and the player to kick isn't the player himself
@@ -1068,67 +1072,6 @@ function DefaultGame::cancelMatchStart(%game, %admin)
          centerprint(%cl, "\nPress FIRE when ready.", 0, 3);
       }
    }
-}
-
-function DefaultGame::voteKickPlayer(%game, %admin, %client)
-{
-   %cause = "";
-   
-   if(%admin) 
-   {
-      kick(%client, %admin, %client.guid );
-      %cause = "(admin)";
-   }
-   else 
-   {
-      %team = %client.team;
-      if(%team == 0)
-	  {
-         %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-         if(%totalVotes > 0 && (%game.totalVotesFor / %totalVotes) > ($Host::VotePasspercent / 100)) 
-         {
-            kick(%client, %admin, %game.kickGuid);
-            %cause = "(vote)";
-         }
-         else
-         {   
-            for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ ) 
-            {
-               %cl = ClientGroup.getObject( %idx );
-
-               if (%cl.team == %game.kickTeam && !%cl.isAIControlled())
-                  messageClient( %cl, 'MsgVoteFailed', '\c2Kick player vote did not pass' ); 
-            }
-         }
-      }
-      else
-	  {
-      
-         %totalVotes = %game.votesFor[%game.kickTeam] + %game.votesAgainst[%game.kickTeam];
-         if(%totalVotes > 0 && (%game.votesFor[%game.kickTeam] / %totalVotes) > ($Host::VotePasspercent / 100)) 
-         {
-            kick(%client, %admin, %game.kickGuid);
-            %cause = "(vote)";
-         }
-         else
-         {   
-            for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ ) 
-            {
-               %cl = ClientGroup.getObject( %idx );
-
-               if (%cl.team == %game.kickTeam && !%cl.isAIControlled())
-                  messageClient( %cl, 'MsgVoteFailed', '\c2Kick player vote did not pass' ); 
-            }
-         }
-      }
-   }
-   
-   %game.kickTeam = "";
-   %game.kickGuid = "";
-   %game.kickClientName = "";
-
-   if(%cause !$= "")
-      logEcho($AdminCl.nameBase @ ": " @ %name @ " (cl " @ %game.kickClient @ ") kicked " @ %cause, 1);
 }
 
 function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typeDisplayName, %missionId, %missionTypeId)

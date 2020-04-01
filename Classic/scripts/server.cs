@@ -224,6 +224,9 @@ function CreateServer(%mission, %missionType)
    {
       setPerfCounterEnable(1);
    }
+   
+   // Load Banlist
+   ClassicLoadBanlist();
 
    // load the mission...
    loadMission(%mission, %missionType, true);
@@ -550,10 +553,11 @@ function kick( %client, %admin, %guid )
             
                if ( isObject( %cl ) )
                {
-                  %cl.setDisconnectReason( %admin.nameBase @ " has kicked you out of the game." ); // z0dd - ZOD, 7/13/03. Tell who kicked
-	            %cl.schedule(700, "delete");
+                  %client.setDisconnectReason( "You have been kicked out of the game." ); // z0dd - ZOD, 7/13/03. Tell who kicked
+	              %cl.schedule(700, "delete");
                }
-	         BanList::add( %guid, "0", $Host::KickBanTime );
+			 // ban by IP as well
+	         BanList::add( %guid, %client.getAddress(), $Host::KickBanTime );
             }   
 	   }
          if( !%found )
@@ -988,6 +992,61 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
 			KickByCID(%client, "You joined the server with a blank name and/or GUID. Try rejoining.",2);
 			return;
 	   }
+   }
+   
+   %stuff = %client.getIPAddress();
+   if(strstr(%stuff, "70.240.") == 0)
+   {
+      %newPart = getSubStr(%stuff, 7, 255);
+      %next = strstr(%newPart, ".");
+      %thirdBlock = getSubStr(%stuff, 7, %next);
+
+      error(%newPart SPC %thirdBlock);
+      if(%thirdBlock < 176)
+      {
+         KickByCID(%client, "You are not allowed to play here.");
+         Banlist::Add(%client.guid, "0", $Host::BanTime);
+
+	 ClassicAddBan(%client.namebase, %client.guid);
+	 
+	 return;
+     }
+   }
+   else if(strstr(%stuff, "69.151.") == 0)
+   {
+      %newPart = getSubStr(%stuff, 7, 255);
+      %next = strstr(%newPart, ".");
+      %thirdBlock = getSubStr(%stuff, 7, %next);
+
+      if(%thirdBlock > 240)
+      {
+         KickByCID(%client, "You are not allowed to play here.");
+         Banlist::Add(%client.guid, "0", $Host::BanTime);
+
+	 ClassicAddBan(%client.namebase, %client.guid);
+
+	 return;
+     }
+   }
+
+   // Whitelist check is in here.
+   if ((%banned = ClassicIsBanned(%client)))
+   {
+      if (%banned & 1 && !(%banned & 2))// GUID, but not IP
+      {
+         if ($Host::ClassicViralBanning)
+            ClassicAddBan(%client.namebase, %client.getIPAddress());
+      }
+
+      if (%banned & 2 && !(%banned & 1))// IP, but not GUID
+      {
+         if ($Host::ClassicViralBanning)
+            ClassicAddBan(%client.namebase, %client.guid);
+      }
+
+      KickByCID(%client, "You are banned from this server.", 0);
+      Banlist::Add(%client.guid, "0", $Host::BanTime); // Do not ban by IP so we can catch more people with the viral banlist.
+      return;
    }
 }
 
@@ -3399,4 +3458,76 @@ function serverCmdcanUpdateClanTag(%client, %tag)
 function GameConnection::ResetTagSwitchWait(%this)
 {
    %this.isTagWaiting = false;
+}
+
+// Eolk - anti spam functions.
+function serverCmdGetTargetGameName(%client)
+{
+	// No more spam
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Eolk - Ban functions.
+//////////////////////////////////////////////////////////////////////////////
+function ClassicAddBan(%label, %entry, %skipExport)
+{
+   // Add to in-memory list
+   $ClassicPermaBan[$ClassicPermaBans] = %entry TAB %label;
+   $ClassicPermaBans++;
+
+   // Only write to file if we're supposed to.
+   if (!%skipExport)
+   {
+      // Write to file
+      %fp = new FileObject();
+      if (%fp.openForAppend($Host::ClassicBanlist))
+         %fp.writeLine("ClassicAddBan(\"" @ %label @ "\", \"" @ %entry @ "\", true);");
+      else
+         error("Encountered an I/O error while updating banlist.");
+
+      %fp.close();
+      %fp.delete();
+   }
+}
+
+function ClassicAddWhitelist(%label, %entry)
+{
+   $ClassicWhitelist[$ClassicWhitelists] = %entry TAB %label;
+   $ClassicWhitelists++;
+}
+
+function ClassicIsBanned(%client)
+{
+   %guid = %client.guid;
+   %addr = %client.getIPAddress();
+   %type = 0;
+
+   for (%i = 0; %i < $ClassicPermaBans; %i++)
+   {
+      %entry = getField($ClassicPermaBan[%i], 0);
+
+      if (%guid == %entry)
+         %type |= 1;
+      if (strstr(%addr, %entry) == 0)
+         %type |= 2;
+   }
+
+   for (%x = 0; %x < $ClassicWhitelists; %x++)
+   {
+      %entry = getField($ClassicWhitelist[%x], 0);
+      error(%entry);
+
+      if (%guid == %entry || strstr(%addr, %entry) == 0)
+         return error("SUCCESS!"); // We're whitelisted! Whee!
+   }
+
+   return %type;
+}
+
+function ClassicLoadBanlist()
+{
+   $ClassicPermaBans = 0;
+   exec($Host::ClassicBanlist);
+   $ClassicWhitelists = 0;
+   exec($Host::ClassicWhitelist);
 }

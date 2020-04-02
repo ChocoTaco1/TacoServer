@@ -1477,6 +1477,13 @@ function passCurrentVote() // Edit GG
          clearBottomPrint(%cl);
    }
    clearVotes();
+   //Stop vote chimes
+   for(%i = 0; %i < $Host::EnableVoteSoundReminders; %i++)
+   {
+      if(isEventPending(Game.voteReminder[%i]))
+         cancel(Game.voteReminder[%i]);
+      Game.voteReminder[%i] = "";
+   }
 }
 
 // stopCurrentVote()
@@ -1495,6 +1502,13 @@ function stopCurrentVote()
          clearBottomPrint(%cl);
    }
    clearVotes();
+   //Stop vote chimes
+   for(%i = 0; %i < $Host::EnableVoteSoundReminders; %i++)
+   {
+      if(isEventPending(Game.voteReminder[%i]))
+         cancel(Game.voteReminder[%i]);
+      Game.voteReminder[%i] = "";
+   }
 }
 
 // calcVotes(%typeName, %arg1, %arg2, %arg3, %arg4)

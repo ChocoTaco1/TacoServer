@@ -48,6 +48,7 @@ $Host::ClassicLoadSniperChanges = 0;
 $Host::ClassicLoadTR2Gametype = 0;
 $Host::ClassicLoadVRamChanges = 0;
 $Host::ClassicLogEchoEnabled = 0;
+$Host::ClassicMaxVotes = 5;
 $Host::ClassicMaxTelepads = 3;
 $Host::ClassicMOTD = "<color:3cb4b4><font:Sui Generis:22>Discord PUB\n<color:3cb4b4><font:Univers:16>Server Hosted/Provided by Branzone/Ravin\n<color:3cb4b4><font:Univers:16>Get Mappacks at https://playt2.com/";
 $Host::ClassicMOTDLines = 3;

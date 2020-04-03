@@ -2260,9 +2260,12 @@ function SCtFGame::startFlagCollisionSearch(%game, %flag)
 
 function SCtFGame::sendGameVoteMenu(%game, %client, %key)
 {
-   	parent::sendGameVoteMenu( %game, %client, %key );
+   parent::sendGameVoteMenu( %game, %client, %key );
 	
-	%isAdmin = ( %client.isAdmin || %client.isSuperAdmin );
+   %isAdmin = ( %client.isAdmin || %client.isSuperAdmin );
+	
+   if(!%client.canVote && !%isAdmin)
+      return;
    
    if ( %game.scheduleVote $= "" )
    {
@@ -2271,23 +2274,23 @@ function SCtFGame::sendGameVoteMenu(%game, %client, %key)
         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Vote to change the Armor class' );
         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
 		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
 		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
 	 }
-	 else if (%client.ForceVote > 0 && %client.NextMission !$= 1 ) //Added for SetNextMission
+	 else if (%client.ForceVote > 0)
 	 {
 		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to enable Pro Mode', 'Vote to enable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
 		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'vote to disable Pro Mode', 'Vote to disable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
 	 }
-	 else if ( %client.NextMission !$= 1 ) //Added for SetNextMission
+	 else
 	 {
 		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'change to enable Pro Mode', 'Enable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Enable Pro Mode' );
 		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'change to disable Pro Mode', 'Disable Pro Mode' );
+		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Disable Pro Mode' );
 	 }
          //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Change the Armor class' );
          //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );

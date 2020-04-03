@@ -24,6 +24,15 @@ function VoteSound( %game, %typename, %arg1, %arg2 )
 				if(%arg1 $= "999") %arg1 = "unlimited";
 				messageAll('', '\c1Vote in Progress: \c0To change the time limit to %1. %2~wgui/objective_notification.wav', %arg1, %votemsg );
 				echo("Vote in Progress: To change the time limit to" SPC %arg1 @ ".");
+			case "VoteTournamentMode":
+				messageAll('', '\c1Vote in Progress: \c0To change the mission to Tournament Mode (%1). %3~wgui/objective_notification.wav', %arg1, %arg2, %votemsg );
+				echo("Vote in Progress: To change the mission to Tournament Mode" SPC "(" @ %arg1 @ ").");
+			case "VoteMatchStart":
+				messageAll('', '\c1Vote in Progress: \c0To start the match. %3~wgui/objective_notification.wav', %arg1, %arg2, %votemsg );
+				echo("Vote in Progress: To start the match.");
+			case "VoteFFAMode":
+				messageAll('', '\c1Vote in Progress: \c0To change the server to Free For All Mode. %3~wgui/objective_notification.wav', %arg1, %arg2, %votemsg );
+				echo("Vote in Progress: To change the server to Free For All Mode.");
 			case "VoteKickPlayer":			
 				if(%arg1.team != 0 && Game.numTeams > 1) //Not observer
 				{
@@ -47,9 +56,6 @@ function VoteSound( %game, %typename, %arg1, %arg2 )
 				else //Is observer
 					messageAll('', '\c1Vote in Progress: \c0To kick player %1. %2~wgui/objective_notification.wav', %arg1.nameBase, %votemsg );
 				echo("Vote in Progress: To kick player" SPC %arg1.nameBase SPC "(" @ %arg1.guid @ ").");
-			case "VoteTournamentMode":
-				messageAll('', '\c1Vote in Progress: \c0To change the mission to Tournament Mode (%1). %3~wgui/objective_notification.wav', %arg1, %arg2, %votemsg );
-				echo("Vote in Progress: To change the mission to Tournament Mode" SPC "(" @ %arg1 @ ").");
 			default:
 				messageAll('', '\c1Vote in Progress: \c0To %1. %2~wgui/objective_notification.wav', %arg1, %votemsg );
 				echo("Vote in Progress: To" SPC %arg1);

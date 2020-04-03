@@ -868,28 +868,31 @@ function DMGame::sendGameVoteMenu(%game, %client, %key)
    
    %isAdmin = ( %client.isAdmin || %client.isSuperAdmin );
    
+   if(!%client.canVote && !%isAdmin)
+      return;
+   
    if ( %game.scheduleVote $= "" )
    {
       if(!%client.isAdmin)
       {
          if(!$Host::DMSLOnlyMode)
-            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to enable Shocklance Only Mode', 'Vote to enable Shocklance Only Mode' );
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'Enable SL Only Mode', 'Vote to enable Shocklance Only Mode' );
          else
-            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to disable Shocklance Only Mode', 'Vote to disable Shocklance Only Mode' );
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'Disable SL Only Mode', 'Vote to disable Shocklance Only Mode' );
       }
-      else if (%client.ForceVote > 0 && %client.NextMission !$= 1 ) //Added for SetNextMission
+      else if (%client.ForceVote > 0)
       {
          if(!$Host::DMSLOnlyMode)
-            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to enable Shocklance Only Mode', 'Vote to enable Shocklance Only Mode' );
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'Enable SL Only Mode', 'Vote to enable Shocklance Only Mode' );
          else
-            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'vote to disable Shocklance Only Mode', 'Vote to disable Shocklance Only Mode' );
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'Disable SL Only Mode', 'Vote to disable Shocklance Only Mode' );
       }
-      else if ( %client.NextMission !$= 1 ) //Added for SetNextMission
+      else
       {
          if(!$Host::DMSLOnlyMode)
-            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'change to enable Shocklance Only Mode', 'Enable Shocklance Only Mode' );
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'Enable SL Only Mode', 'Enable Shocklance Only Mode' );
          else
-            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'change to disable Shocklance Only Mode', 'Disable Shocklance Only Mode' );
+            messageClient( %client, 'MsgVoteItem', "", %key, 'DMSLOnlyMode', 'Disable SL Only Mode', 'Disable Shocklance Only Mode' );
       }
    }
 }

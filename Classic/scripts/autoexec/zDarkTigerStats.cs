@@ -2941,8 +2941,7 @@ function DefaultGame::postGameStats(%game,%client){ //stats to add up at the end
                            %client.missileScore + 
                            %client.mineScore;
    
-   %client.totalMA = %client.cgMA + 
-                     %client.discMA + 
+   %client.totalMA = %client.discMA + 
                      %client.grenadeMA + 
                      %client.laserMA + 
                      %client.mortarMA + 
@@ -2950,7 +2949,6 @@ function DefaultGame::postGameStats(%game,%client){ //stats to add up at the end
                      %client.plasmaMA + 
                      %client.blasterMA + 
                      %client.hGrenadeMA + 
-                     %client.missileMA + 
                      %client.mineMA;
                          
    %client.killAir = %client.cgKillAir +
@@ -2965,7 +2963,7 @@ function DefaultGame::postGameStats(%game,%client){ //stats to add up at the end
                      %client.blasterKillAir +
                      %client.mineKillAir;
                      
-   %client.deathAir = %client.cgDeathAir +
+   %client.deathAir =   %client.cgDeathAir +
                         %client.discDeathAir + 
                         %client.hGrenadeDeathAir +
                         %client.grenadeDeathAir +

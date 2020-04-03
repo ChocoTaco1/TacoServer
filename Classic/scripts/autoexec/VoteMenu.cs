@@ -377,7 +377,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				}
 
 				%msg = %client.nameBase @ " initiated a vote to skip the current mission.";
-				%blank = "next mission.";
 				$CMHasVoted[%client.guid]++;
 			}
 
@@ -511,12 +510,12 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 	if(%isAdmin && !%client.adminVoteSet && !%client.ForceVote)
 		adminStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4);
 	else
-		playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg, %blank);
+		playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg);
 }
 
 //exec("scripts/autoexec/VoteMenu.cs");
 
-function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg, %blank)
+function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg)
 {
 	%clientsVoting = 0;
 	%count = ClientGroup.getCount();

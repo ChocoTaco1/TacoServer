@@ -518,8 +518,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 
 function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg, %blank)
 {
-	echo(%client SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4);
-	
 	%clientsVoting = 0;
 	%count = ClientGroup.getCount();
 	if(%teamSpecific)

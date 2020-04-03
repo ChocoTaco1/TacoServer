@@ -68,9 +68,6 @@ function DefaultGame::gameOver(%game)
 	
 	//Reset everything to do with Vote Overtime
 	ResetVOall(%game);
-	
-	if(isEventPending($VoteSoundSchedule)) 
-		cancel($VoteSoundSchedule);
 }
 
 };

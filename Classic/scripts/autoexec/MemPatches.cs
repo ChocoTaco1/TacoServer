@@ -1,4 +1,4 @@
-// Exploit Patches Script
+// Memory Patches
 
 // Remote Code Execution Patch by Bahke
 memPatch("A3C300","A370C3A300E8D609A0FF8B46205053E98103A0FF");

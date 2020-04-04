@@ -323,6 +323,8 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			{
 				if(%arg1 $= "999") %time = "unlimited"; else %time = %arg1;
 				%msg = %client.nameBase @ " initiated a vote to change the time limit to " @ %time @ ".";
+				// VoteOvertime
+				StartVOTimeVote(%game);
 			}
 
 		case "VoteMatchStart":
@@ -547,6 +549,14 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
 	}
 	else
 	{
+		if(%typeName $= "VoteChangeTimeLimit")
+		{
+			if(%arg1 $= "999") 
+				%time = "Unlimited"; 
+			else 
+				%time = %arg1;
+		}
+		
 		%count = ClientGroup.getCount();
 		for(%i = 0; %i < %count; %i++)
 		{
@@ -561,7 +571,6 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
 					case "VoteSkipMission":
 						messageClient( %cl, 'VoteStarted', "\c2" @ %msg, %client.name, "skip the mission");
 					case "VoteChangeTimeLimit":
-						if(%arg1 $= "999") %time = "Unlimited"; else %time = %arg1;
 						messageClient( %cl, 'VoteStarted', "\c2" @ %msg, %client.name, "change the time limit to", %time);
 					case "VoteKickPlayer":			
 						messageClient( %cl, 'VoteStarted', "\c2" @ %msg, %client.name, "kick player", %arg1.name);
@@ -605,7 +614,14 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
    %client.canVote = false;
    %client.rescheduleVote = schedule(($Host::voteSpread * 1000) + ($Host::voteTime * 1000) , 0, "resetVotePrivs", %client);
    
-   echo("Vote Initiated by" SPC %client.nameBase SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4);
+   echo(%msg);
+   
+   // Log Vote
+   if($Host::ClassicVoteLog)
+   {
+	   %votemsg = %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4;
+	   voteLog(%client, %votemsg);
+   }
    
    if($Host::EnableVoteSoundReminders > 0)
    {
@@ -783,9 +799,17 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
       {
          messageAll('MsgVotePassed', '\c2The mission time limit was set to %1 minutes by vote.', %display);   
          $Host::TimeLimit = %newLimit;
+		 // VoteOvertime
+		 ResetVOTimeChanged(%game);
+		 // Reset the voted time limit when changing mission
+         $TimeLimitChanged = 1;
       }
       else 
-         messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));   
+	  {
+         messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
+		 // VoteOvertime
+		 ResetVOall(%game);
+	  }
    }
 
    //if the match has been started, reset the end of match countdown
@@ -1094,7 +1118,8 @@ function DefaultGame::passRunningVote(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 
 function DefaultGame::stopRunningVote(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
-   if(%admin && Game.scheduleVote !$= "")
+   %curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
+   if(%admin && Game.scheduleVote !$= "" && %curTimeLeftMS > 0)
    {
       stopCurrentVote();
       messageAll('MsgAdminForce', '\c2The Admin stopped the vote.');

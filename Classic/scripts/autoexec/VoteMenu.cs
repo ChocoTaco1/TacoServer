@@ -607,7 +607,14 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
    %client.canVote = false;
    %client.rescheduleVote = schedule(($Host::voteSpread * 1000) + ($Host::voteTime * 1000) , 0, "resetVotePrivs", %client);
    
-   echo("Vote Initiated by" SPC %client.nameBase SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4);
+   echo(%msg);
+   
+   // Log Vote
+   if($Host::ClassicVoteLog)
+   {
+	   %votemsg = %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4;
+	   voteLog(%client, %votemsg);
+   }
    
    if($Host::EnableVoteSoundReminders > 0)
    {

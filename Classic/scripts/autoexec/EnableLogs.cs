@@ -1,5 +1,7 @@
-$Host::ClassicAdminLog = 1;
-$Host::ClassicConnectLog = 1;
+//$Host::ClassicAdminLog = 1;
+//$Host::ClassicConnectLog = 1;
+//$Host::ClassicVoteLog = 1;
+
 //exec("scripts/autoexec/EnableLogs.cs");
 
 //Enable Logs
@@ -57,5 +59,24 @@ function connectLog(%client, %isDisconnect)
       export("$ConnectLog", %logpath, true);
 	  logEcho($ConnectLog);
 	  echo($ConnectLog);
+   }
+}
+
+// voteLog(%client, %votemsg)
+// Info: Logs the vote events
+function voteLog(%client, %votemsg)
+{
+   if($Host::ClassicVoteLog)
+   {
+      // get the client info
+      %authInfo = %client.getAuthInfo();
+	  %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
+
+      // this is the info that will be logged
+      $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %votemsg SPC "CM[" @ $CurrentMission @ "]";
+
+	  %logpath = $Host::ClassicVoteLogPath;
+      export("$VoteLog", %logpath, true);
+	  logEcho($VoteLog);
    }
 }

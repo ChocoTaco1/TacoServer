@@ -10,7 +10,7 @@ package ObserverTimeout
 function serverCmdClientMakeObserver( %client )
 {
     //10 second cooldown on becoming an observer
-    if( !%client.MakeObserverTimeout )
+    if( !%client.MakeObserverTimeout || %client.isAdmin )
     {
 		if ( isObject( Game ) && Game.kickClient != %client )
 			Game.forceObserver( %client, "playerChoose" );

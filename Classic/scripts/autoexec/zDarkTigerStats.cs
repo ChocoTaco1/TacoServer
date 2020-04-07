@@ -776,6 +776,13 @@ $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "shockHitMaxDist";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairturretlandspikeCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairdepinvstationCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairmpbteleCount";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "leavemissionareaCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "teamkillCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "switchteamCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "flipflopCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "packpickupCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "weaponpickupCount";
 
 ///////////////////////////////////////////////////////////////////
 $dtStats::uFC["dtStats"] = 0; // not saved but used to calculate other stats that are saved
@@ -1579,7 +1586,31 @@ package dtStatsGame{
 			    }
 		    }
 	    }
-	}
+   }
+   function DefaultGame::leaveMissionArea(%game, %playerData, %player){
+	   parent::leaveMissionArea(%game, %playerData, %player);
+	   if($dtStats::Enable)
+	       %player.leavemissionareaCount++;
+   }
+   function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned){ // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
+   	   parent::clientChangeTeam(%game, %client, %team, %fromObs, %respawned);
+	   if($dtStats::Enable)
+	       %client.switchteamCount++;
+   }
+   function FlipFlop::playerTouch(%data, %flipflop, %player){
+	   parent::playerTouch(%data, %flipflop, %player);
+	   if($dtStats::Enable)
+	       %player.flipflopCount++;
+   }
+   function Player::pickup(%this,%obj,%amount){
+	   parent::pickup(%this,%obj,%amount);
+	   if($dtStats::Enable){
+		   if(%data.className $= Pack)
+	           %this.packpickupCount++;
+		   else if(%data.className $= Weapon)
+			   %this.weaponpickupCount++;
+	   } 
+   }
 };
 
 function chkGrounded(%player){
@@ -3970,6 +4001,10 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
    
    %clVictim.ttl += getSimTime() - %clVictim.spawnTime;
    %clVictim.timeTL = mFloor((%clVictim.ttl/(%clVictim.deaths+%clVictim.suicides ? %clVictim.deaths+%clVictim.suicides : 1))/1000);
+   
+   //Teamkills
+   if(%clKiller.team == %clVictim.team)
+      %clKiller.teamkillCount++;
    
    if(%clKiller.team != %clVictim.team){
       

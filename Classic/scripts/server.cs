@@ -973,7 +973,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
 			%client.nameBase = %name;
 	   }
 	   // If we still don't have a GUID or name, time to boot the player (unless a local game).
-	   if(getIPAddress(%client) !$= "Local" && (!%client.guid $= "" || %name $= "")) 
+	   if(%client.getIPAddress() !$= "Local" && (!%client.guid $= "" || %name $= "")) 
 	   {
 			//statEchoInfo("No name/GUID kick for CID (" @ %client @ ") with IP (" @ getIPAddress(%client) @ ")");
 			KickByCID(%client, "You joined the server with a blank name and/or GUID. Try rejoining.",2);
@@ -1039,7 +1039,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
 
 // From Eolks
 // Minor improvement by Teratos
-function getIPAddress(%client)
+function GameConnection::getIPAddress(%client)
 {
     %port = nextToken(nextToken(%client.getAddress(), "ip", ":"), "addr", ":");
     if(%client.isAIControlled()) {

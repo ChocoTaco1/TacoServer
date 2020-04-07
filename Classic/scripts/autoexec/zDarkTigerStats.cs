@@ -1580,7 +1580,6 @@ package dtStatsGame{
 		    }
 	    }
 	}
-	}
 };
 
 function chkGrounded(%player){

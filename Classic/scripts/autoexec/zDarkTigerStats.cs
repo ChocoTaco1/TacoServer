@@ -1580,6 +1580,7 @@ package dtStatsGame{
 		    }
 	    }
 	}
+	}
 };
 
 function chkGrounded(%player){
@@ -3740,14 +3741,14 @@ function getTimeDif(%time){
    %ms += mFloor((%min*60)+0.5) * (60 * 1000); // %min * 60 to convert back to mins , * 60kms for one min 
    return mFloor(%ms);
 }
-function genBlanks(){ // optimization thing saves on haveing to do it with every setValueField
+function genBlanks(){ // optimization thing saves on having to do it with every setValueField
    $dtStats::blank["g"] = $dtStats::blank["t"] = "";
 
    if($dtStats::MaxNumOfGames > 300){
       $dtStats::MaxNumOfGames  = 300; //cap it
    }
    $dtStats::blank["g"] = $dtStats::blank["t"] = 0;
-   for(%i=0; %i < $dtStats::MaxNumOfGames-2; %i++){
+   for(%i=0; %i < $dtStats::MaxNumOfGames-1; %i++){
       $dtStats::blank["g"] = $dtStats::blank["g"] TAB 0;  
    }  
    for(%i=0; %i < 8; %i++){

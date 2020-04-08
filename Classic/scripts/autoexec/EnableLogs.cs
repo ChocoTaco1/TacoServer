@@ -62,18 +62,22 @@ function connectLog(%client, %isDisconnect)
    }
 }
 
-// voteLog(%client, %votemsg)
+// voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
 // Info: Logs the vote events
-function voteLog(%client, %votemsg)
+function voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
 {
    if($Host::ClassicVoteLog)
    {
       // get the client info
       %authInfo = %client.getAuthInfo();
 	  %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
+	  
+	  // show name for Votekick
+	  if(%typeName $= "VoteKickPlayer")
+		   %arg1 = %arg1.nameBase;
 
       // this is the info that will be logged
-      $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %votemsg SPC "CM[" @ $CurrentMission @ "]";
+      $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4 SPC "CM[" @ $CurrentMission @ "]";
 
 	  %logpath = $Host::ClassicVoteLogPath;
       export("$VoteLog", %logpath, true);

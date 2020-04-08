@@ -1329,34 +1329,24 @@ package dtStats{
 	}
     //////////////////////////////////////////////////////////////////////////////////
 	function chatMessageAll( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 ){
-      if($dtStats::Enable){
+      if($dtStats::Enable)
 		 %sender.chatallCount++;
-      }
 	  parent::chatMessageAll( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 );
     }
 	function chatMessageTeam( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 ){
-      if($dtStats::Enable){
+      if($dtStats::Enable)
          %sender.chatteamCount++;
-      }
 	  parent::chatMessageTeam( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 );
     }
 	function kick( %client, %admin, %guid ){
-      if($dtStats::Enable){
+      if($dtStats::Enable)
          %client.kickCount++;
-      }
       parent::kick( %client, %admin, %guid );
    }
    function cmdAutoKickObserver(%client, %key){ // Edit GG
       parent::cmdAutoKickObserver(%client, %key);
-	  if($dtStats::Enable){
+	  if($dtStats::Enable)
 		%client.obstimeoutkickCount++;
-	  }
-   }
-   function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg){
-	   parent::playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg);
-	   if($dtStats::Enable){
-	       %client.voteCount++;
-	   }
    }
    //////////////////////////////////////////////////////////////////////////////////
 	
@@ -1555,7 +1545,9 @@ package dtStatsGame{
    function CTFGame::staticShapeOnRepaired(%game, %obj, %objName){
 	   parent::staticShapeOnRepaired(%game, %obj, %objName);
 	   if($dtStats::Enable){
+		   %repairman = %obj.repairedBy;
 		   if (%game.testValidRepair(%obj) && isObject(%repairman)){
+			  %dataName = %obj.getDataBlock().getName();
 			  switch$ (%dataName){
 				 case "GeneratorLarge":
 					%repairman.repairgenCount++;
@@ -1587,7 +1579,13 @@ package dtStatsGame{
 		    }
 	    }
    }
-   function DefaultGame::leaveMissionArea(%game, %playerData, %player){
+   //exec("scripts/autoexec/zDarkTigerStats.cs");
+   function CTFGame::leaveMissionArea(%game, %playerData, %player){
+	   parent::leaveMissionArea(%game, %playerData, %player);
+	   if($dtStats::Enable)
+	       %player.leavemissionareaCount++;
+   }
+   function SCtFGame::leaveMissionArea(%game, %playerData, %player){
 	   parent::leaveMissionArea(%game, %playerData, %player);
 	   if($dtStats::Enable)
 	       %player.leavemissionareaCount++;
@@ -1602,9 +1600,15 @@ package dtStatsGame{
 	   if($dtStats::Enable)
 	       %player.flipflopCount++;
    }
+   function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg){
+	   parent::playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg);
+	   if($dtStats::Enable)
+	       %client.voteCount++;
+   }
    function Player::pickup(%this,%obj,%amount){
 	   parent::pickup(%this,%obj,%amount);
 	   if($dtStats::Enable){
+		   %data = %obj.getDataBlock();
 		   if(%data.className $= Pack)
 	           %this.packpickupCount++;
 		   else if(%data.className $= Weapon)

@@ -266,6 +266,9 @@ function chatMessageTeam( %sender, %team, %msgString, %a1, %a2, %a3, %a4, %a5, %
       if ( %obj.team == %sender.team )
          chatMessageClient( %obj, %sender, %sender.voiceTag, %sender.voicePitch, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 );
    }
+   
+   if($Host::ClassicChatLog)
+      ClassicChatLog(%sender, 1, %sender.team, %a2);
 }
 
 function cannedChatMessageTeam( %sender, %team, %msgString, %name, %string, %keys )
@@ -319,6 +322,9 @@ function chatMessageAll( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7,
       echo( stripTaggedVar(%sender.name), ": ", %a2 );
    }
    //echo( "SAY: " @ stripchars(detag(gettaggedstring(%sender.name)),"\cp\co\c6\c7\c8\c9") @ " \"" @ %a2 @ "\"");
+   
+   if($Host::ClassicChatLog)
+      ClassicChatLog(%sender, 0, 0, %a2);
 }
 
 function cannedChatMessageAll( %sender, %msgString, %name, %string, %keys )

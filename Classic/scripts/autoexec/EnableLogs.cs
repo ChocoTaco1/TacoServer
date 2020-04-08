@@ -84,3 +84,38 @@ function voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
 	  logEcho($VoteLog);
    }
 }
+
+// From Goon
+// Slightly more elegant solution rather than spamming console
+function ClassicChatLog(%client, %id, %team, %msg)
+{
+   // We don't care about bots.
+   if(%client.isAIControlled())
+      return;
+
+   // Don't log voicepack stuff.
+   if(strstr(%msg, "~w") != -1)
+      return;
+
+   switch$(%id)
+   {
+      case 0:
+         %team = "[Global]";
+      case 1:
+         %team = "["@getTaggedString(Game.getTeamName(%team))@"]";
+      case 2:
+         %team = "[Admin]";
+      case 3:
+         %team = "[Bottomprint]";
+      case 4:
+         %team = "[Centerprint]";
+   }
+
+   // Make it all uppercase
+   %team = strupr(%team);
+
+   $ClassicChatLog = "["@formattimestring("H:nn:ss")@"]" SPC %team SPC getTaggedString(%client.name) @": "@%msg;
+   $ClassicChatLog = stripChars($ClassicChatLog, "\c0\c1\c2\c3\c4\c5\c6\c7\c8\c9\x10\x11\co\cp");
+   %path = $Host::ClassicChatLogPath @ formatTimeString("/yy/mm-MM/dd.log");
+   export("$ClassicChatLog", %path, true);
+}

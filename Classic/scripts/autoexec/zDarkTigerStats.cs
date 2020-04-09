@@ -759,6 +759,8 @@ $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "shockHitMaxDist";
    
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "chatallCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "chatteamCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "voicebindsallCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "voicebindsteamCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "kickCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "obstimeoutkickCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "spawnobstimeoutCount";
@@ -1329,15 +1331,35 @@ package dtStats{
 	}
     //////////////////////////////////////////////////////////////////////////////////
 	function chatMessageAll( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 ){
-      if($dtStats::Enable)
-		 %sender.chatallCount++;
-	  parent::chatMessageAll( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 );
+      parent::chatMessageAll( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 );
+	  if($dtStats::Enable){
+		   if(strstr(%msgString, "~w") != -1)
+		   %sender.voicebindsallCount++;
+		   else
+		      %sender.chatallCount++;
+	  }
     }
 	function chatMessageTeam( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 ){
-      if($dtStats::Enable)
-         %sender.chatteamCount++;
 	  parent::chatMessageTeam( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 );
+	  if($dtStats::Enable){
+		   if(strstr(%msgString, "~w") != -1)
+			  %sender.voicebindsteamCount++;
+		   else
+		      %sender.chatteamCount++;
+	  }
     }
+	function cannedChatMessageAll( %sender, %msgString, %name, %string, %keys )
+	{
+		parent::cannedChatMessageAll( %sender, %msgString, %name, %string, %keys );
+	    if($dtStats::Enable)
+		      %sender.voicebindsallCount++;
+	}
+	function cannedChatMessageTeam( %sender, %team, %msgString, %name, %string, %keys )
+    {
+		parent::cannedChatMessageTeam( %sender, %team, %msgString, %name, %string, %keys );
+	    if($dtStats::Enable)
+			  %sender.voicebindsteamCount++;
+	}
 	function kick( %client, %admin, %guid ){
       if($dtStats::Enable)
          %client.kickCount++;

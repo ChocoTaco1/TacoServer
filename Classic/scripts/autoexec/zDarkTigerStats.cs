@@ -785,6 +785,7 @@ $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "shockHitMaxDist";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "flipflopCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "packpickupCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "weaponpickupCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairpackpickupCount";
 
 ///////////////////////////////////////////////////////////////////
 $dtStats::uFC["dtStats"] = 0; // not saved but used to calculate other stats that are saved
@@ -1605,12 +1606,12 @@ package dtStatsGame{
    function CTFGame::leaveMissionArea(%game, %playerData, %player){
 	   parent::leaveMissionArea(%game, %playerData, %player);
 	   if($dtStats::Enable)
-	       %player.leavemissionareaCount++;
+	       %player.client.leavemissionareaCount++;
    }
    function SCtFGame::leaveMissionArea(%game, %playerData, %player){
 	   parent::leaveMissionArea(%game, %playerData, %player);
 	   if($dtStats::Enable)
-	       %player.leavemissionareaCount++;
+	       %player.client.leavemissionareaCount++;
    }
    function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned){ // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
    	   parent::clientChangeTeam(%game, %client, %team, %fromObs, %respawned);
@@ -1620,22 +1621,25 @@ package dtStatsGame{
    function FlipFlop::playerTouch(%data, %flipflop, %player){
 	   parent::playerTouch(%data, %flipflop, %player);
 	   if($dtStats::Enable)
-	       %player.flipflopCount++;
+	       %player.client.flipflopCount++;
    }
    function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg){
 	   parent::playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg);
 	   if($dtStats::Enable)
 	       %client.voteCount++;
    }
-   function Player::pickup(%this,%obj,%amount){
-	   parent::pickup(%this,%obj,%amount);
-	   if($dtStats::Enable){
-		   %data = %obj.getDataBlock();
-		   if(%data.className $= Pack)
-	           %this.packpickupCount++;
-		   else if(%data.className $= Weapon)
-			   %this.weaponpickupCount++;
-	   } 
+   function ItemData::onPickup(%this, %pack, %player, %amount){
+        parent::onPickup(%this, %pack, %player, %amount);
+        if($dtStats::Enable){
+            if(%this.getname() $= "RepairPack")
+               %player.client.repairpackpickupCount++;
+		    %player.client.packpickupCount++;
+		}
+   }
+   function Weapon::onPickup(%this, %obj, %shape, %amount){
+		parent::onPickup(%this, %obj, %shape, %amount);
+	    if($dtStats::Enable)
+	       %this.weaponpickupCount++;
    }
 };
 

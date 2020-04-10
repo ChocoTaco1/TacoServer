@@ -266,7 +266,7 @@ function ClassicLoadBanlist()
 
 // From Eolks
 // Minor improvement by Teratos
-function GameConnection::getIPAddress(%client)
+function getIPAddress(%client)
 {
     %port = nextToken(nextToken(%client.getAddress(), "ip", ":"), "addr", ":");
     if(%client.isAIControlled()) {

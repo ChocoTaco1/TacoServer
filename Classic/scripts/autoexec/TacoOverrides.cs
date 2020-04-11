@@ -93,6 +93,61 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
    // -----------------------------------------------------------------------------------------
 }
 
+// stationTrigger::onEnterTrigger(%data, %obj, %colObj)
+// Info: If the MPB is destroyed, don't allow players to use the inv
+function stationTrigger::onEnterTrigger(%data, %obj, %colObj)  
+{
+   //make sure it's a player object, and that that object is still alive
+   if(%colObj.getDataBlock().className !$= "Armor" || %colObj.getState() $= "Dead")
+      return;
+
+   // z0dd - ZOD, 7/13/02 Part of hack to keep people from mounting 
+   // vehicles in disallowed armors.
+   if(%obj.station.getDataBlock().getName() !$= "StationVehicle")
+      %colObj.client.inInv = true;
+
+   %colObj.inStation = true;
+   commandToClient(%colObj.client,'setStationKeys', true);
+   if(Game.stationOnEnterTrigger(%data, %obj, %colObj))
+   {
+      //verify station.team is team associated and isn't on player's team
+      if((%obj.mainObj.team != %colObj.client.team) && (%obj.mainObj.team != 0))
+      {
+         //%obj.station.playAudio(2, StationAccessDeniedSound);
+         messageClient(%colObj.client, 'msgStationDenied', '\c2Access Denied -- Wrong team.~wfx/powered/station_denied.wav');
+      }
+      else if(%obj.disableObj.isDisabled())
+      {
+         messageClient(%colObj.client, 'msgStationDisabled', '\c2Station is disabled.');
+      }
+      else if(!%obj.mainObj.isPowered())
+      {
+         messageClient(%colObj.client, 'msgStationNoPower', '\c2Station is not powered.');
+      }
+      else if(%obj.station.notDeployed)
+      {
+         messageClient(%colObj.client, 'msgStationNotDeployed', '\c2Station is not deployed.');
+      }
+	  else if(%obj.station.isDestroyed)
+      {
+      	messageClient(%colObj.client, 'msgStationDestroyed', '\c2Station is destroyed.');
+      }
+      else if(%obj.station.triggeredBy $= "")
+      {
+         if(%obj.station.getDataBlock().setPlayersPosition(%obj.station, %obj, %colObj))
+         {
+            messageClient(%colObj.client, 'CloseHud', "", 'inventoryScreen');
+            commandToClient(%colObj.client, 'TogglePlayHuds', true);
+            %obj.station.triggeredBy = %colObj;
+            %obj.station.getDataBlock().stationTriggered(%obj.station, 1);
+            %colObj.station = %obj.station;
+            %colObj.lastWeapon = ( %colObj.getMountedImage($WeaponSlot) == 0 ) ? "" : %colObj.getMountedImage($WeaponSlot).item;
+            %colObj.unmountImage($WeaponSlot);
+         }
+      }
+   }
+}
+
 //OG Blaster Buff
 function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
 {	

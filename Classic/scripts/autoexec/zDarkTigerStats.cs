@@ -756,6 +756,36 @@ $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "shockHitMaxDist";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "scoutFlyerEK";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "bomberFlyerEK";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "hapcFlyerEK";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "chatallCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "chatteamCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "voicebindsallCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "voicebindsteamCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "kickCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "obstimeoutkickCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "spawnobstimeoutCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "voteCount";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairgenCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairsolarpanelCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairsensorlargeCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairstationinvCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairstationvehCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairturretlargeCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairturretsentryCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairdepmotsensorCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairturretspiderclampCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairturretlandspikeCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairdepinvstationCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairmpbteleCount";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "leavemissionareaCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "teamkillCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "switchteamCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "flipflopCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "packpickupCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "weaponpickupCount";
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairpackpickupCount";
 
 ///////////////////////////////////////////////////////////////////
 $dtStats::uFC["dtStats"] = 0; // not saved but used to calculate other stats that are saved
@@ -1229,6 +1259,9 @@ package dtStats{
    function DefaultGame::forceObserver( %game, %client, %reason ){
       parent::forceObserver( %game, %client, %reason );
       if($dtStats::Enable){
+		 if(%reason $= "spawnTimeout"){
+			%client.spawnobstimeoutCount++; 
+		 }
          %client.gt = %client.at = 0;//air time ground time reset   
       }
    }
@@ -1298,6 +1331,48 @@ package dtStats{
 	   return false;
 	}
     //////////////////////////////////////////////////////////////////////////////////
+	function chatMessageAll( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 ){
+      parent::chatMessageAll( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 );
+	  if($dtStats::Enable){
+		   if(strstr(%msgString, "~w") != -1)
+		   %sender.voicebindsallCount++;
+		   else
+		      %sender.chatallCount++;
+	  }
+    }
+	function chatMessageTeam( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 ){
+	  parent::chatMessageTeam( %sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10 );
+	  if($dtStats::Enable){
+		   if(strstr(%msgString, "~w") != -1)
+			  %sender.voicebindsteamCount++;
+		   else
+		      %sender.chatteamCount++;
+	  }
+    }
+	function cannedChatMessageAll( %sender, %msgString, %name, %string, %keys )
+	{
+		parent::cannedChatMessageAll( %sender, %msgString, %name, %string, %keys );
+	    if($dtStats::Enable)
+		      %sender.voicebindsallCount++;
+	}
+	function cannedChatMessageTeam( %sender, %team, %msgString, %name, %string, %keys )
+    {
+		parent::cannedChatMessageTeam( %sender, %team, %msgString, %name, %string, %keys );
+	    if($dtStats::Enable)
+			  %sender.voicebindsteamCount++;
+	}
+	function kick( %client, %admin, %guid ){
+      if($dtStats::Enable)
+         %client.kickCount++;
+      parent::kick( %client, %admin, %guid );
+   }
+   function cmdAutoKickObserver(%client, %key){ // Edit GG
+      parent::cmdAutoKickObserver(%client, %key);
+	  if($dtStats::Enable)
+		%client.obstimeoutkickCount++;
+   }
+   //////////////////////////////////////////////////////////////////////////////////
+	
 };
 //helps with game types that override functions and dont use parent
 // that way we get called first then the gametype can do whatever 
@@ -1339,7 +1414,7 @@ package dtStatsGame{
          clientDmgStats(%data,%position,%sourceObject,%targetObject, %damageType,%amount);
       parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
    }
-   //0 Fire 1 ??? 2 jump 3 jet 4 gernade 5 mine
+   //0 Fire 1 ??? 2 jump 3 jet 4 grenade 5 mine
    function Armor::onTrigger(%data, %player, %triggerNum, %val){
       parent::onTrigger(%data, %player, %triggerNum, %val);
       if($dtStats::Enable){
@@ -1489,6 +1564,82 @@ package dtStatsGame{
          }
       }
       parent::flagCap(%game, %player);
+   }
+   function CTFGame::staticShapeOnRepaired(%game, %obj, %objName){
+	   parent::staticShapeOnRepaired(%game, %obj, %objName);
+	   if($dtStats::Enable){
+		   %repairman = %obj.repairedBy;
+		   if (%game.testValidRepair(%obj) && isObject(%repairman)){
+			  %dataName = %obj.getDataBlock().getName();
+			  switch$ (%dataName){
+				 case "GeneratorLarge":
+					%repairman.repairgenCount++;
+				 case "SolarPanel":
+					%repairman.repairsolarpanelCount++;
+				 case "SensorLargePulse" or "SensorMediumPulse":
+					%repairman.repairsensorlargeCount++;
+				 case "StationInventory" or "StationAmmo":
+					%repairman.repairstationinvCount++;
+				 case "StationVehicle":
+					%repairman.repairstationvehCount++;
+				 case "TurretBaseLarge":
+					%repairman.repairturretlargeCount++;
+				 case "SentryTurret":
+					%repairman.repairturretsentryCount++;
+				 case "DeployedMotionSensor" or "DeployedPulseSensor":
+					%repairman.repairdepmotsensorCount++;
+				 case "TurretDeployedWallIndoor" or "TurretDeployedFloorIndoor" or "TurretDeployedCeilingIndoor":
+					%repairman.repairturretspiderclampCount++;
+				 case "TurretDeployedOutdoor":
+					%repairman.repairturretlandspikeCount++;
+				 case "DeployedStationInventory":
+					%repairman.repairdepinvstationCount++;
+				 case "MPBTeleporter":
+					%repairman.repairmpbteleCount++;
+				 default:
+					return;
+			    }
+		    }
+	    }
+   }
+   //exec("scripts/autoexec/zDarkTigerStats.cs");
+   function CTFGame::leaveMissionArea(%game, %playerData, %player){
+	   parent::leaveMissionArea(%game, %playerData, %player);
+	   if($dtStats::Enable)
+	       %player.client.leavemissionareaCount++;
+   }
+   function SCtFGame::leaveMissionArea(%game, %playerData, %player){
+	   parent::leaveMissionArea(%game, %playerData, %player);
+	   if($dtStats::Enable)
+	       %player.client.leavemissionareaCount++;
+   }
+   function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned){ // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
+   	   parent::clientChangeTeam(%game, %client, %team, %fromObs, %respawned);
+	   if($dtStats::Enable)
+	       %client.switchteamCount++;
+   }
+   function FlipFlop::playerTouch(%data, %flipflop, %player){
+	   parent::playerTouch(%data, %flipflop, %player);
+	   if($dtStats::Enable)
+	       %player.client.flipflopCount++;
+   }
+   function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg){
+	   parent::playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg);
+	   if($dtStats::Enable)
+	       %client.voteCount++;
+   }
+   function ItemData::onPickup(%this, %pack, %player, %amount){
+        parent::onPickup(%this, %pack, %player, %amount);
+        if($dtStats::Enable){
+            if(%this.getname() $= "RepairPack")
+               %player.client.repairpackpickupCount++;
+		    %player.client.packpickupCount++;
+		}
+   }
+   function Weapon::onPickup(%this, %obj, %shape, %amount){
+		parent::onPickup(%this, %obj, %shape, %amount);
+	    if($dtStats::Enable)
+	       %this.weaponpickupCount++;
    }
 };
 
@@ -2917,13 +3068,13 @@ function DefaultGame::postGameStats(%game,%client){ //stats to add up at the end
  
    %client.totalTime = ((getSimTime() - %client.joinTime)/1000)/60;//convert it to min
    
-   %client.cgScore         = %client.cgKill       + %client.cgMA       + %client.cgKillAir        + (%client.cgKillMaxDist/100)      + %client.cgCom;
+   %dtStats.cgScore        = (%dtStats.cgKill     + %dtStats.cgMA      + %dtStats.cgKillAir       + (%dtStats.cgKillMaxDist/100)     + %dtStats.cgCom) / 100;
    %client.discScore       = %client.discKill     + %client.discMA     + %client.discKillAir      + (%client.discKillMaxDist/100)    + %client.discCom;
    %client.hGrenadeScore   = %client.hGrenadeKill + %client.hGrenadeMA + %client.hGrenadeKillAir  + (%client.hGrenadeKillMaxDist/20) + %client.hGrenadeCom;
    %client.grenadeScore    = %client.grenadeKill  + %client.grenadeMA  + %client.grenadeKillAir   + (%client.grenadeKillMaxDist/100) + %client.grenadeCom;
    %client.laserScore      = %client.laserKill    + %client.laserMA    + %client.laserKillAir     + (%client.laserKillMaxDist/250)   + %client.laserCom    + %client.laserHeadShot;
    %client.mortarScore     = %client.mortarKill   + %client.mortarMA   + %client.mortarKillAir    + (%client.mortarKillMaxDist/50)   + %client.mortarCom;
-   %client.missileScore    = %client.missileKill  + %client.missileMA  + %client.missileKillAir   + (%client.missileKillMaxDist/500) + %client.missileCom;
+   %dtStats.missileScore   = (%dtStats.missileKill+ %dtStats.missileMA + %dtStats.missileKillAir  + (%dtStats.missileKillMaxDist/500)+ %dtStats.missileCom) / 10;
    %client.shockScore      = %client.shockKill    + %client.shockMA    + %client.shockKillAir     + (%client.shockKillMaxDist/2)     + %client.shockCom    + %client.shockRearShot;
    %client.plasmaScore     = %client.plasmaKill   + %client.plasmaMA   + %client.plasmaKillAir    + (%client.plasmaKillMaxDist/50)   + %client.plasmaCom;
    %client.blasterScore    = %client.blasterKill  + %client.blasterMA  + %client.blasterKillAir   + (%client.blasterKillMaxDist/50)  + %client.blasterCom;
@@ -3650,14 +3801,14 @@ function getTimeDif(%time){
    %ms += mFloor((%min*60)+0.5) * (60 * 1000); // %min * 60 to convert back to mins , * 60kms for one min 
    return mFloor(%ms);
 }
-function genBlanks(){ // optimization thing saves on haveing to do it with every setValueField
+function genBlanks(){ // optimization thing saves on having to do it with every setValueField
    $dtStats::blank["g"] = $dtStats::blank["t"] = "";
 
    if($dtStats::MaxNumOfGames > 300){
       $dtStats::MaxNumOfGames  = 300; //cap it
    }
    $dtStats::blank["g"] = $dtStats::blank["t"] = 0;
-   for(%i=0; %i < $dtStats::MaxNumOfGames-2; %i++){
+   for(%i=0; %i < $dtStats::MaxNumOfGames-1; %i++){
       $dtStats::blank["g"] = $dtStats::blank["g"] TAB 0;  
    }  
    for(%i=0; %i < 8; %i++){
@@ -3880,6 +4031,10 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
    
    %clVictim.ttl += getSimTime() - %clVictim.spawnTime;
    %clVictim.timeTL = mFloor((%clVictim.ttl/(%clVictim.deaths+%clVictim.suicides ? %clVictim.deaths+%clVictim.suicides : 1))/1000);
+   
+   //Teamkills
+   if(%clKiller.team == %clVictim.team)
+      %clKiller.teamkillCount++;
    
    if(%clKiller.team != %clVictim.team){
       
@@ -6554,10 +6709,10 @@ case "LBOARDS":
 		 %line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Longest Shot: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Highest Speed: <color:03d597>%2</a>';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"weaponHitMaxDistMax-Longest Shot-Max Distance","maxSpeedMax-Highest Speed-Speed km/h",%vClient);
 
-		 %i1 = getField($lData::data["discInDmg",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["discInDmg",%client.lgame,%lType,%mon,%year],0) : %NA; 
-		 %i2 = getField($lData::data["shotsFired",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["shotsFired",%client.lgame,%lType,%mon,%year],0) : %NA;
-		 %line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Most Damage: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Rounds Fired: <color:03d597>%2</a>';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"discInDmg-Most Damage-Total","shotsFired-Most Rounds Fired-Total",%vClient);
+		 %i1 = getField($lData::data["totalWepDmg",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["totalWepDmg",%client.lgame,%lType,%mon,%year],0) : %NA; 
+         %i2 = getField($lData::data["shotsFired",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["shotsFired",%client.lgame,%lType,%mon,%year],0) : %NA;
+         %line = '<font:univers condensed:18><lmargin:75><a:gamelink\tStats\tLB\t%5\t%3><color:0befe7>Most Damage: <color:03d597>%1</a><lmargin:350><a:gamelink\tStats\tLB\t%5\t%4><color:0befe7>Rounds Fired: <color:03d597>%2</a>';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,"totalWepDmg-Most Damage-Total","shotsFired-Most Rounds Fired-Total",%vClient);
 
 		 %i1 = getField($lData::data["shockRearShot",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["shockRearShot",%client.lgame,%lType,%mon,%year],0) : %NA; 
 		 %i2 = getField($lData::data["laserHeadShot",%client.lgame,%lType,%mon,%year],0) ? getField($lData::name["laserHeadShot",%client.lgame,%lType,%mon,%year],0) : %NA;

@@ -953,6 +953,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
          }
       }
    }
+   
    if($Host::EmptyServerReset && isEventPending($EmptyServerResetSchedule)) 
    {
 		error(formatTimeString("HH:nn:ss") SPC "Previous Timed Server Reset schedule cancelled..." );
@@ -973,7 +974,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
 			%client.nameBase = %name;
 	   }
 	   // If we still don't have a GUID or name, time to boot the player (unless a local game).
-	   if(getIPAddress(%client) !$= "Local" && (!%client.guid $= "" || %name $= "")) 
+	   if(%client.getIPAddress() !$= "Local" && (!%client.guid $= "" || %name $= "")) 
 	   {
 			//statEchoInfo("No name/GUID kick for CID (" @ %client @ ") with IP (" @ getIPAddress(%client) @ ")");
 			KickByCID(%client, "You joined the server with a blank name and/or GUID. Try rejoining.",2);
@@ -1035,57 +1036,6 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
       Banlist::Add(%client.guid, "0", $Host::BanTime); // Do not ban by IP so we can catch more people with the viral banlist.
       return;
    }
-}
-
-// From Eolks
-// Minor improvement by Teratos
-function getIPAddress(%client)
-{
-    %port = nextToken(nextToken(%client.getAddress(), "ip", ":"), "addr", ":");
-    if(%client.isAIControlled()) {
-        %addr = "bot";
-    }
-    return (%addr $= "" ? "Local" : %addr);
-}
-
-// From Eolks
-// We are not an admin MOD but this comes in handy when name is missing on races.
-function KickByCID(%client, %reason, %time)
-{
-    if(!isObject(%client))
-        return;
-
-    // AI handler
-    if(%client.isAIControlled())
-    {
-        %client.drop();
-        $HostGameBotCount--;
-        if($HostGameBotCount < 0)
-            $HostGameBotCount = 0;
-        return;
-    }
-
-    if (%reason $= "")
-        %reason = "You have been kicked from the server.";
-    // Perhaps we don't want time done.
-    //if (%time < 0 || %time $= "")
-    //    %time = $Host::KickBanTime;
-
-    // Send proper messages
-    messageClient(%client, 'onClientKicked', "");
-    messageAllExcept(%client, -1, 'MsgClientDrop', "", %client.name, %client);
-
-    // Remove their player, if one exists
-    if (isObject(%client.player))
-        %client.player.scriptKill(0);
-
-    // Set reason, schedule removal
-    %client.setDisconnectReason(%reason);
-    %client.schedule(500, "delete");
-
-    // Keep them out
-   // if(%time != 0)
-   //     BanList::add(%client.guid, %client.getAddress(), %time);
 }
 
 function GameConnection::onDrop(%client, %reason)
@@ -3451,70 +3401,4 @@ function GameConnection::ResetTagSwitchWait(%this)
 function serverCmdGetTargetGameName(%client)
 {
 	// No more spam
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Eolk - Ban functions.
-//////////////////////////////////////////////////////////////////////////////
-function ClassicAddBan(%label, %entry, %skipExport)
-{
-   // Add to in-memory list
-   $ClassicPermaBan[$ClassicPermaBans] = %entry TAB %label;
-   $ClassicPermaBans++;
-
-   // Only write to file if we're supposed to.
-   if (!%skipExport)
-   {
-      // Write to file
-      %fp = new FileObject();
-      if (%fp.openForAppend($Host::ClassicBanlist))
-         %fp.writeLine("ClassicAddBan(\"" @ %label @ "\", \"" @ %entry @ "\", true);");
-      else
-         error("Encountered an I/O error while updating banlist.");
-
-      %fp.close();
-      %fp.delete();
-   }
-}
-
-function ClassicAddWhitelist(%label, %entry)
-{
-   $ClassicWhitelist[$ClassicWhitelists] = %entry TAB %label;
-   $ClassicWhitelists++;
-}
-
-function ClassicIsBanned(%client)
-{
-   %guid = %client.guid;
-   %addr = %client.getIPAddress();
-   %type = 0;
-
-   for (%i = 0; %i < $ClassicPermaBans; %i++)
-   {
-      %entry = getField($ClassicPermaBan[%i], 0);
-
-      if (%guid == %entry)
-         %type |= 1;
-      if (strstr(%addr, %entry) == 0)
-         %type |= 2;
-   }
-
-   for (%x = 0; %x < $ClassicWhitelists; %x++)
-   {
-      %entry = getField($ClassicWhitelist[%x], 0);
-      error(%entry);
-
-      if (%guid == %entry || strstr(%addr, %entry) == 0)
-         return error("SUCCESS!"); // We're whitelisted! Whee!
-   }
-
-   return %type;
-}
-
-function ClassicLoadBanlist()
-{
-   $ClassicPermaBans = 0;
-   exec($Host::ClassicBanlist);
-   $ClassicWhitelists = 0;
-   exec($Host::ClassicWhitelist);
 }

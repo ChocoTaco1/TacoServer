@@ -62,21 +62,54 @@ function connectLog(%client, %isDisconnect)
    }
 }
 
-// voteLog(%client, %votemsg)
-// Info: Logs the vote events
-function voteLog(%client, %votemsg)
-{
-   if($Host::ClassicVoteLog)
    {
       // get the client info
       %authInfo = %client.getAuthInfo();
-	  %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
+	  
+	  // show name for Votekick
+	  if(%typeName $= "VoteKickPlayer")
+		   %arg1 = %arg1.nameBase;
 
       // this is the info that will be logged
-      $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %votemsg SPC "CM[" @ $CurrentMission @ "]";
+      $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4 SPC "CM[" @ $CurrentMission @ "]";
 
 	  %logpath = $Host::ClassicVoteLogPath;
       export("$VoteLog", %logpath, true);
 	  logEcho($VoteLog);
    }
+}
+
+// From Goon
+// Slightly more elegant solution rather than spamming console
+function ClassicChatLog(%client, %id, %team, %msg)
+{
+   // We don't care about bots.
+   if(%client.isAIControlled())
+      return;
+
+   // Don't log voicepack stuff.
+   if(strstr(%msg, "~w") != -1)
+      return;
+
+   switch$(%id)
+   {
+      case 0:
+         %team = "[Global]";
+      case 1:
+         %team = "["@getTaggedString(Game.getTeamName(%team))@"]";
+      case 2:
+         %team = "[Admin]";
+      case 3:
+         %team = "[Bottomprint]";
+      case 4:
+         %team = "[Centerprint]";
+   }
+
+   // Make it all uppercase
+   %team = strupr(%team);
+
+   $ClassicChatLog = "["@formattimestring("H:nn:ss")@"]" SPC %team SPC getTaggedString(%client.name) @": "@%msg;
+   $ClassicChatLog = stripChars($ClassicChatLog, "\c0\c1\c2\c3\c4\c5\c6\c7\c8\c9\x10\x11\co\cp");
+   %path = $Host::ClassicChatLogPath @ formatTimeString("/yy/mm-MM/dd.log");
+   export("$ClassicChatLog", %path, true);
 }

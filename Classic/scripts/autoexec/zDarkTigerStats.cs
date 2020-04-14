@@ -786,6 +786,8 @@ $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "shockHitMaxDist";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "packpickupCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "weaponpickupCount";
    $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "repairpackpickupCount";
+   
+   $dtStats::FV[$dtStats::FC["dtStats"]++,"dtStats"] = "dtTeam";
 
 ///////////////////////////////////////////////////////////////////
 $dtStats::uFC["dtStats"] = 0; // not saved but used to calculate other stats that are saved
@@ -3211,6 +3213,9 @@ function DefaultGame::postGameStats(%game,%client){ //stats to add up at the end
    else if(%game.class $= "LakRabbitGame"){
       %client.flagTimeMin = mFloor((%client.flagTimeMS / 1000)/60); 
    }
+ 
+   //Record clients team 
+   %client.dtTeam = %client.team;
 }
 
 function DefaultGame::getGamePct(%game)

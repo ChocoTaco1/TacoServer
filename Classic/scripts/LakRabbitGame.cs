@@ -616,6 +616,9 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				}
 				%weapon = "Plasma";
 			case $DamageType::Laser:
+			    if($InvBanList[LakRabbit, "SniperRifle"]) //banned
+					return;
+			
 				if(%energy > 0.5 || %players > 7)
 				{
 					%players = (ClientGroup.getCount()-1)/1.5;

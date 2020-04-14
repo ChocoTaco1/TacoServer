@@ -608,10 +608,13 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			case $DamageType::Blaster:
 				if(%ma)
 				{
-					%points = %distanceBonus/2;
+					%points = %distanceBonus/2.5; //was 2
 					%velBonus /= 2;
 					%sound = %defaultSound;
+					%amount *= 0.7; //Midair blaster damage reduction - particularly for blaster spamming
 				}
+				else
+					%amount *= 0.5; //Ground blaster damage reduction - particularly for blaster spamming
 				%weapon = "Blaster";
 			case $DamageType::Plasma:
 				if(%ma && %percentDam >= 98)

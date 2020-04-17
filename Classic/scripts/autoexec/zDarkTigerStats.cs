@@ -235,7 +235,7 @@ $dtStats::gtNameShort["DMGame"] = "DM";
 $dtStats::gtNameShort["SCtFGame"] = "LCTF";
 $dtStats::gtNameShort["ArenaGame"] = "Arena"; 
 $dtStats::gtNameShort["DuelGame"] = "Duel"; 
-//Display name 
+//Display name - rely on these in tacoserver enablelogs.cs
 $dtStats::gtNameLong["CTFGame"] = "Capture the Flag";
 $dtStats::gtNameLong["LakRabbitGame"] = "LakRabbit";
 $dtStats::gtNameLong["DMGame"] = "Deathmatch";

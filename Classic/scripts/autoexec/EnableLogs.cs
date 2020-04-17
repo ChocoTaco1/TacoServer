@@ -94,15 +94,22 @@ function ClassicChatLog(%client, %id, %team, %msg)
       return;
 
    // Don't log voicepack stuff.
-   if(strstr(%msg, "~w") != -1)
+   if(strstr(%msg, "~w") != -1 || strstr(%msg, "flag") != -1)
       return;
+  
+   %team = getTaggedString(Game.getTeamName(%team));
+
+   if(%team $= "Unassigned")
+	   %team = "Observer";
+   else if($CurrentMissionType $= "LakRabbit" || $CurrentMissionType $= "DM") 
+	   %team = $dtStats::gtNameLong[%client.lgame]; //from zDarktigerStats.cs
 
    switch$(%id)
    {
       case 0:
          %team = "[Global]";
       case 1:
-         %team = "["@getTaggedString(Game.getTeamName(%team))@"]";
+         %team = "[" @ %team @ "]";
       case 2:
          %team = "[Admin]";
       case 3:
@@ -111,10 +118,7 @@ function ClassicChatLog(%client, %id, %team, %msg)
          %team = "[Centerprint]";
    }
 
-   // Make it all uppercase
-   %team = strupr(%team);
-
-   $ClassicChatLog = "["@formattimestring("H:nn:ss")@"]" SPC %team SPC getTaggedString(%client.name) @": "@%msg;
+   $ClassicChatLog = "["@formattimestring("H:nn:ss")@"] "@%team SPC getTaggedString(%client.name)@": "@%msg;
    $ClassicChatLog = stripChars($ClassicChatLog, "\c0\c1\c2\c3\c4\c5\c6\c7\c8\c9\x10\x11\co\cp");
    %path = $Host::ClassicChatLogPath @ formatTimeString("/yy/mm-MM/dd.log");
    export("$ClassicChatLog", %path, true);

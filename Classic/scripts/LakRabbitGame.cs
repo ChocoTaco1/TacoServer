@@ -354,9 +354,8 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		// borlak -- DJ + gren spam abuse, remove player height
 		if(%damageType == $DamageType::Grenade && !$lastObjExplode.isHandNade)
 			%targetPosition = setWord(%targetPosition, 2, getWord(%targetPosition,2) - getHeight(%targetObject));
-
-		//if(%damageType == $DamageType::ShockLance || %damageType == $DamageType::Laser)		
-		if(%damageType == $DamageType::ShockLance)
+		
+		if(%damageType == $DamageType::ShockLance || %damageType == $DamageType::Laser)
 		{
 			$lastObjExplode	= 0;
 			%distance		= VectorDist(%targetPosition, %sourceObject.getWorldBoxCenter());
@@ -380,8 +379,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		%velBonus			= (mPow(%vel,1.125)/10)+1;
 
 		// for shock and laser, you get MA points if -you- are in the air not the opponent
-		//if(%damageType == $DamageType::ShockLance || %damageType == $DamageType::Laser)
-		if(%damageType == $DamageType::ShockLance)
+		if(%damageType == $DamageType::ShockLance || %damageType == $DamageType::Laser)
 			%ma = TestForMA(%sourceObject, 6);
 		else
 			%ma = TestForMA(%targetObject, 6);
@@ -399,45 +397,6 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		// no splash damage vote
 		if(Game.noSplashDamage && %percentDam < 98 && $lastObjExplode && !$lastObjExplode.isHandNade && %damageType != $DamageType::Mine)
 			%amount = 0.0;
-		
-		//if(%damageType == $DamageType::Laser && (%energy > 0.5 || %players > 7))
-		//{
-		//	%players = (ClientGroup.getCount()-1)/1.5;
-		//   	%points = (%distance/75)+1;
-		//
-		//	if(%ma)
-		//		%points *= 1.75;
-		//		
-		//	if(%targetObject.client.headshot)
-		//	{
-		//		%sound = %defaultSound;
-		//		%special = " Headshot";
-		//		%points *= 1.75;
-		//	}
-		//	%sourceObject.client.totalSnipeHits++;
-		//	%weapon = "Snipe";
-		//}
-		//else if(%damageType == $DamageType::Bullet)
-		//{
-		//	// doesn't matter if it's MA
-		//	%ma = 0;
-		//
-		//	%players = (ClientGroup.getCount()-1)/1.75;
-		//
-		//	$LakFired[%sourceObject, ChaingunBullet, 1]++;
-		//	
-		//	if($LakFired[%sourceObject, ChaingunBullet, 1] % 5 == 0)
-		//	{
-		//		%accamount = mFloor(($LakFired[%sourceObject, ChaingunBullet, 1] / $LakFired[%sourceObject, ChaingunBullet, 0])*100);
-		//		%velBonus = 0;
-		//		%points = (%accamount/3)+1;
-		//		%accuracy = " [Accuracy:" @ %accamount @ "%]";
-		//
-		//		%sourceObject.client.totalChainAccuracy += %accamount;
-		//		%sourceObject.client.totalChainHits++;
-		//	}
-		//	%weapon = "Chaingun";
-		//}
 		
 		switch$(%damageType)
 		{
@@ -505,37 +464,60 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				}
 				%weapon = "Disc";
 			case $DamageType::Grenade:
-				if(Game.PubPro)
+				if($lastObjExplode.isHandNade) //Hand grenades
 				{
-					if(%ma && %percentDam >= 98)
+					if(%percentDam > 20)
 					{
-						%points = %distanceBonus;
-						%sound = %defaultSound;
+						%accuracy = " [Accuracy:" @ %percentDam @ "%]";
+						%points = (%percentDam/10)+1;
+						%velBonus = 0;
+						%sound = '~wfx/misc/coin.wav';
+
 					}
-					if(%percentDam >= 25 && !%ma && %distance >= 80 && %velTarget > 20)
+					if(%percentDam >= 99)
 					{
-						%points = %longDistanceBonus;
-						%velBonus /= 2;
-						%long = 1;
-						%sound = %defaultSound;
+						%sound = '~wfx/misc/Cheer.wav';
+						%points *= 2.0;
 					}
+					if(%ma)
+						%points *= 1.5;
+
+					%weapon = "Hand-Nade";
 				}
-				else 
+				else
 				{
-					if(%ma && %percentDam >= 98)
+					if(Game.PubPro)
 					{
-						%points = %distanceBonus/1.85;
-						%sound = %defaultSound;
+						if(%ma && %percentDam >= 98)
+						{
+							%points = %distanceBonus;
+							%sound = %defaultSound;
+						}
+						if(%percentDam >= 25 && !%ma && %distance >= 80 && %velTarget > 20)
+						{
+							%points = %longDistanceBonus;
+							%velBonus /= 2;
+							%long = 1;
+							%sound = %defaultSound;
+						}
 					}
-					if(%percentDam >= 25 && !%ma && %distance >= 100 && %velTarget > 30)
+					else 
 					{
-						%points = %longDistanceBonus/1.85;
-						%velBonus /= 4;
-						%long = 1;
-						%sound = %defaultSound;
+						if(%ma && %percentDam >= 98)
+						{
+							%points = %distanceBonus/1.85;
+							%sound = %defaultSound;
+						}
+						if(%percentDam >= 25 && !%ma && %distance >= 100 && %velTarget > 30)
+						{
+							%points = %longDistanceBonus/1.85;
+							%velBonus /= 4;
+							%long = 1;
+							%sound = %defaultSound;
+						}
 					}
+					%weapon = "Grenade-Launcher";
 				}
-				%weapon = "Grenade-Launcher";
 			case $DamageType::Mortar:
 				if(%ma && %percentDam >= 98)
 				{
@@ -588,7 +570,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 					%dif        = VectorNormalize(%dif);
 					%dot        = VectorDot(%dif, %objDir2D);
 
-					if(%dot >= mCos(1.05))
+				if(%dot >= mCos(1.05))
 				{
 					if(%sourceObject.holdingFlag && TestForMA(%targetObject, 6))
 					{
@@ -602,16 +584,22 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				}
 				if(%ma)
 					%points += 3;
-					%sound = %defaultSound;
-					%sourceObject.client.totalShockHits++;
-					%weapon = "ShockLance";
+				
+				//not a bug. sl gets points ma or not
+				%sound = %defaultSound;
+				%sourceObject.client.totalShockHits++;
+
+				%weapon = "ShockLance";
 			case $DamageType::Blaster:
 				if(%ma)
 				{
-					%points = %distanceBonus/2;
+					%points = %distanceBonus/2.5; //was 2
 					%velBonus /= 2;
 					%sound = %defaultSound;
+					%amount *= 0.7; //Midair blaster damage reduction - particularly for blaster spamming
 				}
+				else
+					%amount *= 0.5; //Ground blaster damage reduction - particularly for blaster spamming
 				%weapon = "Blaster";
 			case $DamageType::Plasma:
 				if(%ma && %percentDam >= 98)
@@ -627,29 +615,45 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 					%sound = %defaultSound;
 				}
 				%weapon = "Plasma";
+			case $DamageType::Laser:
+			    if($InvBanList[LakRabbit, "SniperRifle"]) //banned
+					return;
+			
+				if(%energy > 0.5 || %players > 7)
+				{
+					%players = (ClientGroup.getCount()-1)/1.5;
+					%points = (%distance/75)+1;
+				
+					if(%ma)
+						%points *= 1.75;
+						
+					if(%targetObject.client.headshot)
+					{
+						%sound = %defaultSound;
+						%special = " Headshot";
+						%points *= 1.75;
+					}
+					%sourceObject.client.totalSnipeHits++;
+					%weapon = "Snipe";
+				}
+			case $DamageType::Bullet:
+				// doesn't matter if it's MA
+				%ma = 0;
+				%players = (ClientGroup.getCount()-1)/1.75;
+				$LakFired[%sourceObject, ChaingunBullet, 1]++;
+				
+				if($LakFired[%sourceObject, ChaingunBullet, 1] % 5 == 0)
+				{
+					%accamount = mFloor(($LakFired[%sourceObject, ChaingunBullet, 1] / $LakFired[%sourceObject, ChaingunBullet, 0])*100);
+					%velBonus = 0;
+					%points = (%accamount/3)+1;
+					%accuracy = " [Accuracy:" @ %accamount @ "%]";
+			
+					%sourceObject.client.totalChainAccuracy += %accamount;
+					%sourceObject.client.totalChainHits++;
+				}
+				%weapon = "Chaingun";
 		}
-	}
-	
-	//Hand grenades
-	if(%damageType == $DamageType::Grenade && $lastObjExplode.isHandNade)
-	{
-		if(%percentDam > 20)
-		{
-			%accuracy = " [Accuracy:" @ %percentDam @ "%]";
-			%points = (%percentDam/10)+1;
-			%velBonus = 0;
-			%sound = '~wfx/misc/coin.wav';
-
-		}
-		if(%percentDam >= 99)
-		{
-			%sound = '~wfx/misc/Cheer.wav';
-			%points *= 2.0;
-		}
-		if(%ma)
-			%points *= 1.5;
-
-		%weapon = "Hand-Nade";
 	}
 
 	// borlak -- recalc score for hits

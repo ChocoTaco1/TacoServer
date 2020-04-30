@@ -385,6 +385,9 @@ package SCtFGame
 		%damageScale = %data.damageScale[%damageType];
 		if(%damageScale !$= "")
 			%amount *= %damageScale;
+		
+		if(%damageType == $DamageType::Laser && $InvBanList[SctF, "SniperRifle"]) //banned
+			return;
 	   
 		%flash = %targetObject.getDamageFlash() + (%amount * 2);
 		if (%flash > 0.75)

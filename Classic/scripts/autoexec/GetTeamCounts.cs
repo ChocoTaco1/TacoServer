@@ -75,7 +75,7 @@ function GetTeamCounts( %game, %client, %respawn )
 				//Start Team Balance Notify
 				schedule(1000, 0, "TeamBalanceNotify", %game, %team1difference, %team2difference);
 				//Start AntiCloak
-				schedule(1500, 0, "CheckAntiCloak", %game);
+				schedule(1500, 0, "CheckAntiPack", %game);
 				
 				//Set so counter wont run when it doesnt need to.
 				$GetCountsStatus = "IDLE";

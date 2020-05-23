@@ -1641,7 +1641,7 @@ package dtStatsGame{
    function Weapon::onPickup(%this, %obj, %shape, %amount){
 		parent::onPickup(%this, %obj, %shape, %amount);
 	    if($dtStats::Enable)
-	       %this.weaponpickupCount++;
+	       %shape.client.weaponpickupCount++;
    }
 };
 

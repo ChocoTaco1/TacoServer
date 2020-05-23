@@ -1230,7 +1230,7 @@ datablock PlayerData(LightMaleHumanArmor) : LightPlayerDamageProfile
 
    cameraDefaultFov = 90.0;
    cameraMinFov = 5.0;
-   cameraMaxFov = 120.0;
+   cameraMaxFov = 138.0;
 
    debrisShapeName = "debris_player.dts";
    debris = playerDebris;
@@ -1486,7 +1486,7 @@ datablock PlayerData(MediumMaleHumanArmor) : MediumPlayerDamageProfile
 
    cameraDefaultFov = 90.0;
    cameraMinFov = 5.0;
-   cameraMaxFov = 120.0;
+   cameraMaxFov = 138.0;
 
    debrisShapeName = "debris_player.dts";
    debris = playerDebris;
@@ -1743,7 +1743,7 @@ datablock PlayerData(HeavyMaleHumanArmor) : HeavyPlayerDamageProfile
 
    cameraDefaultFov = 90.0;
    cameraMinFov = 5.0;
-   cameraMaxFov = 120.0;
+   cameraMaxFov = 138.0;
 
    debrisShapeName = "debris_player.dts";
    debris = playerDebris;

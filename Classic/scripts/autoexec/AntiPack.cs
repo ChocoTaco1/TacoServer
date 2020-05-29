@@ -9,6 +9,11 @@
 // $Host::AntiPackPlayerCount = 6;
 //
 
+// Choose which packs to limit
+$AntiPackIncludeCloak = 1;
+$AntiPackIncludeShield = 0;
+
+
 // Called in GetCounts.cs
 function CheckAntiPack( %game )
 {
@@ -40,16 +45,26 @@ function CheckAntiPack( %game )
 	switch$($AntiPackStatus)
 	{
 		case ON:
-			$InvBanList[CTF, "CloakingPack"] = 1;
-			$InvBanList[CTF, "ShieldPack"] = 1;
-			if(!isActivePackage(AntiPack))
-				activatePackage(AntiPack);
+			if($AntiPackIncludeCloak)
+			{
+				$InvBanList[CTF, "CloakingPack"] = 1;
+				if(!isActivePackage(AntiPackCloak))
+					activatePackage(AntiPackCloak);
+			}
+			if($AntiPackIncludeShield)
+			{
+				$InvBanList[CTF, "ShieldPack"] = 1;
+				if(!isActivePackage(AntiPackShield))
+					activatePackage(AntiPackShield);
+			}
 			$AntiPackStatus = "ACTIVEON";
 		case OFF:
 			$InvBanList[CTF, "CloakingPack"] = 0;
 			$InvBanList[CTF, "ShieldPack"] = 0;
-			if(isActivePackage(AntiPack))
-				deactivatePackage(AntiPack);
+			if(isActivePackage(AntiPackCloak))
+				deactivatePackage(AntiPackCloak);
+			if(isActivePackage(AntiPackShield))
+				deactivatePackage(AntiPackShield);
 			$AntiPackStatus = "ACTIVEOFF";
 		case ACTIVEON:				
 			//Do Nothing
@@ -59,7 +74,7 @@ function CheckAntiPack( %game )
 }
 
 // So if the player is able to get said pack, he cant use it
-package AntiPack
+package AntiPackCloak
 {
 
 function CloakingPackImage::onActivate(%data, %obj, %slot)
@@ -74,6 +89,11 @@ function CloakingPackImage::onActivate(%data, %obj, %slot)
       messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloaking available for light armors only.');
    }
 }
+
+};
+
+package AntiPackShield
+{
 
 function ShieldPackImage::onActivate(%data, %obj, %slot)
 {

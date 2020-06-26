@@ -303,29 +303,29 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	if(%targetObject.invincible || %targetObject.getState() $= "Dead")
 		return;
 		
-	// rabbit can't DJ in duel mode
-	if(Game.duelMode && %targetObject.holdingFlag && %targetObject == %sourceObject
-	&& %damageType == $DamageType::Disc
-	&& getWord(%targetObject.getMuzzleVector(0),2) < -0.7
-	&& !TestForMA(%sourceObject, 5))
-	{
-		%sound = '~wfx/misc/missed.wav';
-		%amount = 2.0;
-		%targetObject.blowup();
-	}
+	//rabbit can't DJ in duel mode
+	// if(Game.duelMode && %targetObject.holdingFlag && %targetObject == %sourceObject
+	// && %damageType == $DamageType::Disc
+	// && getWord(%targetObject.getMuzzleVector(0),2) < -0.7
+	// && !TestForMA(%sourceObject, 5))
+	// {
+		// %sound = '~wfx/misc/missed.wav';
+		// %amount = 2.0;
+		// %targetObject.blowup();
+	// }
 
-	// Zeph - PubPro no DJ
+	//Zeph - PubPro no DJ
 
-	if(Game.PubPro && %targetObject == %sourceObject
-	&& %damageType == $DamageType::Disc
-	&& getWord(%targetObject.getMuzzleVector(0),2) < -0.7
-	&& !TestForMA(%sourceObject, 5))
-	{
-		%sound = '~wfx/misc/missed.wav';
-		%amount = 2.0;
-		%targetObject.blowup();
-		%targetObject.scriptKill();
-	}
+	// if(Game.PubPro && %targetObject == %sourceObject
+	// && %damageType == $DamageType::Disc
+	// && getWord(%targetObject.getMuzzleVector(0),2) < -0.7
+	// && !TestForMA(%sourceObject, 5))
+	// {
+		// %sound = '~wfx/misc/missed.wav';
+		// %amount = 2.0;
+		// %targetObject.blowup();
+		// %targetObject.scriptKill();
+	// }
 
 	// hurting yourself, check for free DJ
 	if( isObject(%sourceObject)
@@ -1046,7 +1046,7 @@ function checkDuelTimer(%client)
 		if(%client.duelSeconds == 10 || %client.duelSeconds == 5 || %client.duelSeconds <= 3)
 		{
 			%plural = (%client.duelSeconds != 1 ? 's' : "");
-		        messageClient(%client, 'MsgDuelTimer', '\c4[Duel Mode] You have %1 second%2 to kill someone, or die!~wfx/misc/red_alert_short.wav', %client.duelSeconds, %plural);
+		    messageClient(%client, 'MsgDuelTimer', '\c4You have %1 second%2 to kill someone, or die!~wgui/launchMenuOver.wav', %client.duelSeconds, %plural);
 		}
 	}
 }

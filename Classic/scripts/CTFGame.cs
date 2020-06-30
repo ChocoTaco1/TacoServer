@@ -648,16 +648,18 @@ function CTFGame::flagCap(%game, %player)
 
    if($Host::ClassicEvoStats)
    {
-	  %held2 = getSimTime() - %game.totalFlagHeldTime[%flag];
-	  %realtime = %game.formatTime(%held2, true);
 	  %record = false;
+	  if($TotalTeamPlayerCount >= $Host::MinFlagRecordPlayerCount)
+		  %recordit = true;
 	  if(%game.totalFlagHeldTime[%flag])
 	  {
+		 %held2 = getSimTime() - %game.totalFlagHeldTime[%flag];
+		 %realtime = %game.formatTime(%held2, true);
 		 if(%client.team == 1)
 		 {
 			if((%held2 < $flagstats::heldTeam1) || $flagstats::heldTeam1 == 0)
 			{
-			   if($HostGamePlayerCount >= $Host::MinFlagRecordPlayerCount)
+			   if(%recordit)
 			   {
 				   $flagstats::heldTeam1 = %held2;
 				   $flagstats::realTeam1 = %realTime;
@@ -670,7 +672,7 @@ function CTFGame::flagCap(%game, %player)
 		 {
 			if((%held2 < $flagstats::heldTeam2) || $flagstats::heldTeam2 == 0)
 			{
-			   if($HostGamePlayerCount >= $Host::MinFlagRecordPlayerCount)
+			   if(%recordit)
 			   {
 				   $flagstats::heldTeam2 = %held2;
 				   $flagstats::realTeam2 = %realTime;
@@ -682,7 +684,7 @@ function CTFGame::flagCap(%game, %player)
 
 		 if(%record == true)
 		 {
-			if($HostGamePlayerCount >= $Host::MinFlagRecordPlayerCount)
+			if(%recordit)
 			{
 				%fileOut = "stats/maps/classic/" @ $CurrentMissionType @ "/" @ $CurrentMission @ ".txt";
 				export("$flagstats::*", %fileOut, false);
@@ -691,24 +693,24 @@ function CTFGame::flagCap(%game, %player)
 			else
 				schedule(4000, 0, "messageClient", %client, '', "\c2New flag records are disabled until" SPC $Host::MinFlagRecordPlayerCount SPC "players.");
 		 }
+		 
+		 if(!$Host::TournamentMode)
+			bottomprint(%client, "You captured the flag in " @ %realTime @ " seconds", 3);
+		
+		 $stats::caps[%client]++;
+		 if($stats::caps[%client] > $stats::caps_counter)
+		 {
+			$stats::caps_counter = $stats::caps[%client];
+			$stats::caps_client = getTaggedString(%client.name);
+		 }
+			
+		 if(%held2 < $stats::fastestCap || !$stats::fastestCap)
+		 {
+			$stats::fastestCap = %held2;
+			$stats::fastcap_time = %realTime;
+			$stats::fastcap_client = getTaggedString(%client.name);
+		 }
 	  }
-
-	 if(!$Host::TournamentMode)
-		bottomprint(%client, "You captured the flag in " @ %realTime @ " seconds", 3);
-
-	 $stats::caps[%client]++;
-	 if($stats::caps[%client] > $stats::caps_counter)
-	 {
-		$stats::caps_counter = $stats::caps[%client];
-		$stats::caps_client = getTaggedString(%client.name);
-	 }
-	
-	 if(%held2 < $stats::fastestCap || !$stats::fastestCap)
-	 {
-		$stats::fastestCap = %held2;
-		$stats::fastcap_time = %realTime;
-		$stats::fastcap_client = getTaggedString(%client.name);
-	 }
    }
 
    //award points to player and team

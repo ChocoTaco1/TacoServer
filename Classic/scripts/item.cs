@@ -56,7 +56,7 @@
 
 //----------------------------------------------------------------------------
 
-$ItemRespawnTime = 30000;
+$ItemRespawnTime = $Host::ItemRespawnTime * 1000;
 $ItemPopTime = 30 * 1000; // 30 seconds
 
 $WeaponSlot = 0;

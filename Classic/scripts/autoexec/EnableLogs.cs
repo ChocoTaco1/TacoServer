@@ -97,7 +97,10 @@ function ClassicChatLog(%client, %id, %team, %msg)
    if(strstr(%msg, "~w") != -1 || strstr(%msg, "flag") != -1)
       return;
   
-   %team = getTaggedString(Game.getTeamName(%team));
+   if($countdownStarted)
+      %team = getTaggedString(Game.getTeamName(%team));
+   else
+      %team = "Debrief";
 
    if(%team $= "Unassigned")
 	   %team = "Observer";

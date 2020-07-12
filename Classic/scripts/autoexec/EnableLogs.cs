@@ -96,23 +96,23 @@ function ClassicChatLog(%client, %id, %team, %msg)
    // Don't log voicepack stuff.
    if(strstr(%msg, "~w") != -1 || strstr(%msg, "flag") != -1)
       return;
-  
-   if($countdownStarted)
-      %team = getTaggedString(Game.getTeamName(%team));
-   else
-      %team = "Debrief";
-
-   if(%team $= "Unassigned")
-	   %team = "Observer";
-   else if($CurrentMissionType $= "LakRabbit" || $CurrentMissionType $= "DM") 
-	   %team = $dtStats::gtNameLong[%client.lgame]; //from zDarktigerStats.cs
 
    switch$(%id)
    {
       case 0:
          %team = "[Global]";
       case 1:
-         %team = "[" @ %team @ "]";
+         if($countdownStarted)
+			 %team = getTaggedString(Game.getTeamName(%team));
+		 else
+			 %team = "Debrief";
+		 
+		 if(%team $= "Unassigned")
+			 %team = "Observer";
+		 else if($CurrentMissionType $= "LakRabbit" || $CurrentMissionType $= "DM") 
+	         %team = $dtStats::gtNameLong[%client.lgame]; //from zDarktigerStats.cs
+		 
+		 %team = "[" @ %team @ "]";
       case 2:
          %team = "[Admin]";
       case 3:

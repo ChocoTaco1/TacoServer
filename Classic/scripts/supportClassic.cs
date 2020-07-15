@@ -231,7 +231,7 @@ function ClassicAddWhitelist(%label, %entry)
 function ClassicIsBanned(%client)
 {
    %guid = %client.guid;
-   %addr = %client.getIPAddress();
+   %addr = getIPAddress(%client);
    %type = 0;
 
    for (%i = 0; %i < $ClassicPermaBans; %i++)

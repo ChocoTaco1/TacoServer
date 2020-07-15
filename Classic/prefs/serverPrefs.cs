@@ -100,6 +100,7 @@ $Host::holoName4 = "DSword";
 $Host::holoName5 = "BloodEagle";
 $Host::holoName6 = "Harbinger";
 $Host::Info = " ";
+$Host::ItemRespawnTime = 30;
 $Host::KickBanTime = 600;
 $Host::KickObserverTimeout = 1200;
 $Host::LakRabbitDuelMode = 0;

@@ -30,3 +30,7 @@ function StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %pos
 }
 
 };
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(NoBaseRape))
+    activatePackage(NoBaseRape);

@@ -318,6 +318,9 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				messageClient(%client, "", "\c2Switching to this time wouldn't affect the time limit at all.");
 				return;
 			}
+			
+			if(%arg1 < $Host::TimeLimit)
+				return;
 
 			if((!%isAdmin && $Host::AllowPlayerVoteTimeLimit) || (%isAdmin && %client.ForceVote))
 			{

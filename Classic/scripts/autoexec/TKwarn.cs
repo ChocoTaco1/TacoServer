@@ -1,7 +1,3 @@
-$Host::TKMax = 12;
-$Host::TKWarn1 = 4;
-$Host::TKWarn2 = 8;
-
 package TKwarn
 {
 

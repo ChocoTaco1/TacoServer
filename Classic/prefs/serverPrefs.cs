@@ -175,6 +175,7 @@ $Host::TN::beat = 3;
 $Host::TN::echo = 1;
 $Host::TournamentMode = 0;
 $Host::useCustomSkins = 1;
+$Host::VoteCooldown = 120;
 $Host::VotePassPercent = 60;
 $Host::VoteSpread = 20;
 $Host::VoteTime = "45";

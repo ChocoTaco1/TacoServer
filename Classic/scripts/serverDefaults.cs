@@ -193,6 +193,7 @@ $Host::AveragePings = 1;
 $Host::GuidCheck = 1;
 $Host::MinFlagRecordPlayerCount = 6;
 $Host::ItemRespawnTime = 30;
+$Host::VoteCooldown = 120;
 
 //LakRabbit
 $Host::LakRabbitUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled

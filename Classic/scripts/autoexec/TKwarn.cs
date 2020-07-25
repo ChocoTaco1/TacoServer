@@ -14,10 +14,10 @@ function DefaultGame::testTeamKill(%game, %victimID, %killerID)
 
    // warn the player
    if((%killerID.teamkills == $Host::TKWarn1 - 1) && $Host::TKWarn1 != 0)
-      centerprint(%killerID, "<font:Univers Condensed Bold:22><color:ff2222>You have teamkilled " @ %killerID.teamkills + 1 @ " players.\nCut it out!", 5, 3);
+      centerprint(%killerID, "<font:Univers Bold:26><color:ff2222>You have teamkilled " @ %killerID.teamkills + 1 @ " players.\nCut it out!", 5, 3);
    // warn the player of his imminent kick
    else if((%killerID.teamkills == $Host::TKWarn2 - 1) && $Host::TKWarn2 != 0)
-      centerprint(%killerID, "<font:Univers Condensed Bold:22><color:ff2222>You have teamkilled " @ %killerID.teamkills + 1 @ " players.\nWith " @ $Host::TKMax @ " teamkills, you will be kicked.", 5, 3);
+      centerprint(%killerID, "<font:Univers Bold:26><color:ff2222>You have teamkilled " @ %killerID.teamkills + 1 @ " players.\nWith " @ $Host::TKMax @ " teamkills, you will be kicked.", 5, 3);
    // kick the player
    else if((%killerID.teamkills >= $Host::TKMax - 1) && $Host::TKMax != 0)
    {

@@ -18,7 +18,7 @@ function adminLog(%client, %msg)
 	  %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
 
       // this is the info that will be logged
-      $AdminLog = formatTimeString("M-d") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ ", " @ %ip @ ", " @ %client.guid @ ", " @ %client.getAddress() @ ")" @ %msg SPC "[" @ $CurrentMission @ "]";
+      $AdminLog = formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ ", " @ %ip @ ", " @ %client.guid @ ", " @ %client.getAddress() @ ")" @ %msg SPC "[" @ $CurrentMission @ "]";
 
 	  %logpath = $Host::ClassicAdminLogPath;
       export("$AdminLog", %logpath, true);
@@ -53,7 +53,7 @@ function connectLog(%client, %isDisconnect)
 	  else
 		  %name = %client.nameBase;
 	  
-	  $ConnectLog = %inout SPC "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[HH:nn]") SPC %name SPC "(" @ getField(%authInfo, 0) @ "," SPC %client.guid @ "," SPC %ip @ ")" SPC "[" @ $CurrentMission @ "]" SPC "NTC[" @ %ntc @ "]";
+	  $ConnectLog = %inout SPC "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %name SPC "(" @ getField(%authInfo, 0) @ "," SPC %client.guid @ "," SPC %ip @ ")" SPC "[" @ $CurrentMission @ "]" SPC "NTC[" @ %ntc @ "]";
 
 	  %logpath = $Host::ClassicConnLogPath;
       export("$ConnectLog", %logpath, true);
@@ -71,7 +71,7 @@ function connectLog(%client, %isDisconnect)
 		   %arg1 = %arg1.nameBase;
 
       // this is the info that will be logged
-      $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[HH:nn]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4 SPC "CM[" @ $CurrentMission @ "]";
+      $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4 SPC "CM[" @ $CurrentMission @ "]";
 
 	  %logpath = $Host::ClassicVoteLogPath;
       export("$VoteLog", %logpath, true);
@@ -115,7 +115,7 @@ function ClassicChatLog(%client, %id, %team, %msg)
          %team = "[Centerprint]";
    }
 
-   $ClassicChatLog = "["@formattimestring("H:nn:ss")@"] "@%team SPC getTaggedString(%client.name)@": "@%msg;
+   $ClassicChatLog = "["@formattimestring("hh:nn:ss:a")@"] "@%team SPC getTaggedString(%client.name)@": "@%msg;
    $ClassicChatLog = stripChars($ClassicChatLog, "\c0\c1\c2\c3\c4\c5\c6\c7\c8\c9\x10\x11\co\cp");
    %path = $Host::ClassicChatLogPath @ formatTimeString("/yy/mm-MM/dd.log");
    export("$ClassicChatLog", %path, true);

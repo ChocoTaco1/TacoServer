@@ -1143,11 +1143,13 @@ function SCtFGame::beginStalemate(%game)
 {
    %game.stalemate = true;
    %game.showStalemateTargets();
+
    // z0dd - ZOD, 5/27/03. Added anti-turtling, return flags after x minutes
    if(!$Host::TournamentMode)
    {
-      messageAll( 'MsgStalemate', '\c3Anti turtle initialized. Flags will be returned to bases in %1 minutes.', $Host::ClassicAntiTurtleTime);
-      %game.turtleSchedule = %game.schedule($Host::ClassicAntiTurtleTime * 60000, 'antiTurtle');
+      messageAll( 'MsgStalemate', "\c3Anti turtle initialized. Flags will be returned to bases in " @ $Host::ClassicAntiTurtleTime @ " minutes.");
+      %game.turtleSchedule = %game.schedule($Host::ClassicAntiTurtleTime * 60000, "antiTurtle");
+	  error(formatTimeString("HH:nn:ss") SPC "Anti-Turtle thread beginning now - ID:" SPC %game.turtleSchedule);
    }
 }
 
@@ -1156,19 +1158,28 @@ function SCtFGame::endStalemate(%game)
    %game.stalemate = false;
    %game.hideStalemateTargets();
    cancel(%game.stalemateSchedule);
+   cancel(%game.turtleSchedule);
 }
 
-// z0dd - ZOD, 5/27/03. Anti-turtle function
-function CTFGame::antiTurtle(%game)
+function SCtFGame::antiTurtle(%game)
 {
    if(isEventPending(%game.turtleSchedule))
-      cancel(%game.turtleSchedule);
+	  cancel(%game.turtleSchedule);
 
-   for (%i = 1; %i <= 2; %i++)
-   {
+   if(%game.turtleSchedule > 0)
+      %game.turtleSchedule = 0;
+
+   if(isEventPending(%game.stalemateSchedule))
+	  cancel(%game.stalemateSchedule);
+
+   if(%game.stalemateSchedule > 0)
+      %game.stalemateSchedule = 0;
+  
+   for (%i = 1; %i <= Game.numTeams; %i++)
       Game.flagReturn($TeamFlag[%i]);
-      messageAll( 'MsgCTFFlagReturned', '\c3Both flags returned to bases to break stalemate.~wfx/misc/flag_return.wav', 0, 0, %i);
-   }
+   
+   messageAll( "", "\c3Both flags returned to bases to break stalemate.~wfx/misc/flag_return.wav");
+   error(formatTimeString("HH:nn:ss") SPC "Anti-Turtle thread ended");
 }
 
 function SCtFGame::flagReset(%game, %flag)

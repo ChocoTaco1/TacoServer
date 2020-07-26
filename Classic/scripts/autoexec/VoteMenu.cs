@@ -300,6 +300,12 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 
 		case "VoteChangeTimeLimit":
+			if($CMHasVoted[%client.guid] >= $Host::ClassicMaxVotes && !%isAdmin)
+			{
+				messageClient(%client, "", "\c2You have exhausted your voting rights for this mission.");
+				return;
+			}
+			
 			if($CurrentMissionType $= "Siege") // Can't change time in this one
 			{
 				messageClient(%client, "", "\c2Cannot change the time limit in this gametype.");
@@ -318,6 +324,9 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				messageClient(%client, "", "\c2Switching to this time wouldn't affect the time limit at all.");
 				return;
 			}
+			
+			if(%arg1 < $Host::TimeLimit)
+				return;
 
 			if((!%isAdmin && $Host::AllowPlayerVoteTimeLimit) || (%isAdmin && %client.ForceVote))
 			{
@@ -325,6 +334,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				%msg = %client.nameBase @ " initiated a vote to change the time limit to " @ %time @ ".";
 				// VoteOvertime
 				StartVOTimeVote(%game);
+				$CMHasVoted[%client.guid]++;
 			}
 
 		case "VoteMatchStart":
@@ -612,7 +622,7 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
 		clearBottomPrint(%client);
 
    %client.canVote = false;
-   %client.rescheduleVote = schedule(($Host::voteSpread * 1000) + ($Host::voteTime * 1000) , 0, "resetVotePrivs", %client);
+   %client.rescheduleVote = schedule(($Host::VoteCooldown * 1000) + ($Host::VoteTime * 1000) , 0, "resetVotePrivs", %client);
    
    // Log Vote
    voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4);

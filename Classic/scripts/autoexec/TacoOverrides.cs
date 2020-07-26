@@ -3,6 +3,9 @@
 // Various Overrides
 //
 
+// Global water viscosity
+$globalviscosity = 3;
+
 package TacoOverrides
 {
 
@@ -156,6 +159,33 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		%amount *= 1.3;
 	
 	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
+}
+
+//Item 'Use' Console spam fix
+function serverCmdUse(%client,%data)
+{
+   // Item names from the client must converted
+   // into DataBlocks
+   // %data = ItemDataBlock[%item];
+   //if(isObject(%client.player)) // z0dd - ZOD, 5/18/03. Console spam fix
+      //%client.player.use(%data);
+	  
+   //Spam Fix 7/2020
+   if(isObject(%client.player) && isObject(%client.getControlObject())) 
+		%client.getControlObject().use(%data);
+}
+
+// Global water viscosity
+function DefaultGame::missionLoadDone(%game)
+{
+   parent::missionLoadDone(%game);
+   
+   for(%i = 0; %i < MissionGroup.getCount(); %i++)
+   {
+      %obj = MissionGroup.getObject(%i);
+      if(%obj.getClassName() $= "WaterBlock")
+         %obj.viscosity = $globalviscosity;
+   }  
 }
 
 };

@@ -78,7 +78,7 @@ function TKkick( %client, %admin, %guid )
             
                if ( isObject( %cl ) )
                {
-                  %client.setDisconnectReason( "You have been kicked out of the game." ); // z0dd - ZOD, 7/13/03. Tell who kicked
+                  %client.setDisconnectReason( "You have been kicked out of the game for teamkilling." ); // z0dd - ZOD, 7/13/03. Tell who kicked
 	              %cl.schedule(700, "delete");
                }
 			 // ban by IP as well
@@ -96,7 +96,7 @@ function TKkick( %client, %admin, %guid )
       
          if ( isObject( %client ) )
          {
-            %client.setDisconnectReason( "You have been kicked out of the game." );
+            %client.setDisconnectReason( "You have been kicked out of the game for teamkilling." );
 	         %client.schedule(700, "delete");
          }
 	   BanList::add( 0, %client.getAddress(), $Host::KickBanTime );

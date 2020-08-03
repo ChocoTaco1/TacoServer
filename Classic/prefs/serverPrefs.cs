@@ -71,7 +71,6 @@ $Host::ClassicTelnet = 1;
 $Host::ClassicTelnetListenPass = "changeme";
 $Host::ClassicTelnetPassword = "changeme";
 $Host::ClassicTelnetPort = 666;
-$Host::ClassicTkLimit = 0;
 $Host::ClassicUseHighPerformanceCounter = 0;
 $Host::ClassicViralBanning = 1;
 $Host::ClassicVoteLog = 1;

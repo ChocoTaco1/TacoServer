@@ -2497,20 +2497,6 @@ function DefaultGame::awardScoreTeamkill(%game, %victimID, %killerID)
       messageClient(%killerID, 'MsgScoreTeamkill', '\c0You have been penalized for killing teammate %1.', %victimID.name); 
 
    %game.recalcScore(%killerID);
-   // z0dd - ZOD, 8/9/03. Auto vote TKers
-   if(!$Host::TournamentMode)
-   {
-      if(($Host::ClassicTkLimit > 4 && %killerID.teamKills >= $Host::ClassicTkLimit) && (getAdmin() == 0))
-      {
-         serverCmdStartNewVote(%victimID, "VoteKickPlayer", %killerID, 0, 0, 0, true);
-         bottomPrintAll("<color:ff0000>" @ %killerID.nameBase @ " Has " @ %killerID.teamKills @ " team kills. Recommend voting yes.", 4, 2);
-         logEcho(%killerID.nameBase @ " GUID: " @ %killerID.guid @ " TKS: " @ %killerID.teamKills, 1);
-      }
-      //else
-      //{
-      //   BottomPrint(%killerID, "<color:ff0000>You have " @ %killerID.teamKills @ ", you better cut it out!", 2, 1 );
-      //}
-   }
 }
  
 function DefaultGame::awardScoreTurretTeamKill(%game, %victimID, %killerID)
@@ -2520,20 +2506,6 @@ function DefaultGame::awardScoreTurretTeamKill(%game, %victimID, %killerID)
       messageClient(%killerID, 'MsgScoreTeamkill', '\c0You have been penalized for killing your teammate %1, with a turret.', %victimID.name);  
 
    %game.recalcScore(%killerID);
-   // z0dd - ZOD, 6/12/03. Auto vote TKers
-   if(!$Host::TournamentMode)
-   {
-      if(($Host::ClassicTkLimit > 4 && %killerID.teamKills >= $Host::ClassicTkLimit) && (getAdmin() == 0))
-      {
-         serverCmdStartNewVote(%victimID, "VoteKickPlayer", %killerID, 0, 0, 0, true);
-         bottomPrintAll("<color:ff0000>" @ %killerID.nameBase @ " Has " @ %killerID.teamKills @ " team kills. Recommend voting yes.", 4, 2);
-         logEcho(%killerID.nameBase @ " GUID: " @ %killerID.guid @ " TKS: " @ %killerID.teamKills, 1);
-      }
-      else
-      {
-         BottomPrint(%killerID, "<color:ff0000>You have " @ %killerID.teamKills @ ", you better cut it out!", 2, 1 );
-      }
-   }
 }
 
 

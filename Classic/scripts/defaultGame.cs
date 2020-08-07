@@ -639,6 +639,10 @@ function DefaultGame::gameOver( %game )
    $VehicleMax[ScoutFlyer]       = 4;
    $VehicleMax[BomberFlyer]      = 2;
    $VehicleMax[HAPCFlyer]        = 2;
+   
+   // Choco - reset turret maxes after each round.
+   $TeamDeployableMin[TurretIndoorDeployable] = 4;
+   $TeamDeployableMin[TurretOutdoorDeployable] = 4;
 }
 
 //------------------------------------------------------------------------------

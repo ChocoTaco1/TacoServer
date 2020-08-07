@@ -17,6 +17,12 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.37 Aug 2020
+// Nerfed Blaster damage (Less spam)
+// Flag Transform 500 > 100
+// Changed Duel Mode buzzer sound
+// Disabled disc jump restriction in duel mode & Pro Mode
+//
 // v3.36 Dec 2019
 // Boundary bounce speed limit
 // Unified Lakrabbit Vars
@@ -1649,7 +1655,7 @@ function LakRabbitGame::onClientKilled(%game, %clVictim, %clKiller, %damageType,
 function LakRabbitGame::updateFlagTransform(%game, %flag)
 {
    %flag.setTransform(%flag.getTransform());
-   %game.updateFlagThread[%flag] = %game.schedule(500, "updateFlagTransform", %flag);
+   %game.updateFlagThread[%flag] = %game.schedule(100, "updateFlagTransform", %flag);
 }
 
 function LakRabbitGame::playerDroppedFlag(%game, %player)

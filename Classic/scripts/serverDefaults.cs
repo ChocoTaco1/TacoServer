@@ -60,7 +60,6 @@ $Host::ClassicConnectLog = 1;                         // Logs all connections to
 $Host::ClassicAntiTurtleTime = 6;                     // How many minutes after a stalemate in CTF are the flags returned
 $Host::ClassicLimitArmors = 0;                        // Restrict armor types like turrets, larger team dictates amount avail
 $Host::ClassicBadWordFilter = 0;                      // Replace potty mouths words with random garbage
-$Host::ClassicTkLimit = 0;                            // When set to 5 or more and no admin is on server, a vote is started to kick the tker
 $Host::ClassicAllowConsoleAccess = 0;                 // Allows super admins to use the servers console via Admin hud.
 $Host::ClassicNoNullVoiceSpam = 0;                    // Allow or disallow NULL voice usage. 1 enabled NULL voice to be used.
 $Host::ClassicBalancedBots = 0;                       // For every client join a bot is disconnected

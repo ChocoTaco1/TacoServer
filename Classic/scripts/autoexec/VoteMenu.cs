@@ -325,9 +325,20 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				return;
 			}
 			
-			if(%arg1 < $Host::TimeLimit)
+			//If proposed time is lower than server set or higher than unlimited
+			if(%arg1 < $Host::TimeLimit || %arg1 > 999)
+			{
+				messageClient(%client, "", "\c2Invalid time selection.");
 				return;
-
+			}
+			
+			//If proposed time is something other than what is selectable
+			if(%arg1 !$= "90" && %arg1 !$= "120" && %arg1 !$= "150" && %arg1 !$= "180" && %arg1 !$= "240" && %arg1 !$= "360" && %arg1 !$= "480" && %arg1 !$= "999")
+			{
+				messageClient(%client, "", "\c2Only selectable times allowed.");
+				return;
+			}
+			
 			if((!%isAdmin && $Host::AllowPlayerVoteTimeLimit) || (%isAdmin && %client.ForceVote))
 			{
 				if(%arg1 $= "999") %time = "unlimited"; else %time = %arg1;

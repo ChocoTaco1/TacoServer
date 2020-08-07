@@ -161,20 +161,6 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
 }
 
-//Item 'Use' Console spam fix
-function serverCmdUse(%client,%data)
-{
-   // Item names from the client must converted
-   // into DataBlocks
-   // %data = ItemDataBlock[%item];
-   //if(isObject(%client.player)) // z0dd - ZOD, 5/18/03. Console spam fix
-      //%client.player.use(%data);
-	  
-   //Spam Fix 7/2020
-   if(isObject(%client.player) && isObject(%client.getControlObject())) 
-		%client.getControlObject().use(%data);
-}
-
 // Global water viscosity
 function DefaultGame::missionLoadDone(%game)
 {

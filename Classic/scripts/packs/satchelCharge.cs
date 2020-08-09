@@ -696,7 +696,9 @@ function SatchelChargeThrown::onDestroyed(%this, %object, %lastState)
       }
 
       %object.blowingUp = true;
-      RadiusExplosion(%object, %object.getPosition(), %dmgRadius, %dmgMod, %expImpulse, %object.sourceObject, %dmgType);
+	  //Slope fix by DarkTiger
+	  RadiusExplosion(%object, vectorAdd(%object.getPosition(),"0 0 1"), %dmgRadius, %dmgMod, %expImpulse, %object.sourceObject, %dmgType);
+      ///RadiusExplosion(%object, %object.getPosition(), %dmgRadius, %dmgMod, %expImpulse, %object.sourceObject, %dmgType);
 
       %object.schedule(1000, "delete");
    }

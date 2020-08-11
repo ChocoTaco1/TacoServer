@@ -696,9 +696,14 @@ function SatchelChargeThrown::onDestroyed(%this, %object, %lastState)
       }
 
       %object.blowingUp = true;
+	  
 	  //Slope fix by DarkTiger
-	  RadiusExplosion(%object, vectorAdd(%object.getPosition(),"0 0 1"), %dmgRadius, %dmgMod, %expImpulse, %object.sourceObject, %dmgType);
       ///RadiusExplosion(%object, %object.getPosition(), %dmgRadius, %dmgMod, %expImpulse, %object.sourceObject, %dmgType);
+      %rot = getWords(%object.getTransform(), 3, 6);  
+      %tmat = VectorOrthoBasis(%rot);
+      %upVec = getWords(%tmat, 6, 8);
+      %offset = vectorAdd(%object.getPosition(),vectorScale(%upVec,0.5));
+      RadiusExplosion(%object, %offset, %dmgRadius, %dmgMod, %expImpulse, %object.sourceObject, %dmgType);
 
       %object.schedule(1000, "delete");
    }

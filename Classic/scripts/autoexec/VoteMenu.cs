@@ -181,7 +181,11 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 		%client.adminVoteSet = 0;
 		return;
 	}
-
+	
+	// Show smurf names correctly
+	if(%client.isSmurf)
+	   %client.nameBase = stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9" );
+  
 	%teamSpecific = 0;
 	switch$(%typeName)
 	{

@@ -181,13 +181,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 		%client.adminVoteSet = 0;
 		return;
 	}
-	
-	// Show smurf names correctly
-	if(%client.isSmurf)
-	   %votername = stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9" );
-	else
-	   %votername = %client.nameBase;
-  
+
 	%teamSpecific = 0;
 	switch$(%typeName)
 	{
@@ -223,7 +217,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					return;
 				}
 
-				%msg = %votername @ " initiated a vote to kick player " @ %arg1.nameBase @ ".";
+				%msg = %client.nameBase @ " initiated a vote to kick player " @ %arg1.nameBase @ ".";
 				messageAdmins("", "\c5[A]\c1"@ %msg @"~wgui/objective_notification.wav");
 				$CMHasVoted[%client.guid]++;
 			}
@@ -251,7 +245,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				if(!$host::allowadminplayervotes) // admin player votes are NOT enabled
 					return; // can't do that pal
 
-				%msg = %votername @ " initiated a vote to admin player " @ %arg1.nameBase @ ".";
+				%msg = %client.nameBase @ " initiated a vote to admin player " @ %arg1.nameBase @ ".";
 			}
 
 		case "BanPlayer":
@@ -277,14 +271,14 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					return;
 				}
 
-				%msg = %votername @ " initiated a vote to change the mission to " @ %arg1 @ " (" @ %arg2 @ ").";
+				%msg = %client.nameBase @ " initiated a vote to change the mission to " @ %arg1 @ " (" @ %arg2 @ ").";
 				$CMHasVoted[%client.guid]++;
 			}
 
 		case "VoteTeamDamage":
 			if(!%isAdmin)
 			{
-				%msg = %votername @ " initiated a vote to " @ ($TeamDamage == 0 ? "enable" : "disable") @ " team damage.";
+				%msg = %client.nameBase @ " initiated a vote to " @ ($TeamDamage == 0 ? "enable" : "disable") @ " team damage.";
 			}
 
 		case "VoteTournamentMode":
@@ -296,13 +290,13 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					return;
 				}
 
-				%msg = %votername @ " initiated a vote to switch the server to Tournament Mode (" @ %arg1 @ ").";
+				%msg = %client.nameBase @ " initiated a vote to switch the server to Tournament Mode (" @ %arg1 @ ").";
 			}
 
 		case "VoteFFAMode":
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
 			{
-				%msg = %votername @ " initiated a vote to switch the server to Free For All mode.";
+				%msg = %client.nameBase @ " initiated a vote to switch the server to Free For All mode.";
 			}
 
 		case "VoteChangeTimeLimit":
@@ -348,7 +342,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			if((!%isAdmin && $Host::AllowPlayerVoteTimeLimit) || (%isAdmin && %client.ForceVote))
 			{
 				if(%arg1 $= "999") %time = "unlimited"; else %time = %arg1;
-				%msg = %votername @ " initiated a vote to change the time limit to " @ %time @ ".";
+				%msg = %client.nameBase @ " initiated a vote to change the time limit to " @ %time @ ".";
 				// VoteOvertime
 				StartVOTimeVote(%game);
 				$CMHasVoted[%client.guid]++;
@@ -360,7 +354,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				if($MatchStarted || $CountdownStarted)
 					return;
 
-				%msg = %votername @ " initiated a vote to start the match.";
+				%msg = %client.nameBase @ " initiated a vote to start the match.";
 			}
 			
 	    case "CancelMatchStart":
@@ -375,25 +369,25 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				return;
 
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %votername @ " initiated a vote to " @ (Game.greedMode == 0 ? "enable" : "disable") @ " greed mode.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.greedMode == 0 ? "enable" : "disable") @ " greed mode.";
 
 		case "VoteHoardMode":
 			if($CurrentMissionType !$= "Hunters" || $CurrentMissionType !$= "TeamHunters")
 				return;
 
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %votername @ " initiated a vote to " @ (Game.hoardMode == 0 ? "enable" : "disable") @ " hoard mode.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.hoardMode == 0 ? "enable" : "disable") @ " hoard mode.";
 
 		case "VoteRandomTeams":
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
 			{
-				%msg = %votername @ " initiated a vote to " @ ($RandomTeams == 0 ? "enable" : "disable") @ " random teams.";
+				%msg = %client.nameBase @ " initiated a vote to " @ ($RandomTeams == 0 ? "enable" : "disable") @ " random teams.";
 			}
 
 		case "VoteFairTeams":
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
 			{
-				%msg = %votername @ " initiated a vote to " @ ($FairTeams == 0 ? "enable" : "disable") @ " fair teams.";
+				%msg = %client.nameBase @ " initiated a vote to " @ ($FairTeams == 0 ? "enable" : "disable") @ " fair teams.";
 			}
 
 		case "VoteSkipMission":
@@ -405,7 +399,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					return;
 				}
 
-				%msg = %votername @ " initiated a vote to skip the current mission.";
+				%msg = %client.nameBase @ " initiated a vote to skip the current mission.";
 				$CMHasVoted[%client.guid]++;
 			}
 
@@ -429,35 +423,35 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				return;
 
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %votername @ " initiated a vote to " @ (Game.duelMode == 0 ? "enable" : "disable") @ " duel mode.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.duelMode == 0 ? "enable" : "disable") @ " duel mode.";
 
 		case "VoteSplashDamage":
 			if(!$CurrentMissionType $= "LakRabbit")
 				return;
 
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %votername @ " initiated a vote to " @ (Game.noSplashDamage == 0 ? "enable" : "disable") @ " splash damage.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.noSplashDamage == 0 ? "enable" : "disable") @ " splash damage.";
 
 		case "VotePro":
 			if(!$CurrentMissionType $= "LakRabbit")
 				return;
 
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %votername @ " initiated a vote to " @ (Game.pubPro == 0 ? "enable" : "disable") @ " pro mode.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.pubPro == 0 ? "enable" : "disable") @ " pro mode.";
 			
 		case "DMSLOnlyMode":
 			if(!$CurrentMissionType $= "DM")
 				return;
 		
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %votername @ " initiated a vote to " @ (Game.DMSLOnlyMode == 0 ? "enable" : "disable") @ " shocklance only mode.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.DMSLOnlyMode == 0 ? "enable" : "disable") @ " shocklance only mode.";
 		 
 		case "SCtFProMode":
 			if(!$CurrentMissionType $= "sctf")
 				return;
 		
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %votername @ " initiated a vote to " @ (Game.SCtFProMode == 0 ? "enable" : "disable") @ " pro mode.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.SCtFProMode == 0 ? "enable" : "disable") @ " pro mode.";
 		 
 		case "showServerRules":
 			if (($Host::ServerRules[1] !$= "") && (!%client.CantView))

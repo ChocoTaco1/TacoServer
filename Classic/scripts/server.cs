@@ -963,18 +963,18 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    if($Host::GuidCheck)
    {
 	   // If we don't have a GUID try to find one somewhere.
-	   if(! %client.guid || %client.guid $= "") 
+	   if(!%client.guid || %client.guid $= "") 
 	   {
 			%client.guid = getField(%client.getAuthInfo(),3);
 	   }
 	   // If we don't have a name, try to get one.
-	   if(!%name || %name $= "") 
+	   if(%name $= "") 
 	   {
-			%name = getField(%client.getAuthInfo(),0);
-			%client.nameBase = %name;
+		   %name = getField(%client.getAuthInfo(),0);
+		   %client.nameBase = %name;
 	   }
 	   // If we still don't have a GUID or name, time to boot the player (unless a local game).
-	   if(getIPAddress(%client) !$= "Local" && (!%client.guid $= "" || %name $= "")) 
+	   if(getIPAddress(%client) !$= "Local" && (%client.guid $= "" || %name $= ""))
 	   {
 			echo("No name/GUID kick for CID (" @ %client @ ") with IP (" @ getIPAddress(%client) @ ")");
 			KickByCID(%client, "You joined the server with a blank name and/or GUID. Try rejoining.",2);

@@ -9,7 +9,7 @@
 // Called in GetTeamCounts.cs
 function NBRStatusNotify( %game )
 {	
-	if( $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::NoBaseRapeEnabled )
+	if( $Host::EnableNoBaseRapeNotify && $Host::NoBaseRapeEnabled )
 	{	
 		//On
 		if( $Host::NoBaseRapePlayerCount > $TotalTeamPlayerCount )
@@ -57,24 +57,5 @@ function DefaultGame::gameOver(%game)
 // Prevent package from being activated if it is already
 if (!isActivePackage(ResetNBRNotify))
     activatePackage(ResetNBRNotify);
-
-
-// This function is at StaticShapeData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType) in the staticshape.ovl in evoClassic.vl2
-// Plays a sound when a player hits a protected enemy asset
-function NBRAssetSound( %game, %sourceObject )
-{
-	//Wont play again until the schedule is done
-	if(!isEventPending(%sourceObject.NBRAssetSoundSchedule) && $CurrentMissionType $= "CTF" && $Host::EnableNoBaseRapeNotify && !$Host::TournamentMode && $Host::NoBaseRapeEnabled )
-	{
-		messageClient(%sourceObject.client, 'MsgNoBaseRapeNotify', '\c2No Base Rape is enabled until %1 players.', $Host::NoBaseRapePlayerCount );
-		%sourceObject.NBRAssetSoundSchedule = schedule(10000, 0, "ResetNBRAssetSound", %sourceObject );
-	}
-}
-// Reset
-function ResetNBRAssetSound( %sourceObject )
-{
-	if(isEventPending(%sourceObject.NBRAssetSoundSchedule)) 
-		cancel(%sourceObject.NBRAssetSoundSchedule);
-}
 
 

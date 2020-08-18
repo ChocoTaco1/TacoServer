@@ -70,12 +70,15 @@ function GetTeamCounts( %game, %client, %respawn )
 				%team1difference = $PlayerCount[1] - $PlayerCount[2];
 				%team2difference = $PlayerCount[2] - $PlayerCount[1];
 				
-				//Start Base Rape Notify
-				schedule(500, 0, "NBRStatusNotify", %game);
-				//Start Team Balance Notify
-				schedule(1000, 0, "TeamBalanceNotify", %game, %team1difference, %team2difference);
-				//Start AntiCloak
-				schedule(1500, 0, "CheckAntiPack", %game);
+				if( !$Host::TournamentMode )
+				{
+					if( $CurrentMissionType $= "CTF" )
+					{
+						NBRStatusNotify(%game);
+						CheckAntiPack(%game);
+					}
+					TeamBalanceNotify(%game, %team1difference, %team2difference);
+				}
 				
 				//Set so counter wont run when it doesnt need to.
 				$GetCountsStatus = "IDLE";

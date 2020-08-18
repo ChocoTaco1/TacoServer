@@ -9,7 +9,7 @@
 // How far behind littleTeam must be to use All Mode.
 // Meaning picking from a pool of all players on the bigTeam instead of just the lowest scoring player.
 // 400 equals 400 points. 4 caps behind.
-$AllModeThreshold = 400;
+$AllModeThreshold = 300;
 
 
 // Run from TeamBalanceNotify.cs via UnbalancedSound( %game )
@@ -28,18 +28,13 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
 	%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
 	
-	//If even, stop.
-	if( %team1difference == 1 || %team2difference == 1 || $TeamRank[1, count] == $TeamRank[2, count] )
-	{
-		//Reset TBN
-		ResetTBNStatus();
-		return;
-	}
 	//Determine bigTeam
-	else if( %team1difference >= 2 )
+	if( %team1difference >= 2 )
 		%bigTeam = 1;
 	else if( %team2difference >= 2 )
 		%bigTeam = 2;
+	else
+		return;
 
 	%littleTeam = ( %bigTeam == 1 ) ? 2 : 1;
 	

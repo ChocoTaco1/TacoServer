@@ -14,7 +14,7 @@
 // Called in GetTeamCounts.cs
 function TeamBalanceNotify( %game, %team1difference, %team2difference )
 {	
-	if( Game.numTeams > 1 && $TotalTeamPlayerCount !$= 0 && !$Host::TournamentMode )
+	if( Game.numTeams > 1 && $TotalTeamPlayerCount !$= 0 )
 	{	
 		//echo ("%Team1Difference " @ %Team1Difference);
 		//echo ("%Team2Difference " @ %Team2Difference);
@@ -28,7 +28,7 @@ function TeamBalanceNotify( %game, %team1difference, %team2difference )
 					$TBNStatus = "UNBALANCED";
 			}
 			else
-				//Means teams arnt even, but arnt so uneven to do anything about. Meaning a team is a man down. 6vs7, 4vs3 etc
+				//Man down. 6vs7, 4vs3 etc
 				$TBNStatus = "UNEVEN";
 		}
 		//Teams are even
@@ -63,49 +63,32 @@ function NotifyUnbalanced( %game )
 {
 	if(isEventPending($NotifySchedule)) 
 		cancel($NotifySchedule);
+
+	if( $TBNStatus !$= "NOTIFY" ) //If Status has changed to EVEN or anything else (GameOver reset).
+		return;		
+
+	//Difference Variables
+	%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
+	%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
 	
-	if( $TBNStatus $= "NOTIFY" ) //If Status has changed to EVEN or anything else.
-	{				
-		//Team Count code by Keen
-		$PlayerCount[0] = 0;
-		$PlayerCount[1] = 0;
-		$PlayerCount[2] = 0;
-				
-		for(%i = 0; %i < ClientGroup.getCount(); %i++)
+	if( %team1difference >= 2 || %team2difference >= 2 )
+	{
+		//Autobalance Warning
+		if( $Host::EnableAutobalance )
 		{
-			%client = ClientGroup.getObject(%i);
-			
-			//if(!%client.isAIControlled())
-				$PlayerCount[%client.team]++;
+			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance Initializing.~wgui/vote_nopass.wav');
+			$AutoBalanceSchedule = schedule(30000, 0, "Autobalance", %game );
 		}
-			
-		//Difference Variables
-		%team1difference = $PlayerCount[1] - $PlayerCount[2];
-		%team2difference = $PlayerCount[2] - $PlayerCount[1];
-		
-		if( %team1difference == 1 || %team2difference == 1 || $PlayerCount[1] == $PlayerCount[2] )
-		{
-			ResetTBNStatus();
-			return;
-		}
-		//Continue
-		else if( %team1difference >= 2 || %team2difference >= 2 )
-		{
-			//Autobalance Warning
-			if( $Host::EnableAutobalance )
-			{
-				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance Initializing.~wgui/vote_nopass.wav');
-				$AutoBalanceSchedule = schedule(30000, 0, "Autobalance", %game );
-			}
-			//If Autobalance is disabled, message only.
-			else if( $Host::EnableTeamBalanceNotify )
-			{		
-				messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.~wgui/vote_nopass.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
-				schedule(13000, 0, "ResetTBNStatus");
-				schedule(15000, 0, "ResetGetCountsStatus");
-			}
+		//If Autobalance is disabled, message only.
+		else if( $Host::EnableTeamBalanceNotify )
+		{		
+			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.~wgui/vote_nopass.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+			schedule(13000, 0, "ResetTBNStatus");
+			schedule(15000, 0, "ResetGetCountsStatus");
 		}
 	}
+	else
+		ResetTBNStatus();
 }
 
 // Reset TBNStatus

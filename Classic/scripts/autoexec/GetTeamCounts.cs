@@ -20,7 +20,7 @@ function CreateServer( %mission, %missionType )
 {
 	parent::CreateServer( %mission, %missionType );
 	//Call for a GetTeamCount update
-	GetTeamCounts( %game, %client, %respawn );
+	GetTeamCounts(%game);
 	
 	// Set when server starts
 	// Used to reset timelimit (if voted) when map changes
@@ -37,29 +37,21 @@ function CreateServer( %mission, %missionType )
 if (!isActivePackage(StartTeamCounts))
     activatePackage(StartTeamCounts);
 
-function GetTeamCounts( %game, %client, %respawn )
+function GetTeamCounts(%game)
 {	
 	switch$($GetCountsStatus)
 	{
 		case UPDATE:
-			//Get teamcounts
 			if($countdownStarted && $MatchStarted ) 
 			{	
 				//Variables
-				$PlayerCount[1] = $TeamRank[1, count];
-				$PlayerCount[2] = $TeamRank[2, count];
-				$PlayerCount[0] = $HostGamePlayerCount - ($PlayerCount[1] + $PlayerCount[2]);
-
-				//echo ("$PlayerCount[0] " @  $PlayerCount[0]);
-				//echo ("$PlayerCount[1] " @  $PlayerCount[1]);
-				//echo ("$PlayerCount[2] " @  $PlayerCount[2]);
-
-				$TotalTeamPlayerCount = $PlayerCount[1] + $PlayerCount[2];
+				$TotalTeamPlayerCount = $TeamRank[1, count] + $TeamRank[2, count];
 				$AllPlayerCount = $HostGamePlayerCount;
-
-				%team1difference = $PlayerCount[1] - $PlayerCount[2];
-				%team2difference = $PlayerCount[2] - $PlayerCount[1];
 				
+				//echo("$PlayerCount[0] " @  $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]));
+				//echo("$PlayerCount[1] " @  $TeamRank[1, count]);
+				//echo("$PlayerCount[2] " @  $TeamRank[2, count]);
+		
 				if( !$Host::TournamentMode )
 				{
 					if( $CurrentMissionType $= "CTF" )
@@ -67,7 +59,7 @@ function GetTeamCounts( %game, %client, %respawn )
 						NBRStatusNotify(%game);
 						CheckAntiPack(%game);
 					}
-					TeamBalanceNotify(%game, %team1difference, %team2difference);
+					TeamBalanceNotify(%game);
 				}
 				
 				//Set so counter wont run when it doesnt need to.

@@ -12,15 +12,18 @@
 
 
 // Called in GetTeamCounts.cs
-function TeamBalanceNotify( %game, %team1difference, %team2difference )
+function TeamBalanceNotify(%game)
 {	
 	if( Game.numTeams > 1 && $TotalTeamPlayerCount !$= 0 )
 	{	
-		//echo ("%Team1Difference " @ %Team1Difference);
-		//echo ("%Team2Difference " @ %Team2Difference);
+		%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
+		%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
+		
+		//echo("%Team1Difference " @ %team1difference);
+		//echo("%Team2Difference " @ %team2difference);
 
 		//Uneven
-		if( $PlayerCount[1] !$= $PlayerCount[2] )
+		if($TeamRank[1, count] !$= $TeamRank[2, count])
 		{	
 			if( %team1difference >= 2 || %team2difference >= 2 ) //Teams are unbalanced
 			{				
@@ -32,7 +35,7 @@ function TeamBalanceNotify( %game, %team1difference, %team2difference )
 				$TBNStatus = "UNEVEN";
 		}
 		//Teams are even
-		else if( $PlayerCount[1] == $PlayerCount[2] && $TBNStatus !$= "PLAYEDEVEN" )
+		else if($TeamRank[1, count] == $TeamRank[2, count] && $TBNStatus !$= "PLAYEDEVEN" )
 			$TBNStatus = "EVEN";
 
 		switch$($TBNStatus)
@@ -82,7 +85,8 @@ function NotifyUnbalanced( %game )
 		//If Autobalance is disabled, message only.
 		else if( $Host::EnableTeamBalanceNotify )
 		{		
-			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.~wgui/vote_nopass.wav', $PlayerCount[1], $PlayerCount[2], $PlayerCount[0] );
+			%observers = $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]);
+			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.~wgui/vote_nopass.wav', $TeamRank[1, count], $TeamRank[2, count], %observers );
 			schedule(13000, 0, "ResetTBNStatus");
 			schedule(15000, 0, "ResetGetCountsStatus");
 		}

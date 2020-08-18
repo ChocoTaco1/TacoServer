@@ -16,15 +16,15 @@ function TeamBalanceNotify(%game)
 {	
 	if( Game.numTeams > 1 && $TotalTeamPlayerCount !$= 0 )
 	{	
-		%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
-		%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
-		
-		//echo("%Team1Difference " @ %team1difference);
-		//echo("%Team2Difference " @ %team2difference);
-
 		//Uneven
 		if($TeamRank[1, count] !$= $TeamRank[2, count])
 		{	
+			%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
+			%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
+			
+			//echo("%Team1Difference " @ %team1difference);
+			//echo("%Team2Difference " @ %team2difference);
+			
 			if( %team1difference >= 2 || %team2difference >= 2 ) //Teams are unbalanced
 			{				
 				if( $TBNStatus !$= "NOTIFY" ) //Stops any new schedules

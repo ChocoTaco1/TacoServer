@@ -45,28 +45,18 @@ function GetTeamCounts( %game, %client, %respawn )
 			//Get teamcounts
 			if($countdownStarted && $MatchStarted ) 
 			{	
-				//Team Count code by Keen
-				$PlayerCount[0] = 0;
-				$PlayerCount[1] = 0;
-				$PlayerCount[2] = 0;
+				//Variables
+				$PlayerCount[1] = $TeamRank[1, count];
+				$PlayerCount[2] = $TeamRank[2, count];
+				$PlayerCount[0] = $HostGamePlayerCount - ($PlayerCount[1] + $PlayerCount[2]);
 
-				for(%i = 0; %i < ClientGroup.getCount(); %i++)
-				{
-					%client = ClientGroup.getObject(%i);
-						
-					//if(!%client.isAIControlled())
-						$PlayerCount[%client.team]++;
-				}
-				
 				//echo ("$PlayerCount[0] " @  $PlayerCount[0]);
 				//echo ("$PlayerCount[1] " @  $PlayerCount[1]);
 				//echo ("$PlayerCount[2] " @  $PlayerCount[2]);
 
-				//Amount of players on teams
 				$TotalTeamPlayerCount = $PlayerCount[1] + $PlayerCount[2];
-				//Amount of all players including observers
-				$AllPlayerCount = $PlayerCount[1] + $PlayerCount[2] + $PlayerCount[0];
-				//Difference Variables
+				$AllPlayerCount = $HostGamePlayerCount;
+
 				%team1difference = $PlayerCount[1] - $PlayerCount[2];
 				%team2difference = $PlayerCount[2] - $PlayerCount[1];
 				

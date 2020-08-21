@@ -20,7 +20,7 @@ function CreateServer( %mission, %missionType )
 {
 	parent::CreateServer( %mission, %missionType );
 	//Call for a GetTeamCount update
-	GetTeamCounts( %game, %client, %respawn );
+	GetTeamCounts(%game);
 	
 	// Set when server starts
 	// Used to reset timelimit (if voted) when map changes
@@ -37,45 +37,30 @@ function CreateServer( %mission, %missionType )
 if (!isActivePackage(StartTeamCounts))
     activatePackage(StartTeamCounts);
 
-function GetTeamCounts( %game, %client, %respawn )
+function GetTeamCounts(%game)
 {	
 	switch$($GetCountsStatus)
 	{
 		case UPDATE:
-			//Get teamcounts
 			if($countdownStarted && $MatchStarted ) 
 			{	
-				//Team Count code by Keen
-				$PlayerCount[0] = 0;
-				$PlayerCount[1] = 0;
-				$PlayerCount[2] = 0;
-
-				for(%i = 0; %i < ClientGroup.getCount(); %i++)
+				//Variables
+				$TotalTeamPlayerCount = $TeamRank[1, count] + $TeamRank[2, count];
+				$AllPlayerCount = $HostGamePlayerCount;
+				
+				//echo("$PlayerCount[0] " @  $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]));
+				//echo("$PlayerCount[1] " @  $TeamRank[1, count]);
+				//echo("$PlayerCount[2] " @  $TeamRank[2, count]);
+		
+				if( !$Host::TournamentMode )
 				{
-					%client = ClientGroup.getObject(%i);
-						
-					//if(!%client.isAIControlled())
-						$PlayerCount[%client.team]++;
+					if( $CurrentMissionType $= "CTF" )
+					{
+						NBRStatusNotify(%game);
+						CheckAntiPack(%game);
+					}
+					TeamBalanceNotify(%game);
 				}
-				
-				//echo ("$PlayerCount[0] " @  $PlayerCount[0]);
-				//echo ("$PlayerCount[1] " @  $PlayerCount[1]);
-				//echo ("$PlayerCount[2] " @  $PlayerCount[2]);
-
-				//Amount of players on teams
-				$TotalTeamPlayerCount = $PlayerCount[1] + $PlayerCount[2];
-				//Amount of all players including observers
-				$AllPlayerCount = $PlayerCount[1] + $PlayerCount[2] + $PlayerCount[0];
-				//Difference Variables
-				%team1difference = $PlayerCount[1] - $PlayerCount[2];
-				%team2difference = $PlayerCount[2] - $PlayerCount[1];
-				
-				//Start Base Rape Notify
-				schedule(500, 0, "NBRStatusNotify", %game);
-				//Start Team Balance Notify
-				schedule(1000, 0, "TeamBalanceNotify", %game, %team1difference, %team2difference);
-				//Start AntiCloak
-				schedule(1500, 0, "CheckAntiPack", %game);
 				
 				//Set so counter wont run when it doesnt need to.
 				$GetCountsStatus = "IDLE";

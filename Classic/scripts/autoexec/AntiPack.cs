@@ -18,7 +18,7 @@ $AntiPackIncludeShield = 0;
 function CheckAntiPack( %game )
 {
 	//CTF only
-	if( $Host::AntiPackEnable && $CurrentMissionType $= "CTF" && !$Host::TournamentMode )
+	if( $Host::AntiPackEnable )
 	{
 		//echo("TotalTeamPlayerCount " @ $TotalTeamPlayerCount);
 		//echo("AntiPackPlayerCount " @ $AntiPackPlayerCount);

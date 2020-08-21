@@ -1210,7 +1210,7 @@ function cmdAutoKickObserver(%client, %key) // Edit GG
 
    if ( isObject( %client ) )
    {
-      messageAll('MsgAdminForce', '\c2%1 has left the game. (Observer Timeout)', %client.nameBase);
+      messageAll('MsgAdminForce', '\c2%1 has left the game. (Observer Timeout)', %client.name);
 
       %client.setDisconnectReason( "Observer Timeout" );
       %client.schedule(700, "delete");

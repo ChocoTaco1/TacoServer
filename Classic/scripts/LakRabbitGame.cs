@@ -700,12 +700,16 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			%special !$= "" ? %special : "",
 			%distance,
 			%vel,
-			%accuracy );
+			%accuracy);
 			
 		if(%sourceObject.holdingFlag && %points >= 75)
 		{
 			missileEveryone(%sourceObject);
 			%sound = '~wfx/Bonuses/horz_straipass2_heist.wav';
+		}
+		else if(%points >= 100)
+		{
+			%sound = '~wfx/Misc/MA1.wav';
 		}
 
 		Game.recalcScore(%sourceObject.client);

@@ -42,8 +42,22 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	//If a team is behind pick anyone, not just a low scoring player
 	if( $TeamScore[%bigTeam] > ($TeamScore[%littleTeam] + $AllModeThreshold))
 	{
+		//We need to find out how many people are on a team holding flags and in vehicles to make the proper exceptions in the loop
+		for(%i = 0; %i < ClientGroup.getCount(); %i++)
+		{
+			%client = ClientGroup.getObject(%i);
+			%team = %client.team;
+			
+			if(%team $= %bigTeam)
+			{
+				//Holding flag? In a Vehicle?
+				if(%client.player.holdingFlag !$= "" || isObject(%client.vehicleMounted))
+					%exceptioncount++;
+			}
+		}
+		
 		%UseAllMode = 1;
-		%autobalanceRandom = getRandom(1,($PlayerCount[%bigTeam] - 1));
+		%autobalanceRandom = getRandom(1,($TeamRank[%bigTeam, count] - %exceptioncount));
 	}
 	
     //Pick a client for autobalance
@@ -52,26 +66,49 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 		%client = ClientGroup.getObject(%i);
 		%team = %client.team;
 		
-		//Holding flag?
-		if(%client.player.holdingFlag !$= "")
-			continue;
-		
-		if(%UseAllMode)
+		if(%team $= %bigTeam)
 		{
-			//Try to pick any player
-			if(%autobalanceRandom == %AllmodeLoop || %lastclient[%team] $= "")
-				%teamcanidate[%team] = %client;
+			//Holding flag? In a Vehicle?
+			if(%client.player.holdingFlag !$= "" || isObject(%client.vehicleMounted))
+				continue;
 			
-			%AllmodeLoop++;
+			if(%UseAllMode)
+			{
+				//Try to pick any player
+				if(%autobalanceRandom == %AllmodeLoop || %lastclient[%team] $= "")
+					%teamcanidate[%team] = %client;
+				
+				%AllmodeLoop++;
+			}
+			else
+			{
+				//Try to pick a low scoring player
+				if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "")
+					%teamcanidate[%team] = %client;
+			}
+			%lastclient[%team] = %client;
 		}
-		else
+	}
+	
+	//A situation where the whole team is in vehicles or holding a flag
+	//Pick anyone
+	if(%teamcanidate[%bigTeam] $= "")
+	{
+		//Pick a client for autobalance
+		for(%i = 0; %i < ClientGroup.getCount(); %i++)
 		{
-			//Normal circumstances
-			//Try to pick a low scoring player
-			if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "")
-				%teamcanidate[%team] = %client;
+			%client = ClientGroup.getObject(%i);
+			%team = %client.team;
+			
+			if(%team $= %bigTeam)
+			{
+				//Try to pick a low scoring player
+				if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "")
+					%teamcanidate[%team] = %client;
+
+				%lastclient[%team] = %client;
+			}
 		}
-		%lastclient[%team] = %client;
 	}
 
 	//Debug

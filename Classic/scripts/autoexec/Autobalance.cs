@@ -41,6 +41,9 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	//Toggle for All Mode
 	//If a team is behind pick anyone, not just a low scoring player
 	if( $TeamScore[%bigTeam] > ($TeamScore[%littleTeam] + $AllModeThreshold))
+		%UseAllMode = 1;
+	
+	if(%UseAllMode)
 	{
 		//We need to find out how many people are on a team holding flags and in vehicles to make the proper exceptions in the loop
 		for(%i = 0; %i < ClientGroup.getCount(); %i++)
@@ -55,8 +58,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 					%exceptioncount++;
 			}
 		}
-		
-		%UseAllMode = 1;
+
 		%autobalanceRandom = getRandom(1,($TeamRank[%bigTeam, count] - %exceptioncount));
 	}
 	
@@ -119,7 +121,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	%team = %teamcanidate[%bigTeam].team;
 	%otherTeam = ( %team == 1 ) ? 2 : 1;
 			
-	// Fire Autobalance
+	//Fire Autobalance
 	Game.clientChangeTeam( %client, %otherTeam, 0 );
 	messageClient(%client, 'MsgTeamBalanceNotify', "\c0You were switched to the other team for balancing.~wfx/powered/vehicle_screen_on.wav");
 	messageAllExcept(%client, -1, 'MsgTeamBalanceNotify', "~wfx/powered/vehicle_screen_on.wav");
@@ -153,9 +155,9 @@ function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %tea
 	}
 	
 	if(%UseAllMode)
-		%mode = "All Mode";
+		%mode = "All";
 	else
-		%mode = "Low Mode";
+		%mode = "Low";
 		
 	if( %teamcanidate1 $= "" ) 
 		%teamcanidate1 = "NULL"; 

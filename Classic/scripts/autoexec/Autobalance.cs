@@ -41,25 +41,9 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	//Toggle for All Mode
 	//If a team is behind pick anyone, not just a low scoring player
 	if( $TeamScore[%bigTeam] > ($TeamScore[%littleTeam] + $AllModeThreshold))
-		%UseAllMode = 1;
-	
-	if(%UseAllMode)
 	{
-		//We need to find out how many people are on a team holding flags and in vehicles to make the proper exceptions in the loop
-		for(%i = 0; %i < ClientGroup.getCount(); %i++)
-		{
-			%client = ClientGroup.getObject(%i);
-			%team = %client.team;
-			
-			if(%team $= %bigTeam)
-			{
-				//Holding flag? In a Vehicle?
-				if(%client.player.holdingFlag !$= "" || isObject(%client.vehicleMounted))
-					%exceptioncount++;
-			}
-		}
-
-		%autobalanceRandom = getRandom(1,($TeamRank[%bigTeam, count] - %exceptioncount));
+		%UseAllMode = 1;
+		%autobalanceRandom = getRandom(1,($TeamRank[%bigTeam, count] - 1));
 	}
 	
     //Pick a client for autobalance
@@ -70,8 +54,8 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 		
 		if(%team $= %bigTeam)
 		{
-			//Holding flag? In a Vehicle?
-			if(%client.player.holdingFlag !$= "" || isObject(%client.vehicleMounted))
+			//Holding flag?
+			if(%client.player.holdingFlag !$= "")
 				continue;
 			
 			if(%UseAllMode)
@@ -84,32 +68,12 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 			}
 			else
 			{
+				//Normal circumstances
 				//Try to pick a low scoring player
 				if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "")
 					%teamcanidate[%team] = %client;
 			}
 			%lastclient[%team] = %client;
-		}
-	}
-	
-	//A situation where the whole team is in vehicles or holding a flag
-	//Pick anyone
-	if(%teamcanidate[%bigTeam] $= "")
-	{
-		//Pick a client for autobalance
-		for(%i = 0; %i < ClientGroup.getCount(); %i++)
-		{
-			%client = ClientGroup.getObject(%i);
-			%team = %client.team;
-			
-			if(%team $= %bigTeam)
-			{
-				//Try to pick a low scoring player
-				if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "")
-					%teamcanidate[%team] = %client;
-
-				%lastclient[%team] = %client;
-			}
 		}
 	}
 

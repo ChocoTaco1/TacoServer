@@ -43,7 +43,20 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	if( $TeamScore[%bigTeam] > ($TeamScore[%littleTeam] + $AllModeThreshold))
 	{
 		%UseAllMode = 1;
-		%autobalanceRandom = getRandom(1,($TeamRank[%bigTeam, count] - 1));
+		//Find if anyone is holding a flag for exceptions for the loop
+		for(%i = 0; %i < ClientGroup.getCount(); %i++)
+		{
+			%client = ClientGroup.getObject(%i);
+			%team = %client.team;
+			
+			if(%team $= %bigTeam)
+			{
+				//Holding flag?
+				if(%client.player.holdingFlag !$= "")
+					%exception = 1;
+			}
+		}
+		%autobalanceRandom = getRandom(1,($TeamRank[%bigTeam, count] - %exception));
 	}
 	
     //Pick a client for autobalance
@@ -60,29 +73,27 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 			
 			if(%UseAllMode)
 			{
-				//Try to pick any player
-				if(%autobalanceRandom == %AllmodeLoop || %lastclient[%team] $= "")
-					%teamcanidate[%team] = %client;
+				//Pick our random
+				if(%autobalanceRandom == %AllmodeLoop || %canidate $= "")
+					%canidate = %client;
 				
 				%AllmodeLoop++;
 			}
 			else
 			{
-				//Normal circumstances
 				//Try to pick a low scoring player
-				if(%client.score < %lastclient[%team].score || %lastclient[%team] $= "")
-					%teamcanidate[%team] = %client;
+				if(%client.score < %canidate.score || %canidate $= "")
+					%canidate = %client;
 			}
-			%lastclient[%team] = %client;
 		}
 	}
 
 	//Debug
 	if( %AutobalanceDebug )
-		AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys, %UseAllMode);
+		AutobalanceDebug(%canidate, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys, %UseAllMode);
 				
-	%client = %teamcanidate[%bigTeam];
-	%team = %teamcanidate[%bigTeam].team;
+	%client = %canidate;
+	%team = %canidate.team;
 	%otherTeam = ( %team == 1 ) ? 2 : 1;
 			
 	//Fire Autobalance
@@ -96,7 +107,7 @@ function Autobalance( %game, %AutobalanceSafetynetTrys )
 	ResetTBNStatus();
 }
 
-function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys, %UseAllMode)
+function AutobalanceDebug(%canidate, %team1difference, %team2difference, %bigTeam, %AutobalanceSafetynetTrys, %UseAllMode)
 {
 	if( %teamcanidate[%bigTeam] $= "" )
 	{
@@ -104,9 +115,7 @@ function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %tea
 		if(%AutobalanceSafetynetTrys $= 3) 
 			return;
 			
-		if( %teamcanidate1 $= "" && %teamcanidate2 $= "" )
-			%error = "Both Teams";
-		else if( %teamcanidate[%bigTeam] $= "" )
+		if( %canidate $= "" )
 			%error = "Team " @ %bigTeam;
 				
 		if( %error !$= "" )
@@ -128,7 +137,7 @@ function AutobalanceDebug(%teamcanidate1, %teamcanidate2, %team1difference, %tea
 	if( %teamcanidate2 $= "" ) 
 		%teamcanidate2 = "NULL";
 		
-	messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4, %5', %teamcanidate1, %team1difference, %teamcanidate2, %team2difference, %mode );
+	messageAll('MsgTeamBalanceNotify', '\c0Autobalance stat: %1, %2, %3, %4', %canidate, %team1difference, %team2difference, %mode );
 	
 	return;
 }

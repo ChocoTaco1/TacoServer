@@ -131,6 +131,9 @@
 //    Few new stats
 //    Disabled some mine disc stats as they were not accurate, may revisit later  
 //    Fixed Flipflop stat
+//
+//    7.3 
+//    Stat fixes to do copy paste mistakes  
 //-----------Settings------------
 //Notes score ui width is 592
 $dtStats::version = 7.2; 
@@ -180,7 +183,7 @@ $dtStats::quarter = 0;//-4
 $dtStats::year = 0;// number of years
 
 $dtStats::expireMax = 90;  
-$dtStats::expireMin = 32;
+$dtStats::expireMin = 15;
 // you gain extra days based on time played extra days = gameCount * expireFactor;
 // example being 100 games * factor of 0.596 = will gain you 60 extra days but if its over the 90 day max it will be deleted
 $dtStats::expireFactor["CTFGame"] = 0.596;
@@ -1049,8 +1052,8 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "missileKillGroundAir";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "shockKillGroundAir";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaKillGroundAir";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "blasterKillGroundAir";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mineKillAGroundAir";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelKillAGroundAir";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mineKillGroundAir";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelKillGroundAir";
 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "cgDeathGroundAir"; // ground to air death 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "discDeathGroundAir";
@@ -1075,8 +1078,8 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "missileKillGroundGround";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "shockKillGroundGround";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaKillGroundGround";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "blasterKillGroundGround";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mineKillAGroundGround";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelKillAGroundGround";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mineKillGroundGround";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelKillGroundGround";
 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "cgDeathGroundGround"; // ground to ground death
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "discDeathGroundGround";
@@ -2076,7 +2079,7 @@ package dtStatsGame{
       parent::onTrigger(%data, %player, %triggerNum, %val);
       if($dtStats::Enable){
          if(isObject(%player) && !%player.getObjectMount()){
-            if(%val){//cut the amount of tiggers in half
+            if(%val){//cut the amount of tiggers in half 
                %client = %player.client;
                %client.dtStats.onInput++;
 //------------------------------------------------------------------------------               
@@ -2088,8 +2091,8 @@ package dtStatsGame{
                   else
                      %client.dtStats.onTargetMis++;  
                   %client.dtStats.onFire++;
-                  %client.dtStats.onTargetAcc =  (%client.dtStats.onFire / (%client.dtStats.onFire ? %client.dtStats.onFire : 1)) * 100;
-                  %client.dtStats.onTargetHMR=  (%client.dtStats.onFire / (%client.dtStats.onTargetMis ? %client.dtStats.onTargetMis : 1)) * 100;
+                  %client.dtStats.onTargetAcc =  (%client.dtStats.onTargetHit / (%client.dtStats.onFire ? %client.dtStats.onFire : 1)) * 100;
+                  %client.dtStats.onTargetHMR=  (%client.dtStats.onTargetHit / (%client.dtStats.onTargetMis ? %client.dtStats.onTargetMis : 1)) * 100;
                   //error(%client.dtStats.onTargetAcc SPC %hit);
                }  
 //------------------------------------------------------------------------------                   

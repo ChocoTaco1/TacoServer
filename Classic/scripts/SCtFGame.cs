@@ -471,59 +471,7 @@ package SCtFGame
 function SCtFGame::missionLoadDone(%game)
 {
    //default version sets up teams - must be called first...
-   %game.initGameVars();  //set up scoring variables and other game specific globals
-
-   // make team0 visible/friendly to all
-   setSensorGroupAlwaysVisMask(0, 0xffffffff);
-   setSensorGroupFriendlyMask(0, 0xffffffff);
-
-   // update colors:
-   // - enemy teams are red
-   // - same team is green
-   // - team 0 is white
-   for(%i = 0; %i < 32; %i++)
-   {
-      %team = (1 << %i);
-      setSensorGroupColor(%i, %team, "0 255 0 255");
-      setSensorGroupColor(%i, ~%team, "255 0 0 255");
-      setSensorGroupColor(%i, 1, "255 255 255 255");
-
-      // setup the team targets (alwyas friendly and visible to same team)
-      setTargetAlwaysVisMask(%i, %team);
-      setTargetFriendlyMask(%i, %team);
-   }
-
-   //set up the teams
-   %game.setUpTeams();
-
-   //clear out the team rank array...
-   for (%i = 0; %i < 32; %i++)
-      $TeamRank[%i, count] = "";
-
-   // objectiveInit has to take place after setupTeams -- objective HUD relies on flags
-   // having their team set
-   MissionGroup.objectiveInit();
-
-   //initialize the AI system
-   %game.aiInit();
-   
-   //need to reset the teams if we switch from say, CTF to Bounty...
-   // assign the bots team
-   if ($currentMissionType !$= $previousMissionType)
-   {
-      $previousMissionType = $currentMissionType;
-      for(%i = 0; %i < ClientGroup.getCount(); %i++)
-      {
-         %cl = ClientGroup.getObject(%i);
-         if (%cl.isAIControlled())
-            %game.assignClientTeam(%cl);
-      }
-   }
-   
-   //Save off respawn or Siege Team switch information...
-   if(%game.class !$= "SiegeGame")
-      MissionGroup.setupPositionMarkers(true);
-   echo("Default game mission load done.");
+   DefaultGame::missionLoadDone(%game);
 
    for(%i = 1; %i < (%game.numTeams + 1); %i++)
       $teamScore[%i] = 0;
@@ -539,7 +487,7 @@ function SCtFGame::missionLoadDone(%game)
    %game.campThread_1 = schedule( 1000, 0, "checkVehicleCamping", 1 );
    %game.campThread_2 = schedule( 1000, 0, "checkVehicleCamping", 2 );
    
-	deleteNonSCtFObjectsFromMap();
+   deleteNonSCtFObjectsFromMap();
 }
 
 function SCtFGame::clientMissionDropReady(%game, %client)

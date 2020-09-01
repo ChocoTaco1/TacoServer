@@ -709,7 +709,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		}
 		else if(%points >= 100)
 		{
-			%sound = '~wfx/Misc/MA1.wav';
+			messageAll('', '~wfx/Misc/Flair.wav');
 		}
 
 		Game.recalcScore(%sourceObject.client);

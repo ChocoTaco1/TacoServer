@@ -47,13 +47,18 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
 
    if($BigTeam !$= "" && %clVictim.team == $BigTeam)
    {
+		//If someone switches to observer or disconnects
+		if(%damageType $= 0)
+			return;
+
 		%otherteam = $BigTeam == 1 ? 2 : 1;
 		if($TeamRank[$BigTeam, count] - $TeamRank[%otherteam, count] >= 2)
-		{
-			Game.clientChangeTeam( %clVictim, %otherTeam, 0 );
+		{	
 			echo(%clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing.");
 			messageClient(%clVictim, 'MsgTeamBalanceNotify', '\c0You were switched to Team %1 for balancing.~wfx/powered/vehicle_screen_on.wav', $TeamName[%otherteam]);
 			messageAllExcept(%clVictim, -1, 'MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
+			
+			Game.clientChangeTeam( %clVictim, %otherTeam, 0 );
 		}
 		else
 		{

@@ -193,7 +193,7 @@ $dtStats::quarter = 0;//-4
 $dtStats::year = 0;// number of years
 
 $dtStats::expireMax = 90;  
-$dtStats::expireMin = 5;
+$dtStats::expireMin = 15;
 // you gain extra days based on time played extra days = gameCount * expireFactor;
 // example being 100 games * factor of 0.596 = will gain you 60 extra days but if its over the 90 day max it will be deleted
 $dtStats::expireFactor["CTFGame"] = 0.596;

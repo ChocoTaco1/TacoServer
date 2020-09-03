@@ -134,9 +134,19 @@
 //
 //    7.3 
 //    Stat fixes to do copy paste mistakes  
+//
+//    7.35
+//    Mine Disc Kill Stat 
+//    Some extra lightning stats
+//    Stat name and rename fixes
+//    Fixed pixel margin on LMB and LB page
+//    clientDmgStats optimization and cleanup
+//    Score hud bug with viewing last month map stats 
+//    Remove dtTurret stat unused 
+//    
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 7.2; 
+$dtStats::version = 7.35; 
 //disable stats system restart required;
 $dtStats::Enable = 1; 
 //enable disable map stats
@@ -183,7 +193,7 @@ $dtStats::quarter = 0;//-4
 $dtStats::year = 0;// number of years
 
 $dtStats::expireMax = 90;  
-$dtStats::expireMin = 15;
+$dtStats::expireMin = 5;
 // you gain extra days based on time played extra days = gameCount * expireFactor;
 // example being 100 games * factor of 0.596 = will gain you 60 extra days but if its over the 90 day max it will be deleted
 $dtStats::expireFactor["CTFGame"] = 0.596;
@@ -578,8 +588,6 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "impactKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "impactDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "groundKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "groundDeaths";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "dtTurretKills";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "dtTurretDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaTurretKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaTurretDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "aaTurretKills";
@@ -676,6 +684,7 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mortarDmgHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "laserHeadShot";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "shockRearShot";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "minePlusDisc";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "minePlusDiscKill";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "shotsFired";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "totalMA"; 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "totalTime";  
@@ -705,6 +714,12 @@ $dtStats::FV[$dtStats::FC["Avg"]++,"Avg"] = "groundTime";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVKills"; 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lightningMAkills";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lightningMAHits";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lightningMAEVKills";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVHitWep";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVMAHit";
+
+
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "totalWepDmg";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "timeTL";
 $dtStats::FV[$dtStats::FC["Avg"]++,"Avg"] = "timeTL";
@@ -1801,6 +1816,8 @@ package dtStats{
          dtSaveServerVars();
          dtScanForRepair();
          $mapID::gameID = addNum($mapID::gameID,1); 
+         if($dtStats::debugEchos)
+            error("GAME ID" SPC $mapID::gameID SPC "//////////////////////////////");
          export( "$mapID::*", "serverStats/mapIDList.cs", false );
       }
    }
@@ -3684,7 +3701,7 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    }
 }
 function dtStatsClientLeaveGame(%client){
-   if(isObject(Game) && $CurrentMission !$= "" && $missionRunning){// if they dc during game over dont count it
+   if(isGameRun()){// if they dc during game over dont count it
       $dtServer::mapDisconnects[cleanMapName($CurrentMission),Game.class]++;
       if(%client.score != 0)
          $dtServer::mapDisconnectsScore[cleanMapName($CurrentMission),Game.class]++;
@@ -5052,6 +5069,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
       %damageType == $DamageType::Suicide	){
       if((getSimTime() - %clVictim.lastHitTime) < 3000)
          %clKiller = %clVictim.lastHitBy;
+         %clVictim.lastHitBy = 0;
    }
    else if(!isObject(%clKiller) && isObject(%implement)){
       if(%damageType == $DamageType::IndoorDepTurret || %damageLocation == $DamageType::OutdoorDepTurret){
@@ -5161,14 +5179,14 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
          %kcAir = %vcAir = 0; 
          %rvel = %dis = 0;
       }
-//------------------------------------------------------------------------------      
-      if(%clVictim.EVDamageType && %clVictim.EVDamageType != %damageType && (getSimTime() - %clVictim.EVDamagetime) < 3000){ // they were hit by something befor they were killed
+//------------------------------------------------------------------------------   
+      if(%clVictim.EVDamageType && %clVictim.EVDamageType != %damageType){ // they were hit by something befor they were killed
          %killerDT.EVKillsWep++;
          %victimDT.EVDeathsWep++;
          if(rayTest(%clVictim.player, $dtStats::midAirHeight)){
-            if(%clVictim.EVDamageType == $DamageType::Lightning){
+            if(%clVictim.EVDamageType == $DamageType::Lightning && (getSimTime() - %clVictim.EVDamagetime) < 3000){
                %killerDT.lightningMAkills++;
-               %clKiller.dtMessage("Lightning MidAir","fx/Bonuses/down_perppass3_bunnybump.wav");
+               %clKiller.dtMessage("Lightning MidAir Kill","fx/misc/MA2.wav",1);
             }
             else
                %killerDT.EVMA++;
@@ -5201,6 +5219,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             if(%killerDT.discKillVV < %victimVel){%killerDT.discKillVV = %victimVel;} 
             if(%killerDT.discKillSV <  %clKiller.dtShotSpeed){%killerDT.discKillSV = %clKiller.dtShotSpeed;}
             if(%isCombo){%killerDT.discCom++;} 
+            if(%clVictim.md == 1 && (getSimTime() - %clVictim.mdTime1) < 256){%killerDT.minePlusDiscKill++;}
             
             if(%kcAir == 1 && %vcAir == 1){%killerDT.discKillAir++;%victimDT.discDeathAir++;%killerDT.discKillAirAir++;%victimDT.discDeathAirAir++;}
             else if(%kcAir == 2 && %vcAir == 1){%killerDT.discKillAir++;%victimDT.discDeathAir++;%killerDT.discKillGroundAir++;%victimDT.discDeathGroundAir++;}
@@ -5306,6 +5325,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             if(%killerDT.mineKillDist < %dis){%killerDT.mineKillDist = %dis;}
             if(%killerDT.mineKillVV < %victimVel){%killerDT.mineKillVV = %victimVel;}
             if(%isCombo){%killerDT.mineCom++;}
+            if(%clVictim.md == 2 && (getSimTime() - %clVictim.mdTime2) < 256){%killerDT.minePlusDiscKill++;}
             if(%kcAir == 1 && %vcAir == 1){%killerDT.mineKillAir++;%victimDT.mineDeathAir++;%killerDT.mineKillAirAir++;%victimDT.mineDeathAirAir++;}
             else if(%kcAir == 2 && %vcAir == 1){%killerDT.mineKillAir++;%victimDT.mineDeathAir++;%killerDT.mineKillGroundAir++;%victimDT.mineDeathGroundAir++;}
             else if(%kcAir == 1 && %vcAir == 2){%killerDT.mineKillGround++;%victimDT.mineDeathGround++;%killerDT.mineKillAirGround++;%victimDT.mineDeathAirGround++;}
@@ -5321,7 +5341,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             else if(%kcAir == 1 && %vcAir == 2){%killerDT.satchelKillGround++;%victimDT.satchelDeathGround++;%killerDT.satchelKillAirGround++;%victimDT.satchelDeathAirGround++;}
             else if(%kcAir == 2 && %vcAir == 2){%killerDT.satchelKillGround++;%victimDT.satchelDeathGround++;%killerDT.satchelKillGroundGround++; %victimDT.satchelDeathGroundGround++;}
          case $DamageType::Explosion:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.explosionKills++;}
+            if(%clKiller){%killerDT.explosionKills++;}
             %victimDT.explosionDeaths++;
          case $DamageType::Impact:
             if(isObject(%clKiller.vehicleMounted)){
@@ -5339,11 +5359,8 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             %killerDT.impactKills++;
             %victimDT.impactDeaths++;
          case $DamageType::Ground:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.groundKills++;}
+            if(%clKiller){%killerDT.groundKills++;}
             %victimDT.groundDeaths++;
-         case $DamageType::Turret:
-            %killerDT.dtTurretKills++;
-            %victimDT.dtTurretDeaths++;
          case $DamageType::PlasmaTurret:
             %killerDT.plasmaTurretKills++;
             %victimDT.plasmaTurretDeaths++;
@@ -5369,10 +5386,10 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             %killerDT.sentryTurretKills++;
             %victimDT.sentryTurretDeaths++;
          case $DamageType::OutOfBounds:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.outOfBoundKills++;}
+            if(%clKiller){%killerDT.outOfBoundKills++;}
             %victimDT.outOfBoundDeaths++;
          case $DamageType::Lava:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.lavaKills++;}
+            if(%clKiller){%killerDT.lavaKills++;}
             %victimDT.lavaDeaths++;
          case $DamageType::ShrikeBlaster:
             %killerDT.shrikeBlasterKills++;
@@ -5390,22 +5407,29 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             %killerDT.tankMortarKills++;
             %victimDT.tankMortarDeaths++;
          case $DamageType::Lightning:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.lightningKills++;}
+            if(%clKiller){
+               %killerDT.lightningKills++;
+               if(%vcAir == 1 && (getSimTime() - %clVictim.lastHitTime) < 3000 && %clVictim.lastHitMA){
+                  %killerDT.lightningMAEVKills++;
+                  %killerDT.lightningMAkills++;
+                  %clKiller.dtMessage("Lightning MidAir EV Kill","fx/misc/MA2.wav",1);
+               }
+            }
             %victimDT.lightningDeaths++;
          case $DamageType::VehicleSpawn:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.vehicleSpawnKills++;}
+            if(%clKiller){%killerDT.vehicleSpawnKills++;}
             %victimDT.vehicleSpawnDeaths++;
          case $DamageType::ForceFieldPowerup:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.forceFieldPowerUpKills++;}
+            if(%clKiller){%killerDT.forceFieldPowerUpKills++;}
             %victimDT.forceFieldPowerUpDeaths++;
          case $DamageType::Crash:
             %killerDT.crashKills++;
             %victimDT.crashDeaths++;
          case $DamageType::NexusCamping:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.nexusCampingKills++;}
+            if(%clKiller){%killerDT.nexusCampingKills++;}
             %victimDT.nexusCampingDeaths++;
          case $DamageType::Suicide:
-            if(%clKiller){%clVictim.lastHitBy = 0;%killerDT.ctrlKKills++;}
+            if(%clKiller){%killerDT.ctrlKKills++;}
             //%victimDT.ctrlKKills++;
       }
    }
@@ -5466,10 +5490,14 @@ function chainKill(%clKiller,%killerDT){
    }
    %killerDT.chainKill++;
 } 
-function GameConnection::dtMessage(%this,%message,%sfx){
+function GameConnection::dtMessage(%this,%message,%sfx,%bypass){
    if(!%this.isAIControlled()){
       %diff =  getSimTime() - %this.dtLastMessage;
-      if(%sfx !$= "" && %diff > 32){// limits sound spam
+      if(%sfx !$= "" && %bypass){
+         %this.dtLastMessage = getSimTime();
+         messageClient(%this,'MsgClient', "\c2" @ %message @ "~w" @ %sfx);
+      }
+      else if(%sfx !$= "" && %diff > 256){// limits sound spam
          %this.dtLastMessage = getSimTime();
          messageClient(%this,'MsgClient', "\c2" @ %message @ "~w" @ %sfx);
       }
@@ -5531,7 +5559,6 @@ function testHit(%client){
    return 0;
 }
 function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageType,%amount){
-//------------------------------------------------------------------------------
    if(%damageType == $DamageType::Explosion || %damageType == $DamageType::Ground ||
          %damageType == $DamageType::OutOfBounds ||  %damageType == $DamageType::Lava ||
          %damageType == $DamageType::VehicleSpawn || %damageType == $DamageType::ForceFieldPowerup || 
@@ -5543,265 +5570,338 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
          return;
    } 
 //------------------------------------------------------------------------------
-   if(%amount > 0){
-      %t = %s = 0;
-      if(isObject(%sourceObject)){      
-         if(%sourceObject.getClassName() !$= "Player"){%sourceClient = %sourceObject.getControllingClient();}
-         else{%sourceClient = %sourceObject.client;}
-         %sourceDT = %sourceClient.dtStats;
-         if(%sourceObject.getClassName() $= "Player")
+   if(%amount > 0 && %damageType > 0){
+      if(isObject(%sourceObject)){ 
+         %sourceClass = %sourceObject.getClassName();
+         if(%sourceClass $= "Player"){
+            %sourceClient = %sourceObject.client;
+            %sourceDT = %sourceClient.dtStats;
             %aoeHIT = testHit(%sourceClient);
-         else
+            %sv = mFloor(vectorLen(%sourceObject.getVelocity()) * 3.6);
+         }
+         else if(%sourceClass $= "Turret" || %sourceClass $= "FlyingVehicle" || %sourceClass $= "HoverVehicle" || %sourceClass $= "WheeledVehicle"){
+            %sourceClient = %sourceObject.getControllingClient();
+            %sourceDT = %sourceClient.dtStats;
             %aoeHIT = 0;
+         }
+         else{
+            %aoeHIT = 0;
+         }
       }
       if(isObject(%targetObject)){
-         if(%targetObject.getClassName() !$= "Player"){%targetClient = %targetObject.getControllingClient();%objHit = 1;}
-         else{%targetClient = %targetObject.client;%objHit = 0;}
-         %targetDT = %targetClient.dtStats;
-
-      }
-//------------------------------------------------------------------------------   
-      if(%damageType > 0 && %sourceObject != %targetObject){
-         %vv = mFloor(vectorLen(%targetObject.getVelocity()) * 3.6);
-         %sv = mFloor(vectorLen(%sourceObject.getVelocity()) * 3.6);
-         if(%targetClient && %targetClient.team != %sourceClient.team){
-            %targetClient.lastHitBy = %sourceClient;
-            %targetClient.lastHitTime = getSimTime();
-//------------------------------------------------------------------------------          
-            if(!%targetObject.hitBy[%sourceClient]){
-               %sourceDT.assist++;
-               %targetObject.hitBy[%sourceClient] = 1; 
-            }
-//------------------------------------------------------------------------------         
-            if(!%targetObject.combo[%sourceClient,%damageType]){
-               %targetObject.combo[%sourceClient,%damageType] = 1;
-               %sourceClient.player.combo[%targetObject]++;
-            }
-//------------------------------------------------------------------------------         
-         }
-         if(%targetClient && isObject(%sourceClient.player))
-            %dis = vectorDist(%targetObject.getPosition(),%sourceClient.player.getPosition());
-
-//------------------------------------------------------------------------------             
-         if(%targetObject.getClassName() $= "Player"){
-            %dmgL = %targetObject.getDamageLocation(%position);
-            switch$(getWord(%dmgL,0)){
-               case "legs": %sourceDT.hitLegs++;%targetDT.hitTakenLegs++;
-                   switch$(getWord(%dmgL,1)){
-                     case "front_right":%sourceDT.hitLegFrontR++;%targetDT.hitTakenLegFrontR++;
-                     case "front_Left":%sourceDT.hitLegFrontL++;%targetDT.hitTakenLegFrontL++;
-                     case "back_right":%sourceDT.hitLegBackR++;%targetDT.hitTakenLegBackR++;
-                     case "back_Left":%sourceDT.hitLegBackL++;%targetDT.hitTakenLegBackL++;
-                  }
-               case "torso": %sourceDT.hitTorso++;%targetDT.hitTakenTorso++;
-                   switch$(getWord(%dmgL,1)){
-                     case "front_right":%sourceDT.hitTorsoFrontR++;%targetDT.hitTakenTorsoFrontR++;
-                     case "front_Left":%sourceDT.hitTorsoFrontL++;%targetDT.hitTakenTorsoFrontL++;
-                     case "back_right":%sourceDT.hitTorsoBackR++;%targetDT.hitTakenTorsoBackR++;
-                     case "back_Left":%sourceDT.hitTorsoBackL++;%targetDT.hitTakenTorsoBackL++;
-                  }
-               case "head":%sourceDT.hitHead++; %targetDT.hitTakenHead++;
-                   switch$(getWord(%dmgL,1)){
-                     case "middle_front":%sourceDT.hitHeadFront++;%targetDT.hitTakenHeadFront++;
-                     case "middle_back":%sourceDT.hitHeadBack++;  %targetDT.hitTakenHeadBack++;
-                     case "right_middle":%sourceDT.hitHeadRight++;%targetDT.hitTakenHeadRight++;
-                     case "left_middle":%sourceDT.hitHeadLeft++;  %targetDT.hitTakenHeadLeft++;
-                  }   
-            }
-         } 
-//------------------------------------------------------------------------------       
-         %rayTest = rayTestDis(%targetObject);
-         if(%rayTest >= $dtStats::midAirHeight && %damageType != $DamageType::Bullet){
-            if(%sourceDT.maHitDist < %dis){%sourceDT.maHitDist = %dis;}
-            if(%sourceDT.maHitHeight < %rayTest){%sourceDT.maHitHeight = %rayTest;}
-            if(%sourceDT.maHitSV < %sv){%sourceDT.maHitSV = %sv;}    
-         } 
-         switch$(%damageType){// list of all damage types to track see damageTypes.cs
-            case $DamageType::Blaster:
-               %sourceDT.blasterDmg += %amount;
-               %sourceDT.blasterHits++;
-               %sourceDT.blasterACC =  (%sourceDT.blasterHits / (%sourceDT.blasterShotsFired ? %sourceDT.blasterShotsFired : 1)) * 100;
-               if(%sourceDT.blasterHitDist < %dis){%sourceDT.blasterHitDist = %dis;}
-               if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-               if(%rayTest >= $dtStats::midAirHeight){
-                  if(%sourceDT.blasterMADist < %dis){%sourceDT.blasterMADist = %dis;}
-                  %sourceDT.blasterMA++;
-               } 
-               if(%sourceDT.blasterHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.blasterHitSV = %sourceObject.client.dtShotSpeed;} 
-               if(%sourceDT.blasterHitVV < %vv){%sourceDT.blasterHitVV = %vv;}         
-            case $DamageType::Plasma:
-               %sourceDT.plasmaDmg += %amount;
-               if(%aoeHIT){%sourceDT.plasmaHits++;%sourceDT.plasmaDmgHits++;}
-               else{%sourceDT.plasmaDmgHits++;}
-               %sourceDT.plasmaACC = (%sourceDT.plasmaHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
-               %sourceDT.plasmaDmgACC = (%sourceDT.plasmaDmgHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
-               if(%sourceDT.plasmaHitDist < %dis){%sourceDT.plasmaHitDist = %dis;}
-               if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-               if(%rayTest >= $dtStats::midAirHeight){
-                  if(%sourceDT.plasmaMADist < %dis){%sourceDT.plasmaMADist = %dis;}
-                  if(%aoeHIT){
-                     %sourceDT.plasmaMA++;
-                     %sourceDT.plasmaAoeMA++;
-                  }
-                  else
-                     %sourceDT.plasmaAoeMA++;
+         %targetClass  = %targetObject.getClassName();
+         if(%targetClass $= "Player"){
+            %targetClient = %targetObject.client;
+            %targetDT = %targetClient.dtStats;
+            %vv = mFloor(vectorLen(%targetObject.getVelocity()) * 3.6);  
+            if(%sourceClass $= "Player" && %targetClient.team != %sourceClient.team && %sourceObject != %targetObject){
+               %dis = vectorDist(%targetObject.getPosition(),%sourceObject.getPosition());
+               %targetObject.dtPlayer = %targetObject.player;
+               if(!%targetObject.combo[%sourceClient,%damageType]){
+                  %targetObject.combo[%sourceClient,%damageType] = 1;
+                  %sourceClient.player.combo[%targetObject]++;
                }
-               if(%sourceDT.plasmaHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.plasmaHitSV = %sourceObject.client.dtShotSpeed;} 
-               if(%sourceDT.plasmaHitVV < %vv){%sourceDT.plasmaHitVV = %vv;} 
-            case $DamageType::Bullet:
-               %sourceDT.cgDmg += %amount;
-               %sourceDT.cgHits++;
                
-               %sourceDT.cgACC = (%sourceDT.cgHits / (%sourceDT.cgShotsFired ? %sourceDT.cgShotsFired : 1)) * 100;
-               if(%sourceDT.cgHitDist < %dis){%sourceDT.cgHitDist = %dis;}
-               if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-               if(%rayTest >= $dtStats::midAirHeight){
-                  if(%sourceDT.cgMADist < %dis){%sourceDT.cgMADist = %dis;}
-                  %sourceDT.cgMA++;
+               if(!%targetObject.hitBy[%sourceClient]){
+                  %sourceDT.assist++;
+                  %targetObject.hitBy[%sourceClient] = 1; 
                }
-               if(%sourceDT.cgHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.cgHitSV = %sourceObject.client.dtShotSpeed;} 
-               if(%sourceDT.cgHitVV < %vv){%sourceDT.cgHitVV = %vv;}   
-            case $DamageType::Disc:
-               %sourceDT.discDmg += %amount;
-               if(%aoeHIT){%sourceDT.discHits++;%sourceDT.discDmgHits++;}
-               else{%sourceDT.discDmgHits++;} 
-               %sourceDT.discACC = (%sourceDT.discHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
-               %sourceDT.discDmgACC = (%sourceDT.discDmgHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
-               if(%sourceDT.discHitDist < %dis){%sourceDT.discHitDist = %dis;}
-               if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-               if(%targetClient.md == 1 && (getSimTime() - %targetClient.mdTime1) < 256){%sourceDT.minePlusDisc++;}
-               %targetClient.md = 2;
-               %targetClient.mdTime2 = getSimTime(); 
-               if(%rayTest >= $dtStats::midAirHeight){
-                  if(%sourceDT.discMADist < %dis){%sourceDT.discMADist = %dis;}
-                  if(%aoeHIT){
-                     %sourceDT.discMA++;
-                     %sourceDT.discAoeMA++; 
-                  }
-                  else
-                     %sourceDT.discAoeMA++; 
-               }   
-               if(%sourceDT.discHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.discHitSV = %sourceObject.client.dtShotSpeed;}   
-               if(%sourceDT.discHitVV < %vv){%sourceDT.discHitVV = %vv;}
-            case $DamageType::Grenade:
-               if($dtObjExplode.dtNade){
-                  %sourceDT.hGrenadeDmg += %amount;
-                  %sourceDT.hGrenadeHits++;
-                  %sourceDT.hGrenadeACC = (%sourceDT.hGrenadeHits / (%sourceDT.hGrenadeShotsFired ? %sourceDT.hGrenadeShotsFired : 1)) * 100;
-                  if(%sourceDT.hGrenadeHitDist < %dis){%sourceDT.hGrenadeHitDist = %dis;}
-                  if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-                  if(%rayTest >= $dtStats::midAirHeight){
-                     if(%sourceDT.hGrenadeMADist < %dis){%sourceDT.hGrenadeMADist = %dis;}
-                     %sourceDT.hGrenadeMA++;
-                  }
-                  if(%sourceDT.hGrenadeHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.hGrenadeHitSV = %sourceObject.client.dtShotSpeed;}  
-                  if(%sourceDT.hGrenadeHitVV < %vv){%sourceDT.hGrenadeHitVV = %vv;}
-               }
-               else{
-                  %sourceDT.grenadeDmg += %amount;
-                  if(%aoeHIT){%sourceDT.grenadeHits++;%sourceDT.grenadeDmgHits++;}
-                  else{%sourceDT.grenadeDmgHits++;} 
-                  %sourceDT.grenadeACC = (%sourceDT.grenadeHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
-                  %sourceDT.grenadeDmgACC = (%sourceDT.grenadeDmgHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
-                  if(%sourceDT.grenadeHitDist < %dis){%sourceDT.grenadeHitDist = %dis;}
-                  if(%rayTest >= $dtStats::midAirHeight){
-                     if(%sourceDT.grenadeMADist < %dis){%sourceDT.grenadeMADist = %dis;}
-                     if(%aoeHIT){
-                        %sourceDT.grenadeMA++;
-                        %sourceDT.grenadeAoeMA++;
+               
+               %targetClient.lastHitBy = %sourceClient;
+               %targetClient.lastHitTime = getSimTime();
+               
+               if(%targetClient.EVDamageType && %targetClient.EVDamageType != %damageType){ // they were hit by something befor they were killed
+                  %sourceDT.EVHitWep++;
+                  if(rayTest(%targetClient.player, $dtStats::midAirHeight) && %damageType != $DamageType::Bullet){
+                     if(%targetClient.EVDamageType == $DamageType::Lightning && (getSimTime() - %targetClient.EVDamagetime) < 3000){
+                        %sourceDT.lightningMAHits++;
+                        %sourceClient.dtMessage("Lightning MidAir Hit","fx/Bonuses/down_perppass3_bunnybump.wav",0);
                      }
                      else
-                        %sourceDT.grenadeAoeMA++;
+                        %sourceDT.EVMAHit++;
                   }
-                  if(%sourceDT.grenadeHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.grenadeHitSV = %sourceObject.client.dtShotSpeed;}  
-                  if(%sourceDT.grenadeHitVV < %vv){%sourceDT.grenadeHitVV = %vv;}
-               }   
-            case $DamageType::Laser:
-               if(%targetObject.getClassName() $= "Player"){
-                  %damLoc = %targetObject.getDamageLocation(%position);
-                  if(getWord(%damLoc,0) $= "head" && %sourceClient.team != %targetClient.team){
-                     %sourceDT.laserHeadShot++;
+                  if((getSimTime() - %targetClient.EVDamagetime) > 3000){
+                     %targetClient.EVDamageType = 0;
                   }
                }
-               %sourceDT.laserDmg += %amount;
-               %sourceDT.laserHits++;
-               %sourceDT.laserACC = (%sourceDT.laserHits / (%sourceDT.laserShotsFired ? %sourceDT.laserShotsFired : 1)) * 100;
-               if(%sourceDT.laserHitDist < %dis){%sourceDT.laserHitDist = %dis;}
-               if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-               if(%rayTest >= $dtStats::midAirHeight){
-                  if(%sourceDT.laserMADist < %dis){%sourceDT.laserMADist = %dis;}
-                  %sourceDT.laserMA++;
+               
+               %dmgL = %targetObject.getDamageLocation(%position);
+               switch$(getWord(%dmgL,0)){
+                  case "legs": %sourceDT.hitLegs++;%targetDT.hitTakenLegs++;
+                      switch$(getWord(%dmgL,1)){
+                        case "front_right":%sourceDT.hitLegFrontR++;%targetDT.hitTakenLegFrontR++;
+                        case "front_Left":%sourceDT.hitLegFrontL++;%targetDT.hitTakenLegFrontL++;
+                        case "back_right":%sourceDT.hitLegBackR++;%targetDT.hitTakenLegBackR++;
+                        case "back_Left":%sourceDT.hitLegBackL++;%targetDT.hitTakenLegBackL++;
+                     }
+                  case "torso": %sourceDT.hitTorso++;%targetDT.hitTakenTorso++;
+                      switch$(getWord(%dmgL,1)){
+                        case "front_right":%sourceDT.hitTorsoFrontR++;%targetDT.hitTakenTorsoFrontR++;
+                        case "front_Left":%sourceDT.hitTorsoFrontL++;%targetDT.hitTakenTorsoFrontL++;
+                        case "back_right":%sourceDT.hitTorsoBackR++;%targetDT.hitTakenTorsoBackR++;
+                        case "back_Left":%sourceDT.hitTorsoBackL++;%targetDT.hitTakenTorsoBackL++;
+                     }
+                  case "head":%sourceDT.hitHead++; %targetDT.hitTakenHead++;
+                      switch$(getWord(%dmgL,1)){
+                        case "middle_front":%sourceDT.hitHeadFront++;%targetDT.hitTakenHeadFront++;
+                        case "middle_back":%sourceDT.hitHeadBack++;  %targetDT.hitTakenHeadBack++;
+                        case "right_middle":%sourceDT.hitHeadRight++;%targetDT.hitTakenHeadRight++;
+                        case "left_middle":%sourceDT.hitHeadLeft++;  %targetDT.hitTakenHeadLeft++;
+                     }   
                }
-               if(%sourceDT.laserHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.laserHitSV = %sourceObject.client.dtShotSpeed;} 
-               if(%sourceDT.laserHitVV < %vv){%sourceDT.laserHitVV = %vv;}
-            case $DamageType::Mortar:
-               %sourceDT.mortarDmg += %amount;
-               if(%aoeHIT){%sourceDT.mortarHits++;%sourceDT.mortarDmgHits++;}
-               else{%sourceDT.mortarDmgHits++;}
-               %sourceDT.mortarACC = (%sourceDT.mortarHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
-               %sourceDT.mortarDmgACC = (%sourceDT.mortarDmgHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
-               if(%sourceDT.mortarHitDist < %dis){%sourceDT.mortarHitDist = %dis;}
-               if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-               if(%rayTest >= $dtStats::midAirHeight){
-                  if(%sourceDT.mortarMADist < %dis){%sourceDT.mortarMADist = %dis;}
-                  if(%aoeHIT){
-                     %sourceDT.mortarMA++;
-                     %sourceDT.mortarAoeMA++;
-                  }
-                  else
-                     %sourceDT.mortarAoeMA++;
+               %rayTest = rayTestDis(%targetObject);
+               if(%rayTest >= $dtStats::midAirHeight && %damageType != $DamageType::Bullet){
+                  if(%sourceDT.maHitDist < %dis){%sourceDT.maHitDist = %dis;}
+                  if(%sourceDT.maHitHeight < %rayTest){%sourceDT.maHitHeight = %rayTest;}
+                  if(%sourceDT.maHitSV < %sv){%sourceDT.maHitSV = %sv;} 
+                  %targetClient.lastHitMA = 1;   
+               } 
+               else{
+                  %targetClient.lastHitMA = 0; 
                }
-               if(%sourceDT.mortarHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.mortarHitSV = %sourceObject.client.dtShotSpeed;} 
-               if(%sourceDT.mortarHitVV < %vv){%sourceDT.mortarHitVV = %vv;}   
-            case $DamageType::Missile:
-               %sourceDT.missileDmg += %amount;
-               %sourceDT.missileHits++;
-               %sourceDT.missileACC = (%sourceDT.missileHits / (%sourceDT.missileShotsFired ? %sourceDT.missileShotsFired : 1)) * 100;
-               if(%sourceDT.missileHitDist < %dis){%sourceDT.missileHitDist = %dis;}
-               if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-               if(%rayTest >= $dtStats::midAirHeight){
-                  if(%sourceDT.missileMADist < %dis){%sourceDT.missileMADist = %dis;}
-                  %sourceDT.missileMA++;
-               }        
-               if(%sourceDT.missileHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.missileHitSV = %sourceObject.client.dtShotSpeed;}     
-               if(%sourceDT.missileHitVV < %vv){%sourceDT.missileHitVV = %vv;}
-            case $DamageType::ShockLance:
-               if(%targetClient.rearshot){
-                  %sourceDT.shockRearShot++;
-                  }
-               %sourceDT.shockDmg += %amount;
-               %sourceDT.shockHits++;
-               %sourceDT.shockACC = (%sourceDT.shockHits / (%sourceDT.shockShotsFired ? %sourceDT.shockShotsFired : 1)) * 100;
-               if(%sourceDT.shockHitDist < %dis){%sourceDT.shockHitDist = %dis;}
-               if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-               if(%rayTest >= $dtStats::midAirHeight){ 
-                  if(%sourceDT.shockMADist < %dis){%sourceDT.shockMADist = %dis;}
-                  %sourceDT.shockMA++;
+               switch$(%damageType){// list of all damage types to track see damageTypes.cs
+                  case $DamageType::Blaster:
+                     %sourceDT.blasterDmg += %amount;
+                     %sourceDT.blasterHits++;
+                     %sourceDT.blasterACC =  (%sourceDT.blasterHits / (%sourceDT.blasterShotsFired ? %sourceDT.blasterShotsFired : 1)) * 100;
+                     if(%sourceDT.blasterHitDist < %dis){%sourceDT.blasterHitDist = %dis;}
+                     if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                     if(%rayTest >= $dtStats::midAirHeight){
+                        if(%sourceDT.blasterMADist < %dis){%sourceDT.blasterMADist = %dis;}
+                        %sourceDT.blasterMA++;
+                     } 
+                     if(%sourceDT.blasterHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.blasterHitSV = %sourceObject.client.dtShotSpeed;} 
+                     if(%sourceDT.blasterHitVV < %vv){%sourceDT.blasterHitVV = %vv;}         
+                  case $DamageType::Plasma:
+                     %sourceDT.plasmaDmg += %amount;
+                     if(%aoeHIT){%sourceDT.plasmaHits++;%sourceDT.plasmaDmgHits++;}
+                     else{%sourceDT.plasmaDmgHits++;}
+                     %sourceDT.plasmaACC = (%sourceDT.plasmaHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
+                     %sourceDT.plasmaDmgACC = (%sourceDT.plasmaDmgHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
+                     if(%sourceDT.plasmaHitDist < %dis){%sourceDT.plasmaHitDist = %dis;}
+                     if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                     if(%rayTest >= $dtStats::midAirHeight){
+                        if(%sourceDT.plasmaMADist < %dis){%sourceDT.plasmaMADist = %dis;}
+                        if(%aoeHIT){
+                           %sourceDT.plasmaMA++;
+                           %sourceDT.plasmaAoeMA++;
+                        }
+                        else
+                           %sourceDT.plasmaAoeMA++;
+                     }
+                     if(%sourceDT.plasmaHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.plasmaHitSV = %sourceObject.client.dtShotSpeed;} 
+                     if(%sourceDT.plasmaHitVV < %vv){%sourceDT.plasmaHitVV = %vv;} 
+                  case $DamageType::Bullet:
+                     %sourceDT.cgDmg += %amount;
+                     %sourceDT.cgHits++;
+                     
+                     %sourceDT.cgACC = (%sourceDT.cgHits / (%sourceDT.cgShotsFired ? %sourceDT.cgShotsFired : 1)) * 100;
+                     if(%sourceDT.cgHitDist < %dis){%sourceDT.cgHitDist = %dis;}
+                     if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                     if(%rayTest >= $dtStats::midAirHeight){
+                        if(%sourceDT.cgMADist < %dis){%sourceDT.cgMADist = %dis;}
+                        %sourceDT.cgMA++;
+                     }
+                     if(%sourceDT.cgHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.cgHitSV = %sourceObject.client.dtShotSpeed;} 
+                     if(%sourceDT.cgHitVV < %vv){%sourceDT.cgHitVV = %vv;}   
+                  case $DamageType::Disc:
+                     %sourceDT.discDmg += %amount;
+                     if(%aoeHIT){%sourceDT.discHits++;%sourceDT.discDmgHits++;}
+                     else{%sourceDT.discDmgHits++;} 
+                     %sourceDT.discACC = (%sourceDT.discHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
+                     %sourceDT.discDmgACC = (%sourceDT.discDmgHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
+                     if(%sourceDT.discHitDist < %dis){%sourceDT.discHitDist = %dis;}
+                     if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                     if(%targetClient.md == 1 && (getSimTime() - %targetClient.mdTime1) < 256){%sourceDT.minePlusDisc++;}
+                     %targetClient.md = 2;
+                     %targetClient.mdTime2 = getSimTime(); 
+                     if(%rayTest >= $dtStats::midAirHeight){
+                        if(%sourceDT.discMADist < %dis){%sourceDT.discMADist = %dis;}
+                        if(%aoeHIT){
+                           %sourceDT.discMA++;
+                           %sourceDT.discAoeMA++; 
+                        }
+                        else
+                           %sourceDT.discAoeMA++; 
+                     }   
+                     if(%sourceDT.discHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.discHitSV = %sourceObject.client.dtShotSpeed;}   
+                     if(%sourceDT.discHitVV < %vv){%sourceDT.discHitVV = %vv;}
+                  case $DamageType::Grenade:
+                     if($dtObjExplode.dtNade){
+                        %sourceDT.hGrenadeDmg += %amount;
+                        %sourceDT.hGrenadeHits++;
+                        %sourceDT.hGrenadeACC = (%sourceDT.hGrenadeHits / (%sourceDT.hGrenadeShotsFired ? %sourceDT.hGrenadeShotsFired : 1)) * 100;
+                        if(%sourceDT.hGrenadeHitDist < %dis){%sourceDT.hGrenadeHitDist = %dis;}
+                        if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                        if(%rayTest >= $dtStats::midAirHeight){
+                           if(%sourceDT.hGrenadeMADist < %dis){%sourceDT.hGrenadeMADist = %dis;}
+                           %sourceDT.hGrenadeMA++;
+                        }
+                        if(%sourceDT.hGrenadeHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.hGrenadeHitSV = %sourceObject.client.dtShotSpeed;}  
+                        if(%sourceDT.hGrenadeHitVV < %vv){%sourceDT.hGrenadeHitVV = %vv;}
+                     }
+                     else{
+                        %sourceDT.grenadeDmg += %amount;
+                        if(%aoeHIT){%sourceDT.grenadeHits++;%sourceDT.grenadeDmgHits++;}
+                        else{%sourceDT.grenadeDmgHits++;} 
+                        %sourceDT.grenadeACC = (%sourceDT.grenadeHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
+                        %sourceDT.grenadeDmgACC = (%sourceDT.grenadeDmgHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
+                        if(%sourceDT.grenadeHitDist < %dis){%sourceDT.grenadeHitDist = %dis;}
+                        if(%rayTest >= $dtStats::midAirHeight){
+                           if(%sourceDT.grenadeMADist < %dis){%sourceDT.grenadeMADist = %dis;}
+                           if(%aoeHIT){
+                              %sourceDT.grenadeMA++;
+                              %sourceDT.grenadeAoeMA++;
+                           }
+                           else
+                              %sourceDT.grenadeAoeMA++;
+                        }
+                        if(%sourceDT.grenadeHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.grenadeHitSV = %sourceObject.client.dtShotSpeed;}  
+                        if(%sourceDT.grenadeHitVV < %vv){%sourceDT.grenadeHitVV = %vv;}
+                     }   
+                  case $DamageType::Laser:
+                     if(%targetObject.getClassName() $= "Player"){
+                        %damLoc = %targetObject.getDamageLocation(%position);
+                        if(getWord(%damLoc,0) $= "head" && %sourceClient.team != %targetClient.team){
+                           %sourceDT.laserHeadShot++;
+                        }
+                     }
+                     %sourceDT.laserDmg += %amount;
+                     %sourceDT.laserHits++;
+                     %sourceDT.laserACC = (%sourceDT.laserHits / (%sourceDT.laserShotsFired ? %sourceDT.laserShotsFired : 1)) * 100;
+                     if(%sourceDT.laserHitDist < %dis){%sourceDT.laserHitDist = %dis;}
+                     if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                     if(%rayTest >= $dtStats::midAirHeight){
+                        if(%sourceDT.laserMADist < %dis){%sourceDT.laserMADist = %dis;}
+                        %sourceDT.laserMA++;
+                     }
+                     if(%sourceDT.laserHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.laserHitSV = %sourceObject.client.dtShotSpeed;} 
+                     if(%sourceDT.laserHitVV < %vv){%sourceDT.laserHitVV = %vv;}
+                  case $DamageType::Mortar:
+                     %sourceDT.mortarDmg += %amount;
+                     if(%aoeHIT){%sourceDT.mortarHits++;%sourceDT.mortarDmgHits++;}
+                     else{%sourceDT.mortarDmgHits++;}
+                     %sourceDT.mortarACC = (%sourceDT.mortarHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
+                     %sourceDT.mortarDmgACC = (%sourceDT.mortarDmgHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
+                     if(%sourceDT.mortarHitDist < %dis){%sourceDT.mortarHitDist = %dis;}
+                     if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                     if(%rayTest >= $dtStats::midAirHeight){
+                        if(%sourceDT.mortarMADist < %dis){%sourceDT.mortarMADist = %dis;}
+                        if(%aoeHIT){
+                           %sourceDT.mortarMA++;
+                           %sourceDT.mortarAoeMA++;
+                        }
+                        else
+                           %sourceDT.mortarAoeMA++;
+                     }
+                     if(%sourceDT.mortarHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.mortarHitSV = %sourceObject.client.dtShotSpeed;} 
+                     if(%sourceDT.mortarHitVV < %vv){%sourceDT.mortarHitVV = %vv;}   
+                  case $DamageType::Missile:
+                     %sourceDT.missileDmg += %amount;
+                     %sourceDT.missileHits++;
+                     %sourceDT.missileACC = (%sourceDT.missileHits / (%sourceDT.missileShotsFired ? %sourceDT.missileShotsFired : 1)) * 100;
+                     if(%sourceDT.missileHitDist < %dis){%sourceDT.missileHitDist = %dis;}
+                     if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                     if(%rayTest >= $dtStats::midAirHeight){
+                        if(%sourceDT.missileMADist < %dis){%sourceDT.missileMADist = %dis;}
+                        %sourceDT.missileMA++;
+                     }        
+                     if(%sourceDT.missileHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.missileHitSV = %sourceObject.client.dtShotSpeed;}     
+                     if(%sourceDT.missileHitVV < %vv){%sourceDT.missileHitVV = %vv;}
+                  case $DamageType::ShockLance:
+                     if(%targetClient.rearshot){
+                        %sourceDT.shockRearShot++;
+                        }
+                     %sourceDT.shockDmg += %amount;
+                     %sourceDT.shockHits++;
+                     %sourceDT.shockACC = (%sourceDT.shockHits / (%sourceDT.shockShotsFired ? %sourceDT.shockShotsFired : 1)) * 100;
+                     if(%sourceDT.shockHitDist < %dis){%sourceDT.shockHitDist = %dis;}
+                     if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
+                     if(%rayTest >= $dtStats::midAirHeight){ 
+                        if(%sourceDT.shockMADist < %dis){%sourceDT.shockMADist = %dis;}
+                        %sourceDT.shockMA++;
+                     }
+                     if(%sourceDT.shockHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.shockHitSV = %sourceObject.client.dtShotSpeed;}
+                     if(%sourceDT.shockHitVV < %vv){%sourceDT.shockHitVV = %vv;} 
+                  case $DamageType::Mine:
+                     %sourceDT.mineDmg += %amount;
+                     %sourceDT.mineHits++;
+                     %sourceDT.mineACC = (%sourceDT.mineHits / (%sourceDT.mineShotsFired ? %sourceDT.mineShotsFired : 1)) * 100;
+                     if(%sourceDT.mineHitDist < %dis){%sourceDT.mineHitDist = %dis;}
+                     if(%targetClient.md == 2 && (getSimTime() - %targetClient.mdTime2) < 256){%sourceDT.minePlusDisc++;}
+                     %targetClient.md = 1;
+                     %targetClient.mdTime1 = getSimTime(); 
+                     if(%rayTest >= $dtStats::midAirHeight){
+                        if(%sourceDT.mineMADist < %dis){%sourceDT.mineMADist = %dis;}
+                        %sourceDT.mineMA++;
+                     }
+                     if(%sourceDT.mineHitVV < %vv){%sourceDT.mineHitVV = %vv;} 
+                  case $DamageType::SatchelCharge:
+                     %sourceDT.satchelDmg += %amount;
+                     %sourceDT.satchelHits++;
+                     %sourceDT.satchelACC = (%sourceDT.satchelHits / (%sourceDT.satchelShotsFired ? %sourceDT.satchelShotsFired : 1)) * 100;
+                     if(%sourceDT.satchelHitDist < %dis){%sourceDT.satchelHitDist = %dis;}
+                     if(%rayTest >= $dtStats::midAirHeight){%sourceDT.satchelMA++;}
+                     if(%sourceDT.satchelHitVV < %vv){%sourceDT.satchelHitVV = %vv;} 
                }
-               if(%sourceDT.shockHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.shockHitSV = %sourceObject.client.dtShotSpeed;}
-               if(%sourceDT.shockHitVV < %vv){%sourceDT.shockHitVV = %vv;} 
-            case $DamageType::Mine:
-               %sourceDT.mineDmg += %amount;
-               %sourceDT.mineHits++;
-               %sourceDT.mineACC = (%sourceDT.mineHits / (%sourceDT.mineShotsFired ? %sourceDT.mineShotsFired : 1)) * 100;
-               if(%sourceDT.mineHitDist < %dis){%sourceDT.mineHitDist = %dis;}
-               if(%targetClient.md == 2 && (getSimTime() - %targetClient.mdTime2) < 256){%sourceDT.minePlusDisc++;}
-               %targetClient.md = 1;
-               %targetClient.mdTime1 = getSimTime(); 
-               if(%rayTest >= $dtStats::midAirHeight){
-                  if(%sourceDT.mineMADist < %dis){%sourceDT.mineMADist = %dis;}
-                  %sourceDT.mineMA++;
-               }
-               if(%sourceDT.mineHitVV < %vv){%sourceDT.mineHitVV = %vv;} 
-            case $DamageType::SatchelCharge:
-               %sourceDT.satchelDmg += %amount;
-               %sourceDT.satchelHits++;
-               %sourceDT.satchelACC = (%sourceDT.satchelHits / (%sourceDT.satchelShotsFired ? %sourceDT.satchelShotsFired : 1)) * 100;
-               if(%sourceDT.satchelHitDist < %dis){%sourceDT.satchelHitDist = %dis;}
-               if(%rayTest >= $dtStats::midAirHeight){%sourceDT.satchelMA++;}
-               if(%sourceDT.satchelHitVV < %vv){%sourceDT.satchelHitVV = %vv;} 
+            }
          }
-      }
+         else if(%targetClass $= "Turret" || %targetClass $= "FlyingVehicle" || %targetClass $= "HoverVehicle" || %targetClass $= "WheeledVehicle"){
+            %targetClient = %targetObject.getControllingClient();
+            %targetDT = %targetClient.dtStats;
+            if(%sourceClass $= "Player"){
+               switch$(%damageType){// list of all damage types to track see damageTypes.cs
+                  case $DamageType::Blaster:
+                     %sourceDT.blasterHits++;
+                     %sourceDT.blasterACC =  (%sourceDT.blasterHits / (%sourceDT.blasterShotsFired ? %sourceDT.blasterShotsFired : 1)) * 100;
+                  case $DamageType::Plasma:
+                     if(%aoeHIT){%sourceDT.plasmaHits++;%sourceDT.plasmaDmgHits++;}
+                     else{%sourceDT.plasmaDmgHits++;}
+                     %sourceDT.plasmaACC = (%sourceDT.plasmaHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
+                     %sourceDT.plasmaDmgACC = (%sourceDT.plasmaDmgHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
+                  case $DamageType::Bullet:
+                     %sourceDT.cgHits++;
+                     %sourceDT.cgACC = (%sourceDT.cgHits / (%sourceDT.cgShotsFired ? %sourceDT.cgShotsFired : 1)) * 100;
+                  case $DamageType::Disc:
+                     if(%aoeHIT){%sourceDT.discHits++;%sourceDT.discDmgHits++;}
+                     else{%sourceDT.discDmgHits++;} 
+                     %sourceDT.discACC = (%sourceDT.discHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
+                     %sourceDT.discDmgACC = (%sourceDT.discDmgHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
+                  case $DamageType::Grenade:
+                     if($dtObjExplode.dtNade){
+                        %sourceDT.hGrenadeHits++;
+                        %sourceDT.hGrenadeACC = (%sourceDT.hGrenadeHits / (%sourceDT.hGrenadeShotsFired ? %sourceDT.hGrenadeShotsFired : 1)) * 100;
+                     }
+                     else{
+                        if(%aoeHIT){%sourceDT.grenadeHits++;%sourceDT.grenadeDmgHits++;}
+                        else{%sourceDT.grenadeDmgHits++;} 
+                        %sourceDT.grenadeACC = (%sourceDT.grenadeHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
+                        %sourceDT.grenadeDmgACC = (%sourceDT.grenadeDmgHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
+                     }   
+                  case $DamageType::Laser:
+                     %sourceDT.laserHits++;
+                     %sourceDT.laserACC = (%sourceDT.laserHits / (%sourceDT.laserShotsFired ? %sourceDT.laserShotsFired : 1)) * 100;
+                  case $DamageType::Mortar:
+                     if(%aoeHIT){%sourceDT.mortarHits++;%sourceDT.mortarDmgHits++;}
+                     else{%sourceDT.mortarDmgHits++;}
+                     %sourceDT.mortarACC = (%sourceDT.mortarHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
+                     %sourceDT.mortarDmgACC = (%sourceDT.mortarDmgHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
+                  case $DamageType::Missile:
+                     %sourceDT.missileHits++;
+                     %sourceDT.missileACC = (%sourceDT.missileHits / (%sourceDT.missileShotsFired ? %sourceDT.missileShotsFired : 1)) * 100;
+                  case $DamageType::ShockLance:
+                     %sourceDT.shockHits++;
+                     %sourceDT.shockACC = (%sourceDT.shockHits / (%sourceDT.shockShotsFired ? %sourceDT.shockShotsFired : 1)) * 100;
+                  case $DamageType::Mine:
+                     %sourceDT.mineHits++;
+                     %sourceDT.mineACC = (%sourceDT.mineHits / (%sourceDT.mineShotsFired ? %sourceDT.mineShotsFired : 1)) * 100;
+                  case $DamageType::SatchelCharge:
+                     %sourceDT.satchelHits++;
+                     %sourceDT.satchelACC = (%sourceDT.satchelHits / (%sourceDT.satchelShotsFired ? %sourceDT.satchelShotsFired : 1)) * 100;
+               }
+            }
+         }
+      } 
    }
 }
 function clientShotsFired(%data, %sourceObject, %projectile){ // could do a fov check to see if we are trying to aim at a player 
@@ -7771,7 +7871,7 @@ function statsMenu(%client,%game){
 			   case "CTFGame":
                %var1 = "scoreTG";  %var1Title = "Score Total:";   %var1Name = "Score Total";    %var1TypeName = "Total";
                %var2 = "scoreAVG"; %var2Title = "Score Avg:";     %var2Name = "Score Average "; %var2TypeName = "Average";
-               %var3 = "scoreMax"; %var3Title = "Largest Score:"; %var3Name = "Largest Score";  %var3TypeName = "Max";
+               %var3 = "scoreMax"; %var3Title = "Highest Score:"; %var3Name = "Highest Score";  %var3TypeName = "Max";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -7784,7 +7884,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
  
-               %var1 = "winLostPctAvg";  %var1Title = "Win Lost Ratio:";  %var1Name = "Win lost Average"; %var1TypeName = "Percentage";
+               %var1 = "winLostPctAvg";  %var1Title = "Win Lost Ratio:";  %var1Name = "Win lost Ratio Average"; %var1TypeName = "Ratio";
                %var2 = "defenseScoreTG"; %var2Title = "Defense Score:"; %var2Name = "Defense Score";    %var2TypeName = "Total";
                %var3 = "offenseScoreTG"; %var3Title = "Offense Score:"; %var3Name = "Offense Score";    %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -7919,9 +8019,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
 
-               %var1 = "roadKillsTG";        %var1Title = "Road Kills:";   %var1Name = "Road Kills";           %var1TypeName = "Total";
+               %var1 = "roadKillsTG";          %var1Title = "Road Kills:";   %var1Name = "Road Kills";           %var1TypeName = "Total";
                %var2 = "shrikeBlasterKillsTG"; %var2Title = "Shrike Kills:"; %var2Name = "Shrike Blaster Kills"; %var2TypeName = "Total";
-               %var3 = "bomberBombsKillsTG"; %var3Title = "Bomber Kills:"; %var3Name = "Bomber Bomb Kills";    %var3TypeName = "Total";
+               %var3 = "bomberBombsKillsTG";   %var3Title = "Bomber Kills:"; %var3Name = "Bomber Bomb Kills";    %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -7934,7 +8034,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
 
-               %var1 = "destructionTG";            %var1Title = "Destroys:";         %var1Name = "Destroys";           %var1TypeName = "Total";
+               %var1 = "destructionTG";            %var1Title = "Assets Destroyed:"; %var1Name = "Assets Destroyed";   %var1TypeName = "Total";
                %var2 = "repairsTG";                %var2Title = "Repairs:";          %var2Name = "Repairs";            %var2TypeName = "Total";
                %var3 = "repairpackpickupCountTTL"; %var3Title = "Repair Pack Grab:"; %var3Name = "Repair Pack Pickup"; %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -7979,7 +8079,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                //15
-               %var1 = "totalTimeTG"; %var1Title = "Time Played:";  %var1Name = "Time Played";      %var1TypeName = "Minutes";
+               %var1 = "totalTimeTG"; %var1Title = "Server Time:";  %var1Name = "Total Server Time";      %var1TypeName = "Minutes";
                %var2 = "timeTLAvg";   %var2Title = "Avg Lifetime:"; %var2Name = "Average Lifetime"; %var2TypeName = "Seconds";
                %var3 = "maxSpeedMax"; %var3Title = "Max Speed:";    %var3Name = "Highest Speed";    %var3TypeName = "Max";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -7997,7 +8097,7 @@ function statsMenu(%client,%game){
                //1
                %var1 = "scoreTG";  %var1Title = "Score Total:";   %var1Name = "Score Total";    %var1TypeName = "Total";
                %var2 = "scoreAVG"; %var2Title = "Score Avg:";     %var2Name = "Score Average "; %var2TypeName = "Average";
-               %var3 = "scoreMax"; %var3Title = "Largest Score:"; %var3Name = "Largest Score";  %var3TypeName = "Max";
+               %var3 = "scoreMax"; %var3Title = "Highest Score:"; %var3Name = "Highest Score";  %var3TypeName = "Max";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8010,9 +8110,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                //2
-               %var1 = "winLostPctAvg";  %var1Title = "Win Lost Ratio:";  %var1Name = "Win lost Average"; %var1TypeName = "Percentage";
-               %var2 = "defenseScoreTG"; %var2Title = "Defense Score:"; %var2Name = "Defense Score";    %var2TypeName = "Total";
-               %var3 = "offenseScoreTG"; %var3Title = "Offense Score:"; %var3Name = "Offense Score";    %var3TypeName = "Total";
+               %var1 = "winLostPctAvg";  %var1Title = "Win Lost Ratio:"; %var1Name = "Win lost Average"; %var1TypeName = "Percentage";
+               %var2 = "defenseScoreTG"; %var2Title = "Defense Score:";  %var2Name = "Defense Score";    %var2TypeName = "Total";
+               %var3 = "offenseScoreTG"; %var3Title = "Offense Score:";  %var3Name = "Offense Score";    %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8070,8 +8170,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                //6
-               %var1 = "killsTG";     %var1Title = "Kills:";      %var1Name = "Kills";         %var1TypeName = "Total";
-               %var2 = "assistTG";    %var2Title = "Assists:";    %var2Name = "Assists"; %var2TypeName = "Total";
+               %var1 = "killsTG";     %var1Title = "Kills:";      %var1Name = "Kills";      %var1TypeName = "Total";
+               %var2 = "assistTG";    %var2Title = "Assists:";    %var2Name = "Assists";    %var2TypeName = "Total";
                %var3 = "teamKillsTG"; %var3Title = "Team Kills:"; %var3Name = "Team Kills"; %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8100,9 +8200,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                //8
-               %var1 = "airTimeTG";    %var1Title = "Air Time:";       %var1Name = "Total Air Time";       %var1TypeName = "Minutes";
-               %var2 = "groundTimeTG"; %var2Title = "Ground Time:";    %var2Name = "Total Ground Time";    %var2TypeName = "Minutes";
-               %var3 = "distMovTG";    %var3Title = "Distance Moved:"; %var3Name = "Distance Moved"; %var3TypeName = "Total KM";
+               %var1 = "airTimeTG";    %var1Title = "Air Time:";       %var1Name = "Total Air Time";    %var1TypeName = "Minutes";
+               %var2 = "groundTimeTG"; %var2Title = "Ground Time:";    %var2Name = "Total Ground Time"; %var2TypeName = "Minutes";
+               %var3 = "distMovTG";    %var3Title = "Distance Moved:"; %var3Name = "Distance Moved";    %var3TypeName = "Total KM";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8209,7 +8309,7 @@ function statsMenu(%client,%game){
                //2
                %var1 = "scoreTG";  %var1Title = "Score Total:";   %var1Name = "Score Total";    %var1TypeName = "Total";
                %var2 = "scoreAVG"; %var2Title = "Score Avg:";     %var2Name = "Score Average "; %var2TypeName = "Average";
-               %var3 = "scoreMax"; %var3Title = "Largest Score:"; %var3Name = "Largest Score";  %var3TypeName = "Max";
+               %var3 = "scoreMax"; %var3Title = "Highest Score:"; %var3Name = "Highest Score";  %var3TypeName = "Max";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8222,8 +8322,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                //3
-               %var1 = "killsTG";     %var1Title = "Kills:";      %var1Name = "Kills";         %var1TypeName = "Total";
-               %var2 = "assistTG";    %var2Title = "Assists:";    %var2Name = "Assists"; %var2TypeName = "Total";
+               %var1 = "killsTG";     %var1Title = "Kills:";      %var1Name = "Kills";      %var1TypeName = "Total";
+               %var2 = "assistTG";    %var2Title = "Assists:";    %var2Name = "Assists";    %var2TypeName = "Total";
                %var3 = "teamKillsTG"; %var3Title = "Team Kills:"; %var3Name = "Team Kills"; %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8342,9 +8442,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                //11
-               %var1 = "killGroundTG";       %var1Title = "Ground Kills:";  %var1Name = "Ground Kills";           %var1TypeName = "Total";
-               %var2 = "killGroundAirTG";    %var2Title = "Ground To Air:"; %var2Name = "Ground To Air Kills"; %var2TypeName = "Total";
-               %var3 = "killGroundGroundTG"; %var3Title = "Ground To Ground:";    %var3Name = "Ground To Ground Kills";    %var3TypeName = "Total";
+               %var1 = "killGroundTG";       %var1Title = "Ground Kills:";     %var1Name = "Ground Kills";           %var1TypeName = "Total";
+               %var2 = "killGroundAirTG";    %var2Title = "Ground To Air:";    %var2Name = "Ground To Air Kills";    %var2TypeName = "Total";
+               %var3 = "killGroundGroundTG"; %var3Title = "Ground To Ground:"; %var3Name = "Ground To Ground Kills"; %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8391,7 +8491,7 @@ function statsMenu(%client,%game){
                //1
                %var1 = "scoreTG";  %var1Title = "Score Total:";   %var1Name = "Score Total";    %var1TypeName = "Total";
                %var2 = "scoreAVG"; %var2Title = "Score Avg:";     %var2Name = "Score Average "; %var2TypeName = "Average";
-               %var3 = "scoreMax"; %var3Title = "Largest Score:"; %var3Name = "Largest Score";  %var3TypeName = "Max";
+               %var3 = "scoreMax"; %var3Title = "Highest Score:"; %var3Name = "Highest Score";  %var3TypeName = "Max";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8509,9 +8609,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                //9
-               %var1 = "killAirTG";       %var1Title = "Air Kills:";      %var1Name = "Air Kills";             %var1TypeName = "Total";
-               %var2 = "killAirGroundTG"; %var2Title = "Air To Ground:"; %var2Name = "Air To Ground Kills";    %var2TypeName = "Total";
-               %var3 = "killAirAirTG";    %var3Title = "Air To Air:";    %var3Name = "Air To Air Kills";       %var3TypeName = "Total";
+               %var1 = "killAirTG";       %var1Title = "Air Kills:";     %var1Name = "Air Kills";           %var1TypeName = "Total";
+               %var2 = "killAirGroundTG"; %var2Title = "Air To Ground:"; %var2Name = "Air To Ground Kills"; %var2TypeName = "Total";
+               %var3 = "killAirAirTG";    %var3Title = "Air To Air:";    %var3Name = "Air To Air Kills";    %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8524,9 +8624,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                //10
-               %var1 = "killGroundTG";       %var1Title = "Ground Kills:";  %var1Name = "Ground Kills";           %var1TypeName = "Total";
-               %var2 = "killGroundAirTG";    %var2Title = "Ground To Air:"; %var2Name = "Ground To Air Kills"; %var2TypeName = "Total";
-               %var3 = "killGroundGroundTG"; %var3Title = "Ground To Ground:";    %var3Name = "Ground To Ground Kills";    %var3TypeName = "Total";
+               %var1 = "killGroundTG";       %var1Title = "Ground Kills:";     %var1Name = "Ground Kills";           %var1TypeName = "Total";
+               %var2 = "killGroundAirTG";    %var2Title = "Ground To Air:";    %var2Name = "Ground To Air Kills";    %var2TypeName = "Total";
+               %var3 = "killGroundGroundTG"; %var3Title = "Ground To Ground:"; %var3Name = "Ground To Ground Kills"; %var3TypeName = "Total";
                %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
                %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8613,9 +8713,9 @@ function statsMenu(%client,%game){
          %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
          
-         %var1 = "totalWepDmgTG";   %var1Title = "Total Weapon Dmg:"; %var1Name = "Score Total";    %var1TypeName = "Total";
-         %var2 = "shotsFiredTG";    %var2Title = "Rounds Fired:";     %var2Name = "Score Average "; %var2TypeName = "Total";
-         %var3 = "elfShotsFiredTG"; %var3Title = "ELF Usage:";        %var3Name = "Largest Score";  %var3TypeName = "Max";
+         %var1 = "totalWepDmgTG";   %var1Title = "Tot Wep Damage:"; %var1Name = "Total Weapon Damage"; %var1TypeName = "Total";
+         %var2 = "shotsFiredTG";    %var2Title = "Rounds Fired:";   %var2Name = "Rounds Fired";        %var2TypeName = "Total";
+         %var3 = "elfShotsFiredTG"; %var3Title = "ELF Usage:";     %var3Name = "ELF Usage";            %var3TypeName = "Max";
          %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8922,7 +9022,7 @@ function statsMenu(%client,%game){
          %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
          
-         %var1 = "switchteamCountTTL";     %var1Title = "Switch Teams:";  %var1Name = "Switch Teams";          %var1TypeName = "Minutes";
+         %var1 = "switchteamCountTTL";     %var1Title = "Switch Teams:";  %var1Name = "Switch Teams";          %var1TypeName = "Total";
          %var2 = "teamkillCountTTL";       %var2Title = "Team Kills:";    %var2Name = "Team Kills";            %var2TypeName = "Average";
          %var3 = "obstimeoutkickCountTTL"; %var3Title = "Observer kick:"; %var3Name = "Observer Timeout Kick"; %var3TypeName = "Max";
          %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8954,7 +9054,7 @@ function statsMenu(%client,%game){
            
          %var1 = "spawnobstimeoutCountTTL"; %var1Title = "Spawn Timeouts:";  %var1Name = "Spawn Timeouts"; %var1TypeName = "Total";
          %var2 = "weaponpickupCountTTL";    %var2Title = "Weapon Pickups:";  %var2Name = "Weapon Pickups"; %var2TypeName = "Total";
-         %var3 = "nullTG";                  %var3Title = "RNG Luck:";        %var3Name = "Random Number"; %var3TypeName = "Total";
+         %var3 = "nullTG";                  %var3Title = "RNG Luck:";        %var3Name = "Random Number";  %var3TypeName = "Total";
          %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -8982,9 +9082,9 @@ function statsMenu(%client,%game){
          %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);            
          
-         %var1 = "repairpackpickupCountTTL"; %var1Title = "Repair Pickup:";        %var1Name = "Repair Pickup";        %var1TypeName = "Total";
+         %var1 = "repairpackpickupCountTTL"; %var1Title = "Repair Pickup:"; %var1Name = "Repair Pickup";        %var1TypeName = "Total";
          %var2 = "repairpackpickupEnemyTTL"; %var2Title = "Pickup Enemy:";  %var2Name = "Repair Pickup Enemy";  %var2TypeName = "Total";
-         %var3 = "invyEatRepairPackTTL";     %var3Title = "Invy Eat:"; %var3Name = "Invy Eat Repair Pack"; %var3TypeName = "Total";
+         %var3 = "invyEatRepairPackTTL";     %var3Title = "Invy Eat:";      %var3Name = "Repair Packs Eaten";   %var3TypeName = "Total";
          %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -9053,14 +9153,14 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", '<just:center>%2 (Top %1 Players)',$dtStats::topAmount, %name);
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tS\t%3\t%1\t%2>  Back</a>  -  <a:gamelink\tS\tReset\t%1>Return To Score Screen</a>',%vClient,%lType,%client.backPage);
         
-         %header = '<tab:0,24,225><color:0befe7>\t #. \t%1\t%2';
+         %header = '<tab:5,24,225><color:0befe7>\t#. \t%1\t%2';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header,%name,%fieldName);
          for(%i = 0; %i < getFieldCount($lData::data[%field,%client.lgame,%lType,%mon,%year]) && %i < $dtStats::topAmount; %i++){
             %scoreName  = getField($lData::name[%field,%client.lgame,%lType,%mon,%year],%i);
             %gameScore  = getField($lData::data[%field,%client.lgame,%lType,%mon,%year],%i);
             if(%scoreName !$= "NA"){  
                %gameScore = (strPos(%gameScore,"x") == -1) ? (mFloatLength(%gameScore,2) + 0) : %gameScore;
-               %line = '<tab:0,24,225><font:univers condensed:18><color:33CCCC> \t%1. \t%2\t<color:03d597>%3';
+               %line = '<tab:5,24,225><font:univers condensed:18><color:33CCCC> \t%1. \t%2\t<color:03d597>%3';
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i+1,%scoreName,%gameScore);
             }
             else{
@@ -9079,14 +9179,14 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetScoreHudHeader', "", '<just:center>%2 (Top %1 Players)',$dtStats::topAmount, %name);
          messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tS\tMap\t%1\t%2\t0>  Back</a>  -  <a:gamelink\tS\tReset\t%1>Return To Score Screen</a>',%vClient,%map);
         
-         %header = '<tab:0,24,225><color:0befe7>\t #. \t%1\t%2';
+         %header = '<tab:5,24,225><color:0befe7>\t#. \t%1\t%2';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %header,%name,%fieldName);
          for(%i = 0; %i < getFieldCount($lMapData::data[%map,%field,%client.lgame,%client.curMon]) && %i < $dtStats::topAmount; %i++){
             %scoreName  = getField($lMapData::name[%map,%field,%client.lgame,%client.curMon],%i);
             %gameScore  = getField($lMapData::data[%map,%field,%client.lgame,%client.curMon],%i);
             if(%scoreName !$= "NA"){  
                %gameScore = (strPos(%gameScore,"x") == -1) ? (mFloatLength(%gameScore,2) + 0) : %gameScore;
-               %line = '<tab:0,24,225><font:univers condensed:18><color:33CCCC> \t%1. \t%2\t<color:03d597>%3';
+               %line = '<tab:5,24,225><font:univers condensed:18><color:33CCCC> \t%1. \t%2\t<color:03d597>%3';
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i+1,%scoreName,%gameScore);
             }
              else{
@@ -9180,9 +9280,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                             
-               %var1 = "destructionTG"; %var1Title = "Destruction:"; %var1Name = "Destroyed Base Items"; %var1TypeName = "Total";
-               %var2 = "repairsTG";     %var2Title = "Repairs:";     %var2Name = "Repaired Base Items";  %var2TypeName = "Total";
-               %var3 = "genDefendsTG";  %var3Title = "Gen Defends:"; %var3Name = "Generator Defends";    %var3TypeName = "Total";
+               %var1 = "destructionTG"; %var1Title = "Assets Destroyed:"; %var1Name = "Assets Destroyed"; %var1TypeName = "Total";
+               %var2 = "repairsTG";     %var2Title = "Repairs:";          %var2Name = "Repaired Base Items";  %var2TypeName = "Total";
+               %var3 = "genDefendsTG";  %var3Title = "Gen Defends:";      %var3Name = "Generator Defends";    %var3TypeName = "Total";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
                %i3 = getField($lMapData::data[%map,%var3,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var3,%client.lgame,%client.curMon],0) : %NA; 
@@ -9195,7 +9295,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "roadKillsTG";         %var1Title = "Road Kills:";    %var1Name = "Road Kills";         %var1TypeName = "Total";
+               %var1 = "roadKillsTG";        %var1Title = "Road Kills:";    %var1Name = "Road Kills";         %var1TypeName = "Total";
                %var2 = "vehicleScoreTG";     %var2Title = "Vehicle Score:"; %var2Name = "Vehicle Score";      %var2TypeName = "Total";
                %var3 = "bomberBombsKillsTG"; %var3Title = "Bomber Kills:";  %var3Name = "Bomber Bombs Kills"; %var3TypeName = "Total";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -9211,7 +9311,7 @@ function statsMenu(%client,%game){
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
                %var1 = "discKillsTG";    %var1Title = "Disc Kills:";   %var1Name = "Spinfusor Kills";   %var1TypeName = "Total";
-               %var2 = "discMATG";    %var2Title = "Disc MidAirs:"; %var2Name = "Spinfusor MidAirs"; %var2TypeName = "Total";
+               %var2 = "discMATG";       %var2Title = "Disc MidAirs:"; %var2Name = "Spinfusor MidAirs"; %var2TypeName = "Total";
                %var3 = "minePlusDiscTG"; %var3Title = "Mine + Disc:";  %var3Name = "Mine + Disc Kills"; %var3TypeName = "Total";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9225,8 +9325,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "laserKillsTG";        %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "laserHeadShotTG";     %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
+               %var1 = "laserKillsTG";    %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "laserHeadShotTG"; %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
                %var3 = "laserHitDistMax"; %var3Title = "Laser Max Dist:"; %var3Name = "Laser Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9255,8 +9355,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "plasmaKillsTG";        %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "plasmaMATG";           %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
+               %var1 = "plasmaKillsTG";    %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "plasmaMATG";       %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
                %var3 = "plasmaHitDistMax"; %var3Title = "Plasma Max Dist:"; %var3Name = "Plasma Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9270,8 +9370,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "cgKillsTG";       %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
-               %var2 = "cgACCAvg";        %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
+               %var1 = "cgKillsTG";    %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
+               %var2 = "cgACCAvg";     %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
                %var3 = "cgHitDistMax"; %var3Title = "Chaingun Max Dist:"; %var3Name = "Chaingun Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9406,9 +9506,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "heldTimeSecAvgi";  %var1Title = "Cap Time Avg:";   %var1Name = "Flag Capture Time";       %var1TypeName = "Time In Secs";
-               %var2 = "grabSpeedAvg";     %var2Title = "Grab Speed Avg:"; %var2Name = "Flag Grab Speed";         %var2TypeName = "Average KM/H";
-               %var3 = "capEfficiencyAvg"; %var3Title = "Cap Eff Avg:";      %var3Name = "Flag Capture Efficiency"; %var3TypeName = "Percentage";
+               %var1 = "heldTimeSecAvgi";  %var1Title = "Cap Time Avg:";    %var1Name = "Flag Capture Time";       %var1TypeName = "Time In Secs";
+               %var2 = "grabSpeedAvg";     %var2Title = "Grab Speed Avg:";  %var2Name = "Flag Grab Speed";         %var2TypeName = "Average KM/H";
+               %var3 = "capEfficiencyAvg"; %var3Title = "Cap Eff Avg:";     %var3Name = "Flag Capture Efficiency"; %var3TypeName = "Percentage";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
                %i3 = getField($lMapData::data[%map,%var3,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var3,%client.lgame,%client.curMon],0) : %NA; 
@@ -9436,8 +9536,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "laserKillsTG";        %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "laserHeadShotTG";     %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
+               %var1 = "laserKillsTG";    %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "laserHeadShotTG"; %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
                %var3 = "laserHitDistMax"; %var3Title = "Laser Max Dist:"; %var3Name = "Laser Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9466,8 +9566,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "plasmaKillsTG";        %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "plasmaMATG";           %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
+               %var1 = "plasmaKillsTG";    %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "plasmaMATG";       %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
                %var3 = "plasmaHitDistMax"; %var3Title = "Plasma Max Dist:"; %var3Name = "Plasma Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9481,7 +9581,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "grenadeKillsTG";       %var1Title = "GrenadeL Kills:";    %var1Name = "Grenade Launcher Kills";        %var1TypeName = "Total";
+               %var1 = "grenadeKillsTG";    %var1Title = "GrenadeL Kills:";    %var1Name = "Grenade Launcher Kills";        %var1TypeName = "Total";
                %var2 = "grenadeMATG";       %var2Title = "GrenadeL MidAirs:";  %var2Name = "Grenade Launcher MidAirs";      %var2TypeName = "Total";
                %var3 = "grenadeHitDistMax"; %var3Title = "GrenadeL Max Dist:"; %var3Name = "Grenade Launcher Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -9496,8 +9596,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "cgKillsTG";       %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
-               %var2 = "cgACCAvg";        %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
+               %var1 = "cgKillsTG";    %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
+               %var2 = "cgACCAvg";     %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
                %var3 = "cgHitDistMax"; %var3Title = "Chaingun Max Dist:"; %var3Name = "Chaingun Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9526,8 +9626,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "mineKillsTG";       %var1Title = "Mine Kills:";    %var1Name = "Mine Kills";        %var1TypeName = "Total";
-               %var2 = "mineMATG";          %var2Title = "Mine MidAirs:";  %var2Name = "MineMidAirs";       %var2TypeName = "Total";
+               %var1 = "mineKillsTG";    %var1Title = "Mine Kills:";    %var1Name = "Mine Kills";        %var1TypeName = "Total";
+               %var2 = "mineMATG";       %var2Title = "Mine MidAirs:";  %var2Name = "MineMidAirs";       %var2TypeName = "Total";
                %var3 = "mineHitDistMax"; %var3Title = "Mine Max Dist:"; %var3Name = "Mine Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9541,8 +9641,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "hGrenadeKillsTG";       %var1Title = "HGrenade Kills:";    %var1Name = "Hand Grenade Kills";        %var1TypeName = "Total";
-               %var2 = "hGrenadeMATG";          %var2Title = "HGrenade MidAirs:";  %var1Name = "Hand Grenade MidAirs";      %var2TypeName = "Total";
+               %var1 = "hGrenadeKillsTG";    %var1Title = "HGrenade Kills:";    %var1Name = "Hand Grenade Kills";        %var1TypeName = "Total";
+               %var2 = "hGrenadeMATG";       %var2Title = "HGrenade MidAirs:";  %var1Name = "Hand Grenade MidAirs";      %var2TypeName = "Total";
                %var3 = "hGrenadeHitDistMax"; %var3Title = "HGrenade Max Dist:"; %var3Name = "Hand Grenade Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9587,7 +9687,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);  
                
-               %var1 = "discKillsTG";       %var1Title = "Spinfusor Kills:";    %var1Name = "Spinfusor Kills";        %var1TypeName = "Total";
+               %var1 = "discKillsTG";    %var1Title = "Spinfusor Kills:";    %var1Name = "Spinfusor Kills";        %var1TypeName = "Total";
                %var2 = "discMATG";       %var2Title = "Spinfusor MidAirs:";  %var2Name = "Spinfusor MidAirs";      %var2TypeName = "Total";
                %var3 = "discHitDistMax"; %var3Title = "Spinfusor Max Dist:"; %var3Name = "Spinfusor Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -9647,7 +9747,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);  
                 
-               %var1 = "plasmaKillsTG";       %var1Title = "Plasma Kills:";    %var1Name = "Plasma Kills";        %var1TypeName = "Total";
+               %var1 = "plasmaKillsTG";    %var1Title = "Plasma Kills:";    %var1Name = "Plasma Kills";        %var1TypeName = "Total";
                %var2 = "plasmaMATG";       %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma MidAirs";      %var2TypeName = "Total";
                %var3 = "plasmaHitDistMax"; %var3Title = "Plasma Max Dist:"; %var3Name = "Plasma Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -9677,7 +9777,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);  
                
-               %var1 = "grenadeKillsTG";       %var1Title = "GrenadeL Kills:";    %var1Name = "Grenade Launcher Kills";        %var1TypeName = "Total";
+               %var1 = "grenadeKillsTG";    %var1Title = "GrenadeL Kills:";    %var1Name = "Grenade Launcher Kills";        %var1TypeName = "Total";
                %var2 = "grenadeMATG";       %var2Title = "GrenadeL MidAirs:";  %var2Name = "Grenade Launcher MidAirs";      %var2TypeName = "Total";
                %var3 = "grenadeHitDistMax"; %var3Title = "GrenadeL Max Dist:"; %var3Name = "Grenade Launcher Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -9707,8 +9807,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);  
                
-               %var1 = "blasterKillsTG";       %var1Title = "Blaster Kills:";    %var1Name = "Blaster Kills";        %var1TypeName = "Total";
-               %var2 = "blasterMATG";          %var2Title = "Blaster MidAirs:";  %var2Name = "Blaster MidAirs";      %var2TypeName = "Total";
+               %var1 = "blasterKillsTG";    %var1Title = "Blaster Kills:";    %var1Name = "Blaster Kills";        %var1TypeName = "Total";
+               %var2 = "blasterMATG";       %var2Title = "Blaster MidAirs:";  %var2Name = "Blaster MidAirs";      %var2TypeName = "Total";
                %var3 = "blasterHitDistMax"; %var3Title = "Blaster Max Dist:"; %var3Name = "Blaster Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9767,8 +9867,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);   
                
-               %var1 = "hGrenadeKillsTG";       %var1Title = "HGrenade Kills:";    %var1Name = "Hand Grenade Kills";        %var1TypeName = "Total";
-               %var2 = "hGrenadeMATG";          %var2Title = "HGrenade MidAirs:";  %var2Name = "Hand Grenade MidAirs";      %var2TypeName = "Total";
+               %var1 = "hGrenadeKillsTG";    %var1Title = "HGrenade Kills:";    %var1Name = "Hand Grenade Kills";        %var1TypeName = "Total";
+               %var2 = "hGrenadeMATG";       %var2Title = "HGrenade MidAirs:";  %var2Name = "Hand Grenade MidAirs";      %var2TypeName = "Total";
                %var3 = "hGrenadeHitDistMax"; %var3Title = "HGrenade Max Dist:"; %var3Name = "Hand Grenade Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9887,9 +9987,9 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
                
-               %var1 = "discKillsTG";      %var1Title = "Spinfusor Kills:"; %var1Name = "Spinfusor Kills"; %var1TypeName = "Total";
-               %var2 = "discMATG";        %var2Title = "Spinfusor MidAirs:"; %var2Name = "Spinfusor MidAirs"; %var2TypeName = "Total";
-               %var3 = "minePlusDiscTG"; %var3Title = "Mine + Disc:";      %var3Name = "Mine + Disc Hits"; %var3TypeName = "Total";
+               %var1 = "discKillsTG";    %var1Title = "Spinfusor Kills:";   %var1Name = "Spinfusor Kills";   %var1TypeName = "Total";
+               %var2 = "discMATG";       %var2Title = "Spinfusor MidAirs:"; %var2Name = "Spinfusor MidAirs"; %var2TypeName = "Total";
+               %var3 = "minePlusDiscTG"; %var3Title = "Mine + Disc:";       %var3Name = "Mine + Disc Hits";  %var3TypeName = "Total";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
                %i3 = getField($lMapData::data[%map,%var3,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var3,%client.lgame,%client.curMon],0) : %NA; 
@@ -9902,8 +10002,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
                
-               %var1 = "plasmaKillsTG";        %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "plasmaMATG";           %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
+               %var1 = "plasmaKillsTG";    %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "plasmaMATG";       %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
                %var3 = "plasmaHitDistMax"; %var3Title = "Plasma Max Dist:"; %var3Name = "Plasma Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9917,7 +10017,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "grenadeKillsTG";       %var1Title = "GrenadeL Kills:";    %var1Name = "Grenade Launcher Kills";        %var1TypeName = "Total";
+               %var1 = "grenadeKillsTG";    %var1Title = "GrenadeL Kills:";    %var1Name = "Grenade Launcher Kills";        %var1TypeName = "Total";
                %var2 = "grenadeMATG";       %var2Title = "GrenadeL MidAirs:";  %var2Name = "Grenade Launcher MidAirs";      %var2TypeName = "Total";
                %var3 = "grenadeHitDistMax"; %var3Title = "GrenadeL Max Dist:"; %var3Name = "Grenade Launcher Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -9932,8 +10032,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "laserKillsTG";        %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "laserHeadShotTG";     %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
+               %var1 = "laserKillsTG";    %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "laserHeadShotTG"; %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
                %var3 = "laserHitDistMax"; %var3Title = "Laser Max Dist:"; %var3Name = "Laser Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -9962,7 +10062,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "mortarKillsTG";       %var1Title = "Mortar Kills:";    %var1Name = "Mortar Kills";        %var1TypeName = "Total";
+               %var1 = "mortarKillsTG";    %var1Title = "Mortar Kills:";    %var1Name = "Mortar Kills";        %var1TypeName = "Total";
                %var2 = "mortarMATG";       %var3Title = "Mortar MidAir:";   %var3Name = "Mortar MidAIrs";      %var3TypeName = "Total";
                %var3 = "mortarHitDistMax"; %var3Title = "Mortar Max Dist:"; %var3Name = "Mortar Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -9977,8 +10077,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                               
-               %var1 = "cgKillsTG";       %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
-               %var2 = "cgACCAvg";        %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
+               %var1 = "cgKillsTG";    %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
+               %var2 = "cgACCAvg";     %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
                %var3 = "cgHitDistMax"; %var3Title = "Chaingun Max Dist:"; %var3Name = "Chaingun Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10007,8 +10107,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "mineKillsTG";       %var1Title = "Mine Kills:";    %var1Name = "Mine Kills";        %var1TypeName = "Total";
-               %var2 = "mineMATG";          %var2Title = "Mine MidAirs:";  %var2Name = "Mine MidAirs";      %var2TypeName = "Total";
+               %var1 = "mineKillsTG";    %var1Title = "Mine Kills:";    %var1Name = "Mine Kills";        %var1TypeName = "Total";
+               %var2 = "mineMATG";       %var2Title = "Mine MidAirs:";  %var2Name = "Mine MidAirs";      %var2TypeName = "Total";
                %var3 = "mineHitDistMax"; %var3Title = "Mine Max Dist:"; %var3Name = "Mine Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10128,8 +10228,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "plasmaKillsTG";        %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "plasmaMATG";           %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
+               %var1 = "plasmaKillsTG";    %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "plasmaMATG";       %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
                %var3 = "plasmaHitDistMax"; %var3Title = "Plasma Max Dist:"; %var3Name = "Plasma Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10143,7 +10243,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "grenadeKillsTG";       %var1Title = "GrenadeL Kills:";    %var1Name = "Grenade Launcher Kills";        %var1TypeName = "Total";
+               %var1 = "grenadeKillsTG";    %var1Title = "GrenadeL Kills:";    %var1Name = "Grenade Launcher Kills";        %var1TypeName = "Total";
                %var2 = "grenadeMATG";       %var2Title = "GrenadeL MidAirs:";  %var2Name = "Grenade Launcher MidAirs";      %var2TypeName = "Total";
                %var3 = "grenadeHitDistMax"; %var3Title = "GrenadeL Max Dist:"; %var3Name = "Grenade Launcher Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -10158,8 +10258,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "laserKillsTG";        %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "laserHeadShotTG";     %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
+               %var1 = "laserKillsTG";    %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "laserHeadShotTG"; %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
                %var3 = "laserHitDistMax"; %var3Title = "Laser Max Dist:"; %var3Name = "Laser Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10188,7 +10288,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "mortarKillsTG";       %var1Title = "Mortar Kills:";    %var1Name = "Mortar Kills";        %var1TypeName = "Total";
+               %var1 = "mortarKillsTG";    %var1Title = "Mortar Kills:";    %var1Name = "Mortar Kills";        %var1TypeName = "Total";
                %var2 = "mortarMATG";       %var2Title = "Mortar MidAir:";   %var2Name = "Mortar MidAIrs";      %var2TypeName = "Total";
                %var3 = "mortarHitDistMax"; %var3Title = "Mortar Max Dist:"; %var3Name = "Mortar Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -10203,8 +10303,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                               
-               %var1 = "cgKillsTG";       %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
-               %var2 = "cgACCAvg";        %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
+               %var1 = "cgKillsTG";    %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
+               %var2 = "cgACCAvg";     %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
                %var3 = "cgHitDistMax"; %var3Title = "Chaingun Max Dist:"; %var3Name = "Chaingun Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10233,8 +10333,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "mineKillsTG";       %var1Title = "Mine Kills:";    %var1Name = "Mine Kills";        %var1TypeName = "Total";
-               %var2 = "mineMATG";          %var2Title = "Mine MidAirs:";  %var2Name = "Mine MidAirs";      %var2TypeName = "Total";
+               %var1 = "mineKillsTG";    %var1Title = "Mine Kills:";    %var1Name = "Mine Kills";        %var1TypeName = "Total";
+               %var2 = "mineMATG";       %var2Title = "Mine MidAirs:";  %var2Name = "Mine MidAirs";      %var2TypeName = "Total";
                %var3 = "mineHitDistMax"; %var3Title = "Mine Max Dist:"; %var3Name = "Mine Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10248,8 +10348,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "hGrenadeKillsTG";       %var1Title = "HGrenade Kills:";    %var1Name = "Hand Grenade Kills";        %var1TypeName = "Total";
-               %var2 = "hGrenadeMATG";          %var2Title = "HGrenade MidAirs:";  %var2Name = "Hand Grenade MidAirs";      %var2TypeName = "Total";
+               %var1 = "hGrenadeKillsTG";    %var1Title = "HGrenade Kills:";    %var1Name = "Hand Grenade Kills";        %var1TypeName = "Total";
+               %var2 = "hGrenadeMATG";       %var2Title = "HGrenade MidAirs:";  %var2Name = "Hand Grenade MidAirs";      %var2TypeName = "Total";
                %var3 = "hGrenadeHitDistMax"; %var3Title = "HGrenade Max Dist:"; %var3Name = "Hand Grenade Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10368,8 +10468,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "plasmaKillsTG";        %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "plasmaMATG";           %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
+               %var1 = "plasmaKillsTG";    %var1Title = "Plasma Kills:";    %var1Name = "Plasma Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "plasmaMATG";       %var2Title = "Plasma MidAirs:";  %var2Name = "Plasma Rifle MidAirs";      %var2TypeName = "Total";
                %var3 = "plasmaHitDistMax"; %var3Title = "Plasma Max Dist:"; %var3Name = "Plasma Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10398,8 +10498,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "laserKillsTG";        %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
-               %var2 = "laserHeadShotTG";     %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
+               %var1 = "laserKillsTG";    %var1Title = "Laser Kills:";    %var1Name = "Laser Rifle Kills";        %var1TypeName = "Total";
+               %var2 = "laserHeadShotTG"; %var2Title = "Head Shots:";     %var2Name = "Laser Rifle Head Shots";   %var2TypeName = "Total";
                %var3 = "laserHitDistMax"; %var3Title = "Laser Max Dist:"; %var3Name = "Laser Rifle Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10428,7 +10528,7 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "mortarKillsTG";       %var1Title = "Mortar Kills:";    %var1Name = "Mortar Kills";        %var1TypeName = "Total";
+               %var1 = "mortarKillsTG";    %var1Title = "Mortar Kills:";    %var1Name = "Mortar Kills";        %var1TypeName = "Total";
                %var2 = "mortarMATG";       %var2Title = "Mortar MidAir:";   %var2Name = "Mortar MidAIrs";      %var2TypeName = "Total";
                %var3 = "mortarHitDistMax"; %var3Title = "Mortar Max Dist:"; %var3Name = "Mortar Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
@@ -10443,8 +10543,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                               
-               %var1 = "cgKillsTG";       %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
-               %var2 = "cgACCAvg";        %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
+               %var1 = "cgKillsTG";    %var1Title = "Chaingun Kills:";    %var1Name = "ChaingunKills";         %var1TypeName = "Total";
+               %var2 = "cgACCAvg";     %var2Title = "Chaingun MidAirs:";  %var2Name = "Chaingun MidAirs";      %var2TypeName = "Total";
                %var3 = "cgHitDistMax"; %var3Title = "Chaingun Max Dist:"; %var3Name = "Chaingun Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10473,8 +10573,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "mineKillsTG";       %var1Title = "Mine Kills:";    %var1Name = "Mine Kills";        %var1TypeName = "Total";
-               %var2 = "mineMATG";          %var2Title = "Mine MidAirs:";  %var2Name = "Mine MidAirs";      %var2TypeName = "Total";
+               %var1 = "mineKillsTG";    %var1Title = "Mine Kills:";    %var1Name = "Mine Kills";        %var1TypeName = "Total";
+               %var2 = "mineMATG";       %var2Title = "Mine MidAirs:";  %var2Name = "Mine MidAirs";      %var2TypeName = "Total";
                %var3 = "mineHitDistMax"; %var3Title = "Mine Max Dist:"; %var3Name = "Mine Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10488,8 +10588,8 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%map,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3);
                
-               %var1 = "hGrenadeKillsTG";       %var1Title = "HGrenade Kills:";    %var1Name = "Hand Grenade Kills";        %var1TypeName = "Total";
-               %var2 = "hGrenadeMATG";          %var2Title = "HGrenade MidAirs:";  %var2Name = "Hand Grenade MidAirs";      %var2TypeName = "Total";
+               %var1 = "hGrenadeKillsTG";    %var1Title = "HGrenade Kills:";    %var1Name = "Hand Grenade Kills";        %var1TypeName = "Total";
+               %var2 = "hGrenadeMATG";       %var2Title = "HGrenade MidAirs:";  %var2Name = "Hand Grenade MidAirs";      %var2TypeName = "Total";
                %var3 = "hGrenadeHitDistMax"; %var3Title = "HGrenade Max Dist:"; %var3Name = "Hand Grenade Max Distance"; %var3TypeName = "Meters";
                %i1 = getField($lMapData::data[%map,%var1,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var1,%client.lgame,%client.curMon],0) : %NA; 
                %i2 = getField($lMapData::data[%map,%var2,%client.lgame,%client.curMon],0) ? getField($lMapData::name[%map,%var2,%client.lgame,%client.curMon],0) : %NA; 
@@ -10528,14 +10628,14 @@ function statsMenu(%client,%game){
 
          %perPage = 14;// num of games listed per page
    
-         messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Map List" SPC monthString(%client.curMon)); 
+        // messageClient( %client, 'SetScoreHudHeader', "", "<just:center>Map List" SPC monthString(%client.curMon)); 
          if(%curMon + %lastMon  == 2 && %client.curMon == $dtStats::curMonth){
             %line = '<a:gamelink\tS\tView\t%1>  Back</a>  -  <a:gamelink\tS\tReset\t%1>Return To Score Screen</a> <just:right><a:gamelink\tS\tMAPLIST\t%1\t%2\t%3-%4> [View last month stats]</a>';
-            messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,1, %client.lgame, %lMon);    
+            messageClient( %client, 'SetScoreHudSubheader', "", %line,%vClient,1, %client.lgame, %lMon);    
          }
          else if(%curMon + %lastMon  == 2 && %client.curMon == %lMon){
             %line = '<a:gamelink\tS\tView\t%1>  Back</a>  -  <a:gamelink\tS\tReset\t%1>Return To Score Screen</a> <just:right><a:gamelink\tS\tMAPLIST\t%1\t%2\t%3-%4> [View current month stats]</a>';
-            messageClient( %client, 'SetLineHud', "", %tag, %index++,%line,%vClient,1, %client.lgame, $dtStats::curMonth);    
+            messageClient( %client, 'SetScoreHudSubheader', "", %line,%vClient,1, %client.lgame, $dtStats::curMonth);    
          }
          else{
             %line = '<a:gamelink\tS\tView\t%1>  Back</a>  -  <a:gamelink\tS\tReset\t%1>Return To Score Screen</a> ';
@@ -11146,6 +11246,7 @@ function dtCleanUp(%force){
          %gcPM = getField(%gameCountLine,5);
          %gc =  (%gcCM > %gcPM) ? %gcCM : %gcPM;
          %extraDays = mCeil((%gc * $dtStats::expireFactor[%game]) + $dtStats::expireMin);
+         //error(%extraDays SPC %dayCount);
          if(%dayCount > %extraDays || %dayCount > $dtStats::expireMax){
             if($dtStats::sm || %force){
                if($dtStats::debugEchos){error("Deleting old file" SPC %dayCount SPC %extraDays SPC %filepath);}

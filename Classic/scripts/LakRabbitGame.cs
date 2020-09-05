@@ -709,7 +709,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		}
 		else if(%points >= 100)
 		{
-			%sound = '~wfx/Misc/MA1.wav';
+			messageAll('', '~wfx/Misc/Flair.wav');
 		}
 
 		Game.recalcScore(%sourceObject.client);
@@ -1768,11 +1768,6 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
 	}
 }
 
-function ResetCantPickUpFlag(%player)
-{
-	%player.client.CantPickUpFlag = false;
-}
-
 function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 {
 	if(%player.getState() $= "Dead" || %player.client.flagDeny)
@@ -1781,11 +1776,11 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 	// borlak - can't pick up flag until 2 ppl are on
 	if(PlayingPlayers() < 2)
 	{
-		if(!%player.client.CantPickUpFlag)
+		%timeDif = getSimTime() - %player.client.pickUpTime;
+		if(%timeDif > 5000 || !%player.client.pickUpTime)
 		{
 			messageClient(%player.client, 'msgNoFlagWarning', "\c2You can't pick up the flag until another person joins." );
-			%player.client.CantPickUpFlag = true;
-			schedule(5000, 0, "ResetCantPickUpFlag", %player ); //message only every 5 seconds
+			%player.client.pickUpTime = getSimTime();
 		}
 		return;
 	}

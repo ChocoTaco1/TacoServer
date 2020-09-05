@@ -68,7 +68,6 @@ $dtLoadingScreen::ShowImages = 0;
 if( $Host::LoadScreenColor1 $= " " ) $Host::LoadScreenColor1 = "05edad";
 if( $Host::LoadScreenColor2 $= " " ) $Host::LoadScreenColor2 = "29DEE7";
 if( $Host::LoadScreenColor3 $= " " ) $Host::LoadScreenColor3 = "33CCCC";
-if( $Host::Info !$= " " ) 			$Host::Info = " ";
 
 // So ServerDefaults wont replace a "" value when meant to be blank
 for(%x = 1; %x <= 4; %x++) 
@@ -458,8 +457,8 @@ function NORMALsendModInfoToClient(%client)
 			messageClient(%client, 'MsgLoadObjectiveLine', "", %SpecialTextLine[%line], !%singlePlayer);
 
 	// Send server info:
-	if(!%singlePlayer)
-		messageClient(%client, 'MsgLoadRulesLine', "", "<color:29DEE7>" @ $Host::Info, false);
+	//if(!%singlePlayer)
+	//	messageClient(%client, 'MsgLoadRulesLine', "", "<color:29DEE7>" @ $Host::Info, false);
 
 	for(%line = 0; %line < %ServerCnt; %line++)
 	if (%ServerTextLine[%line] !$= "")

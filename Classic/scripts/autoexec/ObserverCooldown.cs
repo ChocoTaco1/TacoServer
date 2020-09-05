@@ -10,24 +10,23 @@ package ObserverTimeout
 function serverCmdClientMakeObserver( %client )
 {
     //10 second cooldown on becoming an observer
-    if( !%client.MakeObserverTimeout || %client.isAdmin )
-    {
+	%timeDif  = getSimTime() - %client.observerTimeout;
+	%timeDif1 = getSimTime() - %client.observerMsg;
+	if(%timeDif > 10000 || !%client.observerTimeout || %client.isAdmin)
+	{
 		if ( isObject( Game ) && Game.kickClient != %client )
 			Game.forceObserver( %client, "playerChoose" );
 		
-		%client.MakeObserverTimeout = true;
-		%client.ObserverProtectStart = getSimTime();
-		schedule(10000, 0, "ResetMakeObserverTimeout", %client );
+		%client.observerProtectStart = getSimTime();
+		%client.observerTimeout = getSimTime();
     }
-	//5 second cooldown on the notification
-	else if( !%client.ObserverCooldownMsgPlayed )
+	//1 second cooldown on message
+	else if((%timeDif1 > 1000 || !%client.observerMsg))
 	{
-		%wait = mFloor((10000 - (getSimTime() - %client.ObserverProtectStart)) / 1000);
+		%wait = mFloor((10000 - (getSimTime() - %client.observerProtectStart)) / 1000);
 		messageClient(%client, 'MsgObserverCooldown', '\c3Observer Cooldown:\cr Please wait another %1 seconds.', %wait );
-		//messageClient(%client, 'MsgObserverCooldown', '\c2Observer is on cooldown.' );
 		
-		%client.ObserverCooldownMsgPlayed = true;
-		schedule(2000, 0, "ResetObserverCooldownMsgPlayed", %client );
+		%client.observerMsg = getSimTime();
 	}
 }
 
@@ -36,15 +35,3 @@ function serverCmdClientMakeObserver( %client )
 // Prevent package from being activated if it is already
 if (!isActivePackage(ObserverTimeout))
     activatePackage(ObserverTimeout);
-
-//Allow client to become observer again
-function ResetMakeObserverTimeout( %client )
-{
-	%client.MakeObserverTimeout = false;
-}
-
-//Allow a notification again
-function ResetObserverCooldownMsgPlayed( %client )
-{
-	%client.ObserverCooldownMsgPlayed = false;
-}

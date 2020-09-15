@@ -47,6 +47,7 @@ function GetTeamCounts(%game)
 				//Variables
 				$TotalTeamPlayerCount = $TeamRank[1, count] + $TeamRank[2, count];
 				$AllPlayerCount = $HostGamePlayerCount;
+				$Observers = $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]);
 				
 				//echo("$PlayerCount[0] " @  $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]));
 				//echo("$PlayerCount[1] " @  $TeamRank[1, count]);

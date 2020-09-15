@@ -15,7 +15,7 @@ function DefaultGame::testTeamKill(%game, %victimID, %killerID)
       return true;
 
    // Ignore this map
-   if($CurrentMission $= "Mac_FlagArena")
+   if($CurrentMission $= "Mac_FlagArena" || $CurrentMission $= "Machineeggs")
 	  return true;
    
    // warn the player

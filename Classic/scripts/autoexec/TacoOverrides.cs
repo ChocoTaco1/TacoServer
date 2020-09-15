@@ -171,7 +171,33 @@ function DefaultGame::missionLoadDone(%game)
       %obj = MissionGroup.getObject(%i);
       if(%obj.getClassName() $= "WaterBlock")
          %obj.viscosity = $globalviscosity;
-   }  
+   }
+}
+
+// Temp Fix for Asset nameTag Strings
+function GameBaseData::onAdd(%data, %obj)
+{
+   if(%data.targetTypeTag !$= "")
+   {
+      // use the name given to the object in the mission file
+      if(%obj.nameTag !$= "" && strpos(%obj.nameTag,"\x01") == -1)
+      {
+         %obj.nameTag = addTaggedString(%obj.nameTag);
+         %nameTag = %obj.nameTag;
+      }
+      else if(%data.targetNameTag !$= "")
+         %nameTag = %data.targetNameTag;
+      else
+      {
+         if(%obj.name !$= "")
+            %nameTag = %obj.nameTag = addTaggedString(%obj.name);
+         else 
+            %nameTag = %obj.nameTag = addTaggedString("Base"); // fail safe so it shows up on cc
+      }
+       %obj.target = createTarget(%obj, %nameTag, "", "", %data.targetTypeTag, 0, 0);
+   }
+   else
+      %obj.target = -1;
 }
 
 };

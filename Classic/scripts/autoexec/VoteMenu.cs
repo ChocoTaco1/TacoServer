@@ -430,7 +430,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				return;
 
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %client.nameBase @ " initiated a vote to " @ (Game.noSplashDamage == 0 ? "enable" : "disable") @ " splash damage.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.noSplashDamage == 1 ? "enable" : "disable") @ " splash damage.";
 
 		case "VotePro":
 			if(!$CurrentMissionType $= "LakRabbit")

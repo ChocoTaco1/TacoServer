@@ -2098,7 +2098,7 @@ function plzBounceOffGrid(%obj, %bounceForce, %count)
 		%vec = VectorNormalize(%vec);
 		%vec = VectorScale(%vec, 25);
 	}
-	else if (%oldSpeed < 300)
+	else if (%oldSpeed < 60) //Max speed in which to get a bounce: Added so runners cant abuse
 		%vec = VectorScale(%vec, 1.15);
 
 	// apply the impulse to the object

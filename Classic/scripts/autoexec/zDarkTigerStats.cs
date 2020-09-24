@@ -143,12 +143,21 @@
 //    clientDmgStats optimization and cleanup
 //    Score hud bug with viewing last month map stats 
 //    Remove dtTurret stat unused 
-//    
+//
+//    7.4
+//    Fix for mine disc kill stat
+//    Fix for name to client id function not working in lak
+//    Reworked a ugly fix for %kPlayer var in clientKillStats 
+//    Lightning stats tweak 
+//    Changed time restriction on flag escort from 3 to 5 
+//    Adjusted clientShotsFired, to fix warnings, still unsure why flyingVehicleObject is getting passed into a onFire?
+//    Added server crashing tracking, not 100% accurate 
+//
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 7.35; 
-//disable stats system restart required;
-$dtStats::Enable = 1; 
+$dtStats::version = 7.4; 
+//disable stats system 
+$dtStats::Enable = 1;
 //enable disable map stats
 $dtStats::mapStats  = 1; 
 //Only self client can see his own stats, any stat, unless admin
@@ -177,7 +186,7 @@ $dtStats::loadAfter = 0;//keep 0 not finished
 //Control whats displayed  
 $dtStats::Live = 1;  
 $dtStats::KD = 0;// disabled 
-$dtStats::Hist =1;
+$dtStats::Hist =1; 
  
 //Leaderboards stuff
 //To rebuild the leaderboards manually type lStatsCycle(1) into the console;
@@ -715,6 +724,7 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lightningMAkills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lightningMAHits";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lightningMAEVHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lightningMAEVKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVHitWep";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVMAHit";
@@ -827,7 +837,7 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "shockCom";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelCom";
 
  //source kill velocity  - note no mine 
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] ="cgKillSV";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "cgKillSV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "discKillSV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "grenadeKillSV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "laserKillSV";
@@ -839,7 +849,7 @@ $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "hGrenadeKillSV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "missileKillSV";
 
  //source hit velocity - note no mine 
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] ="cgHitSV";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "cgHitSV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "discHitSV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "grenadeHitSV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "laserHitSV";
@@ -851,7 +861,7 @@ $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "hGrenadeHitSV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "missileHitSV";
 
  //victim velocity
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] ="cgKillVV";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "cgKillVV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "discKillVV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "grenadeKillVV";
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "laserKillVV";
@@ -1191,12 +1201,8 @@ $dtStats::unused[$dtStats::unusedCount++] = "gt";
 //MapStats Vars
 ////////////////////////////////////////////////////////////////////////////////
 //NOTE DO NOT RECOUNT!!!!// NOTE DO NOT RECOUNT!!!!// NOTE DO NOT RECOUNT!!!!
-//108 stats per game type is a hard limit, change at yor own risk 
-
-//If you need to remove a stat its best to leave a gap in the numbers or replace it
-//If you need to replace a stat simply rename the stat you want remvoed with the new stat do not change array numbers 
-//If you want to add a new stat just add it at the end of the list and increasing the index number by 1 from the last one 
-//If you do need to recount for whatever reason, it best to do it at the start of a month as recounting will zero out stats that were not in the same postion as last time
+//100 stats per game type is a soft limit, change at yor own risk 
+//If you need to remove a stat its best to leave a gap in the array index or replace it with something new
 
 //1
 $mapStats::mapVars[1,"CTFGame"] = "scoreTG";//note this starts at 1 for... reasions 
@@ -1818,7 +1824,6 @@ package dtStats{
          $mapID::gameID = addNum($mapID::gameID,1); 
          if($dtStats::debugEchos)
             error("GAME ID" SPC $mapID::gameID SPC "//////////////////////////////");
-         export( "$mapID::*", "serverStats/mapIDList.cs", false );
       }
    }
    function DefaultGame::forceObserver( %game, %client, %reason ){
@@ -1955,7 +1960,7 @@ package dtStats{
        %clAttacker.dmgdFlagTime = getSimTime();  
 	}
 	function CTFGame::testEscortAssist(%game, %victimID, %killerID){
-	   if((getSimTime() - %victimID.dmgdFlagTime) < %game.TIME_CONSIDERED_FLAGCARRIER_THREAT && %killerID.player.holdingFlag $= "")
+	   if((getSimTime() - %victimID.dmgdFlagTime) < 5000 && %killerID.player.holdingFlag $= "")
 		  return true;
 	   return false;
 	}
@@ -1965,7 +1970,7 @@ package dtStats{
 		  %clAttacker.dmgdFlagTime = getSimTime();  
 	}
 	function SCtFGame::testEscortAssist(%game, %victimID, %killerID){
-	   if((getSimTime() - %victimID.dmgdFlagTime) < %game.TIME_CONSIDERED_FLAGCARRIER_THREAT && %killerID.player.holdingFlag $= "")
+	   if((getSimTime() - %victimID.dmgdFlagTime) < 5000 && %killerID.player.holdingFlag $= "")
 		  return true;
 	   return false;
 	}
@@ -2415,22 +2420,7 @@ function dtGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4, %arg5){
       }
    }
 }
-function tsPlayerCountTeam( %teamindex )
-{
-  %count = 0;
 
-  %lim = ClientGroup.getCount();
-
-  for ( %i = 0; %i < %lim; %i++ )
-  {
-    %client = ClientGroup.getObject( %i );
-
-    if ( %client.team == %teamindex )
-      %count++;
-  }
-
-  return %count;
-}
 function ArenaHud(%game, %client, %tag){
    if(%client.viewStats && $dtStats::enableRefresh){
       statsMenu(%client, %game.class);
@@ -2462,8 +2452,7 @@ function ArenaHud(%game, %client, %tag){
      {
        // Send team name
        
-       %teamPlayerCount = tsPlayerCountTeam( %iTeam );
-       %teamPlayerCountPlural = %teamPlayerCount == 1 ? "" : "s";
+       %teamPlayerCountPlural = $TeamRank[%iTeam,count] == 1 ? "" : "s";
 
        messageClient( %client, 'SetLineHud', "", %tag, %index++, '<tab:10, 310><spush><font:Univers Condensed:28>\t%1 (%2) <font:Univers Condensed:16>%3 Player%4<spop>', %game.getTeamName(%iTeam), $TeamScore[%iTeam], %teamPlayerCount, %teamPlayerCountPlural );
        messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
@@ -3611,7 +3600,6 @@ function CTFHud(%game, %client, %tag){// defaultGame/evo
                %obsTimeStr = %game.formatTime(%obsTime, false);
                if(%client.isAdmin ||%client.isSuperAdmin || !$dtStats::viewSelf){
                   messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tS\tView\t%3>+</a> %1</clip><rmargin:260><just:right>%2', %cl.name, %obsTimeStr,%cl);
-                  
                }
                else if(%cl == %client){
                   messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:20, 310>\t<clip:150><a:gamelink\tS\tView\t%3>+</a> %1</clip><rmargin:260><just:right>%2', %cl.name, %obsTimeStr,%cl);
@@ -4117,7 +4105,7 @@ function secToMinSec(%sec){
 
    return(%min @ ":" @ %sec);
 }
-function formatTime(%ms)
+function dtFormatTime(%ms)
 {
    %sec = mFloor(%ms / 1000);
    %min = mFloor(%sec / 60);
@@ -4170,13 +4158,14 @@ function getDynamicField(%obj,%field){
 }
 function getCNameToCID(%name){
    if(%name !$= ""){
-      if(isObject(%name) && %name.getClassName() $= "GameConnection" || %name.getClassName() $= "AIConnection"){
-         return %name; // not a name its a client so return it
+      if(isObject(%name)){
+         if(%name.getClassName() $= "GameConnection" || %name.getClassName() $= "AIConnection")
+            return %name; // not a name its a client so return it
       }
       else{
          for (%i = 0; %i < ClientGroup.getCount(); %i++){
             %client = ClientGroup.getObject(%i);
-            if(getTaggedString(%client.name) $= %name){
+            if(stripChars(getTaggedString( %client.name ), "\cp\co\c6\c7\c8\c9" ) $= %name){
                return %client;
             }
          }
@@ -5078,9 +5067,11 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
       else
          %clKiller = %implement.getControllingClient();  
    }
-   %clVictim.lastPlayer = %clVictim.player;
    %killerDT = %clKiller.dtStats;
    %victimDT = %clVictim.dtStats;
+   //fail safe in case  package is out of order 
+   %victimPlayer = isObject(%clVictim.player) ? %clVictim.player : %clVictim.lastPlayer;
+   %killerPlayer = isObject(%clKiller.player) ? %clKiller.player : %clKiller.lastPlayer;
    %clVictim.lp = "";//last position for distMove
 //------------------------------------------------------------------------------
    %victimDT.timeToLive += getSimTime() - %clVictim.spawnTime;
@@ -5090,11 +5081,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
       %killerDT.teamkillCount++;
 //------------------------------------------------------------------------------    
    if(%clKiller.team != %clVictim.team){
-      if(isObject(%clKiller.player))
-         %kPlayer = %clKiller.player;
-      else if(isObject(%clKiller.lastPlayer)) 
-         %kPlayer = %clKiller.lastPlayer;
-      if(isObject(%clVictim.player) && isObject(%kPlayer) && %damageType != $DamageType::IndoorDepTurret && %damageLocation != $DamageType::OutdoorDepTurret){
+      if(isObject(%victimPlayer) && isObject(%killerPlayer) && %damageType != $DamageType::IndoorDepTurret && %damageLocation != $DamageType::OutdoorDepTurret){
          
 //------------------------------------------------------------------------------
             %clKiller.k++; %clVictim.k = 0;
@@ -5105,12 +5092,12 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
                %killerDT.killStreak = %clKiller.k;
             }
 //------------------------------------------------------------------------------            
-            if(%clVictim.player.hitBy[%clKiller]){
+            if(%victimPlayer.hitBy[%clKiller]){
                %killerDT.assist--;
             }
 //------------------------------------------------------------------------------            
             %isCombo = 0;
-            if(%kPlayer.combo[%clVictim.player] > 1){
+            if(%killerPlayer.combo[%victimPlayer] > 1){
                %killerDT.comboCount++;
                %isCombo =1;
             }
@@ -5122,7 +5109,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
 //------------------------------------------------------------------------------         
          statsGroup.lastKill = %killerDT;
 //------------------------------------------------------------------------------         
-         if(%kPlayer.getState() $= "Dead"){
+         if(%killerPlayer.getState() $= "Dead"){
             %killerDT.deathKills++;
          }
 //------------------------------------------------------------------------------         
@@ -5146,44 +5133,42 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
          }%clKiller.mCKill =  getSimTime();
          
 //------------------------------------------------------------------------------         
-         if(rayTest(%clVictim.player, $dtStats::midAirHeight)){%vcAir =1;}else{%vcAir =2;}
-         if(rayTest(%kPlayer, $dtStats::midAirHeight)){%kcAir =1;}else{%kcAir =2;}
+         if(rayTest(%victimPlayer, $dtStats::midAirHeight)){%vcAir =1;}else{%vcAir =2;}
+         if(rayTest(%killerPlayer, $dtStats::midAirHeight)){%kcAir =1;}else{%kcAir =2;}
       
-         switch$(%clVictim.player.getArmorSize()){
+         switch$(%victimPlayer.getArmorSize()){
             case "Light":%killerDT.armorL++; %victimDT.armorLD++;
-               switch$(%kPlayer.getArmorSize()){
+               switch$(%killerPlayer.getArmorSize()){
                   case "Light": %killerDT.armorLL++; %victimDT.armorLLD++;
                   case "Medium":%killerDT.armorML++; %victimDT.armorLMD++;
                   case "Heavy": %killerDT.armorHL++; %victimDT.armorLHD++;
                }
             case "Medium": %killerDT.armorM++; %victimDT.armorMD++;
-               switch$(%kPlayer.getArmorSize()){
+               switch$(%killerPlayer.getArmorSize()){
                   case "Light": %killerDT.armorLM++; %victimDT.armorMLD++;
                   case "Medium":%killerDT.armorMM++; %victimDT.armorMMD++;
                   case "Heavy": %killerDT.armorHM++; %victimDT.armorMHD++;
                }
             case "Heavy":%killerDT.armorH++; %victimDT.armorHD++;
-               switch$(%kPlayer.getArmorSize()){
+               switch$(%killerPlayer.getArmorSize()){
                   case "Light": %killerDT.armorLH++; %victimDT.armorHLD++;
                   case "Medium":%killerDT.armorMH++; %victimDT.armorHMD++;
                   case "Heavy": %killerDT.armorHH++; %victimDT.armorHHD++;
                }
          } 
 //------------------------------------------------------------------------------         
-         %dis = vectorDist(%kPlayer.getPosition(),%clVictim.player.getPosition());
-         %vD = vectorSub(%clVictim.player.getVelocity(),%kPlayer.getVelocity());
-         %rvel = mFloor(vectorLen(%vD) * 3.6);
-         %victimVel =  mFloor(vectorLen(%clVictim.player.getVelocity()) * 3.6);
+         %dis = vectorDist(%killerPlayer.getPosition(),%victimPlayer.getPosition());
+         %victimVel =  mFloor(vectorLen(%victimPlayer.getVelocity()) * 3.6);
       }
       else{
          %kcAir = %vcAir = 0; 
-         %rvel = %dis = 0;
+         %dis = 0;
       }
 //------------------------------------------------------------------------------   
-      if(%clVictim.EVDamageType && %clVictim.EVDamageType != %damageType){ // they were hit by something befor they were killed
+      if(%clVictim.EVDamageType && %clVictim.EVDamageType != %damageType && (getSimTime() - %clVictim.EVDamagetime) < 10000){ // they were hit by something befor they were killed
          %killerDT.EVKillsWep++;
          %victimDT.EVDeathsWep++;
-         if(rayTest(%clVictim.player, $dtStats::midAirHeight)){
+         if(rayTest(%victimPlayer, $dtStats::midAirHeight)){
             if(%clVictim.EVDamageType == $DamageType::Lightning && (getSimTime() - %clVictim.EVDamagetime) < 3000){
                %killerDT.lightningMAkills++;
                %clKiller.dtMessage("Lightning MidAir Kill","fx/misc/MA2.wav",1);
@@ -5219,8 +5204,8 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             if(%killerDT.discKillVV < %victimVel){%killerDT.discKillVV = %victimVel;} 
             if(%killerDT.discKillSV <  %clKiller.dtShotSpeed){%killerDT.discKillSV = %clKiller.dtShotSpeed;}
             if(%isCombo){%killerDT.discCom++;} 
-            if(%clVictim.md == 1 && (getSimTime() - %clVictim.mdTime1) < 256){%killerDT.minePlusDiscKill++;}
-            
+            if((getSimTime() - %clKiller.mdHitTime) < 256){%killerDT.minePlusDiscKill++;}
+
             if(%kcAir == 1 && %vcAir == 1){%killerDT.discKillAir++;%victimDT.discDeathAir++;%killerDT.discKillAirAir++;%victimDT.discDeathAirAir++;}
             else if(%kcAir == 2 && %vcAir == 1){%killerDT.discKillAir++;%victimDT.discDeathAir++;%killerDT.discKillGroundAir++;%victimDT.discDeathGroundAir++;}
             else if(%kcAir == 1 && %vcAir == 2){%killerDT.discKillGround++;%victimDT.discDeathGround++;%killerDT.discKillAirGround++;%victimDT.discDeathAirGround++;}
@@ -5325,7 +5310,8 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             if(%killerDT.mineKillDist < %dis){%killerDT.mineKillDist = %dis;}
             if(%killerDT.mineKillVV < %victimVel){%killerDT.mineKillVV = %victimVel;}
             if(%isCombo){%killerDT.mineCom++;}
-            if(%clVictim.md == 2 && (getSimTime() - %clVictim.mdTime2) < 256){%killerDT.minePlusDiscKill++;}
+            if((getSimTime() - %clKiller.mdHitTime) < 256){%killerDT.minePlusDiscKill++;}
+
             if(%kcAir == 1 && %vcAir == 1){%killerDT.mineKillAir++;%victimDT.mineDeathAir++;%killerDT.mineKillAirAir++;%victimDT.mineDeathAirAir++;}
             else if(%kcAir == 2 && %vcAir == 1){%killerDT.mineKillAir++;%victimDT.mineDeathAir++;%killerDT.mineKillGroundAir++;%victimDT.mineDeathGroundAir++;}
             else if(%kcAir == 1 && %vcAir == 2){%killerDT.mineKillGround++;%victimDT.mineDeathGround++;%killerDT.mineKillAirGround++;%victimDT.mineDeathAirGround++;}
@@ -5563,11 +5549,18 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
          %damageType == $DamageType::OutOfBounds ||  %damageType == $DamageType::Lava ||
          %damageType == $DamageType::VehicleSpawn || %damageType == $DamageType::ForceFieldPowerup || 
          %damageType == $DamageType::Lightning  ||   %damageType == $DamageType::NexusCamping){
-         if(isObject(%targetObject)){   
-            %targetObject.client.EVDamageType = %damageType;   
-            %targetObject.client.EVDamagetime = getSimTime();
-         }
-         return;
+      if(isObject(%targetObject)){   
+         %targetObject.client.EVDamageType = %damageType;   
+         %targetObject.client.EVDamagetime = getSimTime();
+      }
+      if(getSimTime() - %targetClient.lastHitTime < 5000){ 
+         %sourceClient = %targetClient.lastHitBy;
+         if(rayTest(%targetObject, $dtStats::midAirHeight) && %damageType == $DamageType::Lightning)
+            %sourceClient.dtStats.lightningMAEVHits++;
+         //else
+         //   %sourceDT.EVMAHit++;
+      }
+      return;
    } 
 //------------------------------------------------------------------------------
    if(%amount > 0 && %damageType > 0){
@@ -5575,6 +5568,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
          %sourceClass = %sourceObject.getClassName();
          if(%sourceClass $= "Player"){
             %sourceClient = %sourceObject.client;
+            %sourceClient.lastPlayer = %sourceClient.player;
             %sourceDT = %sourceClient.dtStats;
             %aoeHIT = testHit(%sourceClient);
             %sv = mFloor(vectorLen(%sourceObject.getVelocity()) * 3.6);
@@ -5592,11 +5586,11 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
          %targetClass  = %targetObject.getClassName();
          if(%targetClass $= "Player"){
             %targetClient = %targetObject.client;
+            %targetClient.lastPlayer = %targetClient.player;//used for when some how client kill is out of order 
             %targetDT = %targetClient.dtStats;
             %vv = mFloor(vectorLen(%targetObject.getVelocity()) * 3.6);  
             if(%sourceClass $= "Player" && %targetClient.team != %sourceClient.team && %sourceObject != %targetObject){
                %dis = vectorDist(%targetObject.getPosition(),%sourceObject.getPosition());
-               %targetObject.dtPlayer = %targetObject.player;
                if(!%targetObject.combo[%sourceClient,%damageType]){
                   %targetObject.combo[%sourceClient,%damageType] = 1;
                   %sourceClient.player.combo[%targetObject]++;
@@ -5610,12 +5604,12 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                %targetClient.lastHitBy = %sourceClient;
                %targetClient.lastHitTime = getSimTime();
                
-               if(%targetClient.EVDamageType && %targetClient.EVDamageType != %damageType){ // they were hit by something befor they were killed
+               if(%targetClient.EVDamageType && %targetClient.EVDamageType != %damageType && (getSimTime() - %targetClient.EVDamagetime) < 3000){ // they were hit by something befor they were killed
                   %sourceDT.EVHitWep++;
-                  if(rayTest(%targetClient.player, $dtStats::midAirHeight) && %damageType != $DamageType::Bullet){
-                     if(%targetClient.EVDamageType == $DamageType::Lightning && (getSimTime() - %targetClient.EVDamagetime) < 3000){
+                  if(rayTest(%targetObject, $dtStats::midAirHeight) && %damageType != $DamageType::Bullet){
+                     if(%targetClient.EVDamageType == $DamageType::Lightning){
                         %sourceDT.lightningMAHits++;
-                        %sourceClient.dtMessage("Lightning MidAir Hit","fx/Bonuses/down_perppass3_bunnybump.wav",0);
+                        //%sourceClient.dtMessage("Lightning MidAir Hit","fx/Bonuses/down_perppass3_bunnybump.wav",0);
                      }
                      else
                         %sourceDT.EVMAHit++;
@@ -5712,7 +5706,8 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      %sourceDT.discDmgACC = (%sourceDT.discDmgHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
                      if(%sourceDT.discHitDist < %dis){%sourceDT.discHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-                     if(%targetClient.md == 1 && (getSimTime() - %targetClient.mdTime1) < 256){%sourceDT.minePlusDisc++;}
+                     %targetClient.mdHit = 0;
+                     if(%targetClient.md == 1 && (getSimTime() - %targetClient.mdTime1) < 256){%sourceDT.minePlusDisc++; %targetClient.mdHit = 1;}
                      %targetClient.md = 2;
                      %targetClient.mdTime2 = getSimTime(); 
                      if(%rayTest >= $dtStats::midAirHeight){
@@ -5828,7 +5823,8 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      %sourceDT.mineHits++;
                      %sourceDT.mineACC = (%sourceDT.mineHits / (%sourceDT.mineShotsFired ? %sourceDT.mineShotsFired : 1)) * 100;
                      if(%sourceDT.mineHitDist < %dis){%sourceDT.mineHitDist = %dis;}
-                     if(%targetClient.md == 2 && (getSimTime() - %targetClient.mdTime2) < 256){%sourceDT.minePlusDisc++;}
+                     %targetClient.mdHit = 0;
+                     if(%targetClient.md == 2 && (getSimTime() - %targetClient.mdTime2) < 256){%sourceDT.minePlusDisc++; %targetClient.mdHit = 1;}
                      %targetClient.md = 1;
                      %targetClient.mdTime1 = getSimTime(); 
                      if(%rayTest >= $dtStats::midAirHeight){
@@ -5905,17 +5901,22 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
    }
 }
 function clientShotsFired(%data, %sourceObject, %projectile){ // could do a fov check to see if we are trying to aim at a player 
-   if(isObject(%projectile) && isObject(%sourceObject)){
-      if(%projectile.sourceObject.getClassName() !$= "Player")
+   if(isObject(%projectile.sourceObject) && isObject(%sourceObject)){
+      if(%projectile.sourceObject.getClassName() !$= "Player"){
          %sourceClient = %projectile.sourceObject.getControllingClient();
+      }
       else
          %sourceClient = %sourceObject.client;
    }
-      
-   if(!isObject(%sourceClient.dtStats)){ return;}
+   if(!isObject(%sourceClient.dtStats))
+      return;
+   
    %dtStats = %sourceClient.dtStats;
-   if(%data.directDamageType !$= ""){%damageType = %data.directDamageType;}
-   else{%damageType =  %data.radiusDamageType;}
+   if(%data.hasDamageRadius)
+      %damageType =  %data.radiusDamageType;
+   else
+      %damageType = %data.directDamageType;
+      
    %dtStats.shotsFired++;
    %sourceClient.dtShotSpeed = %projectile.dtShotSpeed = mFloor(vectorLen(%sourceObject.getVelocity()) * 3.6);
    switch$(%damageType){// list of all damage types to track see damageTypes.cs
@@ -6179,14 +6180,6 @@ function statsMenu(%client,%game){
                   $dtStats::Enable = 0; 
                %client.GlArg4 = 0;
             case "reset":
-               $dtServer::serverHangTotal = 0;   
-               $dtServer::serverHangMicro = 0;
-               $dtServer::serverHangTime = 0; 
-               $dtServer::serverHangLast = 0;
-               $dtServer::hostHang = 0;
-               $dtServer::hostTime = 0;   
-               $dtServer::hostHangLast = 0;
-               $dtServer::clientCrashCount = 0;
                %client.GlArg4 = 0; 
          } 
 //------------------------------------------------------------------------------
@@ -6217,8 +6210,8 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,%game,1); 
 //------------------------------------------------------------------------------
          messageClient( %client, 'SetLineHud', "", %tag, %index++, "");
-         %line = '<a:gamelink\tS\tSP\t%1\t%2\t%3>  + Reset Server Metrics</a>';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,"reset",0); 
+         //%line = '<a:gamelink\tS\tSP\t%1\t%2\t%3>  + Reset Server Metrics</a>';
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,"reset",0); 
          %a1 = ($dtServer::serverHangMap[cleanMapName($CurrentMission),%game] ? "<color:00FF00>" @ $dtServer::serverHangMap[cleanMapName($CurrentMission),%game] : 0); 
          %a2 = ($dtServer::serverHangTotal ? "<color:00FF00>" @ $dtServer::serverHangTotal : 0);
          %a3 = (($dtServer::serverHangLast !$= "") ? "<color:00FF00>" @ $dtServer::serverHangLast : 0);
@@ -6245,10 +6238,10 @@ function statsMenu(%client,%game){
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%b3,%b4); 
          %id = new scriptObject(); %id.delete();
          %line = '<color:0befe7>ID Count - %1 out of 2147483647 %2%% Up Time - %3';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%id,mFloor((%id / 2147483647) * 100),formatTime(getSimTime())); 
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%id,mFloor((%id / 2147483647) * 100),dtFormatTime(getSimTime())); 
          
          %max = 30;
-         %limit = 5;
+         %limit = 6;
          %v = $dtServerVars::upTimeCount-1;
          %line = '<color:0befe7>Server Run Time History';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%limit);  
@@ -6289,7 +6282,15 @@ function statsMenu(%client,%game){
                $dtServer::serverHangMap[%map,%client.lgame] = 0;
                $dtServer::serverHangMapMicro[%map,%client.lgame] = 0;
                $dtServer::hostHangMap[%map,%client.lgame] = 0;
+               $dtServerVars::serverCrash[%mis, %client.lgame] = 0;
             }
+            $dtServer::serverHangTotal = 0;   
+            $dtServer::serverHangTime = 0; 
+            $dtServer::serverHangLast = 0;
+            $dtServer::hostHang = 0;
+            $dtServer::hostTime = 0;   
+            $dtServer::hostHangLast = 0;
+            $dtServer::clientCrashCount = 0;
             %client.cat = %cat = 1;
          }
          else if(%cat !$= "C"){
@@ -9115,7 +9116,7 @@ function statsMenu(%client,%game){
          //12
          %var1 = "lightningDeathsTG";  %var1Title = "Lightning Deaths:";  %var1Name = "Lightning Deaths";   %var1TypeName = "Total";
          %var2 = "lightningKillsTG";   %var2Title = "Lightning Kills:";   %var2Name = "Lightning Kills";    %var2TypeName = "Total";
-         %var3 = "lightningMAkillsTG"; %var3Title = "Lightning MA Kills"; %var3Name = "Lightning MA Kills"; %var3TypeName = "Total";
+         %var3 = "lightningMAkillsTG"; %var3Title = "Lightning + MA Kills"; %var3Name = "Lightning MA Kills, Lightning + Wep"; %var3TypeName = "Total";
          %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -9127,6 +9128,22 @@ function statsMenu(%client,%game){
          %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
          %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
+         
+         //13
+         //%var1 = "lightningMAEVKillsTG";  %var1Title = "MA + Lightning Kills:";  %var1Name = "MA Lightning Kills, Wep + Lightning";   %var1TypeName = "Total";
+         //%var2 = "lightningMAHitsTG";   %var2Title = "Lightning + Ma Hits:";   %var2Name = "Lightning Kills";    %var2TypeName = "Total";
+         //%var3 = "lightningMAEVHitsTG"; %var3Title = "Ma Hits + Lightning"; %var3Name = "Lightning MA Kills"; %var3TypeName = "Total";
+         //%i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
+         //%i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
+         //%i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
+         //%client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
+         //%client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
+         //%client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
+         //%line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
+         //%nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
+         //%nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
+         //%nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
+         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
          
          for(%i = %index; %i < 15; %i++)
 			   messageClient( %client, 'SetLineHud', "", %tag, %index++, '');
@@ -11597,22 +11614,7 @@ function  sortMapStats(%varIndex,%game,%lType,%mapIndex){
 //Server Stats
 ////////////////////////////////////////////////////////////////////////////////
 
-function dtSaveServerVars(){
-   $dtServerVars::lastSimTime = getSimTime();
-   $dtServerVars::lastDate = formattimestring("mm/dd/yy hh:nn:a");
-   $dtServerVars::lastMission = cleanMapName($CurrentMission);
-   schedule(1,0,"export", "$dtServerVars::*", "serverStats/serverVars.cs", false );
-   schedule(1000,0,"export", "$dtServer::serverHang*", "serverStats/serverHangs.cs", false );
-   schedule(2000,0,"export", "$dtServer::hostHang*", "serverStats/hostHangs.cs", false );
-   schedule(3000,0,"export", "$dtServer::playCount*", "serverStats/playCount.cs", false );
-   schedule(3000,0,"export", "$dtServer::lastPlay*", "serverStats/lastPlay.cs", false );
-   schedule(4000,0,"export", "$dtServer::mapDisconnects*", "serverStats/mapDisconnects.cs", false );
-   schedule(5000,0,"export", "$dtServer::mapReconnects*", "serverStats/mapReconnects.cs", false );
-   schedule(6000,0,"export", "$dtServer::voteFor*", "serverStats/voteFor.cs", false );
-   schedule(7000,0,"export", "$dtServer::skipCount*", "serverStats/skipCount.cs", false );
-   schedule(8000,0,"export", "$dtServer::maxPlayers*", "serverStats/maxPlayers.cs", false );
-   schedule(9000,0,"export", "$dtServer::clientCrash*", "serverStats/clientCrash.cs", false );
-}
+
 $dtStats::prefTestTime = 512;// the lower the better tracking 
 $dtStats::prefTestIdleTime = 10*1000;// if no one is playing just run slow
 $dtStats::prefTolerance = 128;//this number is to account for base line preformance and differences between engine simTime and realtime  
@@ -11630,16 +11632,15 @@ function prefTest(%time,%skip){
          $dtServer::serverHangMap[cleanMapName($CurrentMission),Game.class]++;
          $dtServer::serverHangLast = formattimestring("hh:nn:a mm-dd-yy");
          $dtServer::serverHangTime = %dif;
-         LogPrefIssue(%msg SPC "Map:" SPC $CurrentMission SPC Game.class SPC "UpTime:" SPC formatTime(getSimTime()));
+         LogPrefIssue(%msg SPC "Map:" SPC $CurrentMission SPC Game.class SPC "UpTime:" SPC dtFormatTime(getSimTime()));
          %skip = 1;  
       }
       else
          %skip = 0; 
-      dtPingAvg();
+       dtPingAvg();     
    }
-
    if($dtStats::prefEnable){
-      if(isGameRun() && %plCount > 0)
+      if(%plCount > 1)
          schedule($dtStats::prefTestTime, 0, "prefTest",%real,%skip);
       else 
          schedule($dtStats::prefTestIdleTime, 0, "prefTest",%real,1);
@@ -11668,13 +11669,19 @@ function dtPingAvg(){
    }
    if(%pc > 4){ 
       if($dtStats::pingAvg > 1000){//network issues 
-         %msg = "Host Hang Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms";
+         %msg = "Host Hang Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC "ms" SPC %pc;
          if($dtStats::debugEchos){error(%msg);}
          $dtServer::hostHangMap[cleanMapName($CurrentMission),Game.class]++;
          $dtServer::hostHangTotal++;
          $dtServer::hostHangLast = formattimestring("hh:nn:a mm-dd-yy");
          $dtServer::hostHangTime = %pingT / %pc;
-         LogPrefIssue(%msg SPC "Map:" SPC $CurrentMission SPC Game.class SPC "UpTime:" SPC formatTime(getSimTime()));
+         LogPrefIssue(%msg SPC "Map:" SPC $CurrentMission SPC Game.class SPC "UpTime:" SPC dtFormatTime(getSimTime()));
+      }
+      else if($dtStats::pingAvg > 500){
+         %msg = "Small Host Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC %pc;
+         if($dtStats::debugEchos){error(%msg);}
+
+         LogPrefIssue(%msg SPC "Map:" SPC $CurrentMission SPC Game.class SPC "UpTime:" SPC dtFormatTime(getSimTime()));
       }
    }
 } 
@@ -11705,6 +11712,25 @@ function LogPrefIssue(%msg) {
       }
    }
 }
+function dtSaveServerVars(){
+   $dtServerVars::lastSimTime = getSimTime();
+   $dtServerVars::lastDate = formattimestring("mm/dd/yy hh:nn:a");
+   $dtServerVars::lastMission = cleanMapName($CurrentMission);
+   $dtServerVars::lastGameType = Game.class;
+   $dtServerVars::lastPlayerCount =  $HostGamePlayerCount - $HostGameBotCount;
+   schedule(1,0,"export", "$dtServerVars::*", "serverStats/serverVars.cs", false );
+   schedule(1000,0,"export", "$dtServer::serverHang*", "serverStats/serverHangs.cs", false );
+   schedule(2000,0,"export", "$dtServer::hostHang*", "serverStats/hostHangs.cs", false );
+   schedule(3000,0,"export", "$dtServer::playCount*", "serverStats/playCount.cs", false );
+   schedule(3000,0,"export", "$dtServer::lastPlay*", "serverStats/lastPlay.cs", false );
+   schedule(4000,0,"export", "$dtServer::mapDisconnects*", "serverStats/mapDisconnects.cs", false );
+   schedule(5000,0,"export", "$dtServer::mapReconnects*", "serverStats/mapReconnects.cs", false );
+   schedule(6000,0,"export", "$dtServer::voteFor*", "serverStats/voteFor.cs", false );
+   schedule(7000,0,"export", "$dtServer::skipCount*", "serverStats/skipCount.cs", false );
+   schedule(8000,0,"export", "$dtServer::maxPlayers*", "serverStats/maxPlayers.cs", false );
+   schedule(9000,0,"export", "$dtServer::clientCrash*", "serverStats/clientCrash.cs", false );
+   schedule(10000,0,"export", "$mapID::*", "serverStats/mapIDList.cs", false );
+}
 function dtLoadServerVars(){// keep function at the bottom
    if($dtStats::Enable){
       if(!statsGroup.serverStart){
@@ -11713,14 +11739,21 @@ function dtLoadServerVars(){// keep function at the bottom
          if(isFile("serverStats/serverVars.cs")){
             exec("serverStats/serverVars.cs");
             %date = $dtServerVars::lastDate;
-            %upTime = formatTime($dtServerVars::lastSimTime); 
+            %upTime = dtFormatTime($dtServerVars::lastSimTime); 
             %mis = $dtServerVars::lastMission;
             if($dtStats::debugEchos){schedule(6000,0,"error","last server uptime = " SPC %date @ "-" @ %upTime @ "-" @ %mis);}  
-            $dtServerVars::upTime[$dtServerVars::upTimeCount] = %date @ "-" @ %upTime @ "-" @ %mis;
+            $dtServerVars::upTime[$dtServerVars::upTimeCount++] = %date @ "-" @ %upTime @ "-" @ %mis;
+            if($dtServerVars::lastPlayerCount > 0){
+               $dtServerVars::serverCrash[%mis, $dtServerVars::lastGameType]++;
+               $dtServerVars::crashLog[$dtServerVars::crashLogCount++] =%date @ "-" @ %upTime @ "-" @ %mis @ "-" @  $dtServerVars::lastGameType @ "-" @ $dtServerVars::lastPlayerCount;
+               $dtServerVars::lastPlayerCount = 0;
+            }
          }
-         if($dtServerVars::upTimeCount++ >= 30){
-            $dtServerVars::upTimeCount = 0;  
-         }
+         if($dtServerVars::upTimeCount >= 30)
+            $dtServerVars::upTimeCount = 0;
+         if($dtServerVars::crashLogCount >= 15)
+            $dtServerVars::crashLogCount = 0;
+      
          $dtServerVars::lastSimTime = getSimTime();
          $dtServerVars::lastDate =  formattimestring("mm/dd/yy hh:nn:a");
          export( "$dtServerVars::*", "serverStats/serverVars.cs", false );

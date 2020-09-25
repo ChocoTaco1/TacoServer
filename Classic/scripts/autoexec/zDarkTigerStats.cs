@@ -153,9 +153,16 @@
 //    Adjusted clientShotsFired, to fix warnings, still unsure why flyingVehicleObject is getting passed into a onFire?
 //    Added server crashing tracking, not 100% accurate 
 //
+//    7.5
+//    Fixed averages was useing the total avg instead of game avg 
+//    Removed distance calc from weapon score on throwables 
+//    Fixed killStreaks 
+//    Fixed unused vars reset 
+//
+//
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 7.4; 
+$dtStats::version = 7.5; 
 //disable stats system 
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -600,7 +607,7 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "groundDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaTurretKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaTurretDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "aaTurretKills";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "aaTurretDeaths";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "aaTurretDeaths"; 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "elfTurretKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "elfTurretDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mortarTurretKills";
@@ -673,7 +680,6 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelShotsFired";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "cgHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "laserHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "blasterHits";
-//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "elfHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "discHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "grenadeHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hGrenadeHits";
@@ -683,6 +689,7 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "shockHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mineHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelHits";
+
 //aoe hits
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaDmgHits";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "discDmgHits";
@@ -1193,8 +1200,7 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "null";//rng number
 //Unused vars that are not tracked but used for other things
 
 $dtStats::unused[$dtStats::unusedCount++] = "timeToLive";
-$dtStats::unused[$dtStats::unusedCount++] = "at";
-$dtStats::unused[$dtStats::unusedCount++] = "gt";
+$dtStats::unused[$dtStats::unusedCount++] = "ksCounter";
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3795,8 +3801,8 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
    %dtStats.shockScore      = %dtStats.shockKill    + %dtStats.shockMA    + %dtStats.shockKillAir     + (%dtStats.shockKillDist/2)     + %dtStats.shockCom    + %dtStats.shockRearShot;
    %dtStats.plasmaScore     = %dtStats.plasmaKill   + %dtStats.plasmaMA   + %dtStats.plasmaKillAir    + (%dtStats.plasmaKillDist/50)   + %dtStats.plasmaCom;
    %dtStats.blasterScore    = %dtStats.blasterKill  + %dtStats.blasterMA  + %dtStats.blasterKillAir   + (%dtStats.blasterKillDist/50)  + %dtStats.blasterCom;
-   %dtStats.mineScore       = %dtStats.mineKill     + %dtStats.mineMA     + %dtStats.mineKillAir      + (%dtStats.mineKillDist/20)     + %dtStats.mineCom;
-   %dtStats.satchelScore    = %dtStats.satchelKill  + %dtStats.satchelMA  + %dtStats.satchelKillAir   + (%dtStats.satchelKillDist/20)  + %dtStats.satchelCom;
+   %dtStats.mineScore       = %dtStats.mineKill     + %dtStats.mineMA     + %dtStats.mineKillAir      + %dtStats.mineCom;
+   %dtStats.satchelScore    = %dtStats.satchelKill  + %dtStats.satchelMA  + %dtStats.satchelKillAir   + %dtStats.satchelCom;
    
    %dtStats.weaponScore =   %dtStats.cgScore + 
                            %dtStats.discScore + 
@@ -4654,8 +4660,8 @@ function incGameStats(%dtStats,%game) {// record that games stats and inc by one
             }
          case "Min":
             %val = getDynamicField(%dtStats,%varName);
-            
             setValueField(%dtStats,%varNameType,"g",%game,%c,%val);
+            
             %varID = $mapStats::mapVarIndex[%varNameType,%game]; 
             if(%varID > 0 && $dtStats::mapStats){
                %varID -= 1;
@@ -4675,6 +4681,7 @@ function incGameStats(%dtStats,%game) {// record that games stats and inc by one
             }
          case "Avg" or "AvgI":
             %val = getDynamicField(%dtStats,%varName);
+            setValueField(%dtStats,%varNameType,"g",%game,%c,%val);
             %varID = $mapStats::mapVarIndex[%varNameType,%game]; 
             if(%varID > 0 && %val != 0 && $dtStats::mapStats){
                %varID -= 1;
@@ -4716,8 +4723,6 @@ function incGameStats(%dtStats,%game) {// record that games stats and inc by one
                   %total = getField(%t,1);
                   %gameCount = getField(%t,2);
                }
-               if(%x ==1)
-                  setValueField(%dtStats,%varNameType,"g",%game,%c,%avg);// may not be needed
                setValueField(%dtStats,%varNameType,"t",%game,%x, hasValue(%avg) @ "%a" @ hasValue(%total) @ "%a" @ hasValue(%gameCount));
          }
       }
@@ -4981,6 +4986,10 @@ function resetDtStats(%dtStats,%game,%slow){
             schedule(32*%i,0,"resetChain",%game,%dtStats,%x,(%i * %amount));
          }
          schedule(32*(%i+1),0,"resetChain",%game,%dtStats,(%x+%leftOver),(%i * %amount));
+         for(%i = 1; %i <= $dtStats::unusedCount; %i++){//script unused
+            %var = $dtStats::unused[%i];
+            setDynamicField(%dtStats,%var,0);
+         }
       }
       else{
          for(%q = 0; %q < $statsVars::count[%game]; %q++){
@@ -5084,12 +5093,12 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
       if(isObject(%victimPlayer) && isObject(%killerPlayer) && %damageType != $DamageType::IndoorDepTurret && %damageLocation != $DamageType::OutdoorDepTurret){
          
 //------------------------------------------------------------------------------
-            %clKiller.k++; %clVictim.k = 0;
+            %killerDT.ksCounter++; %victimDT.ksCounter = 0;
             if(%clVictim == %clKiller || %damageType == $DamageType::Suicide || %damageType == $DamageType::Lava || %damageType == $DamageType::OutOfBounds || %damageType == $DamageType::Ground || %damageType == $DamageType::Lightning){
-              %clVictim.k = %clKiller.k = 0;
+              %victimDT.ksCounter = %killerDT.ksCounter = 0;
             }
-            if(%killerDT.killStreak < %clKiller.k){
-               %killerDT.killStreak = %clKiller.k;
+            if(%killerDT.killStreak < %killerDT.ksCounter){
+               %killerDT.killStreak = %killerDT.ksCounter;
             }
 //------------------------------------------------------------------------------            
             if(%victimPlayer.hitBy[%clKiller]){
@@ -5494,21 +5503,32 @@ function GameConnection::dtMessage(%this,%message,%sfx,%bypass){
 }
 
 function rayTest(%targetObject,%dis){
-   %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
-   %rayStart = %targetObject.getWorldBoxCenter();
-   %rayEnd = VectorAdd(%rayStart,"0 0" SPC ((%dis+1.15) * -1));
-   %ground = !ContainerRayCast(%rayStart, %rayEnd, %mask, %targetObject);  
-   return %ground; 
+   if(isObject(%targetObject)){
+      %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+      %rayStart = %targetObject.getWorldBoxCenter();
+      %rayEnd = VectorAdd(%rayStart,"0 0" SPC ((%dis+1.15) * -1));
+      %ground = !ContainerRayCast(%rayStart, %rayEnd, %mask, %targetObject);  
+      return %ground; 
+   }
+   else{
+      return 0;
+     error("Fix Me rayTest"); 
+   }
 }
 function rayTestDis(%targetObject){
-   %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
-   %rayStart = %targetObject.getWorldBoxCenter();
-   %rayEnd = VectorAdd(%rayStart,"0 0" SPC -5000);
-   %ray = ContainerRayCast(%rayStart, %rayEnd, %mask, %targetObject);  
-   if(!%ray)
+   if(isObject(%targetObject)){
+      %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+      %rayStart = %targetObject.getWorldBoxCenter();
+      %rayEnd = VectorAdd(%rayStart,"0 0" SPC -5000);
+      %ray = ContainerRayCast(%rayStart, %rayEnd, %mask, %targetObject);  
+      if(!%ray)
+         return 0;
+      return vectorDist(%rayStart,getWords(%ray,1,3)) - 1.15;
+   }
+   else{
       return 0;
-      %dis =  vectorDist(%rayStart,getWords(%ray,1,3)) - 1.15;
-   return %dis; 
+     error("Fix Me rayTestDis"); 
+   }
 }
 function vectorRayCast(%startPos,%vec,%dis){
    %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::PlayerObjectType;
@@ -5539,7 +5559,7 @@ function testHit(%client){
             %dmgType = %data.radiusDamageType;
             //error(%dmgType);  
             return 1;
-         }  
+         }
       }
    }
    return 0;
@@ -5557,11 +5577,11 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
          %sourceClient = %targetClient.lastHitBy;
          if(rayTest(%targetObject, $dtStats::midAirHeight) && %damageType == $DamageType::Lightning)
             %sourceClient.dtStats.lightningMAEVHits++;
-         //else
-         //   %sourceDT.EVMAHit++;
+         else
+            %sourceDT.EVMAHit++;
       }
       return;
-   } 
+   }
 //------------------------------------------------------------------------------
    if(%amount > 0 && %damageType > 0){
       if(isObject(%sourceObject)){ 
@@ -5643,7 +5663,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                         case "left_middle":%sourceDT.hitHeadLeft++;  %targetDT.hitTakenHeadLeft++;
                      }   
                }
-               %rayTest = rayTestDis(%targetObject);
+               %rayTest = rayTestDis(%targetObject); 
                if(%rayTest >= $dtStats::midAirHeight && %damageType != $DamageType::Bullet){
                   if(%sourceDT.maHitDist < %dis){%sourceDT.maHitDist = %dis;}
                   if(%sourceDT.maHitHeight < %rayTest){%sourceDT.maHitHeight = %rayTest;}
@@ -11622,7 +11642,7 @@ $dtStats::prefLog = 0; // enable logging of server hangs
 function prefTest(%time,%skip){
    %real  = getRealTime();
    %plCount = $HostGamePlayerCount - $HostGameBotCount;
-   if(isGameRun() && !$dtStats::building && %plCount > 0){// only track during run time  
+   if(isGameRun() && !$dtStats::building && %plCount > 1){// only track during run time  
       %dif = (%real - %time) - $dtStats::prefTestTime; 
       //echo(%dif);
       if(%dif > $dtStats::prefTolerance && !%skip){ 
@@ -11640,7 +11660,7 @@ function prefTest(%time,%skip){
        dtPingAvg();     
    }
    if($dtStats::prefEnable){
-      if(%plCount > 1)
+      if(isGameRun() && %plCount > 1)
          schedule($dtStats::prefTestTime, 0, "prefTest",%real,%skip);
       else 
          schedule($dtStats::prefTestIdleTime, 0, "prefTest",%real,1);

@@ -2800,23 +2800,21 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
       %flash = 0.75;
    
    	// Teratos: Originally from Eolk? Mine+Disc tracking/death message support.
-	// No Schedules by DarkTiger
+	// No Schedules by DarkTiger Ver.2
 	%targetClient.mineDisc = false;
 	switch$(%damageType)
 	{
-		case $DamageType::Disc:
-		   if(%targetClient.mdc == 1 && (getSimTime() - %targetClient.mdcTime1) < 256)
-			  %targetClient.mineDisc = true;
+	   case $DamageType::Disc:
+		  if((getSimTime() - %targetClient.mdcTime1) < 256)
+			%targetClient.mineDisc = true;
+			
+		  %targetClient.mdcTime2 = getSimTime(); 
 
-		   %targetClient.mdc = 2;
-		   %targetClient.mdcTime2 = getSimTime(); 
-
-		case $DamageType::Mine:
-		   if(%targetClient.mdc == 2 && (getSimTime() - %targetClient.mdcTime2) < 256)
-			  %targetClient.mineDisc = true;
-
-		   %targetClient.mdc = 1;
-		   %targetClient.mdcTime1 = getSimTime(); 
+	   case $DamageType::Mine:
+		  if((getSimTime() - %targetClient.mdcTime2) < 256)
+			%targetClient.mineDisc = true;
+			
+		  %targetClient.mdcTime1 = getSimTime(); 
 	}
 	// -- End Mine+Disc insert.
    

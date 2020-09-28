@@ -159,10 +159,18 @@
 //    Fixed killStreaks 
 //    Fixed unused vars reset 
 //
-//
+//    7.6
+//    Removed the cross check form mine disc, as the timer cross check is enough 
+//    Converted kdr to decimal to better match website and is less confusing 
+//    Commented out nexusCampingKills/Deaths as we currenlty dont support hunters
+//    Commented out server stat client crash, it will just echo to the console if it sees any
+//    Removed lockout schedule on chain kills, left the multi kill one in as its kind of nessaary in how it functions 
+//    Renamed mid air distance vars to know at a glance how its tracking, Ex: instead of cgMaDist renamed to cgMAHitDist 
+//    Fixed land spike turret stats 
+
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 7.5; 
+$dtStats::version = 7.6; 
 //disable stats system 
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -387,8 +395,10 @@ $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "winCount";
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "lossCount";
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "destruction";
 $dtStats::FV[$dtStats::FC["CTFGame","Min"]++,"CTFGame","Min"] = "heldTimeSec";
+$dtStats::FV[$dtStats::FC["CTFGame","Min"]++,"CTFGame","Min"] = "heldTimeSecLow";
 $dtStats::FV[$dtStats::FC["CTFGame","AvgI"]++,"CTFGame","AvgI"] = "heldTimeSec";
 $dtStats::FV[$dtStats::FC["CTFGame","Max"]++,"CTFGame","Max"] = "grabSpeed";
+$dtStats::FV[$dtStats::FC["CTFGame","Max"]++,"CTFGame","Max"] = "grabSpeedLow";
 $dtStats::FV[$dtStats::FC["CTFGame","Avg"]++,"CTFGame","Avg"] = "grabSpeed";
 $dtStats::FV[$dtStats::FC["CTFGame","Avg"]++,"CTFGame","Avg"] = "capEfficiency";
 $dtStats::FV[$dtStats::FC["CTFGame","Avg"]++,"CTFGame","Avg"] = "winLostPct";
@@ -485,8 +495,10 @@ $dtStats::FVG[$dtStats::FCG["SCtFGame","TG"]++,"SCtFGame","TG"] = "flagDefends";
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "winCount";// in this script only
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "lossCount";
 $dtStats::FV[$dtStats::FC["SCtFGame","Min"]++,"SCtFGame","Min"] = "heldTimeSec";
+$dtStats::FV[$dtStats::FC["SCtFGame","Min"]++,"SCtFGame","Min"] = "heldTimeSecLow";
 $dtStats::FV[$dtStats::FC["SCtFGame","AvgI"]++,"SCtFGame","AvgI"] = "heldTimeSec";
 $dtStats::FV[$dtStats::FC["SCtFGame","Max"]++,"SCtFGame","Max"] = "grabSpeed";
+$dtStats::FV[$dtStats::FC["SCtFGame","Max"]++,"SCtFGame","Max"] = "grabSpeedLow";
 $dtStats::FV[$dtStats::FC["SCtFGame","Avg"]++,"SCtFGame","Avg"] = "grabSpeed";
 $dtStats::FV[$dtStats::FC["SCtFGame","Avg"]++,"SCtFGame","Avg"] = "capEfficiency";
 $dtStats::FV[$dtStats::FC["SCtFGame","Avg"]++,"SCtFGame","Avg"] = "winLostPct";
@@ -644,8 +656,8 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "forceFieldPowerUpKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "forceFieldPowerUpDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "crashKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "crashDeaths";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "nexusCampingKills";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "nexusCampingDeaths";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "nexusCampingKills";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "nexusCampingDeaths";
 
 //Damage Stats
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "cgDmg";
@@ -917,17 +929,17 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "discAoeMA";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaAoeMA";
 
 //ma dist
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "cgMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "discMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "grenadeMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "laserMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "mortarMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "shockMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "plasmaMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "blasterMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "hGrenadeMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "missileMADist";
-$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "mineMADist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "cgMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "discMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "grenadeMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "laserMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "mortarMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "shockMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "plasmaMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "blasterMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "hGrenadeMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "missileMAHitDist";
+$dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "mineMAHitDist";
    
    
 $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "cgHitDist";
@@ -1276,7 +1288,7 @@ $mapStats::mapVars[47,"CTFGame"] = "hGrenadeKillsTG";
 $mapStats::mapVars[48,"CTFGame"] = "satchelKillsTG"; 
 //16
 $mapStats::mapVars[49,"CTFGame"] = "discHitDistMax"; 
-$mapStats::mapVars[50,"CTFGame"] = "discMADistMAx";
+$mapStats::mapVars[50,"CTFGame"] = "discMAHitDistMax";
 $mapStats::mapVars[51,"CTFGame"] = "totalTimeTG"; 
 //17
 $mapStats::mapVars[52,"CTFGame"] = "InventoryDepTG"; 
@@ -1294,6 +1306,7 @@ $mapStats::mapVars[60,"CTFGame"] = "distMovTG";
 $mapStats::mapVars[61,"CTFGame"] = "repairpackpickupCountTG"; 
 $mapStats::mapVars[62,"CTFGame"] = "repairpackpickupEnemyTG"; 
 $mapStats::mapVars[63,"CTFGame"] = "invyEatRepairPackTG"; 
+
 $mapStats::mapVarCount["CTFGame"] = 63; 
 ////////////////////////////////////////////////////////////////////////////////
 //1
@@ -2246,8 +2259,12 @@ package dtStatsGame{
          if(!%player.flagStatsWait){
             %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
             if(%grabSpeed > %player.client.dtStats.grabSpeed){
-               if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5)
+               if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
                   %player.client.dtStats.grabSpeed  = %grabSpeed;
+                  %player.client.dtStats.grabSpeedLow  = %grabSpeed;
+               }
+               else
+                  %player.client.dtStats.grabSpeedLow  = %grabSpeed;
             }
          }  
       }
@@ -2259,8 +2276,12 @@ package dtStatsGame{
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
             if(%heldTime < %player.client.dtStats.heldTimeSec || !%player.client.dtStats.heldTimeSec){
-                  if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5)
+                  if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
                      %player.client.dtStats.heldTimeSec  = %heldTime;
+                     %player.client.dtStats.heldTimeLow  = %heldTime;
+                  }
+                  else
+                     %player.client.dtStats.heldTimeLow  = %heldTime;
             }
          }
       }
@@ -3639,11 +3660,12 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
       %name =  stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9" );
       
    %crash = 0;
-   if(clientCrash(%name) && !$dtStats::cs[%client]){
-      $dtStats::cs[%client] = 1;
-      $dtServer::clientCrash[cleanMapName($CurrentMission),%game.class]++;
-      $dtServer::clientCrashCount++;
-      %crash = 1;
+   if(clientCrash(%name)){// && !$dtStats::cs[%client]
+      error("Client Crash" SPC %name);
+      //$dtStats::cs[%client] = 1;
+      //$dtServer::clientCrash[cleanMapName($CurrentMission),%game.class]++;
+      //$dtServer::clientCrashCount++;
+      //%crash = 1;
    }
       
    if(!isObject(%client.dtStats)){
@@ -4736,6 +4758,20 @@ function cropDec(%num){
       return %num @ "x";
    else
       return getSubStr(%num,0,%dot) @ "x";
+}
+function cropFloat(%num,%x){
+   %length = strlen(%num);
+   %dot = strPos(%num,".");
+   if(%dot != -1){
+       %int =getSubStr(%num,0,%dot);
+      %decLen = %length - strLen(%int)-1;
+      %x  = %decLen >= %x ? %x : %decLen;
+      error(%x);
+      %dec = getSubStr(%num,%dot,%dot+%x);
+      return %int @ %dec;
+   }
+   else
+      return %num;
 }  
 function addNum(%a,%b){
    if(strPos(%a,"x") == -1 && strPos(%b,"x") == -1){
@@ -5070,7 +5106,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
          %clVictim.lastHitBy = 0;
    }
    else if(!isObject(%clKiller) && isObject(%implement)){
-      if(%damageType == $DamageType::IndoorDepTurret || %damageLocation == $DamageType::OutdoorDepTurret){
+      if(%damageType == $DamageType::IndoorDepTurret || %damageType == $DamageType::OutdoorDepTurret){
          %clKiller = %implement.owner;
       }
       else
@@ -5078,7 +5114,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
    }
    %killerDT = %clKiller.dtStats;
    %victimDT = %clVictim.dtStats;
-   //fail safe in case  package is out of order 
+   //fail safe in case  package is out of order
    %victimPlayer = isObject(%clVictim.player) ? %clVictim.player : %clVictim.lastPlayer;
    %killerPlayer = isObject(%clKiller.player) ? %clKiller.player : %clKiller.lastPlayer;
    %clVictim.lp = "";//last position for distMove
@@ -5133,12 +5169,11 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
          }%clKiller.mKill =  getSimTime();
 //------------------------------------------------------------------------------      
          if(getSimTime() - %clKiller.mCKill < 10000){
-            %clKiller.chainCount++;
-            if(!isEventPending(%clKiller.chainID))
-               %clKiller.chainID = schedule(256,0,"chainKill",%clKiller,%killerDT);
+               if(%clKiller.chainCount++ > 1)
+                  chainKill(%killerDT,%clKiller);
          } 
          else{
-            %clKiller.chainCount = 1;  
+         %clKiller.chainCount = 1;  
          }%clKiller.mCKill =  getSimTime();
          
 //------------------------------------------------------------------------------         
@@ -5452,13 +5487,14 @@ function multiKillDelayer(%clKiller,%killerDT){
          %killerDT.decupleKill++;
       default:
          if(%clKiller.mkCounter > 10)
-         %killerDT.nuclearKill++;
+            %killerDT.nuclearKill++;
    }
    %killerDT.multiKill++;
    %clKiller.mkCounter = 1;
 }
 
-function chainKill(%clKiller,%killerDT){
+function chainKill(%killerDT,%clKiller){
+   %killerDT.chainKill++;
    switch(%clKiller.chainCount){
       case 2:
          %killerDT.doubleChainKill++;
@@ -5470,20 +5506,15 @@ function chainKill(%clKiller,%killerDT){
          %killerDT.quintupleChainKill++;
       case 6:
          %killerDT.sextupleChainKill++;
-      default:
-         if(%clKiller.chainCount > 6)
-         switch(%clKiller.chainCount){
-            case 7:
-               %killerDT.septupleChainKill++; 
-            case 8:
-               %killerDT.octupleChainKill++; 
-            case 9:
-               %killerDT.nonupleChainKill++; 
-            case 10:
-               %killerDT.decupleChainKill++;
-         }
+      case 7:
+         %killerDT.septupleChainKill++; 
+      case 8:
+         %killerDT.octupleChainKill++; 
+      case 9:
+         %killerDT.nonupleChainKill++; 
+      case 10:
+         %killerDT.decupleChainKill++;
    }
-   %killerDT.chainKill++;
 } 
 function GameConnection::dtMessage(%this,%message,%sfx,%bypass){
    if(!%this.isAIControlled()){
@@ -5510,10 +5541,8 @@ function rayTest(%targetObject,%dis){
       %ground = !ContainerRayCast(%rayStart, %rayEnd, %mask, %targetObject);  
       return %ground; 
    }
-   else{
+   else
       return 0;
-     error("Fix Me rayTest"); 
-   }
 }
 function rayTestDis(%targetObject){
    if(isObject(%targetObject)){
@@ -5525,10 +5554,8 @@ function rayTestDis(%targetObject){
          return 0;
       return vectorDist(%rayStart,getWords(%ray,1,3)) - 1.15;
    }
-   else{
+   else
       return 0;
-     error("Fix Me rayTestDis"); 
-   }
 }
 function vectorRayCast(%startPos,%vec,%dis){
    %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::PlayerObjectType;
@@ -5557,7 +5584,7 @@ function testHit(%client){
          %ray = containerRayCast(%ePos, VectorAdd(%ePos, VectorScale(VectorNormalize(%vec), 5)), %mask, -1);  
          if(%ray){
             %dmgType = %data.radiusDamageType;
-            //error(%dmgType);  
+            //error(%dmgType);
             return 1;
          }
       }
@@ -5590,16 +5617,16 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
             %sourceClient = %sourceObject.client;
             %sourceClient.lastPlayer = %sourceClient.player;
             %sourceDT = %sourceClient.dtStats;
-            %aoeHIT = testHit(%sourceClient);
+            %directHit = testHit(%sourceClient);
             %sv = mFloor(vectorLen(%sourceObject.getVelocity()) * 3.6);
          }
          else if(%sourceClass $= "Turret" || %sourceClass $= "FlyingVehicle" || %sourceClass $= "HoverVehicle" || %sourceClass $= "WheeledVehicle"){
             %sourceClient = %sourceObject.getControllingClient();
             %sourceDT = %sourceClient.dtStats;
-            %aoeHIT = 0;
+            %directHit = 0;
          }
          else{
-            %aoeHIT = 0;
+            %directHit = 0;
          }
       }
       if(isObject(%targetObject)){
@@ -5681,22 +5708,22 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      if(%sourceDT.blasterHitDist < %dis){%sourceDT.blasterHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                      if(%rayTest >= $dtStats::midAirHeight){
-                        if(%sourceDT.blasterMADist < %dis){%sourceDT.blasterMADist = %dis;}
+                        if(%sourceDT.blasterMAHitDist < %dis){%sourceDT.blasterMAHitDist = %dis;}
                         %sourceDT.blasterMA++;
                      } 
                      if(%sourceDT.blasterHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.blasterHitSV = %sourceObject.client.dtShotSpeed;} 
                      if(%sourceDT.blasterHitVV < %vv){%sourceDT.blasterHitVV = %vv;}         
                   case $DamageType::Plasma:
                      %sourceDT.plasmaDmg += %amount;
-                     if(%aoeHIT){%sourceDT.plasmaHits++;%sourceDT.plasmaDmgHits++;}
+                     if(%directHit){%sourceDT.plasmaHits++;%sourceDT.plasmaDmgHits++;}
                      else{%sourceDT.plasmaDmgHits++;}
                      %sourceDT.plasmaACC = (%sourceDT.plasmaHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
                      %sourceDT.plasmaDmgACC = (%sourceDT.plasmaDmgHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
                      if(%sourceDT.plasmaHitDist < %dis){%sourceDT.plasmaHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                      if(%rayTest >= $dtStats::midAirHeight){
-                        if(%sourceDT.plasmaMADist < %dis){%sourceDT.plasmaMADist = %dis;}
-                        if(%aoeHIT){
+                        if(%sourceDT.plasmaMAHitDist < %dis){%sourceDT.plasmaMAHitDist = %dis;}
+                        if(%directHit){
                            %sourceDT.plasmaMA++;
                            %sourceDT.plasmaAoeMA++;
                         }
@@ -5713,26 +5740,25 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      if(%sourceDT.cgHitDist < %dis){%sourceDT.cgHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                      if(%rayTest >= $dtStats::midAirHeight){
-                        if(%sourceDT.cgMADist < %dis){%sourceDT.cgMADist = %dis;}
+                        if(%sourceDT.cgMAHitDist < %dis){%sourceDT.cgMAHitDist = %dis;}
                         %sourceDT.cgMA++;
                      }
                      if(%sourceDT.cgHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.cgHitSV = %sourceObject.client.dtShotSpeed;} 
                      if(%sourceDT.cgHitVV < %vv){%sourceDT.cgHitVV = %vv;}   
                   case $DamageType::Disc:
                      %sourceDT.discDmg += %amount;
-                     if(%aoeHIT){%sourceDT.discHits++;%sourceDT.discDmgHits++;}
+                     if(%directHit){%sourceDT.discHits++;%sourceDT.discDmgHits++;}
                      else{%sourceDT.discDmgHits++;} 
                      %sourceDT.discACC = (%sourceDT.discHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
                      %sourceDT.discDmgACC = (%sourceDT.discDmgHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
                      if(%sourceDT.discHitDist < %dis){%sourceDT.discHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                      %targetClient.mdHit = 0;
-                     if(%targetClient.md == 1 && (getSimTime() - %targetClient.mdTime1) < 256){%sourceDT.minePlusDisc++; %targetClient.mdHit = 1;}
-                     %targetClient.md = 2;
+                     if((getSimTime() - %targetClient.mdTime1) < 256){%sourceDT.minePlusDisc++; %targetClient.mdHit = 1;}
                      %targetClient.mdTime2 = getSimTime(); 
                      if(%rayTest >= $dtStats::midAirHeight){
-                        if(%sourceDT.discMADist < %dis){%sourceDT.discMADist = %dis;}
-                        if(%aoeHIT){
+                        if(%sourceDT.discMAHitDist < %dis){%sourceDT.discMAHitDist = %dis;}
+                        if(%directHit){
                            %sourceDT.discMA++;
                            %sourceDT.discAoeMA++; 
                         }
@@ -5749,7 +5775,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                         if(%sourceDT.hGrenadeHitDist < %dis){%sourceDT.hGrenadeHitDist = %dis;}
                         if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                         if(%rayTest >= $dtStats::midAirHeight){
-                           if(%sourceDT.hGrenadeMADist < %dis){%sourceDT.hGrenadeMADist = %dis;}
+                           if(%sourceDT.hGrenadeMAHitDist < %dis){%sourceDT.hGrenadeMAHitDist = %dis;}
                            %sourceDT.hGrenadeMA++;
                         }
                         if(%sourceDT.hGrenadeHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.hGrenadeHitSV = %sourceObject.client.dtShotSpeed;}  
@@ -5757,14 +5783,14 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      }
                      else{
                         %sourceDT.grenadeDmg += %amount;
-                        if(%aoeHIT){%sourceDT.grenadeHits++;%sourceDT.grenadeDmgHits++;}
+                        if(%directHit){%sourceDT.grenadeHits++;%sourceDT.grenadeDmgHits++;}
                         else{%sourceDT.grenadeDmgHits++;} 
                         %sourceDT.grenadeACC = (%sourceDT.grenadeHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
                         %sourceDT.grenadeDmgACC = (%sourceDT.grenadeDmgHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
                         if(%sourceDT.grenadeHitDist < %dis){%sourceDT.grenadeHitDist = %dis;}
                         if(%rayTest >= $dtStats::midAirHeight){
-                           if(%sourceDT.grenadeMADist < %dis){%sourceDT.grenadeMADist = %dis;}
-                           if(%aoeHIT){
+                           if(%sourceDT.grenadeMAHitDist < %dis){%sourceDT.grenadeMAHitDist = %dis;}
+                           if(%directHit){
                               %sourceDT.grenadeMA++;
                               %sourceDT.grenadeAoeMA++;
                            }
@@ -5787,22 +5813,22 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      if(%sourceDT.laserHitDist < %dis){%sourceDT.laserHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                      if(%rayTest >= $dtStats::midAirHeight){
-                        if(%sourceDT.laserMADist < %dis){%sourceDT.laserMADist = %dis;}
+                        if(%sourceDT.laserMAHitDist < %dis){%sourceDT.laserMAHitDist = %dis;}
                         %sourceDT.laserMA++;
                      }
                      if(%sourceDT.laserHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.laserHitSV = %sourceObject.client.dtShotSpeed;} 
                      if(%sourceDT.laserHitVV < %vv){%sourceDT.laserHitVV = %vv;}
                   case $DamageType::Mortar:
                      %sourceDT.mortarDmg += %amount;
-                     if(%aoeHIT){%sourceDT.mortarHits++;%sourceDT.mortarDmgHits++;}
+                     if(%directHit){%sourceDT.mortarHits++;%sourceDT.mortarDmgHits++;}
                      else{%sourceDT.mortarDmgHits++;}
                      %sourceDT.mortarACC = (%sourceDT.mortarHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
                      %sourceDT.mortarDmgACC = (%sourceDT.mortarDmgHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
                      if(%sourceDT.mortarHitDist < %dis){%sourceDT.mortarHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                      if(%rayTest >= $dtStats::midAirHeight){
-                        if(%sourceDT.mortarMADist < %dis){%sourceDT.mortarMADist = %dis;}
-                        if(%aoeHIT){
+                        if(%sourceDT.mortarMAHitDist < %dis){%sourceDT.mortarMAHitDist = %dis;}
+                        if(%directHit){
                            %sourceDT.mortarMA++;
                            %sourceDT.mortarAoeMA++;
                         }
@@ -5818,7 +5844,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      if(%sourceDT.missileHitDist < %dis){%sourceDT.missileHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                      if(%rayTest >= $dtStats::midAirHeight){
-                        if(%sourceDT.missileMADist < %dis){%sourceDT.missileMADist = %dis;}
+                        if(%sourceDT.missileMAHitDist < %dis){%sourceDT.missileMAHitDist = %dis;}
                         %sourceDT.missileMA++;
                      }        
                      if(%sourceDT.missileHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.missileHitSV = %sourceObject.client.dtShotSpeed;}     
@@ -5833,7 +5859,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      if(%sourceDT.shockHitDist < %dis){%sourceDT.shockHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
                      if(%rayTest >= $dtStats::midAirHeight){ 
-                        if(%sourceDT.shockMADist < %dis){%sourceDT.shockMADist = %dis;}
+                        if(%sourceDT.shockMAHitDist < %dis){%sourceDT.shockMAHitDist = %dis;}
                         %sourceDT.shockMA++;
                      }
                      if(%sourceDT.shockHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.shockHitSV = %sourceObject.client.dtShotSpeed;}
@@ -5844,11 +5870,10 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      %sourceDT.mineACC = (%sourceDT.mineHits / (%sourceDT.mineShotsFired ? %sourceDT.mineShotsFired : 1)) * 100;
                      if(%sourceDT.mineHitDist < %dis){%sourceDT.mineHitDist = %dis;}
                      %targetClient.mdHit = 0;
-                     if(%targetClient.md == 2 && (getSimTime() - %targetClient.mdTime2) < 256){%sourceDT.minePlusDisc++; %targetClient.mdHit = 1;}
-                     %targetClient.md = 1;
+                     if((getSimTime() - %targetClient.mdTime2) < 256){%sourceDT.minePlusDisc++; %targetClient.mdHit = 1;}
                      %targetClient.mdTime1 = getSimTime(); 
                      if(%rayTest >= $dtStats::midAirHeight){
-                        if(%sourceDT.mineMADist < %dis){%sourceDT.mineMADist = %dis;}
+                        if(%sourceDT.mineMAHitDist < %dis){%sourceDT.mineMAHitDist = %dis;}
                         %sourceDT.mineMA++;
                      }
                      if(%sourceDT.mineHitVV < %vv){%sourceDT.mineHitVV = %vv;} 
@@ -5871,7 +5896,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      %sourceDT.blasterHits++;
                      %sourceDT.blasterACC =  (%sourceDT.blasterHits / (%sourceDT.blasterShotsFired ? %sourceDT.blasterShotsFired : 1)) * 100;
                   case $DamageType::Plasma:
-                     if(%aoeHIT){%sourceDT.plasmaHits++;%sourceDT.plasmaDmgHits++;}
+                     if(%directHit){%sourceDT.plasmaHits++;%sourceDT.plasmaDmgHits++;}
                      else{%sourceDT.plasmaDmgHits++;}
                      %sourceDT.plasmaACC = (%sourceDT.plasmaHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
                      %sourceDT.plasmaDmgACC = (%sourceDT.plasmaDmgHits / (%sourceDT.plasmaShotsFired ? %sourceDT.plasmaShotsFired : 1)) * 100;
@@ -5879,7 +5904,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      %sourceDT.cgHits++;
                      %sourceDT.cgACC = (%sourceDT.cgHits / (%sourceDT.cgShotsFired ? %sourceDT.cgShotsFired : 1)) * 100;
                   case $DamageType::Disc:
-                     if(%aoeHIT){%sourceDT.discHits++;%sourceDT.discDmgHits++;}
+                     if(%directHit){%sourceDT.discHits++;%sourceDT.discDmgHits++;}
                      else{%sourceDT.discDmgHits++;} 
                      %sourceDT.discACC = (%sourceDT.discHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
                      %sourceDT.discDmgACC = (%sourceDT.discDmgHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
@@ -5889,7 +5914,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                         %sourceDT.hGrenadeACC = (%sourceDT.hGrenadeHits / (%sourceDT.hGrenadeShotsFired ? %sourceDT.hGrenadeShotsFired : 1)) * 100;
                      }
                      else{
-                        if(%aoeHIT){%sourceDT.grenadeHits++;%sourceDT.grenadeDmgHits++;}
+                        if(%directHit){%sourceDT.grenadeHits++;%sourceDT.grenadeDmgHits++;}
                         else{%sourceDT.grenadeDmgHits++;} 
                         %sourceDT.grenadeACC = (%sourceDT.grenadeHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
                         %sourceDT.grenadeDmgACC = (%sourceDT.grenadeDmgHits / (%sourceDT.grenadeShotsFired ? %sourceDT.grenadeShotsFired : 1)) * 100;
@@ -5898,7 +5923,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      %sourceDT.laserHits++;
                      %sourceDT.laserACC = (%sourceDT.laserHits / (%sourceDT.laserShotsFired ? %sourceDT.laserShotsFired : 1)) * 100;
                   case $DamageType::Mortar:
-                     if(%aoeHIT){%sourceDT.mortarHits++;%sourceDT.mortarDmgHits++;}
+                     if(%directHit){%sourceDT.mortarHits++;%sourceDT.mortarDmgHits++;}
                      else{%sourceDT.mortarDmgHits++;}
                      %sourceDT.mortarACC = (%sourceDT.mortarHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
                      %sourceDT.mortarDmgACC = (%sourceDT.mortarDmgHits / (%sourceDT.mortarShotsFired ? %sourceDT.mortarShotsFired : 1)) * 100;
@@ -6083,18 +6108,6 @@ function numReduce(%num,%des){
    return 0; 
 }
 
-function kdr(%x,%y) 
-{
-	 if(%x == 0)
-       return 0; 
-     else if(%y == 0)
-        return 100;
-	
-	 if(%x >= %y)
-		return 100 - mFloatLength((%y / %x) * 100,1) + 0;
-	 else
-		return mFloatLength((%x / %y) * 100,1) - 100 + 0;
-}
 function menuReset(%client){
    %client.viewMenu = 0;
    %client.viewClient = 0;
@@ -6243,9 +6256,9 @@ function statsMenu(%client,%game){
          %b4 = ($dtServer::hostHangTime ? "<color:00FF00>" @ $dtServer::hostHangTime : 0);
          
          %c1 = ($dtStats::pingAvg ? $dtStats::pingAvg : 0);
-         %cli = ($dtServer::clientCrashCount ? "<color:00FF00>" @ $dtServer::clientCrashCount : 0);
-         %line = 'Server Ping Avg = %1 - Client Issues = %2';
-         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%c1@"ms",%cli); 
+         //%cli = ($dtServer::clientCrashCount ? "<color:00FF00>" @ $dtServer::clientCrashCount : 0);
+         %line = 'Server Ping Avg = %1';
+         messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%c1@"ms"); 
          
          %line = '<color:0befe7>Server Hangs - This Map = %1<color:0befe7> - All Time = %2';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%a2); 
@@ -6298,7 +6311,7 @@ function statsMenu(%client,%game){
                $dtServer::voteFor[%map,%client.lgame] = 0;
                $dtServer::skipCount[%map,%client.lgame] = 0;
                $dtServer::maxPlayers[%map,%client.lgame] = 0;
-               $dtServer::clientCrash[%map,%client.lgame] = 0;
+               //$dtServer::clientCrash[%map,%client.lgame] = 0;
                $dtServer::serverHangMap[%map,%client.lgame] = 0;
                $dtServer::serverHangMapMicro[%map,%client.lgame] = 0;
                $dtServer::hostHangMap[%map,%client.lgame] = 0;
@@ -6310,7 +6323,7 @@ function statsMenu(%client,%game){
             $dtServer::hostHang = 0;
             $dtServer::hostTime = 0;   
             $dtServer::hostHangLast = 0;
-            $dtServer::clientCrashCount = 0;
+            //$dtServer::clientCrashCount = 0;
             %client.cat = %cat = 1;
          }
          else if(%cat !$= "C"){
@@ -7610,7 +7623,8 @@ function statsMenu(%client,%game){
          %line = '<tab:0,145,290,435><font:univers condensed:18>\t%1\t%2\t%3\t%4'; 
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%i1,%i2,%i3,%i4);         
          
-         %i1 = "<color:0befe7>KDR:<color:03d597>" SPC kdr(%vClient.kills,%vClient.deaths) @ "%"; 
+         %kdr = %vClient.deaths ? mFloatLength(%vClient.kills/%vClient.deaths,2)+0 : %vClient.kills;
+         %i1 = "<color:0befe7>KDR:<color:03d597>" SPC %kdr;
          %i2 = "<color:0befe7>KillStreak:<color:03d597>" SPC %dtVClient.killStreak;
          %i3 = "<color:0befe7>MineDisc:<color:03d597>" SPC %dtVClient.minePlusDisc;
          %i4 = %dtVClient.plasmaMA + %dtVClient.discMA + %dtVClient.mineMA + %dtVClient.grenadeMA + %dtVClient.hGrenadeMA + %dtVClient.mortarMA + %dtVClient.shockMA + %dtVClient.laserMA +
@@ -8706,7 +8720,7 @@ function statsMenu(%client,%game){
          
          %var1 = "minePlusDiscTG"; %var1Title = "Mine + Disc:";   %var1Name = "Mine Disc Hits";            %var1TypeName = "Total";
          %var2 = "discACCAvg";     %var2Title = "Spinfusor Acc:"; %var2Name = "Spinfusor Accuracy";        %var2TypeName = "Percentage";
-         %var3 = "discMADistMax";  %var3Title = "Disc MA Dist:";  %var3Name = "Spinfusor MidAir Distance"; %var3TypeName = "Meters";
+         %var3 = "discMAHitDistMax";  %var3Title = "Disc MA Dist:";  %var3Name = "Spinfusor MidAir Distance"; %var3TypeName = "Meters";
          %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
          %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
@@ -11151,7 +11165,7 @@ function loadMapLeaderBoards(%reset){
       else{
          if($dtStats::lsmMap){
             if($dtStats::debugEchos){error("Deleting old file" SPC %filepath);}
-            schedule((%i+1)  * 1000,0,"deleteFile",%filepath);  
+            schedule((%i+1)  * 500,0,"deleteFile",%filepath);  
          }
       }
    }
@@ -11666,12 +11680,6 @@ function prefTest(%time,%skip){
          schedule($dtStats::prefTestIdleTime, 0, "prefTest",%real,1);
    }
 }
-function dtBuildEvent(){
-   if(getTimeDif($dtStats::buildSetTime) < 900000){
-      if(!isEventPending($dtStats::buildEvent))
-         $dtStats::buildEvent = schedule(getTimeDif($dtStats::buildSetTime),0,"lStatsCycle",1);
-   }  
-}
 function dtPingAvg(){
    %ping = %pc = 0;
    for(%i = 0; %i < ClientGroup.getCount(); %i++){
@@ -11748,8 +11756,8 @@ function dtSaveServerVars(){
    schedule(6000,0,"export", "$dtServer::voteFor*", "serverStats/voteFor.cs", false );
    schedule(7000,0,"export", "$dtServer::skipCount*", "serverStats/skipCount.cs", false );
    schedule(8000,0,"export", "$dtServer::maxPlayers*", "serverStats/maxPlayers.cs", false );
-   schedule(9000,0,"export", "$dtServer::clientCrash*", "serverStats/clientCrash.cs", false );
-   schedule(10000,0,"export", "$mapID::*", "serverStats/mapIDList.cs", false );
+   //schedule(9000,0,"export", "$dtServer::clientCrash*", "serverStats/clientCrash.cs", false );
+   schedule(9000,0,"export", "$mapID::*", "serverStats/mapIDList.cs", false );
 }
 function dtLoadServerVars(){// keep function at the bottom
    if($dtStats::Enable){
@@ -11795,8 +11803,8 @@ function dtLoadServerVars(){// keep function at the bottom
             exec("serverStats/skipCount.cs");
          if(isFile("serverStats/maxPlayers.cs"))
             exec("serverStats/maxPlayers.cs");
-         if(isFile("serverStats/clientCrash.cs"))
-            exec("serverStats/clientCrash.cs");
+         //if(isFile("serverStats/clientCrash.cs"))
+            //exec("serverStats/clientCrash.cs");
          genBlanks();
          buildVarList();
          startMonitor();

@@ -13,7 +13,7 @@
 // 400 equals 400 points. 4 caps behind.
 $Autobalance::AMThreshold = 300;
 // Based on BigTeams Top3 scorers. If BigTeams Top3 scorers is greater than the otherTeams Top3 + Top3Threshold. Use AllMode. 
-$Autobalance::Top3Threshold = 300;
+$Autobalance::Top3Threshold = 400;
 // If it takes too long for specific canidates to die. After a time choose anyone.
 $Autobalance::Fallback = 90000;
 
@@ -44,7 +44,7 @@ function Autobalance( %game )
 	%otherTeamTop3 = $TeamRank[%otherTeam, 0].score + $TeamRank[%otherTeam, 1].score + $TeamRank[%otherTeam, 2].score;
 	//Anyone who dies is eligable to switch
 	//If BigTeam score is greater than otherteam score + threshold or BigTeam Top3 is greater than otherTeam Top3 + Top3Threshold
-	if($TeamScore[$BigTeam] > ($TeamScore[%otherTeam] + $Autobalance::AMThreshold) || $TeamRank[%otherTeam, count] $= 0 || (%bigTeamTop3 > %otherTeamTop3 + $Autobalance::Top3Threshold))
+	if($TeamScore[$BigTeam] > ($TeamScore[%otherTeam] + $Autobalance::AMThreshold) || $TeamRank[%otherTeam, count] $= 0 || %bigTeamTop3 > (%otherTeamTop3 + $Autobalance::Top3Threshold))
 		$Autobalace::UseAllMode = 1;
 	//echo("Allmode " @  $Autobalace::UseAllMode);
 	

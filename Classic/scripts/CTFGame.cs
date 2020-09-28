@@ -255,35 +255,6 @@ function Flag::onLeaveLiquid(%data, %obj, %type)
       cancel(%obj.lavaEnterThread);
 }
 
-function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
-{
-      if(!isObject(%targetObject) && !isObject(%projectile.sourceObject))
-         return;
-      if(!(%targetObject.getType() & ($TypeMasks::StaticTSObjectType | $TypeMasks::InteriorObjectType | 
-                                      $TypeMasks::TerrainObjectType | $TypeMasks::WaterObjectType)))
-      {
-         if(%projectile.sourceObject.team !$= %targetObject.team)
-         {
-            if(%targetObject.getDataBlock().getClassName() $= "PlayerData" && %data.getName() $= "DiscProjectile")
-            {
-	         %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType; 
-	         %start = %targetObject.getWorldBoxCenter();
-               %distance = mFloor(VectorDist(%start, %projectile.initialPosition));
-	         %end = getWord(%start, 0) SPC getWord(%start, 1) SPC getWord(%start, 2) - 15;
-	         %grounded = ContainerRayCast(%start, %end, %mask, 0);
-               if(!%grounded)
-               {
-                  %projectile.sourceObject.client.scoreMidAir++;
-                  messageClient(%projectile.sourceObject.client, 'MsgMidAir', '\c0You received a %1 point bonus for a successful mid air shot.~wfx/misc/bounty_bonus.wav', Game.SCORE_PER_MIDAIR, %data.radiusDamageType, %distance);
-                  messageTeamExcept(%projectile.sourceObject.client, 'MsgMidAir', '\c5%1 hit a mid air shot.', %projectile.sourceObject.client.name, %data.radiusDamageType, %distance);
-                  Game.recalcScore(%projectile.sourceObject.client);
-               }
-            }
-         }
-         Parent::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal);
-      }
-}
-
 };
 
 //--------------------------------------------------------------------------

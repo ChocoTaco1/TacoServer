@@ -430,7 +430,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				return;
 
 			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %client.nameBase @ " initiated a vote to " @ (Game.noSplashDamage == 0 ? "enable" : "disable") @ " splash damage.";
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.noSplashDamage == 1 ? "enable" : "disable") @ " splash damage.";
 
 		case "VotePro":
 			if(!$CurrentMissionType $= "LakRabbit")
@@ -569,15 +569,7 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
 		}
 	}
 	else
-	{
-		if(%typeName $= "VoteChangeTimeLimit")
-		{
-			if(%arg1 $= "999") 
-				%time = "Unlimited"; 
-			else 
-				%time = %arg1;
-		}
-		
+	{		
 		%count = ClientGroup.getCount();
 		for(%i = 0; %i < %count; %i++)
 		{
@@ -592,6 +584,7 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
 					case "VoteSkipMission":
 						messageClient( %cl, 'VoteStarted', "\c2" @ %msg, %client.name, "skip the mission");
 					case "VoteChangeTimeLimit":
+						if(%arg1 $= "999") %time = "Unlimited"; else %time = %arg1;
 						messageClient( %cl, 'VoteStarted', "\c2" @ %msg, %client.name, "change the time limit to", %time);
 					case "VoteKickPlayer":			
 						messageClient( %cl, 'VoteStarted', "\c2" @ %msg, %client.name, "kick player", %arg1.name);

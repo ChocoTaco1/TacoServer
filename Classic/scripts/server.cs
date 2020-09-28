@@ -670,6 +670,9 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    %realName = getField( %authInfo, 0 );
    if ( $PlayingOnline && $Host::NoSmurfs )
       %name = %realName;
+  
+   //Remove <> to not mess up tribesnext json
+   %name = stripChars( detag( %name ), "<>" );
 
    if ( strcmp( %name, %realName ) == 0 )
    {

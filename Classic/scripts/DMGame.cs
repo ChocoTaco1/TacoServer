@@ -704,36 +704,7 @@ package DMGame
       // explode it vgc
       schedule(2000, %mineObj, "explodeMine", %mineObj, true);
    }
-   
-   function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal)
-   {
-      if(!isObject(%targetObject) && !isObject(%projectile.sourceObject))
-         return;
-      if(!(%targetObject.getType() & ($TypeMasks::StaticTSObjectType | $TypeMasks::InteriorObjectType |
-         $TypeMasks::TerrainObjectType | $TypeMasks::WaterObjectType)))
-      {
-         if(%projectile.sourceObject.team !$= %targetObject.team)
-         {
-            if(%targetObject.getDataBlock().getClassName() $= "PlayerData" && %data.getName() $= "DiscProjectile")
-            {
-               %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
-               %start = %targetObject.getWorldBoxCenter();
-               %distance = mFloor(VectorDist(%start, %projectile.initialPosition));
-               %end = getWord(%start, 0) SPC getWord(%start, 1) SPC getWord(%start, 2) - 15;
-               %grounded = ContainerRayCast(%start, %end, %mask, 0);
-               if(!%grounded)
-               {
-                  %projectile.sourceObject.client.scoreMidAir++;
-                  messageClient(%projectile.sourceObject.client, 'MsgMidAir', '\c0You hit a successful mid air shot.~wfx/misc/bounty_bonus.wav', %data.radiusDamageType, %distance);
-                  messageTeamExcept(%projectile.sourceObject.client, 'MsgMidAir', '\c5%1 hit a mid air shot.', %projectile.sourceObject.client.name, %data.radiusDamageType, %distance);
-                  Game.recalcScore(%projectile.sourceObject.client);
-               }
-            }
-         }
-         Parent::onCollision(%data, %projectile, %targetObject, %modifier, %position, %normal);
-      }
-   }
-   
+    
     //Take out anything vehicle related
 	function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
 	{

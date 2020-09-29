@@ -172,6 +172,7 @@
 //    Added teamScore to player game files for correct team scores
 //    KDR adjustment  
 //    Adjusted cleanup function 
+//    Mine disc kill fix
 
 //-----------Settings------------
 //Notes score ui width is 592
@@ -5259,8 +5260,8 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             if(%killerDT.discKillDist < %dis){%killerDT.discKillDist = %dis;}
             if(%killerDT.discKillVV < %victimVel){%killerDT.discKillVV = %victimVel;} 
             if(%killerDT.discKillSV <  %clKiller.dtShotSpeed){%killerDT.discKillSV = %clKiller.dtShotSpeed;}
-            if(%isCombo){%killerDT.discCom++;} 
-            if((getSimTime() - %clKiller.mdHitTime) < 256){%killerDT.minePlusDiscKill++;}
+            if(%isCombo){%killerDT.discCom++;}
+            if(%clKiller.mdHit){%killerDT.minePlusDiscKill++;}
 
             if(%kcAir == 1 && %vcAir == 1){%killerDT.discKillAir++;%victimDT.discDeathAir++;%killerDT.discKillAirAir++;%victimDT.discDeathAirAir++;}
             else if(%kcAir == 2 && %vcAir == 1){%killerDT.discKillAir++;%victimDT.discDeathAir++;%killerDT.discKillGroundAir++;%victimDT.discDeathGroundAir++;}
@@ -5366,8 +5367,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             if(%killerDT.mineKillDist < %dis){%killerDT.mineKillDist = %dis;}
             if(%killerDT.mineKillVV < %victimVel){%killerDT.mineKillVV = %victimVel;}
             if(%isCombo){%killerDT.mineCom++;}
-            if((getSimTime() - %clKiller.mdHitTime) < 256){%killerDT.minePlusDiscKill++;}
-
+            if(%clKiller.mdHit){%killerDT.minePlusDiscKill++;}
             if(%kcAir == 1 && %vcAir == 1){%killerDT.mineKillAir++;%victimDT.mineDeathAir++;%killerDT.mineKillAirAir++;%victimDT.mineDeathAirAir++;}
             else if(%kcAir == 2 && %vcAir == 1){%killerDT.mineKillAir++;%victimDT.mineDeathAir++;%killerDT.mineKillGroundAir++;%victimDT.mineDeathGroundAir++;}
             else if(%kcAir == 1 && %vcAir == 2){%killerDT.mineKillGround++;%victimDT.mineDeathGround++;%killerDT.mineKillAirGround++;%victimDT.mineDeathAirGround++;}
@@ -5765,8 +5765,8 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      %sourceDT.discDmgACC = (%sourceDT.discDmgHits / (%sourceDT.discShotsFired ? %sourceDT.discShotsFired : 1)) * 100;
                      if(%sourceDT.discHitDist < %dis){%sourceDT.discHitDist = %dis;}
                      if(%sourceDT.weaponHitDist < %dis){%sourceDT.weaponHitDist = %dis;}
-                     %targetClient.mdHit = 0;
-                     if((getSimTime() - %targetClient.mdTime1) < 256){%sourceDT.minePlusDisc++; %targetClient.mdHit = 1;}
+                     %sourceClient.mdHit = 0;
+                     if((getSimTime() - %targetClient.mdTime1) < 256){%sourceDT.minePlusDisc++; %sourceClient.mdHit = 1;}
                      %targetClient.mdTime2 = getSimTime(); 
                      if(%rayTest >= $dtStats::midAirHeight){
                         if(%sourceDT.discMAHitDist < %dis){%sourceDT.discMAHitDist = %dis;}
@@ -5876,13 +5876,13 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      }
                      if(%sourceDT.shockHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.shockHitSV = %sourceObject.client.dtShotSpeed;}
                      if(%sourceDT.shockHitVV < %vv){%sourceDT.shockHitVV = %vv;} 
-                  case $DamageType::Mine:
+                  case $DamageType::Mine: 
                      %sourceDT.mineDmg += %amount;
                      %sourceDT.mineHits++;
                      %sourceDT.mineACC = (%sourceDT.mineHits / (%sourceDT.mineShotsFired ? %sourceDT.mineShotsFired : 1)) * 100;
                      if(%sourceDT.mineHitDist < %dis){%sourceDT.mineHitDist = %dis;}
-                     %targetClient.mdHit = 0;
-                     if((getSimTime() - %targetClient.mdTime2) < 256){%sourceDT.minePlusDisc++; %targetClient.mdHit = 1;}
+                     %sourceClient.mdHit = 0;
+                     if((getSimTime() - %targetClient.mdTime2) < 256){%sourceDT.minePlusDisc++; %sourceClient.mdHit = 1;}
                      %targetClient.mdTime1 = getSimTime(); 
                      if(%rayTest >= $dtStats::midAirHeight){
                         if(%sourceDT.mineMAHitDist < %dis){%sourceDT.mineMAHitDist = %dis;}

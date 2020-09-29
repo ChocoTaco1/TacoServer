@@ -167,10 +167,15 @@
 //    Removed lockout schedule on chain kills, left the multi kill one in as its kind of nessaary in how it functions 
 //    Renamed mid air distance vars to know at a glance how its tracking, Ex: instead of cgMaDist renamed to cgMAHitDist 
 //    Fixed land spike turret stats 
+//
+//    7.7 
+//    Added teamScore to player game files for correct team scores
+//    KDR adjustment  
+//    Adjusted cleanup function 
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 7.6; 
+$dtStats::version = 7.7; 
 //disable stats system 
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -423,6 +428,7 @@ $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "PulseSensorDep";
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "InventoryDep"; 
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "TurretOutdoorDep"; 
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "TurretIndoorDep"; 
+$dtStats::FV[$dtStats::FC["CTFGame","Game"]++,"CTFGame","Game"] = "teamScore"; 
 
 /////////////////////////////////////////////////////////////////////////////
 //Unused vars needed for stats back up
@@ -505,6 +511,7 @@ $dtStats::FV[$dtStats::FC["SCtFGame","Avg"]++,"SCtFGame","Avg"] = "winLostPct";
 $dtStats::FV[$dtStats::FC["SCtFGame","Game"]++,"SCtFGame","Game"] = "dtTeam"; 
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "destruction";
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "repairs"; 
+$dtStats::FV[$dtStats::FC["SCtFGame","Game"]++,"SCtFGame","Game"] = "teamScore"; 
 ////////////////////////////Unused LCTF Vars/////////////////////////////////////
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "tkDestroys";
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "genDestroys";
@@ -561,6 +568,7 @@ $dtStats::FVG[$dtStats::FCG["ArenaGame","TG"]++,"ArenaGame","TG"] = "assists";
 $dtStats::FVG[$dtStats::FCG["ArenaGame","TG"]++,"ArenaGame","TG"] = "roundKills";
 $dtStats::FVG[$dtStats::FCG["ArenaGame","TG"]++,"ArenaGame","TG"] = "hatTricks";
 $dtStats::FV[$dtStats::FC["ArenaGame","Game"]++,"ArenaGame","Game"] = "dtTeam"; 
+$dtStats::FV[$dtStats::FC["ArenaGame","Game"]++,"ArenaGame","Game"] = "teamScore"; 
 ///////////////////////////////////////////////////////////////////////////////
 //                            	 SiegeGame								   		
 ///////////////////////////////////////////////////////////////////////////////
@@ -3801,7 +3809,7 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
    if(!isObject(%dtStats))
       return;
    %dtStats.null = getRandom(1,100);  
-   %dtStats.kdr = (%dtStats.kills / (%dtStats.deaths ? %dtStats.deaths : 1));
+   %dtStats.kdr = %dtStats.deaths ? (%dtStats.kills/%dtStats.deaths) : %dtStats.kills;
    if(statsGroup.lastKill == %dtStats)
       %dtStats.lastKill = 1;
       
@@ -3935,6 +3943,8 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
                          
                          
    if(%game.class $= "CTFGame" || %game.class $= "SCtFGame"){
+     %dtStats.teamScore =  $TeamScore[%dtStats.team];
+     
      %dtStats.destruction =   %dtStats.genDestroys + 
                               %dtStats.solarDestroys + 
                               %dtStats.sensorDestroys + 
@@ -3984,6 +3994,8 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
    }
    else if(%game.class $= "LakRabbitGame")
       %dtStats.flagTimeMin = (%dtStats.flagTimeMS / 1000)/60; 
+   else if(%game.class $= "ArenaGame")
+      %dtStats.teamScore =  $TeamScore[%dtStats.team];
 }
 
 function isGameRun(){// 
@@ -11296,7 +11308,7 @@ function dtCleanUp(%force){
          %gcCM = getField(%gameCountLine,6);  
          %gcPM = getField(%gameCountLine,5);
          %gc =  (%gcCM > %gcPM) ? %gcCM : %gcPM;
-         %extraDays = mCeil((%gc * $dtStats::expireFactor[%game]) + $dtStats::expireMin);
+         %extraDays = mCeil((%gc * $dtStats::expireFactor[%game]));
          //error(%extraDays SPC %dayCount);
          if(%dayCount > %extraDays || %dayCount > $dtStats::expireMax){
             if($dtStats::sm || %force){
@@ -11305,12 +11317,12 @@ function dtCleanUp(%force){
                   schedule(%v++ * 500,0,"deleteFile",%filepath);
                   %oldFileCount++;
                }
-               %gPath = strreplace(%filepath,"t.cs","g.cs");
                %mPath = strreplace(%filepath,"t.cs","m.cs");
                if(isFile(%mPath)){
                   schedule(%v++ * 500,0,"deleteFile",%mPath);
                   %oldFileCount++;
                }
+               %gPath = strreplace(%filepath,"t.cs","g.cs");
                if(isFile(%gPath)){
                   schedule(%v++ * 500,0,"deleteFile",%gPath);
                   %oldFileCount++;

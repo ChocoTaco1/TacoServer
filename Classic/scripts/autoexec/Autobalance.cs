@@ -12,10 +12,8 @@
 // Meaning picking from a pool of all players on the $BigTeam instead of just the lowest scoring players.
 // 400 equals 400 points. 4 caps behind.
 $Autobalance::AMThreshold = 300;
-// Based on BigTeams Top3 scorers. If BigTeams Top3 scorers is greater than the otherTeams Top3 + Top3Threshold. Use AllMode. 
-$Autobalance::Top3Threshold = 400;
 // If it takes too long for specific canidates to die. After a time choose anyone.
-$Autobalance::Fallback = 90000;
+$Autobalance::Fallback = 60000; //60000 is 1 minute
 
 // Run from TeamBalanceNotify.cs via NotifyUnbalanced
 function Autobalance( %game )
@@ -40,12 +38,26 @@ function Autobalance( %game )
 
 	$Autobalace::UseAllMode = 0;
 	%otherTeam = $BigTeam == 1 ? 2 : 1;
-	%bigTeamTop3 = $TeamRank[$BigTeam, 0].score + $TeamRank[$BigTeam, 1].score + $TeamRank[$BigTeam, 2].score;
-	%otherTeamTop3 = $TeamRank[%otherTeam, 0].score + $TeamRank[%otherTeam, 1].score + $TeamRank[%otherTeam, 2].score;
-	//Anyone who dies is eligable to switch
-	//If BigTeam score is greater than otherteam score + threshold or BigTeam Top3 is greater than otherTeam Top3 + Top3Threshold
-	if($TeamScore[$BigTeam] > ($TeamScore[%otherTeam] + $Autobalance::AMThreshold) || $TeamRank[%otherTeam, count] $= 0 || %bigTeamTop3 > (%otherTeamTop3 + $Autobalance::Top3Threshold))
+	
+	//If BigTeam score is greater than otherteam score + threshold
+	if($TeamScore[$BigTeam] > ($TeamScore[%otherTeam] + $Autobalance::AMThreshold) || $TeamRank[%otherTeam, count] $= 0)
 		$Autobalace::UseAllMode = 1;
+	//BigTeam Top is greater than otherTeam Top + threshold
+	else if($TeamRank[$BigTeam, count] >= 5 && $TeamRank[%otherTeam, count] >= 3)
+	{
+		%max = mfloor($TeamRank[$BigTeam, count]/2);
+		if(%max > $TeamRank[%otherTeam, count]) 
+			%max = $TeamRank[%otherTeam, count];
+		%threshold = %max * 100;
+		for(%i = 0; %i < %max; %i++)
+		{
+			%bigTeamTop = %bigTeamTop + $TeamRank[$BigTeam, %i].score;
+			%otherTeamTop = %otherTeamTop + $TeamRank[%otherTeam, %i].score;
+		}
+		
+		if(%bigTeamTop > (%otherTeamTop + %threshold))
+			$Autobalace::UseAllMode = 1;
+	}
 	//echo("Allmode " @  $Autobalace::UseAllMode);
 	
 	//Select lower half of team rank as canidates for team change

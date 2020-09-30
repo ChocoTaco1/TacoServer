@@ -8,10 +8,6 @@
 //
 // exec("scripts/autoexec/Autobalance.cs");
 //
-// How far behind otherteam must be to use All Mode.
-// Meaning picking from a pool of all players on the $BigTeam instead of just the lowest scoring players.
-// 400 equals 400 points. 4 caps behind.
-$Autobalance::AMThreshold = 300;
 // If it takes too long for specific canidates to die. After a time choose anyone.
 $Autobalance::Fallback = 60000; //60000 is 1 minute
 
@@ -38,15 +34,16 @@ function Autobalance( %game )
 
 	$Autobalace::UseAllMode = 0;
 	%otherTeam = $BigTeam == 1 ? 2 : 1;
+	$Autobalance::AMThreshold = mCeil(MissionGroup.CTF_scoreLimit/3) * 100;
 	
 	//If BigTeam score is greater than otherteam score + threshold
 	if($TeamScore[$BigTeam] > ($TeamScore[%otherTeam] + $Autobalance::AMThreshold) || $TeamRank[%otherTeam, count] $= 0)
 		$Autobalace::UseAllMode = 1;
-	//BigTeam Top is greater than otherTeam Top + threshold
+	//BigTeam Top Players score is greater than otherTeam Top Players score + threshold
 	else if($TeamRank[$BigTeam, count] >= 5 && $TeamRank[%otherTeam, count] >= 3)
 	{
 		%max = mfloor($TeamRank[$BigTeam, count]/2);
-		if(%max > $TeamRank[%otherTeam, count]) 
+		if(%max > $TeamRank[%otherTeam, count])
 			%max = $TeamRank[%otherTeam, count];
 		%threshold = %max * 100;
 		for(%i = 0; %i < %max; %i++)

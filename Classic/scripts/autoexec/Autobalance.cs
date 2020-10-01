@@ -13,17 +13,17 @@ $Autobalance::Fallback = 60000; //60000 is 1 minute
 
 // Run from TeamBalanceNotify.cs via NotifyUnbalanced
 function Autobalance( %game )
-{	
-	if(isEventPending($AutoBalanceSchedule)) 
+{
+	if(isEventPending($AutoBalanceSchedule))
 		cancel($AutoBalanceSchedule);
-	
+
 	if($TBNStatus !$= "NOTIFY") //If Status has changed to EVEN or anything else (GameOver reset).
 		return;
-	
+
 	//Difference Variables
 	%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
 	%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
-	
+
 	//Determine BigTeam
 	if( %team1difference >= 2 )
 		$BigTeam = 1;
@@ -35,7 +35,7 @@ function Autobalance( %game )
 	$Autobalace::UseAllMode = 0;
 	%otherTeam = $BigTeam == 1 ? 2 : 1;
 	$Autobalance::AMThreshold = mCeil(MissionGroup.CTF_scoreLimit/3) * 100;
-	
+
 	//If BigTeam score is greater than otherteam score + threshold
 	if($TeamScore[$BigTeam] > ($TeamScore[%otherTeam] + $Autobalance::AMThreshold) || $TeamRank[%otherTeam, count] $= 0)
 		$Autobalace::UseAllMode = 1;
@@ -51,12 +51,12 @@ function Autobalance( %game )
 			%bigTeamTop = %bigTeamTop + $TeamRank[$BigTeam, %i].score;
 			%otherTeamTop = %otherTeamTop + $TeamRank[%otherTeam, %i].score;
 		}
-		
+
 		if(%bigTeamTop > (%otherTeamTop + %threshold))
 			$Autobalace::UseAllMode = 1;
 	}
 	//echo("Allmode " @  $Autobalace::UseAllMode);
-	
+
 	//Select lower half of team rank as canidates for team change
 	if(!$Autobalace::UseAllMode)
 	{
@@ -68,10 +68,10 @@ function Autobalance( %game )
 		}
 		%a = " selected";
 	}
-	
+
 	if($TeamRank[$BigTeam, count] - $TeamRank[%otherTeam, count] >= 3)
 		%s = "s";
-	
+
 	//Warning message
 	messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance will switch the next%3 respawning player%2 on Team %1.', $TeamName[$BigTeam], %s, %a);
 }
@@ -98,17 +98,17 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
    {
 		%otherTeam = $BigTeam == 1 ? 2 : 1;
 		if($TeamRank[$BigTeam, count] - $TeamRank[%otherTeam, count] >= 2)
-		{	
+		{
 			if($Autobalance::CanidateFallbackTime $= "")
 				$Autobalance::CanidateFallbackTime = getSimTime();
-			
+
 			//damageType 0: If someone switches to observer or disconnects
-			if(%damageType !$= 0 && (CheckCanidate(%clVictim) || $Autobalace::UseAllMode || (getSimTime() - $Autobalance::CanidateFallbackTime > $Autobalance::Fallback))) 
+			if(%damageType !$= 0 && (CheckCanidate(%clVictim) || $Autobalace::UseAllMode || (getSimTime() - $Autobalance::CanidateFallbackTime > $Autobalance::Fallback)))
 			{
-				echo(%clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing.");
+				echo("[Autobalance]" SPC %clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing. [AM:" @ $Autobalace::UseAllMode @ "]");
 				messageClient(%clVictim, 'MsgTeamBalanceNotify', '\c0You were switched to Team %1 for balancing.~wfx/powered/vehicle_screen_on.wav', $TeamName[%otherTeam]);
 				messageAllExcept(%clVictim, -1, 'MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
-				
+
 				Game.clientChangeTeam( %clVictim, %otherTeam, 0 );
 			}
 		}
@@ -124,7 +124,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
 function DefaultGame::gameOver(%game)
 {
 	Parent::gameOver(%game);
-	
+
 	//Reset Autobalance
 	$BigTeam = "";
 	deleteVariables("$Autobalace::Canidate*");

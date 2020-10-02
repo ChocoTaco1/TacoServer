@@ -32,14 +32,14 @@ function Autobalance( %game )
 	else
 		return;
 
-	$Autobalace::UseAllMode = 0;
+	$Autobalance::UseAllMode = 0;
 	%otherTeam = $BigTeam == 1 ? 2 : 1;
 	$Autobalance::AMThreshold = mCeil(MissionGroup.CTF_scoreLimit/3) * 100;
 
 	//If BigTeam score is greater than otherteam score + threshold
 	if($TeamScore[$BigTeam] > ($TeamScore[%otherTeam] + $Autobalance::AMThreshold) || $TeamRank[%otherTeam, count] $= 0)
-		$Autobalace::UseAllMode = 1;
-	//BigTeam Top Players score is greater than otherTeam Top Players score + threshold
+		$Autobalance::UseAllMode = 1;
+	//If BigTeam Top Players score is greater than otherTeam Top Players score + threshold
 	else if($TeamRank[$BigTeam, count] >= 5 && $TeamRank[%otherTeam, count] >= 3)
 	{
 		%max = mfloor($TeamRank[$BigTeam, count]/2);
@@ -53,12 +53,12 @@ function Autobalance( %game )
 		}
 
 		if(%bigTeamTop > (%otherTeamTop + %threshold))
-			$Autobalace::UseAllMode = 1;
+			$Autobalance::UseAllMode = 1;
 	}
-	//echo("Allmode " @  $Autobalace::UseAllMode);
+	//echo("Allmode " @  $Autobalance::UseAllMode);
 
 	//Select lower half of team rank as canidates for team change
-	if(!$Autobalace::UseAllMode)
+	if(!$Autobalance::UseAllMode)
 	{
 		$Autobalance::Max = mFloor($TeamRank[$BigTeam, count]/2);
 		for(%i = $Autobalance::Max; %i < $TeamRank[$BigTeam, count]; %i++)
@@ -79,11 +79,14 @@ function Autobalance( %game )
 // Return true if client is a canidate
 function CheckCanidate(%client)
 {
-    for(%i = $Autobalance::Max; %i < $TeamRank[$BigTeam, count]; %i++)
-    {
-        if(%client $= $Autobalance::Canidate[%i])
-            return true;
-    }
+	if(!$Autobalance::UseAllMode)
+	{
+		for(%i = $Autobalance::Max; %i < $TeamRank[$BigTeam, count]; %i++)
+		{
+			if(%client $= $Autobalance::Canidate[%i])
+				return true;
+		}
+	}
     return false;
 }
 
@@ -103,9 +106,9 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
 				$Autobalance::CanidateFallbackTime = getSimTime();
 
 			//damageType 0: If someone switches to observer or disconnects
-			if(%damageType !$= 0 && (CheckCanidate(%clVictim) || $Autobalace::UseAllMode || (getSimTime() - $Autobalance::CanidateFallbackTime > $Autobalance::Fallback)))
+			if(%damageType !$= 0 && (CheckCanidate(%clVictim) || $Autobalance::UseAllMode || (getSimTime() - $Autobalance::CanidateFallbackTime > $Autobalance::Fallback)))
 			{
-				echo("[Autobalance]" SPC %clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing. [AM:" @ $Autobalace::UseAllMode @ "]");
+				echo("[Autobalance]" SPC %clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing. [AM:" @ $Autobalance::UseAllMode @ "]");
 				messageClient(%clVictim, 'MsgTeamBalanceNotify', '\c0You were switched to Team %1 for balancing.~wfx/powered/vehicle_screen_on.wav', $TeamName[%otherTeam]);
 				messageAllExcept(%clVictim, -1, 'MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
 

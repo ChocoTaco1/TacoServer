@@ -173,10 +173,14 @@
 //    KDR adjustment  
 //    Adjusted cleanup function 
 //    Mine disc kill fix
+//
+//    7.8
+//    Added Armor Timers 
+
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 7.7; 
+$dtStats::version = 7.8; 
 //disable stats system 
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -801,6 +805,10 @@ $dtStats::FV[$dtStats::FC["TTL"]++,"TTL"] = "voteCount";
 $dtStats::FV[$dtStats::FC["TTL"]++,"TTL"] = "lagSpikes";
 $dtStats::FV[$dtStats::FC["TTL"]++,"TTL"] = "clientCrash";
 
+
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lArmorTime";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mArmorTime";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hArmorTime";
 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "armorL";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "armorM";
@@ -1958,6 +1966,16 @@ package dtStats{
          }
       }
       parent::onLeaveTrigger(%data, %obj, %colObj);
+   }
+   function DefaultGame::playerSpawned(%game, %player){
+      parent::playerSpawned(%game, %player);
+      if($dtStats::Enable)
+         armorTimer(%player.client.dtStats, %player.getArmorSize(), 0);
+   }
+   function Player::setArmor(%this,%size){//for game types that use spawn favs
+      parent::setArmor(%this,%size);
+      if($dtStats::Enable)
+         armorTimer(%this.client.dtStats, %size, 0);
    }
    function Weapon::onPickup(%this, %obj, %shape, %amount){
 		parent::onPickup(%this, %obj, %shape, %amount);
@@ -3809,6 +3827,7 @@ function dtSaveDone(){
 function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the end of the match 
    if(!isObject(%dtStats))
       return;
+   armorTimer(%dtStats, 0, 1);   
    %dtStats.null = getRandom(1,100);  
    %dtStats.kdr = %dtStats.deaths ? (%dtStats.kills/%dtStats.deaths) : %dtStats.kills;
    if(statsGroup.lastKill == %dtStats)
@@ -4022,7 +4041,7 @@ function ArenaGame::getGamePct(%game){
         else if( $TeamScore[1] <= $TeamScore[2]){
            return ($TeamScore[2] / %game.roundLimit) * 100;
         }
-      }
+      } 
    }
    return 0;
 }
@@ -4039,7 +4058,6 @@ function CTFGame::getGamePct(%game){
          %scorePct =  ($TeamScore[1] / %scoreLimit) * 100;
       else
          %scorePct =  ($TeamScore[2] / %scoreLimit) * 100;
-      
 
       if(%scorePct > %timePct)
          return %scorePct;
@@ -4204,9 +4222,10 @@ function getCNameToCID(%name){
             return %name; // not a name its a client so return it
       }
       else{
+         %name = stripChars(%name, "\cp\co\c6\c7\c8\c9" );
          for (%i = 0; %i < ClientGroup.getCount(); %i++){
             %client = ClientGroup.getObject(%i);
-            if(stripChars(getTaggedString( %client.name ), "\cp\co\c6\c7\c8\c9" ) $= %name){
+            if(stripChars( getTaggedString( %client.name ), "\cp\co\c6\c7\c8\c9" ) $=  %name){
                return %client;
             }
          }
@@ -5108,6 +5127,29 @@ function buildVarList(){
 ////////////////////////////////////////////////////////////////////////////////
 //Stats Collecting
 ////////////////////////////////////////////////////////////////////////////////
+function armorTimer(%dtStats, %size, %death){
+   if(%dtStats.lastArmor $= "Light" && %dtStats.ArmorTime[%dtStats.lastArmor] > 0){
+      %dtStats.lArmorTime += ((getSimTime() - %dtStats.ArmorTime[%dtStats.lastArmor])/1000)/60;  
+      %dtStats.ArmorTime[%dtStats.lastArmor] = 0;
+      %dtStats.lastArmor = 0;
+   }
+   else if(%dtStats.lastArmor $= "Medium" && %dtStats.ArmorTime[%dtStats.lastArmor] > 0){
+      %dtStats.mArmorTime += ((getSimTime() - %dtStats.ArmorTime[%dtStats.lastArmor])/1000)/60; 
+      %dtStats.ArmorTime[%dtStats.lastArmor] = 0;
+      %dtStats.lastArmor = 0;
+   }
+   else if(%dtStats.lastArmor $= "Heavy" && %dtStats.ArmorTime[%dtStats.lastArmor] > 0){
+      %dtStats.hArmorTime += ((getSimTime() - %dtStats.ArmorTime[%dtStats.lastArmor])/1000)/60; 
+      %dtStats.ArmorTime[%dtStats.lastArmor] = 0;
+      %dtStats.lastArmor = 0;
+   }
+   if(!%death){
+      %dtStats.ArmorTime[%size] = getSimTime(); 
+      %dtStats.lastArmor = %size;   
+   }
+   //error(%dtStats.lArmorTime SPC %dtStats.mArmorTime SPC %dtStats.hArmorTime);
+}
+
 function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %damageLocation){
    if(%damageType == $DamageType::Explosion || %damageType == $DamageType::Ground ||
       %damageType == $DamageType::OutOfBounds ||  %damageType == $DamageType::Lava ||
@@ -5131,6 +5173,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
    %victimPlayer = isObject(%clVictim.player) ? %clVictim.player : %clVictim.lastPlayer;
    %killerPlayer = isObject(%clKiller.player) ? %clKiller.player : %clKiller.lastPlayer;
    %clVictim.lp = "";//last position for distMove
+   armorTimer(%victimDT, 0, 1);
 //------------------------------------------------------------------------------
    %victimDT.timeToLive += getSimTime() - %clVictim.spawnTime;
    %victimDT.timeTL = mFloor((%victimDT.timeToLive/(%clVictim.deaths+%clVictim.suicides ? %clVictim.deaths+%clVictim.suicides : 1))/1000);
@@ -11307,7 +11350,7 @@ function dtCleanUp(%force){
       if(%dayCount > $dtStats::expireMin){ 
          %gcCM = getField(%gameCountLine,6);  
          %gcPM = getField(%gameCountLine,5);
-         %gc =  (%gcCM > %gcPM) ? %gcCM : %gcPM;
+         %gc =  (%gcCM > %gcPM) ? %gcCM : %gcPM; 
          %extraDays = mCeil((%gc * $dtStats::expireFactor[%game]));
          //error(%extraDays SPC %dayCount);
          if(%dayCount > %extraDays || %dayCount > $dtStats::expireMax){

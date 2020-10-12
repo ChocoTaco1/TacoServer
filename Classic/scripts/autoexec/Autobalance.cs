@@ -9,7 +9,7 @@
 // exec("scripts/autoexec/Autobalance.cs");
 //
 // If it takes too long for specific canidates to die. After a time choose anyone.
-$Autobalance::Fallback = 60000; //60000 is 1 minute
+$Autobalance::Fallback = 120000; //60000 is 1 minute
 
 // Run from TeamBalanceNotify.cs via NotifyUnbalanced
 function Autobalance( %game )
@@ -63,7 +63,7 @@ function Autobalance( %game )
 		$Autobalance::Max = mFloor($TeamRank[$BigTeam, count]/2);
 		for(%i = $Autobalance::Max; %i < $TeamRank[$BigTeam, count]; %i++)
 		{
-			//echo(%i); echo($TeamRank[$BigTeam, %i].nameBase);
+			//echo("[Autobalance]: Selected" SPC $TeamRank[$BigTeam, %i].nameBase @ ", " @ %i);
 			$Autobalance::Canidate[%i] = $TeamRank[$BigTeam, %i];
 		}
 		%a = " selected";
@@ -87,7 +87,7 @@ function CheckCanidate(%client)
 				return true;
 		}
 	}
-    return false;
+	return false;
 }
 
 package Autobalance
@@ -95,20 +95,23 @@ package Autobalance
 
 function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation)
 {
-   parent::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
+	parent::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
 
-   if($BigTeam !$= "" && %clVictim.team == $BigTeam)
-   {
+	if($BigTeam !$= "" && %clVictim.team == $BigTeam)
+	{
 		%otherTeam = $BigTeam == 1 ? 2 : 1;
 		if($TeamRank[$BigTeam, count] - $TeamRank[%otherTeam, count] >= 2)
 		{
+			%fallback = 0;
 			if($Autobalance::CanidateFallbackTime $= "")
 				$Autobalance::CanidateFallbackTime = getSimTime();
+			else if((getSimTime() - $Autobalance::CanidateFallbackTime) < $Autobalance::Fallback)
+				%fallback = 1;
 
 			//damageType 0: If someone switches to observer or disconnects
-			if(%damageType !$= 0 && (CheckCanidate(%clVictim) || $Autobalance::UseAllMode || (getSimTime() - $Autobalance::CanidateFallbackTime > $Autobalance::Fallback)))
+			if(%damageType !$= 0 && (CheckCanidate(%clVictim) || $Autobalance::UseAllMode || %fallback))
 			{
-				echo("[Autobalance]" SPC %clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing. [AM:" @ $Autobalance::UseAllMode @ "]");
+				echo("[Autobalance]" SPC %clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing. [AM:" @ $Autobalance::UseAllMode SPC "#BT:" @ $TeamRank[$BigTeam, count] SPC "FB:" @ %fallback @ "]");
 				messageClient(%clVictim, 'MsgTeamBalanceNotify', '\c0You were switched to Team %1 for balancing.~wfx/powered/vehicle_screen_on.wav', $TeamName[%otherTeam]);
 				messageAllExcept(%clVictim, -1, 'MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
 
@@ -121,7 +124,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
 			ResetTBNStatus();
 			deleteVariables("$Autobalace::Canidate*");
 		}
-   }
+	}
 }
 
 function DefaultGame::gameOver(%game)

@@ -180,10 +180,13 @@
 //    7.9
 //    Added Concussion Stats
 //    Invy use stat
-
+//
+//    8.0
+//    Added check for teams for concuss
+//    Adjust crash log player count to > 1  
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 7.9; 
+$dtStats::version = 8.0; 
 //disable stats system 
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -2067,8 +2070,8 @@ package dtStats{
       return %obj;
    }
    function Armor::applyConcussion( %this, %dist, %radius, %sourceObject, %targetObject ){
-      if($dtStats::Enable){
-         %sourceObject.client.dtStats.concussHit++;   
+      if($dtStats::Enable && %sourceObject.client.team != %targetObject.client.team){
+         %sourceObject.client.dtStats.concussHit++;
          %targetObject.client.dtStats.concussTaken++; 
          %targetObject.concussBy = %sourceObject.client.dtStats;  
       }
@@ -5979,7 +5982,7 @@ function clientDmgStats(%data,%position,%sourceObject, %targetObject, %damageTyp
                      if(%rayTest >= $dtStats::midAirHeight){%sourceDT.satchelMA++;}
                      if(%sourceDT.satchelHitVV < %vv){%sourceDT.satchelHitVV = %vv;} 
                }
-            }
+            } 
          }
          else if(%targetClass $= "Turret" || %targetClass $= "FlyingVehicle" || %targetClass $= "HoverVehicle" || %targetClass $= "WheeledVehicle"){
             %targetClient = %targetObject.getControllingClient();
@@ -6142,12 +6145,6 @@ function getGameData(%game,%client,%var,%type,%value){
       }
    }
    return 0;
-}
-function getGameRunWinLossAvg(%client,%game){
-      %winCount = getField(%vClient.dtStats.gameStats["winCount","t",%game],9);
-      %lossCount =getField(%vClient.dtStats.gameStats["lossCount","t",%game],9);
-      %total = %winCount + %lossCount;
-      return (%winCount / %total) * 100 SPC (%lossCount / %total) * 100;
 }
 
 function numReduce(%num,%des){
@@ -11894,7 +11891,7 @@ function dtLoadServerVars(){// keep function at the bottom
             %mis = $dtServerVars::lastMission;
             if($dtStats::debugEchos){schedule(6000,0,"error","last server uptime = " SPC %date @ "-" @ %upTime @ "-" @ %mis);}  
             $dtServerVars::upTime[$dtServerVars::upTimeCount++] = %date @ "-" @ %upTime @ "-" @ %mis;
-            if($dtServerVars::lastPlayerCount > 0){
+            if($dtServerVars::lastPlayerCount > 1){
                $dtServerVars::serverCrash[%mis, $dtServerVars::lastGameType]++;
                $dtServerVars::crashLog[$dtServerVars::crashLogCount++] =%date @ "-" @ %upTime @ "-" @ %mis @ "-" @  $dtServerVars::lastGameType @ "-" @ $dtServerVars::lastPlayerCount;
                $dtServerVars::lastPlayerCount = 0;

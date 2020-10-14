@@ -111,7 +111,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
 			//damageType 0: If someone switches to observer or disconnects
 			if(%damageType !$= 0 && (CheckCanidate(%clVictim) || $Autobalance::UseAllMode || %fallback))
 			{
-				echo("[Autobalance]" SPC %clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing. [AM:" @ $Autobalance::UseAllMode SPC "#BT:" @ $TeamRank[$BigTeam, count] SPC "FB:" @ %fallback @ "]");
+				echo("[Autobalance]" SPC %clVictim.nameBase @ " has been moved to Team " @ %otherTeam @ " for balancing. [AM:" @ $Autobalance::UseAllMode SPC "#BT:" @ ($TeamRank[$BigTeam, count]-1) SPC "#OT:" @ ($TeamRank[%otherTeam, count]+1) SPC "FB:" @ %fallback @ "]");
 				messageClient(%clVictim, 'MsgTeamBalanceNotify', '\c0You were switched to Team %1 for balancing.~wfx/powered/vehicle_screen_on.wav', $TeamName[%otherTeam]);
 				messageAllExcept(%clVictim, -1, 'MsgTeamBalanceNotify', '~wfx/powered/vehicle_screen_on.wav');
 

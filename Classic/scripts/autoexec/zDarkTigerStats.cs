@@ -183,10 +183,16 @@
 //
 //    8.0
 //    Added check for teams for concuss
-//    Adjust crash log player count to > 1  
+//    Adjust crash log player count to > 1 
+//
+//    8.1
+//    Misc stat fixes  
+//    Added mpb glitch stat
+//    Added flag tossing and catching stats
+
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 8.0; 
+$dtStats::version = 8.1; 
 //disable stats system 
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -442,6 +448,16 @@ $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "TurretIndoorDep";
 $dtStats::FV[$dtStats::FC["CTFGame","Game"]++,"CTFGame","Game"] = "teamScore"; 
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "concussFlag";
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "depInvyUse";
+
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "mpbGlitch";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "flagCatch";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "maFlagCatch";
+$dtStats::FV[$dtStats::FC["CTFGame","Max"]++,"CTFGame","Max"] = "flagCatchSpeed";
+$dtStats::FV[$dtStats::FC["CTFGame","Max"]++,"CTFGame","Max"] = "maFlagCatchSpeed";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "flagToss";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "flagTossCatch";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "interceptedFlag";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "maInterceptedFlag";
 /////////////////////////////////////////////////////////////////////////////
 //Unused vars needed for stats back up
 $dtStats::uGFV[$dtStats::uGFC["CTFGame"]++,"CTFGame"] = "returnPts";
@@ -525,6 +541,14 @@ $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "destruction";
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "repairs"; 
 $dtStats::FV[$dtStats::FC["SCtFGame","Game"]++,"SCtFGame","Game"] = "teamScore"; 
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "concussFlag"; 
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "flagCatch";
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "maFlagCatch";
+$dtStats::FV[$dtStats::FC["SCtFGame","Max"]++,"SCtFGame","Max"] = "flagCatchSpeed";
+$dtStats::FV[$dtStats::FC["SCtFGame","Max"]++,"SCtFGame","Max"] = "maFlagCatchSpeed";
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "flagToss";
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "flagTossCatch";
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "interceptedFlag";
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "maInterceptedFlag";
 ////////////////////////////Unused LCTF Vars/////////////////////////////////////
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "tkDestroys";
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "genDestroys";
@@ -556,6 +580,7 @@ $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "depSensorRepairs";
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "depInvRepairs";
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "depTurretRepairs";
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "returnPts";
+
 ///////////////////////////////////////////////////////////////////////////////
 //                            	 DuelGame								   		
 ///////////////////////////////////////////////////////////////////////////////
@@ -2018,7 +2043,7 @@ package dtStats{
    function CTFGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc){ 
        parent::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc);
        if ((%clVictim.player.holdingFlag !$= "") && (%clVictim.team != %clAttacker.team))
-       %clAttacker.dmgdFlagTime = getSimTime();  
+         %clAttacker.dmgdFlagTime = getSimTime();  
 	}
 	function CTFGame::testEscortAssist(%game, %victimID, %killerID){
 	   if((getSimTime() - %victimID.dmgdFlagTime) < 5000 && %killerID.player.holdingFlag $= "")
@@ -2035,18 +2060,25 @@ package dtStats{
 		  return true;
 	   return false;
 	}
+
    function ProjectileData::onExplode(%data, %proj, %pos, %mod){
-      if($dtStats::Enable)
-         dtOnExplode(%data, %proj, %pos, %mod);
+      if($dtStats::Enable){
+         %cl = %proj.sourceObject.client;
+         if(isObject(%cl)){
+            if(%proj.dtShotSpeed > 0)
+               %cl.dtShotSpeed = %proj.dtShotSpeed; 
+            else
+               %cl.dtShotSpeed = mFloor(vectorLen(%proj.sourceObject.getVelocity()) * 3.6);
+            %cl.lastExp = %data TAB %proj.initialPosition TAB %pos; 
+         }
+      }
       parent::onExplode(%data, %proj, %pos, %mod);
    }
    //function MineDeployed::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType){
       //parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType);
-      //if($DamageType::Disc && $dtStats::Enable){
-         //%sourceObject.client.dtStats.mineDiscPct = (%sourceObject.client.dtStats.mineDiscHit++   / (%thrower.client.dtStats.mineShotsFired ? %thrower.client.dtStats.mineShotsFired : 1)) * 100;
-         //%sourceObject.client.dtStats.mineDiscAcc = (%sourceObject.client.dtStats.mineDiscShots   / (%thrower.client.dtStats.mineShotsFired ? %thrower.client.dtStats.mineShotsFired : 1)) * 100;
-         //%sourceObject.client.dtStats.mineDiscAccMP = (%sourceObject.client.dtStats.minePlusDisc   / (%thrower.client.dtStats.mineShotsFired ? %thrower.client.dtStats.mineShotsFired : 1)) * 100;
-//
+      //if(%damageType == $DamageType::Disc && $dtStats::Enable){
+         //%targetObject.mineDiscHit = 1;
+         //error("boom" SPC %sourceObject.getClassName());
       //}
    //}
    function ShapeBaseImageData::onDeploy(%item, %plyr, %slot){
@@ -2094,6 +2126,21 @@ package dtStats{
             %dtStats.concussFlag++;  
          %player.concussBy = -1;
       }
+   }
+   function MobileBaseVehicle::playerMounted(%data, %obj, %player, %node){
+      if($dtStats::Enable){
+         %obj.dtStats = %player.client.dtStats;
+      }
+      parent::playerMounted(%data, %obj, %player, %node);
+   }
+   function MobileBaseVehicle::onDamage(%this, %obj){
+      if($dtStats::Enable){
+         if(VectorLen(%obj.getVelocity()) > 200){
+            if(isObject(%obj.dtStats))
+               %obj.dtStats.mpbGlitch++;
+         }
+      }
+      parent::onDamage(%this, %obj);  
    }
    //function TurretData::replaceCallback(%this, %turret, %engineer){
       //parent::replaceCallback(%this, %turret, %engineer);
@@ -2310,6 +2357,15 @@ package dtStatsGame{
       if($dtStats::Enable){
          %flag = %player.holdingFlag;
          %game.dtTotalFlagTime[%flag] = 0;
+         if(%player.getState() !$= "Dead"){
+            error("flag drop");
+            %player.client.dtStats.flagToss++;
+            %flag.pass = 1;
+            %flag.lastDTStat = %player.client.dtStats;
+         }
+         else{
+            %flag.pass = 0;  
+         }
       }
       parent::playerDroppedFlag(%game, %player);
    }
@@ -2320,12 +2376,37 @@ package dtStatsGame{
      }
      parent::boundaryLoseFlag(%game, %player); 
    }
+   function CTFGame::updateFlagTransform(%game, %flag){
+      parent::updateFlagTransform(%game, %flag);   
+      if($dtStats::Enable){
+         %vel = %flag.getVelocity();
+	      %flag.speed = vectorLen(%vel) ;   
+         //error(%flag.speed);
+      }
+   }
    function CTFGame::playerTouchEnemyFlag(%game, %player, %flag){
       if($dtStats::Enable){
          if(%flag.isHome){
             %game.dtTotalFlagTime[%flag] = getSimTime();
          }
-         if(!%player.flagStatsWait){
+         if(!%player.flagTossWait){
+            if(%flag.speed > 10 && %flag.pass && %player.client.dtStats != %flag.lastDTStat){
+               //error("pass" SPC %player.flagStatsWait);
+               %player.client.dtStats.flagCatch++;
+               %speed = vectorLen(%player.getVelocity());
+               %player.client.dtStats.flagCatchSpeed = (%player.client.dtStats.flagCatchSpeed > %speed) ? %player.client.dtStats.flagCatchSpeed : %speed; 
+               if(rayTest(%player, $dtStats::midAirHeight)){
+                  %player.client.dtStats.maFlagCatch++;
+                  %player.client.dtStats.maFlagCatchSpeed = (%player.client.dtStats.maFlagCatchSpeed > %speed) ? %player.client.dtStats.maFlagCatchSpeed : %speed;
+               }
+               if(isObject(%flag.lastDTStat)){
+                  %flag.lastDTStat.flagTossCatch++;  
+                  %flag.lastDTStat = -1;
+               }
+               %flag.speed = 0;
+               %flag.pass = 0;
+                 
+            }
             %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
             if(%grabSpeed > %player.client.dtStats.grabSpeed){
                if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
@@ -2339,28 +2420,50 @@ package dtStatsGame{
       }
       parent::playerTouchEnemyFlag(%game, %player, %flag);
    }
+   
    function CTFGame::flagCap(%game, %player){
       if($dtStats::Enable){
          %flag = %player.holdingFlag;
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
             if(%heldTime < %player.client.dtStats.heldTimeSec || !%player.client.dtStats.heldTimeSec){
-                  if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
-                     %player.client.dtStats.heldTimeSec  = %heldTime;
-                     %player.client.dtStats.heldTimeLow  = %heldTime;
-                  }
-                  else
-                     %player.client.dtStats.heldTimeLow  = %heldTime;
+               if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
+                  %player.client.dtStats.heldTimeSec  = %heldTime;
+                  %player.client.dtStats.heldTimeSecLow  = %heldTime;
+               }
+               else
+                  %player.client.dtStats.heldTimeSecLow  = %heldTime;
             }
          }
       }
       parent::flagCap(%game, %player);
+   }
+   function CTFGame::playerTouchOwnFlag(%game, %player, %flag){   
+      if($dtStats::Enable){
+         if(!%flag.isHome){
+            if(%flag.speed > 10 && %flag.pass){
+                %player.client.dtStats.interceptedFlag++;
+                if(rayTest(%player, $dtStats::midAirHeight))
+                   %player.client.dtStats.maInterceptedFlag++;
+            }
+         }
+      }
+      parent::playerTouchOwnFlag(%game, %player, %flag);
    }
 /////////////////////////////////////////////////////////////////////////////   
    function SCtFGame::playerDroppedFlag(%game, %player){
       if($dtStats::Enable){
          %flag = %player.holdingFlag;
          %game.dtTotalFlagTime[%flag] = 0;
+         if(%player.getState() !$= "Dead"){
+            error("flag drop");
+            %player.client.dtStats.flagToss++;
+            %flag.pass = 1;
+            %flag.lastDTStat = %player.client.dtStats;
+         }
+         else{
+            %flag.pass = 0;  
+         }
       }
       parent::playerDroppedFlag(%game, %player);
    }
@@ -2371,33 +2474,79 @@ package dtStatsGame{
      }
      parent::boundaryLoseFlag(%game, %player); 
    }
+   function SCtFGame::updateFlagTransform(%game, %flag){
+      parent::updateFlagTransform(%game, %flag);   
+      if($dtStats::Enable){
+         %vel = %flag.getVelocity();
+	      %flag.speed = vectorLen(%vel) ;   
+         //error(%flag.speed);
+      }
+   }
    function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag){
       if($dtStats::Enable){
          if(%flag.isHome){
             %game.dtTotalFlagTime[%flag] = getSimTime();
          }
-         if(!%player.flagStatsWait){
+         if(!%player.flagTossWait){
+            if(%flag.speed > 10 && %flag.pass && %player.client.dtStats != %flag.lastDTStat){
+               //error("pass" SPC %player.flagStatsWait);
+               %player.client.dtStats.flagCatch++;
+               %speed = vectorLen(%player.getVelocity());
+               %player.client.dtStats.flagCatchSpeed = (%player.client.dtStats.flagCatchSpeed > %speed) ? %player.client.dtStats.flagCatchSpeed : %speed; 
+               if(rayTest(%player, $dtStats::midAirHeight)){
+                  %player.client.dtStats.maFlagCatch++;
+                  %player.client.dtStats.maFlagCatchSpeed = (%player.client.dtStats.maFlagCatchSpeed > %speed) ? %player.client.dtStats.maFlagCatchSpeed : %speed;
+               }
+               if(isObject(%flag.lastDTStat)){
+                  %flag.lastDTStat.flagTossCatch++;  
+                  %flag.lastDTStat = -1;
+               }
+               %flag.speed = 0;
+               %flag.pass = 0;
+                 
+            }
             %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
             if(%grabSpeed > %player.client.dtStats.grabSpeed){
-               if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5)
+               if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
                   %player.client.dtStats.grabSpeed  = %grabSpeed;
+                  %player.client.dtStats.grabSpeedLow  = %grabSpeed;
+               }
+               else
+                  %player.client.dtStats.grabSpeedLow  = %grabSpeed;
             }
          }  
       }
       parent::playerTouchEnemyFlag(%game, %player, %flag);
    }
+   
    function SCtFGame::flagCap(%game, %player){
       if($dtStats::Enable){
          %flag = %player.holdingFlag;
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
             if(%heldTime < %player.client.dtStats.heldTimeSec || !%player.client.dtStats.heldTimeSec){
-               if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5)
+               if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
                   %player.client.dtStats.heldTimeSec  = %heldTime;
+                  %player.client.dtStats.heldTimeSecLow  = %heldTime;
+               }
+               else
+                  %player.client.dtStats.heldTimeSecLow  = %heldTime;
             }
          }
       }
       parent::flagCap(%game, %player);
+   }
+   function SCtFGame::playerTouchOwnFlag(%game, %player, %flag){   
+      if($dtStats::Enable){
+         if(!%flag.isHome){
+            if(%flag.speed > 10 && %flag.pass){
+                %player.client.dtStats.interceptedFlag++;
+                if(rayTest(%player, $dtStats::midAirHeight))
+                   %player.client.dtStats.maInterceptedFlag++;
+            }
+         }
+      }
+      parent::playerTouchOwnFlag(%game, %player, %flag);
    }
 };
 
@@ -3808,7 +3957,7 @@ function dtStatsGameOver( %game ){
    $dtStats::statsSave = 1;
    if(%game.getGamePct() > 50){
       $dtServer::playCount[cleanMapName($CurrentMission),%game.class]++;
-      $dtServer::lastPlay[cleanMapName($CurrentMission),%game.class] = getDayNum() TAB getYear TAB formattimestring("mm/dd/yy hh:nn:a");
+      $dtServer::lastPlay[cleanMapName($CurrentMission),%game.class] = getDayNum() TAB getYear() TAB formattimestring("mm/dd/yy hh:nn:a");
    }
    else
       $dtServer::skipCount[cleanMapName($CurrentMission),%game.class]++;
@@ -5660,17 +5809,6 @@ function vectorRayCast(%startPos,%vec,%dis){
    %result = containerRayCast(%startPos, %endPos, %mask, %proj);  
    return %result;  
 }
-
-function  dtOnExplode(%data, %proj, %pos, %mod){
-   %cl = %proj.sourceObject.client;
-   if(isObject(%cl)){
-      if(%proj.dtShotSpeed > 0)
-         %cl.dtShotSpeed = %proj.dtShotSpeed; 
-      else
-         %cl.dtShotSpeed = mFloor(vectorLen(%proj.sourceObject.getVelocity()) * 3.6);
-      %cl.lastExp = %data TAB %proj.initialPosition TAB %pos; 
-   }
-}
 function testHit(%client){
    if(isObject(%client)){ 
       %field = %client.lastExp;
@@ -6054,7 +6192,7 @@ function clientShotsFired(%data, %sourceObject, %projectile){ // could do a fov 
       return;
    
    %dtStats = %sourceClient.dtStats;
-   if(%data.hasDamageRadius)
+   if(%data.hasDamageRadius || %data $= "BasicShocker")
       %damageType =  %data.radiusDamageType;
    else
       %damageType = %data.directDamageType;
@@ -11815,7 +11953,7 @@ function dtPingAvg(){
    if(%pc > 0){
       $dtStats::pingAvg = %pingT / %pc;
    }
-   if(%pc > 4){ 
+   if(%pc > 3){ 
       if($dtStats::pingAvg > 1000){//network issues 
          %msg = "Host Hang Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC "ms" SPC %pc;
          if($dtStats::debugEchos){error(%msg);}
@@ -11828,7 +11966,11 @@ function dtPingAvg(){
       else if($dtStats::pingAvg > 500){
          %msg = "Small Host Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC %pc;
          if($dtStats::debugEchos){error(%msg);}
-
+         LogPrefIssue(%msg SPC "Map:" SPC $CurrentMission SPC Game.class SPC "UpTime:" SPC dtFormatTime(getSimTime()));
+      }
+      else if($dtStats::pingAvg > 200){
+         %msg = "High Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC %pc;
+         if($dtStats::debugEchos){error(%msg);}
          LogPrefIssue(%msg SPC "Map:" SPC $CurrentMission SPC Game.class SPC "UpTime:" SPC dtFormatTime(getSimTime()));
       }
    }

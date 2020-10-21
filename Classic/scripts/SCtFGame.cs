@@ -926,21 +926,42 @@ function SCtFGame::flagCap(%game, %player)
    //call the AI function
    %game.AIflagCap(%player, %flag);
 
-   //if this cap didn't end the game, play the announcer...
-   if ($missionRunning)
+   //Determine score status
+   %caplimit = MissionGroup.CTF_scoreLimit;
+   %otherteam = ( %client.team == 1 ) ? 2 : 1;   
+   //Find out caps from score
+   %clientteamcaps = mFloor($TeamScore[%client.team] / %game.SCORE_PER_TEAM_FLAG_CAP);
+   %otherteamcaps = mFloor($TeamScore[%otherteam] / %game.SCORE_PER_TEAM_FLAG_CAP);
+   
+   //Determine Gamepoint
+   if(%clientteamcaps >= (%caplimit - 1))
    {
-      if (%game.getTeamName(%client.team) $= 'Inferno')
-         messageAll("", '~wvoice/announcer/ann.infscores.wav');
-      else if (%game.getTeamName(%client.team) $= 'Storm')
-         messageAll("", '~wvoice/announcer/ann.stoscores.wav');
-      else if (%game.getTeamName(%client.team) $= 'Phoenix')
-         messageAll("", '~wvoice/announcer/ann.pxscore.wav');
-      else if (%game.getTeamName(%client.team) $= 'Blood Eagle')
-         messageAll("", '~wvoice/announcer/ann.bescore.wav');
-      else if (%game.getTeamName(%client.team) $= 'Diamond Sword')
-         messageAll("", '~wvoice/announcer/ann.dsscore.wav');
-      else if (%game.getTeamName(%client.team) $= 'Starwolf')
-         messageAll("", '~wvoice/announcer/ann.swscore.wav');
+	   if(%clientteamcaps == %otherteamcaps)
+		  %scorestatus = "tied";
+	   else
+		  %scorestatus = "gamepoint";
+   }
+   else
+	   %scorestatus = "normal";
+
+   //if this cap didn't end the game, play the announcer...
+   if($missionRunning)
+   {
+	  switch$(%scorestatus)
+	  {
+		  case normal:
+			  //classic uses only storm/inferno
+			  if(%game.getTeamName(%client.team) $= 'Inferno')
+				 messageAll("", '~wvoice/announcer/ann.infscores.wav');
+			  else if(%game.getTeamName(%client.team) $= 'Storm')
+				 messageAll("", '~wvoice/announcer/ann.stoscores.wav');
+		  case tied:
+		      //Announce tied message
+			  messageAll("", '~wvoice/announcer/ann.closegame_03.wav');
+		  case gamepoint:
+			  //Announce gamepoint
+			  messageAll("", '~wvoice/announcer/ann.gamepoint_imminent.wav');
+	  }
    }
 }
 

@@ -1830,7 +1830,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
 		   cancel(%client.okschedule);
       
       %minutes = $Host::KickObserverTimeout / 60;
-      messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
+      //messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
        
       %key = mFloor(getRandom() * 1000);
       %client.okkey = %key;

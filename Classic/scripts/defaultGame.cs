@@ -1123,7 +1123,8 @@ function DefaultGame::forceObserver( %game, %client, %reason )
          messageClient(%client, 'MsgClientJoinTeam', '\c2You have become an observer.', %client.name, %game.getTeamName(0), %client, 0 );
          logEcho(%client.nameBase@" (cl "@%client@") entered observer mode");
          %client.lastTeam = %client.team;
-		 %scheduleAutoKick = true;
+
+		   %scheduleAutoKick = true;
       
       case "AdminForce":
          %client.camera.getDataBlock().setMode( %client.camera, "observerFly" );
@@ -1155,18 +1156,22 @@ function DefaultGame::forceObserver( %game, %client, %reason )
          logEcho(%client.nameBase@" (cl "@%client@") was placed in observer mode due to spawn delay");
          // save the team the player was on - only if this was a delay in respawning
          %client.lastTeam = %client.team;
-		 %scheduleAutoKick = true;
+
+		   %scheduleAutoKick = true;
    }
    
-   if (%scheduleAutoKick && !%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout ) 
+   if(%scheduleAutoKick && !%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout) 
    {
-	   %minutes = $Host::KickObserverTimeout / 60;
-       messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
+	   if(isEventPending(%client.okschedule)) 
+		   cancel(%client.okschedule);
+      
+      %minutes = $Host::KickObserverTimeout / 60;
+      messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
        
-       %key = mFloor(getRandom() * 1000);
-       %client.okkey = %key;
+      %key = mFloor(getRandom() * 1000);
+      %client.okkey = %key;
        
-       schedule(($Host::KickObserverTimeout * 1000), 0, "cmdAutoKickObserver", %client, %key);
+      %client.okschedule = schedule(($Host::KickObserverTimeout * 1000), 0, "cmdAutoKickObserver", %client, %key);
    }
    
    // switch client to team 0 (observer)
@@ -1203,6 +1208,9 @@ function cmdAutoKickObserver(%client, %key) // Edit GG
 {
    if (($Host::TournamentMode) || (!$MissionRunning) || (%client.isAdmin) || (%client.team != 0) || (!%client.okkey) || (%client.okkey != %key))
       return;
+
+   if(isEventPending(%client.okschedule)) 
+      cancel(%client.okschedule);
 
    %client.okkey = "";
    if( isObject( %client.player ) )
@@ -1378,7 +1386,7 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
 
 function DefaultGame::assignClientTeam(%game, %client, %respawn )
 {
-//error("DefaultGame::assignClientTeam");
+   //error("DefaultGame::assignClientTeam");
    // this function is overwritten in non-team mission types (e.g. DM)
    // so these lines won't do anything
    //if(!%game.numTeams)
@@ -1449,6 +1457,9 @@ function DefaultGame::assignClientTeam(%game, %client, %respawn )
 
    logEcho(%client.nameBase@" (cl "@%client@") joined team "@%client.team);
 
+   //Cancel clients observer kick schedule if he/she has one
+   if(isEventPending(%client.okschedule)) 
+      cancel(%client.okschedule);
 }
 
 function DefaultGame::getTeamSkin(%game, %team)
@@ -1469,7 +1480,7 @@ function DefaultGame::getTeamName(%game, %team)
 
 function DefaultGame::clientJoinTeam( %game, %client, %team, %respawn )
 {
-//error("DefaultGame::clientJoinTeam");
+   //error("DefaultGame::clientJoinTeam");
    if ( %team < 1 || %team > %game.numTeams )
       return;
 
@@ -1491,6 +1502,10 @@ function DefaultGame::clientJoinTeam( %game, %client, %team, %respawn )
    updateCanListenState( %client );
 
    logEcho(%client.nameBase@" (cl "@%client@") joined team "@%client.team);
+
+   //Cancel clients observer kick schedule if he/she has one
+   if(isEventPending(%client.okschedule)) 
+      cancel(%client.okschedule);
 }
 
 function DefaultGame::AIHasJoined(%game, %client)
@@ -1808,6 +1823,20 @@ function DefaultGame::clientMissionDropReady(%game, %client)
    %client.hs = "";
    for(%i = 1; %i <= 13; %i++)
       $stats::weapon_damage[%client, %i] = "";
+
+   if(!%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout) 
+   {
+	   if(isEventPending(%client.okschedule)) 
+		   cancel(%client.okschedule);
+      
+      %minutes = $Host::KickObserverTimeout / 60;
+      messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
+       
+      %key = mFloor(getRandom() * 1000);
+      %client.okkey = %key;
+       
+      %client.okschedule = schedule(($Host::KickObserverTimeout * 1000), 0, "cmdAutoKickObserver", %client, %key);
+   }
 }
 
 function DefaultGame::sendClientTeamList(%game, %client)

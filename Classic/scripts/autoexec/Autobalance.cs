@@ -33,6 +33,7 @@ function Autobalance( %game )
 		return;
 
 	$Autobalance::UseAllMode = 0;
+	$Autobalance::FallbackTime = "";
 	%otherTeam = $BigTeam == 1 ? 2 : 1;
 	$Autobalance::AMThreshold = mCeil(MissionGroup.CTF_scoreLimit/3) * 100;
 
@@ -119,7 +120,6 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
 		{
 			ResetABClients();
 			ResetTBNStatus();
-			$Autobalance::FallbackTime = "";
 			$BigTeam = "";
 		}
 	}
@@ -131,7 +131,6 @@ function DefaultGame::gameOver(%game)
 
 	//Reset Autobalance
 	$BigTeam = "";
-	$Autobalance::FallbackTime = "";
 
 	//Reset all clients canidate var
 	for (%i = 0; %i < ClientGroup.getCount(); %i++)

@@ -13,6 +13,7 @@ function CTFGame::onEnterTrigger(%game, %triggerName, %data, %obj, %colobj)
             CTFGame::zoneTossFlag(%game, %colobj, %obj);
          }
 
+      //Has issues
       case TURTLEDAMAGE:
          if(%client.player.holdingFlag !$= "")
          {
@@ -29,7 +30,7 @@ function CTFGame::zoneTossFlag(%game, %player, %obj)
    // ------------------------------------------------------------------------------
    // z0dd - ZOD - SquirrelOfDeath, 9/27/02. Delay on grabbing flag after tossing it
    %player.flagTossWait = true;
-   %player.schedule(1500, resetFlagTossWait);
+   %player.schedule(1000, resetFlagTossWait);
    // ------------------------------------------------------------------------------
 
    %client = %player.client;

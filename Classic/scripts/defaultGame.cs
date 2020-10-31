@@ -1824,18 +1824,22 @@ function DefaultGame::clientMissionDropReady(%game, %client)
    for(%i = 1; %i <= 13; %i++)
       $stats::weapon_damage[%client, %i] = "";
 
-   if(!%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout) 
+   if(%client.team $=0) //Observer only
    {
-	   if(isEventPending(%client.okschedule)) 
-		   cancel(%client.okschedule);
-      
-      %minutes = $Host::KickObserverTimeout / 60;
-      //messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
-       
-      %key = mFloor(getRandom() * 1000);
-      %client.okkey = %key;
-       
-      %client.okschedule = schedule(($Host::KickObserverTimeout * 1000), 0, "cmdAutoKickObserver", %client, %key);
+      if(!%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout)
+      {
+         if(isEventPending(%client.okschedule)) 
+            cancel(%client.okschedule);
+         
+         %time = ($Host::KickObserverTimeout) + ($Host::KickObserverTimeout/2);
+         //%minutes = %time / 60;
+         //messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
+         
+         %key = mFloor(getRandom() * 1000);
+         %client.okkey = %key;
+         
+         %client.okschedule = schedule((%time * 1000), 0, "cmdAutoKickObserver", %client, %key);
+      }
    }
 }
 

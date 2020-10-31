@@ -42,6 +42,7 @@ function chatCmd(%client, %message) //%client is sender
             messageClient(%client, 'msgChatCmd', '\c2/sandsky - changes the sky to a sand sky.');	
             messageClient(%client, 'msgChatCmd', '\c2/nicesky - changes the sky to a variation of four nice skies.');				
             messageClient(%client, 'msgChatCmd', '\c2/normalsky - changes the sky to a fallback sky.');
+			messageClient(%client, 'msgChatCmd', '\c2/spookysky - changes the sky to a halloween sky.');
             messageClient(%client, 'msgChatCmd', '\c2/fireworks - look at some fireworks.');
             messageClient(%client, 'msgChatCmd', '\c2/disableAI  -  as it sounds.');
             messageClient(%client, 'msgChatCmd', '\c2/enableAI  -  as it sounds.');
@@ -54,6 +55,7 @@ function chatCmd(%client, %message) //%client is sender
             messageClient(%client, 'msgChatCmd', '\c2/sandsky - changes the sky to a sand sky.');
 	        messageClient(%client, 'msgChatCmd', '\c2/nicesky - changes the sky to a variation of four nice skies.');				
             messageClient(%client, 'msgChatCmd', '\c2/normalsky - changes the sky to a fallback sky.');
+			messageClient(%client, 'msgChatCmd', '\c2/spookysky - changes the sky to a halloween sky.');
             messageClient(%client, 'msgChatCmd', '\c2/fireworks - look at some fireworks.');
 			messageClient(%client, 'msgChatCmd', '\c2/AIQ 1 or 0 - to enable tor disable ai chat.');
             messageClient(%client, 'msgChatCmd', '\c2/idInfo - get id resources.'); 
@@ -172,6 +174,13 @@ function chatCmd(%client, %message) //%client is sender
 				$AIDisableChat = 0; 
 				messageClient(%client, 'msgChatCmd', '\c2AI Chat Enabled.');
             }
+         }
+
+	   case "/spookysky":
+         if(%client.isAdmin || %client.isSuperAdmin )
+		 {
+			spookySky(1);// only one sky for right now
+			$CurrentSky = "spookySky";
          }
 		 
 	    default:
@@ -961,6 +970,85 @@ datablock AudioProfile(dtFireworksSound)
    description = AudioBomb3d;
    preload = true;
 };
+
+function spookySky(%sky)
+{	
+	if($CurrentSky $= "spookySky")
+	{
+		schedule(1500, 0, "dtCommandsReset");
+		return;
+	}
+	
+	removeSky(%sky);
+		
+	new Sky(Sky) {
+		position = "0 0 0";
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		cloudHeightPer[0] = "0.349971";
+		cloudHeightPer[1] = "0.25";
+		cloudHeightPer[2] = "0.199973";
+		cloudSpeed1 = "0.0001";
+		cloudSpeed2 = "0.0002";
+		cloudSpeed3 = "0.0003";
+		visibleDistance = "350";
+		useSkyTextures = "1";
+		renderBottomTexture = "0";
+		SkySolidColor = "0.000000 0.000000 0.000000 1.000000";
+		fogDistance = "150";
+		fogColor = "0.000000 0.000000 0.000000 1.000000";
+		fogVolume1 = "0 0 0";
+		fogVolume2 = "0 0 0";
+		fogVolume3 = "0 0 0";
+		materialList = "nef_night1.dml";
+		windVelocity = "1 0 0";
+		windEffectPrecipitation = "0";
+		fogVolumeColor1 = "128.000000 128.000000 128.000000 -1037713472.000000";
+		fogVolumeColor2 = "128.000000 128.000000 128.000000 -1037713472.000000";
+		fogVolumeColor3 = "128.000000 128.000000 128.000000 -1037713472.000000";
+		high_visibleDistance = "-1";
+		high_fogDistance = "-1";
+		high_fogVolume1 = "-1 6.94105e-41 6.95941e-41";
+		high_fogVolume2 = "-1 2.01181 6.95955e-41";
+		high_fogVolume3 = "-1 6.94147e-41 6.95941e-41";
+
+		locked = "true";
+		cloudSpeed0 = "0.000000 0.000000";
+	};
+		
+	MissionCleanup.add(Sky);
+	
+	schedule(1500, 0, "spookyFireworkLoop");
+}
+
+function spookyFireworkLoop()
+{
+	if($CurrentSky !$= "spookySky")
+		return;
+	
+	// find a random client.
+	%client = ClientGroup.getObject(getRandom(ClientGroup.getCount() - 1));
+
+	if(isObject(%client.player) && isObject(Game))
+	{
+		%distance = Sky.visibleDistance;
+		if(!%distance || %distance > 250)
+			%distance = 250;
+
+		%position = %client.player.position;
+		// Vary by half of the visible distance.
+		%neg = getRandom(0, 1) - 1;
+		%x = getWord(%position, 0) + ((%distance - getRandom(%distance / 2)) * %neg);
+		%neg = getRandom(0, 1) - 1; // Randomize it again.
+		%y = getWord(%position, 1) + ((%distance - getRandom(%distance / 2)) * %neg);
+		%z = getWord(%position, 2) + (%distance - getRandom(%distance / 2));
+
+		explodeFirework(%x SPC %y SPC %z, 7); //Orange Only
+		explodeFirework(%x SPC %y SPC %z, 6); //Purple Only
+	}
+
+	$fireworkSchedule = schedule(250 + getRandom(1500), 0, "spookyFireworkLoop");
+}
 
 /////////////////////////////////////////////////////////////////////////////
 

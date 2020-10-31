@@ -101,6 +101,7 @@ $Host::holoName6 = "Harbinger";
 $Host::Info = "This is a Tribes 2 Classic server. More information in Discord. <a:playt2.com/discord>playt2.com/discord</a>";
 $Host::ItemRespawnTime = 30;
 $Host::KickBanTime = 600;
+$Host::KickObserverStartOnJoin = 1;
 $Host::KickObserverTimeout = 1200;
 $Host::LakRabbitDuelMode = 0;
 $Host::LakRabbitNoSplashDamage = 1;

@@ -1824,7 +1824,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
    for(%i = 1; %i <= 13; %i++)
       $stats::weapon_damage[%client, %i] = "";
 
-   if(%client.team $=0) //Observer only
+   if(%client.team $=0 && $Host::KickObserverStartOnJoin) //Observer only
    {
       if(!%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout)
       {

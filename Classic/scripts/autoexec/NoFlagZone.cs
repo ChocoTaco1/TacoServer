@@ -1,6 +1,11 @@
 //exec("scripts/autoexec/NoFlagZone.cs");
 $TurleCampTime = 10000; //10secs
 
+//Trigger Zone Collision Patch
+//MemPatch so mines, grenades, and flags
+//Dont interact with the trigger zone
+memPatch("604358","0C");
+
 function CTFGame::onEnterTrigger(%game, %triggerName, %data, %obj, %colobj)
 {
    %client = %colobj.client;

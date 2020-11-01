@@ -909,10 +909,15 @@ function DefaultGame::missionLoadDone(%game)
 	{
 		%client = ClientGroup.getObject(%i);
 
-		%client.team = $NonRabbitTeam;
-		%client.lastTeam = $NonRabbitTeam;
+		if(%client.lakobs $=1)
+			%client.lakobs = 0;
+		else
+		{
+			%client.team = $NonRabbitTeam;
+			%client.lastTeam = $NonRabbitTeam;
+		}
 	}
-	
+
 	parent::missionLoadDone(%game);
 }
 
@@ -2011,6 +2016,9 @@ function LakRabbitGame::gameOver(%game)
       if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
          cancel(%client.waypointSchedule);
       cancel(%client.duelTimer);
+
+	  if(%client.team $=0)
+	  	%client.lakobs = 1;
 
 	  //Put everyone in observer
 	  //Mainly for switching to CTF

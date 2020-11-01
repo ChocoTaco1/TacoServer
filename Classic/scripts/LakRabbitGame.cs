@@ -17,6 +17,9 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.38 Nov 2020
+// Added Observer GameOver (Mainly for switching to CTF)
+//
 // v3.37 Aug 2020
 // Nerfed Blaster damage (Less spam)
 // Flag Transform 500 > 100
@@ -898,6 +901,20 @@ function Player::setKnockback(%this, %val)
 //		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
 //    }
 //}
+
+//Put everyone on NonRabbit Team
+function DefaultGame::missionLoadDone(%game)
+{
+	for(%i = 0; %i < ClientGroup.getCount(); %i++)
+	{
+		%client = ClientGroup.getObject(%i);
+
+		%client.team = $NonRabbitTeam;
+		%client.lastTeam = $NonRabbitTeam;
+	}
+	
+	parent::missionLoadDone(%game);
+}
 
 };
 
@@ -1994,6 +2011,11 @@ function LakRabbitGame::gameOver(%game)
       if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
          cancel(%client.waypointSchedule);
       cancel(%client.duelTimer);
+
+	  //Put everyone in observer
+	  //Mainly for switching to CTF
+	  %client.team = 0;
+	  %client.lastTeam = 0;
    }
 
    // ilys -- cancel waypoint if not showing flag icon

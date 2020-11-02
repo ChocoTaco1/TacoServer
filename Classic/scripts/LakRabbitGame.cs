@@ -167,7 +167,7 @@ function Flag::objectiveInit(%data, %flag)
 {
    $flagStatus = "<At Home>";
    %flag.carrier = "";
-   %flag.originalPosition = %flag.getTransform();  
+   %flag.originalPosition = %flag.getTransform();
    %flag.isHome = true;
    %flag.rotate = true;
 
@@ -179,7 +179,7 @@ function Flag::objectiveInit(%data, %flag)
       setTargetRenderMask(%flag.getTarget(), getTargetRenderMask(%flag.getTarget()) | 0x2);
       setTargetAlwaysVisMask(%flag.getTarget(), 0x7);
    }
-   
+
    // create a waypoint to the flag's starting place
    if( $Host::LakRabbitShowFlagIcon == 0 )
    {
@@ -245,22 +245,22 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
 		$LakFired[%obj, ChaingunBullet, 0] = 0;
 		$LakFired[%obj, ChaingunBullet, 1] = 0;
 	}
-	
+
 	%p = parent::onFire(%data, %obj, %slot);
 	%p.shotFrom = %obj.getWorldBoxCenter();
 	%p.shotSpeed = getSpeed(%obj);
-	
+
 // borlak -- remove height from grenades to get rid of DJ + gren spam abuse
 	switch$(%data.projectile)
 	{
 	case BasicGrenade:
 		%p.shotFrom = setWord(%p.shotFrom, 2, getWord(%p.shotFrom,2) - getHeight(%obj));
-	}		
+	}
 	return %p;
 }
 
 // borlak -- this is going to be one ugly hack, but I can't find where a non radius damage
-// object calls damageObject on a -hit-, therefore cannot pass on the projectiles data to 
+// object calls damageObject on a -hit-, therefore cannot pass on the projectiles data to
 // damageObject and get it's true origin of fire
 function ProjectileData::onExplode(%data, %proj, %pos, %mod)
 {
@@ -274,7 +274,7 @@ function detonateGrenade(%obj)
 	%obj.shotSpeed = -1;
 	%obj.isHandNade = 1;
 	$lastObjExplode = %obj;
-	
+
 	parent::detonateGrenade(%obj);
 }
 function GrenadeThrown::onThrow(%this, %gren)
@@ -311,7 +311,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 
 	if(%targetObject.invincible || %targetObject.getState() $= "Dead")
 		return;
-		
+
 	//rabbit can't DJ in duel mode
 	// if(Game.duelMode && %targetObject.holdingFlag && %targetObject == %sourceObject
 	// && %damageType == $DamageType::Disc
@@ -351,19 +351,19 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	%targetObject.lastDamageType = %damageType;
 
 	// borlak -- MA, long distance, mine and grenade points
-	if( isObject(%sourceObject) 
-	&&  %sourceObject.getDataBlock().getClassName() $= "PlayerData" && %targetObject.getDataBlock().getClassName() $= "PlayerData" 
+	if( isObject(%sourceObject)
+	&&  %sourceObject.getDataBlock().getClassName() $= "PlayerData" && %targetObject.getDataBlock().getClassName() $= "PlayerData"
 	&&  %targetObject.client.team != %sourceObject.client.team
 	&&  %damageType)
 	{
 		$LakDamaged[%targetObject.client]	= %sourceObject.client;
 		%targetObject.lastDamagedBy			= %sourceObject;
 		%targetPosition						= %targetObject.getWorldBoxCenter();
-		
+
 		// borlak -- DJ + gren spam abuse, remove player height
 		if(%damageType == $DamageType::Grenade && !$lastObjExplode.isHandNade)
 			%targetPosition = setWord(%targetPosition, 2, getWord(%targetPosition,2) - getHeight(%targetObject));
-		
+
 		if(%damageType == $DamageType::ShockLance || %damageType == $DamageType::Laser)
 		{
 			$lastObjExplode	= 0;
@@ -406,7 +406,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		// no splash damage vote
 		if(Game.noSplashDamage && %percentDam < 98 && $lastObjExplode && !$lastObjExplode.isHandNade && %damageType != $DamageType::Mine)
 			%amount = 0.0;
-		
+
 		switch$(%damageType)
 		{
 			case $DamageType::Disc:
@@ -429,11 +429,11 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				//%chance = mFloor(25 - %distance/3);
 				//if(%ma && getRandom(1,50) <= %chance && %targetObject.client.headshot)
 
-					
+
 				//Normal Slap
 				%chance = mFloor(15 - %distance/3);
 				if(%chance <= 0) %chance = 1;
-				
+
 				if(%ma && getRandom(1,100) <= %chance)
 				{
 					if(%targetObject.holdingFlag)
@@ -448,7 +448,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 						duelBonus(%sourceObject.client);
 						$LakDamaged[%targetObject.client] = 0;
 					}
-						
+
 					// lower damage and make invincible to ground damage to make it a little more fun
 					%amount = 0.01;
 					%targetObject.setKnockback(true);
@@ -459,7 +459,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 					%impulseVec = VectorScale(%muzzleVec, 25000);
 					%targetObject.applyImpulse(%p, %impulseVec);
 					%sound = '~wfx/misc/slapshot.wav';
-					
+
 					%slapmsg = getRandom(1,3);
 					switch$(%slapmsg)
 					{
@@ -467,9 +467,9 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 							messageAll('msgSlapmessage','\c0%1 wonders what the five fingers said to the face.', %targetObject.client.name );
 						case 2:
 							messageAll('msgSlapmessage','\c0%1 gets slapped the heck out!', %targetObject.client.name );
-						case 3:				
+						case 3:
 							messageAll('msgSlapmessage','\c0%1 is taking a short tour around the map.', %targetObject.client.name );
-					}	
+					}
 				}
 				%weapon = "Disc";
 			case $DamageType::Grenade:
@@ -510,7 +510,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 							%sound = %defaultSound;
 						}
 					}
-					else 
+					else
 					{
 						if(%ma && %percentDam >= 98)
 						{
@@ -545,7 +545,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				%weapon = "Mortar";
 			case $DamageType::Mine:
 				%amount /= %amount > 0 ? 3 : 1;
-				
+
 				if(%ma)
 				{
 					%accuracy = " [Accuracy:" @ %percentDam @ "%]";
@@ -561,13 +561,13 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				}
 				if(!%ma)
 					%amount = 0;
-				%weapon = "MINE";		
+				%weapon = "MINE";
 			case $DamageType::ShockLance:
 				%height = getHeight(%sourceObject);
 				%heightBonus = (mPow(%height,1.20)/14)+1; //was 10
 				%velBonus /= 2;
 				%points = mFloor(%distance/2) + (%heightBonus);
-				
+
 				%accuracy = " [Height:" @ %height @"m]";
 				// borlak -- check rear shocklance hit
 				%muzzlePos  = %sourceObject.getMuzzlePoint(0);
@@ -587,13 +587,13 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 						if($host::dontcloakflag)
 							%sourceObject.holdingFlag.setCloaked(false);
 					}
-						
+
 					%points *= 1.5; //was 2
 					%special = "-in-the-back";
 				}
 				if(%ma)
 					%points += 3;
-				
+
 				//not a bug. sl gets points ma or not
 				%sound = %defaultSound;
 				%sourceObject.client.totalShockHits++;
@@ -627,15 +627,15 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			case $DamageType::Laser:
 			    if($InvBanList[LakRabbit, "SniperRifle"]) //banned
 					return;
-			
+
 				if(%energy > 0.5 || %players > 7)
 				{
 					%players = (ClientGroup.getCount()-1)/1.5;
 					%points = (%distance/75)+1;
-				
+
 					if(%ma)
 						%points *= 1.75;
-						
+
 					if(%targetObject.client.headshot)
 					{
 						%sound = %defaultSound;
@@ -650,14 +650,14 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				%ma = 0;
 				%players = (ClientGroup.getCount()-1)/1.75;
 				$LakFired[%sourceObject, ChaingunBullet, 1]++;
-				
+
 				if($LakFired[%sourceObject, ChaingunBullet, 1] % 5 == 0)
 				{
 					%accamount = mFloor(($LakFired[%sourceObject, ChaingunBullet, 1] / $LakFired[%sourceObject, ChaingunBullet, 0])*100);
 					%velBonus = 0;
 					%points = (%accamount/3)+1;
 					%accuracy = " [Accuracy:" @ %accamount @ "%]";
-			
+
 					%sourceObject.client.totalChainAccuracy += %accamount;
 					%sourceObject.client.totalChainHits++;
 				}
@@ -667,7 +667,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 
 	// borlak -- recalc score for hits
 	if( isObject(%sourceObject)
-	&&  %sourceObject.getDataBlock().getClassName() $= "PlayerData" && %targetObject.getDataBlock().getClassName() $= "PlayerData" 
+	&&  %sourceObject.getDataBlock().getClassName() $= "PlayerData" && %targetObject.getDataBlock().getClassName() $= "PlayerData"
 	&& %points)
 	{
 		%distance = mFloor(%distance);
@@ -686,7 +686,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			%hitType = "Long-Distance ";
 		else
 			%hitType = "";
-		
+
 		messageClient(%sourceObject.client,'msgPlrPointBonus', '\c4You receive %1 point%2! [%3%4%5] [Distance:%6m] [Speed:%7kph] %8',
 			%points, %points == 1 ? "" : "s",
 			%hitType,
@@ -704,7 +704,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			%distance,
 			%vel,
 			%accuracy);
-			
+
 		if(%sourceObject.holdingFlag && %points >= 75)
 		{
 			missileEveryone(%sourceObject);
@@ -732,19 +732,19 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		else
 			%amount *= 1.5;
 	}
-	
+
    //error("Armor::damageObject( "@%data@", "@%targetObject@", "@%sourceObject@", "@%position@", "@%amount@", "@%damageType@", "@%momVec@" )");
    if(%targetObject.invincible || %targetObject.getState() $= "Dead")
       return;
 
    %targetClient = %targetObject.getOwnerClient();
    if(isObject(%mineSC))
-      %sourceClient = %mineSC;   
+      %sourceClient = %mineSC;
    else
       %sourceClient = isObject(%sourceObject) ? %sourceObject.getOwnerClient() : 0;
 
    %targetTeam = %targetClient.team;
-   
+
    // if the source object is a player object, player's don't have sensor groups
    // if it's a turret, get the sensor group of the target
    // if its a vehicle (of any type) use the sensor group
@@ -757,7 +757,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
    // (but are not the same person), apply no damage
    if(!$teamDamage && (%targetClient != %sourceClient) && (%targetTeam == %sourceTeam))
       return;
-   
+
    if(%amount == 0)
       return;
 
@@ -765,11 +765,11 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
    %damageScale = %data.damageScale[%damageType];
    if(%damageScale !$= "")
       %amount *= %damageScale;
-   
+
    %flash = %targetObject.getDamageFlash() + (%amount * 2);
    if (%flash > 0.75)
       %flash = 0.75;
-  
+
   	// Teratos: Originally from Eolk? Mine+Disc tracking/death message support.
 	// client.mineDisc = [true|false]
 	// client.mineDiscCheck [0-None|1-Disc Damage|2-Mine Damage]
@@ -794,7 +794,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		}
 	}
 	// -- End Mine+Disc insert.
-   
+
    %previousDamage = %targetObject.getDamagePercent();
    %targetObject.setDamageFlash(%flash);
    %targetObject.applyDamage(%amount);
@@ -802,39 +802,39 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 
    %targetClient.lastDamagedBy = %damagingClient;
    %targetClient.lastDamaged = getSimTime();
-   
-   //now call the "onKilled" function if the client was... you know...  
+
+   //now call the "onKilled" function if the client was... you know...
    if(%targetObject.getState() $= "Dead")
    {
       // where did this guy get it?
       %damLoc = %targetObject.getDamageLocation(%position);
-      
+
       // should this guy be blown apart?
-      if( %damageType == $DamageType::Explosion || 
-          %damageType == $DamageType::Mortar || 
-          %damageType == $DamageType::Missile )     
+      if( %damageType == $DamageType::Explosion ||
+          %damageType == $DamageType::Mortar ||
+          %damageType == $DamageType::Missile )
       {
          if( %previousDamage >= 0.35 ) // only if <= 35 percent damage remaining
          {
             %targetObject.setMomentumVector(%momVec);
-            %targetObject.blowup(); 
+            %targetObject.blowup();
          }
       }
-      
+
       // If we were killed, max out the flash
       %targetObject.setDamageFlash(0.75);
-      
+
       %damLoc = %targetObject.getDamageLocation(%position);
       Game.onClientKilled(%targetClient, %sourceClient, %damageType, %sourceObject, %damLoc);
    }
    else if ( %amount > 0.1 )
-   {   
+   {
       if( %targetObject.station $= "" && %targetObject.isCloaked() )
       {
          %targetObject.setCloaked( false );
-         %targetObject.reCloak = %targetObject.schedule( 500, "setCloaked", true ); 
+         %targetObject.reCloak = %targetObject.schedule( 500, "setCloaked", true );
       }
-      
+
       playPain( %targetObject );
    }
 }
@@ -847,7 +847,7 @@ function deployMineCheck(%mineObj, %player)
 // thanks mista
 function MineDeployed::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType)
 {
-	// NO NIFTY NADE/MINE SCRIPTS 
+	// NO NIFTY NADE/MINE SCRIPTS
 	if (Game.duelMode && %damageType == $DamageType::Grenade && $lastObjExplode.isHandNade)
 		return;
 
@@ -889,13 +889,13 @@ function Player::setKnockback(%this, %val)
 //{
 //    %damLoc = firstWord(%targetObject.getDamageLocation(%position));
 //    if(%damLoc $= "head")
-//    {   
+//    {
 //        %targetObject.getOwnerClient().headShot = 1;
 //        //%modifier = %data.rifleHeadMultiplier;
 //		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
 //    }
 //    else
-//    {   
+//    {
 //        //%modifier = 1;
 //        %targetObject.getOwnerClient().headShot = 0;
 //		%targetObject.damage(%projectile.sourceObject, %position, %data.directDamage * %modifier, %data.directDamageType);
@@ -909,8 +909,8 @@ function DefaultGame::missionLoadDone(%game)
 	{
 		%client = ClientGroup.getObject(%i);
 
-		if(%client.lakobs $=1)
-			%client.lakobs = 0;
+		if(%client.lakobs)
+			%client.lakobs = "";
 		else
 		{
 			%client.team = $NonRabbitTeam;
@@ -976,7 +976,7 @@ $InvBanList[LakRabbit, "TargetingLaser"] = 0;
 // borlak functions
 function TestForMA(%player, %distance)
 {
-	%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType; 
+	%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
 	%rayStart = %player.getWorldBoxCenter();
 	%rayEnd = getWord(%rayStart, 0) SPC getWord(%rayStart, 1) SPC getWord(%rayStart, 2) - %distance;
 	%ground = ContainerRayCast(%rayStart, %rayEnd, %mask, 0);
@@ -999,7 +999,7 @@ function PlayingPlayers()
 			%players++;
 	}
 	return %players;
-}	
+}
 
 function duelBonus(%client)
 {
@@ -1015,7 +1015,7 @@ function duelBonus(%client)
 // awards/tricks/fun things
 function missileEveryone(%attacker)
 {
-	for(%i = 0; %i < ClientGroup.getCount(); %i++)   
+	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
 		%target = ClientGroup.getObject(%i);
 
@@ -1031,7 +1031,7 @@ function missileEveryone(%attacker)
 	// make him invincible so he doesn't get killed and ruin the effect!
 	%attacker.setInvincible(true);
 	%attacker.schedule(5000, "setInvincible", false);
-	
+
 	// give the rabbit some more duel seconds if it's duel mode..
 	if(Game.duelMode && %attacker.holdingFlag)
 		%attacker.client.duelSeconds += 15;
@@ -1043,13 +1043,13 @@ function killEveryone(%ignore, %message)
 	else
 		messageAll('msgKillEveryone', %message);
 
-	for(%i = 0; %i < ClientGroup.getCount(); %i++)   
+	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
 		%target = ClientGroup.getObject(%i);
-		
+
 		if(!%target.player || %target.player == %ignore)
 			continue;
-		
+
 		%target.player.blowup();
 		%target.player.scriptKill();
 	}
@@ -1064,7 +1064,7 @@ function checkDuelTimer(%client)
 
 	%client.duelSeconds--;
 	%client.duelSecondsCounted++;
-	
+
 	if(%client.duelSeconds <= 0)
 	{
 		cancel(%client.duelTimer);
@@ -1096,7 +1096,7 @@ $VoteMessage["VotePro"] = "turn";
 function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 {
 	parent::sendGameVoteMenu( %game, %client, %key );
-	
+
 	%isAdmin = ( %client.isAdmin || %client.isSuperAdmin );
 
 	if(!%client.canVote && !%isAdmin)
@@ -1140,7 +1140,7 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
-		} 
+		}
 		else
 		{
 			if(!Game.duelMode)
@@ -1180,7 +1180,7 @@ function LakRabbitGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, 
 
 function LakRabbitGame::VotePro(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
-	if(%admin) 
+	if(%admin)
 	{
 		killeveryone();
 
@@ -1207,7 +1207,7 @@ function LakRabbitGame::VotePro(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 			%game.PubPro = true;
 		}
 	}
-	else 
+	else
 	{
 		%totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
 		if(%totalVotes > 0 && (%game.totalVotesFor / ClientGroup.getCount()) > ($Host::VotePasspercent / 100))
@@ -1222,7 +1222,7 @@ function LakRabbitGame::VotePro(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 				$InvBanList[LakRabbit, "ShockLance"] = 0;
 				$InvBanList[LakRabbit, "Mortar"] = 0;
 				$InvBanList[LakRabbit, "Grenade"] = 0;
-				
+
 				%game.PubPro = false;
 			}
 			else
@@ -1233,12 +1233,12 @@ function LakRabbitGame::VotePro(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 				$InvBanList[LakRabbit, "ShockLance"] = 1;
 				$InvBanList[LakRabbit, "Mortar"] = 1;
 				$InvBanList[LakRabbit, "Grenade"] = 1;
-			
+
 				%game.PubPro = true;
 			}
 		}
 		else
-			messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100)); 
+			messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100));
 	}
 
 	$Host::LakRabbitPubPro = %game.PubPro;
@@ -1246,21 +1246,21 @@ function LakRabbitGame::VotePro(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 
 function LakRabbitGame::voteDuelMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
-	if(%admin) 
+	if(%admin)
 	{
 		killEveryone();
 		if(%game.duelMode)
 		{
-			messageAll('MsgAdminForce', '\c2The Admin has disabled Duel Mode.');   
+			messageAll('MsgAdminForce', '\c2The Admin has disabled Duel Mode.');
 			%game.duelMode = false;
 		}
 		else
 		{
-			messageAll('MsgAdminForce', '\c2The Admin has enabled Duel Mode.');   
+			messageAll('MsgAdminForce', '\c2The Admin has enabled Duel Mode.');
 			%game.duelMode = true;
 		}
 	}
-	else 
+	else
 	{
 		%totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
 		if(%totalVotes > 0 && (%game.totalVotesFor / ClientGroup.getCount()) > ($Host::VotePasspercent / 100))
@@ -1268,17 +1268,17 @@ function LakRabbitGame::voteDuelMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 			killEveryone();
 			if(%game.duelMode)
 			{
-				messageAll('MsgVotePassed', '\c2Duel Mode disabled.'); 
+				messageAll('MsgVotePassed', '\c2Duel Mode disabled.');
 				%game.duelMode = false;
 			}
 			else
 			{
-				messageAll('MsgVotePassed', '\c2Duel Mode enabled.'); 
+				messageAll('MsgVotePassed', '\c2Duel Mode enabled.');
 				%game.duelMode = true;
 			}
 		}
 		else
-			messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100)); 
+			messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100));
 	}
 
 	// save
@@ -1287,7 +1287,7 @@ function LakRabbitGame::voteDuelMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 
 function LakRabbitGame::voteSplashDamage(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
-	if(%admin) 
+	if(%admin)
 	{
 		if(%game.noSplashDamage)
 		{
@@ -1296,30 +1296,30 @@ function LakRabbitGame::voteSplashDamage(%game, %admin, %arg1, %arg2, %arg3, %ar
 		}
 		else
 		{
-			messageAll('MsgAdminForce', '\c2The Admin has disabled Splash Damage.');   
+			messageAll('MsgAdminForce', '\c2The Admin has disabled Splash Damage.');
 			%game.noSplashDamage = true;
 		}
 	}
-	else 
+	else
 	{
 		%totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
 		if(%totalVotes > 0 && (%game.totalVotesFor / ClientGroup.getCount()) > ($Host::VotePasspercent / 100))
 		{
 			if(%game.noSplashDamage)
 			{
-				messageAll('MsgVotePassed', '\c2Splash Damage enabled.'); 
+				messageAll('MsgVotePassed', '\c2Splash Damage enabled.');
 				%game.noSplashDamage = false;
 			}
 			else
 			{
-				messageAll('MsgVotePassed', '\c2Splash Damage disabled.'); 
+				messageAll('MsgVotePassed', '\c2Splash Damage disabled.');
 				%game.noSplashDamage = true;
 			}
 		}
 		else
-			messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100)); 
+			messageAll('MsgVoteFailed', '\c2Mode change did not pass: %1 percent.', mFloor(%game.totalVotesFor/ClientGroup.getCount() * 100));
 	}
-	
+
 	// save
 	$Host::LakRabbitNoSplashDamage = %game.noSplashDamage;
 }
@@ -1345,7 +1345,7 @@ function LakRabbitGame::sendDebriefing( %game, %client )
 	%shocks		= 0;
 	%alltotdistance		= 0;
 	%totshockhits		= 0;
-	
+
 	%count = $TeamRank[0, count];
 	for(%i = 0; %i < %count; %i++)
 	{
@@ -1358,10 +1358,10 @@ function LakRabbitGame::sendDebriefing( %game, %client )
 		else			%kills = %cl.kills;
 		if(%cl.mas == 0)	%mas = 0;
 		else			%mas = %cl.mas;
-		
+
 		//if(%cl.totalSnipes == 0) %cl.totalSnipes = 1;
 		if(%cl.totalShocks == 0) %cl.totalShocks = 1;
-		
+
 		if(%cl.totalSpeed == 0)	%avgSpeed = 0;
 		else				%avgSpeed = mFloor(%cl.totalSpeed/%cl.mas);
 		if(%cl.totalDistance == 0)	%avgDistance = 0;
@@ -1389,9 +1389,9 @@ function LakRabbitGame::sendDebriefing( %game, %client )
 		if(%shockPercent){	%totshockpercent	+= %shockPercent;	%shocks++; }
 		if(%othertotdistance){	%alltotdistance			+= %othertotdistance;  }
 		if(%shockhits){			%totshockhits			+= %shockhits;  }
-		
+
 	}
-	
+
 	messageClient( %client, 'MsgDebriefAddLine', "", '<spush><lmargin:0><Font:Arial:15><color:00FF7F>%1<lmargin%%:23>%2<lmargin%%:34>%3<lmargin%%:44>%4<lmargin%%:52>%5<lmargin%%:62>%6<lmargin%%:70>%7<lmargin%%:80>%8%%<lmargin%%:90>%9<spop>\n',
 		"   Totals:", %totscore, %totkills, %totmas, mFloor(%totspeed/%speeds), mFloor(%totdistance/%dists), %alltotdistance, mFloor(%totshockpercent/%shocks), %totshockhits);
 }
@@ -1424,12 +1424,12 @@ function LakRabbitGame::initGameVars(%game)
    %game.playerBonusTime = 3 * 1000;
 
    %game.teamBonusValue = 3;
-   %game.teamBonusTime = 5 * 1000; 
+   %game.teamBonusTime = 5 * 1000;
    %game.flagReturnTime = 25 * 1000;
 
    %game.waypointFrequency = 24000;
    %game.waypointDuration = 6000;
-   
+
    %game.duelMode = $Host::LakRabbitDuelMode;
    %game.PubPro = $Host::LakRabbitPubPro;
    %game.noSplashDamage = $Host::LakRabbitNoSplashDamage;
@@ -1451,8 +1451,8 @@ function LakRabbitGame::clientMissionDropReady(%game, %client)
    messageClient(%client, 'MsgYourScoreIs', "", 0);
    //messageClient(%client, 'MsgYourRankIs', "", -1);
    messageClient(%client, 'MsgRabbitFlagStatus', "", $flagStatus);
-   
-   messageClient(%client, 'MsgMissionDropInfo', '\c0You are in mission %1 (%2).', $MissionDisplayName, $MissionTypeDisplayName, $ServerName ); 
+
+   messageClient(%client, 'MsgMissionDropInfo', '\c0You are in mission %1 (%2).', $MissionDisplayName, $MissionTypeDisplayName, $ServerName );
 
    DefaultGame::clientMissionDropReady(%game,%client);
 }
@@ -1466,7 +1466,7 @@ function LakRabbitGame::AIHasJoined(%game, %client)
 function LakRabbitGame::clientJoinTeam( %game, %client, %team, %respawn )
 {
    %game.assignClientTeam( %client );
-   
+
    // Spawn the player:
    %game.spawnPlayer( %client, %respawn );
    %game.recalcScore( %client );
@@ -1534,26 +1534,26 @@ function LakRabbitGame::playerSpawned(%game, %player)
 	%player.setInventory(EnergyPack,1);
    	%player.use("Disc");
    }
-   
+
    %player.schedule(250,"selectWeaponSlot", 0);
    %player.setEnergyLevel(%player.getDatablock().maxEnergy);
-   	
+
 	if($Host::LakRabbitUnlimitedDJ == 1)
 		%player.freeDJ = 999; // free diskjump
 	else
 		%player.freeDJ = 1; // free diskjump
-	
+
 }
 
 
 // modified to spawn you near rabbit or flag
-function LakRabbitGame::pickTeamSpawn(%game, %team) 
+function LakRabbitGame::pickTeamSpawn(%game, %team)
 {
     //Use traditional spawnspheres for indoor maps
 	if($CurrentMission $= "BoxLak")
 	   return parent::pickTeamSpawn(%game, %team);
 
-	
+
 	//find the rabbit
 	%spawnNear = -1;
 	for (%i = 0; %i < ClientGroup.getCount(); %i++)
@@ -1565,13 +1565,13 @@ function LakRabbitGame::pickTeamSpawn(%game, %team)
 			break;
 		}
 	}
-   
+
 	if(!isObject(%spawnNear))
 	{
 		for (%i = 0; %i < Team0.getCount(); %i++)
 		{
 			%obj = Team0.getObject(%i);
-			
+
 			if(%obj.dataBlock $= Flag)
 			{
 				%spawnNear = %obj;
@@ -1586,7 +1586,7 @@ function LakRabbitGame::pickTeamSpawn(%game, %team)
 		%pos = %spawnNear.getWorldBoxCenter();
 		%randx = getWord(%pos,0)+getRandom(-150,150);
 		%randy = getWord(%pos,1)+getRandom(-150,150);
-		%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType; 
+		%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
 		%rayStart = %randx SPC %randy SPC "1000";
 		%rayEnd = %randx SPC %randy SPC "-1000";
 		%ground = ContainerRayCast(%rayStart, %rayEnd, %mask, 0);
@@ -1604,7 +1604,7 @@ function LakRabbitGame::pickTeamSpawn(%game, %team)
 	if(%ground)
 		return %loc;
 	return "0 0 500";
-}            
+}
 
 
 function LakRabbitGame::pickPlayerSpawn(%game, %client, %respawn)
@@ -1617,7 +1617,7 @@ function LakRabbitGame::pickPlayerSpawn(%game, %client, %respawn)
 	%client.player.lastDamageType	= 0;
 	%client.player.knockback	= 0;
 	cancel(%client.duelTimer);
-	
+
 	// all spawns come from team 1
 	return %game.pickTeamSpawn($NonRabbitTeam);
 }
@@ -1673,7 +1673,7 @@ function LakRabbitGame::onClientKilled(%game, %clVictim, %clKiller, %damageType,
 	}
 // borlak -- flag bug fix
 	%clVictim.flagDeny = schedule(2500, 0, setFlagDeny, %clVictim, 0);
-	
+
 	DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
 }
 
@@ -1766,7 +1766,7 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
 			messageAll('MsgDuelBonus', '\c2%1 suicides and gets no points!', %player.client.name);
 			return;
 		}
-		
+
 		%points = 0;
 		for(%i = 1; %i <= %player.client.duelKills; %i++)
 			%points += (%i*4);
@@ -1780,7 +1780,7 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
 		%plural = (%points != 1 ? 's' : "");
 		%pluralP = (%player.client.duelKills != 1 ? 'people' : 'person');
 		%pluralSec = (%player.client.duelSecondsCounted != 1 ? 's' : "");
-		
+
 		if(%player.client.duelKills == 0)
 			messageAll('MsgDuelBonus', '\c2%1 kills nobody and gets nothing!  Better luck next time....', %player.client.name, %points, %plural, %player.client.duelKills, %player.client.duelSecondsCounted);
 		else
@@ -1828,12 +1828,12 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 	for (%i = 0; %i < Team0.getCount(); %i++)
 	{
 		%obj = Team0.getObject(%i);
-			
+
 		if(%obj.dataBlock $= Flag)
 		{
 			if(!%obj.isHome)
 				%flagInPlay = %obj;
-				
+
 			if(!%obj.isHome && %obj.carrier)
 			{
 				messageClient(%player.client, 'msgNoFlagWarning', "\c2Only one flag may be in play.");
@@ -1847,7 +1847,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 		messageClient(%player.client, 'msgNoFlagWarning', "\c2You can only pick up the flag in play.");
 		return;
 	}
-	
+
    if(%flag.carrier $= "")
    {
 // borlak cancel flag search and remove free diskjump
@@ -1875,7 +1875,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
       $flagStatus = %client.name;
 
 // borlak -- points for MA flag grabs
-      %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType; 
+      %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
       %rayStart = %player.getWorldBoxCenter();
       %rayEnd = getWord(%rayStart, 0) SPC getWord(%rayStart, 1) SPC getWord(%rayStart, 2) - 5;
       %ground = ContainerRayCast(%rayStart, %rayEnd, %mask, 0);
@@ -1913,7 +1913,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 // borlak - make rabbit invincible for 2 seconds ..
       %player.setInvincible(true);
       %player.schedule(2000, "setInvincible", false);
-      
+
 // duel mode
       if(%game.duelMode)
       {
@@ -1955,7 +1955,7 @@ function LakRabbitGame::resetFlag(%game, %flag)
    %flag.carrier = "";
    $flagStatus = "<At Home>";
    %flag.hide(false);
-   
+
    //so flag turns back green
    if($Host::LakRabbitShowFlagIcon == 1 || $Host::LakRabbitShowFlagIcon == 2)
    {
@@ -1988,7 +1988,7 @@ function LakRabbitGame::checkScoreLimit(%game, %client)
    // default of 1200 if scoreLimit not defined  (that's 1200 seconds worth - 20 minutes)
    if(%scoreLimit $= "")
       %scoreLimit = 2000;
-   if(%client.score >= %scoreLimit) 
+   if(%client.score >= %scoreLimit)
       %game.scoreLimitReached();
 }
 
@@ -1999,7 +1999,7 @@ function LakRabbitGame::gameOver(%game)
    {
       cancel($TeamFlag[%f].searchSchedule);
    }
-   
+
    //call the default
    DefaultGame::gameOver(%game);
 
@@ -2029,7 +2029,7 @@ function LakRabbitGame::gameOver(%game)
    // ilys -- cancel waypoint if not showing flag icon
    if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
       cancel(%game.waypointSchedule);
-   
+
 // borlak -- delete variables
    deleteVariables("$LakFired*");
    deleteVariables("$LakDamaged*");
@@ -2044,7 +2044,7 @@ function LakRabbitGame::resetScore(%game, %client)
 	%client.flagGrabs	= 0;
 	%client.flagTimeMS	= 0;
 	%client.morepoints	= 0;
-	
+
 	// new debriefing stuff
 	%client.mas					= 0;
 	%client.totalSpeed			= 0;
@@ -2061,14 +2061,14 @@ function LakRabbitGame::enterMissionArea(%game, %playerData, %player)
 {
    if(%player.getState() $= "Dead")
       return;
-  
+
    %player.client.outOfBounds = false;
    messageClient(%player.client, 'EnterMissionArea', '\c1You are back in the mission area.');
    logEcho(%player.client.nameBase@" (pl "@%player@"/cl "@%player.client@") entered mission area");
    cancel(%player.alertThread);
 }
 
-	
+
 // borlak -- TAKEN FROM TR2 -- thanks! :D
 function plzBounceOffGrid(%obj, %bounceForce, %count)
 {
@@ -2081,7 +2081,7 @@ function plzBounceOffGrid(%obj, %bounceForce, %count)
 	%shapePos = %obj.getPosition();
 	%shapex = firstWord(%shapePos);
 	%shapey = getWord(%shapePos, 1);
-	
+
 	if( %shapex >= %boundsWest && %shapex <= %boundsEast && %shapey >= %boundsNorth && %shapey <= %boundsSouth) {
 		// we don't need to bounce at all
 		return;
@@ -2095,7 +2095,7 @@ function plzBounceOffGrid(%obj, %bounceForce, %count)
 
 	if (%bounceForce $= "")
 		%bounceForce = 65;
-      
+
 	%oldVel = %obj.getVelocity();
 	%obj.setVelocity("0 0 0");
 
@@ -2134,7 +2134,7 @@ function plzBounceOffGrid(%obj, %bounceForce, %count)
 	// apply the impulse to the object
 	//%obj.applyImpulse(%obj.getWorldBoxCenter(), %vec);
 	%obj.setVelocity(%vec);
-	
+
 	// repeat this bounce 4 times per second.  if we're oob for 2 seconds, take action
 	// don't do this with the flag because that has its own thread
 	if( %obj.dataBlock !$= "Flag" ) {
@@ -2151,7 +2151,7 @@ function isOutOfBounds(%position)
 	%boundsNorth = getWord(%bounds, 1);
 	%boundsEast = %boundsWest + getWord(%bounds, 2);
 	%boundsSouth = %boundsNorth + getWord(%bounds, 3);
-   
+
 	return (%shapex < %boundsWest  || %shapex > %boundsEast ||
 		%shapey < %boundsNorth || %shapey > %boundsSouth);
 }
@@ -2306,10 +2306,10 @@ function LakRabbitGame::updateScoreHud(%game, %client, %tag)
       if (%client.team != 0)
       {
          if ( %numColumns == 2 )
-            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150>%1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left>%4<rmargin:505><just:right>%5<rmargin:570><just:right>%6', 
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150>%1</clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310>%8<just:left>%4<rmargin:505><just:right>%5<rmargin:570><just:right>%6',
                   %col1Client.name, %col1ClientScore, %col1ClientTime, %col2Client.name, %col2ClientScore, %col2ClientTime, %col1Style, %col2Style );
          else
-            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200>%1</clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3', 
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200>%1</clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
                   %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style );
       }
       //else for observers, create an anchor around the player name so they can be observed
@@ -2320,28 +2320,28 @@ function LakRabbitGame::updateScoreHud(%game, %client, %tag)
             //this is really crappy, but I need to save 1 tag - can only pass in up to %9, %10 doesn't work...
             if (%col2Style $= "<color:00dc00>")
             {
-               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6', 
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:00dc00><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
                               %col1Client.name, %col1ClientScore, %col1ClientTime,
                               %col2Client.name, %col2ClientScore, %col2ClientTime,
                               %col1Style, %col1Client, %col2Client );
             }
             else if (%col2Style $= "<color:dcdcdc>")
             {
-               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:dcdcdc><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6', 
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><color:dcdcdc><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
                               %col1Client.name, %col1ClientScore, %col1ClientTime,
                               %col2Client.name, %col2ClientScore, %col2ClientTime,
                               %col1Style, %col1Client, %col2Client );
             }
             else
             {
-               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6', 
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:10><spush>%7\t<clip:150><a:gamelink\t%8>%1</a></clip><rmargin:205><just:right>%2<rmargin:270><just:right>%3<spop><rmargin:505><lmargin:310><just:left><clip:150><a:gamelink\t%9>%4</a></clip><rmargin:505><just:right>%5<rmargin:570><just:right>%6',
                               %col1Client.name, %col1ClientScore, %col1ClientTime,
                               %col2Client.name, %col2ClientScore, %col2ClientTime,
                               %col1Style, %col1Client, %col2Client );
             }
          }
          else
-            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200><a:gamelink\t%5>%1</a></clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3', 
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20>%4\t<clip:200><a:gamelink\t%5>%1</a></clip><rmargin:280><just:right>%2<rmargin:375><just:right>%3',
                   %col1Client.name, %col1ClientScore, %col1ClientTime, %col1Style, %col1Client );
       }
    }
@@ -2497,14 +2497,14 @@ function LakRabbitGame::hideRabbitWaypoint(%game, %clRabbit)
 function LakRabbitGame::updateKillScores(%game, %clVictim, %clKiller, %damageType, %implement)
 {
    if(%game.testTurretKill(%implement))   //check for turretkill before awarded a non client points for a kill
-        %game.awardScoreTurretKill(%clVictim, %implement);  
+        %game.awardScoreTurretKill(%clVictim, %implement);
    else if (%game.testKill(%clVictim, %clKiller)) //verify victim was an enemy
    {
      %game.awardScoreKill(%clKiller);
-     %game.awardScoreDeath(%clVictim);          
+     %game.awardScoreDeath(%clVictim);
    }
    else
-   {        
+   {
      if (%game.testSuicide(%clVictim, %clKiller, %damageType))  //otherwise test for suicide
      {
        %game.awardScoreSuicide(%clVictim);
@@ -2514,7 +2514,7 @@ function LakRabbitGame::updateKillScores(%game, %clVictim, %clKiller, %damageTyp
         if (%game.testTeamKill(%clVictim, %clKiller)) //otherwise test for a teamkill
               %game.awardScoreTeamKill(%clVictim, %clKiller);
      }
-   }        
+   }
 }
 
 function LakRabbitGame::applyConcussion(%game, %player)
@@ -2531,7 +2531,7 @@ function LakRabbitGame::applyConcussion(%game, %player)
 //function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %playerVote)
 //{
 //		parent::serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %playerVote);
-//	
+//
 //	    // sonic9k 11/6/2003 - Added support for LakRabbit DuelMode option
 //      //
 //      case "VoteDuelMode":

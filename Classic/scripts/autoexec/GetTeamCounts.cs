@@ -29,6 +29,10 @@ function CreateServer( %mission, %missionType )
 	// Prevent package from being activated if it is already
 	if (!isActivePackage(TeamCountsTriggers))
 		activatePackage(TeamCountsTriggers);
+	
+	// Auto Daily Hard Server Restart at a specific timelimit
+	// getTimeDif from zDarkTigerStats.cs
+	schedule(getTimeDif("10\t00\tam"),0,"quit");
 }
 
 };

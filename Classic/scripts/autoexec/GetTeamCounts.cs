@@ -30,7 +30,7 @@ function CreateServer( %mission, %missionType )
 	if (!isActivePackage(TeamCountsTriggers))
 		activatePackage(TeamCountsTriggers);
 	
-	// Auto Daily Hard Server Restart at a specific timelimit
+	// Auto Daily Hard Server Restart at a specific time
 	// getTimeDif from zDarkTigerStats.cs
 	schedule(getTimeDif("10\t00\tam"),0,"quit");
 }

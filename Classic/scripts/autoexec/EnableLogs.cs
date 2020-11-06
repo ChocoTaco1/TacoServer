@@ -62,9 +62,15 @@ function connectLog(%client, %isDisconnect)
    }
 }
 
+// voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
+// Info: Logs the vote events
+function voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
+{
+   if($Host::ClassicVoteLog)
    {
       // get the client info
       %authInfo = %client.getAuthInfo();
+	  %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
 	  
 	  // show name for Votekick
 	  if(%typeName $= "VoteKickPlayer")

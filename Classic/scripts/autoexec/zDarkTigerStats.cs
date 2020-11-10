@@ -7,207 +7,14 @@
 // Version 4.0 - Code refactor / optimizing / fixes
 // Version 5.0 - DuleMod and Arena support / optimizing / fixes / misc stuff		
 //	Version 6.0 - Lan & Bot Support / Leaderboard / Stats Storage Overhaul / Optimization / Fixes 	
-//	Version 7.0 - Code refactor / Heavy Optimization / Map Stats / Server Stats / Fixes / Misc other features  							
+//	Version 7.0 - Code refactor / Heavy Optimization / Map Stats / Server Stats / Fixes / Misc other features  	
+//	Version 8.0 - More Stats / Fixes / Server Event Log  
+// Note See bottom of file for full log					
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//ChangeLog
-//    4.0
-//    *Removed most redudent/repeating code
-//       *Menus - removed redudent menus
-//       *Global arrays - reorganized to get rid of repeating field values 
-//       *Save Load - removed unused functions from the load/save fast methods
-//       *Stats -  condensed the stats handling code by 50%
-//    *Fixed bug with saveing weapon stats after a person has left
-//    *Removed $dtStats::fullGames, as it was not necessary becuase $dtStats::fgPercentage gives the same level of contorl
-//    *Null GUID protection, just to prevent garbage or null data
-//
-//    5.0
-//    Rework functions to remove dependencies on other .vl2 this script now works in base, classic, and some variants of the two. 
-//    Arena and Duel Mod Support added  
-//    MA stats across all weapons/items
-//    Mine Grenades Satchel Turrets Vehicles stats added
-//    Stats menu clean up and rework, some stuff was not even working 
-//    Remvoed ProjectileData::onCollision hook for stats collection, everything is now under clientDmg
-//    Make processGameLink into one funciton for all game types
-//    Added fail safe to getCNameToCID to prevent blank names 
-//    Reduce decimal places and scale down large numbers in the menus 
-//    Added $dtStats::debugEchos for debuging issues 
-//    Fix issue with reset when player joins the game
-//    Fix issue with back button bricking the score hud, as well as add a fail safe so this cant happen
-//    Added to options to control whats displayed
-//    Reworked history to remove redudent menus and to add the ablity to view weapon history, may expand on later
-//    Cleaned up the field value array removed unused and unnecessary values
-//    Total stats now reset onces a value has getting near the 32 bit int limit 
-//    Added Live View so players can watch there stats in realtime with the added feature of being able to pin it and keep that window in place
-//    Added Player/Armror kill stats
-//
-//    5.5 fixes
-//    Rework hand grenade stats collection 
-//    Moved commonly overridden functions in its own package and uses DefaultGame- 
-//    -activate/deactivatePackages to correctly postion them on top of gameType 
-//    -overrides this fixes issues with lakRabbitGame overrides
-//    Reworked some of the values on live screen to be more correct 
-//    Moved resetDtStats to MissionDropReady so that liveStats work in lan game
-//    
-//    6.0
-//    Full lan/no guid support - function will gen a uid  and associate it with the players name
-//    Overhall of the way we store stats - NOTE this breaks compatibility with older versions so delete serverStats folder 
-//    Leader Board/Best Of System - this info is compled during non peak server hours  see $dtStats::buildSetTime 
-//    Rename set/getFieldValue to set/getDynamicField to be less confuseing with the other field functions that deal with strings
-//    Added setValueField function to handel the new way of stats storage 
-//    Made skip zeros the the only method for running averages there for removed extra code  
-//    Removed timeLimitReached and scoreLimitReached, not sure why i needed them in the first place everything runs threw gameover anyways  
-//    Removed $dtStats::slowLoadTime its not used any more with the new system as theres only 2 files to load vs 11  at a given time 
-//    History menu redone added a page system  to allow for larger then 10 game history    
-//    System now self maintains files and will delete when out of date see $dtStats::expireMax
-//    Removed AI checks and added in ai support for better testing
-//    Fix some divide by zero issues useing conditional ternary operator example condition ? result1 : result2
-//    Fix few dynamic fields that were named wrong resulting in stats just showing 0 
-//    Score resetting is handeld in script to better handel end game saving
-//    Added unused varable array uFV for short, this is only to reset the values we dont track directly or unused gametype values  
-//    Renamed the arrays to keep them shorter, example fieldValue is now FV
-//    Added max array to allow recording of varables we only want the max of example being longest sniper shot
-//    Added an averaging array to be able to store current averages, keeps code complexity down on loaderboard stuff, may rework later 
-//    setValueField will now default to 0 is value is "" 
-//    Fixed mine disc code forgot to add %targetClient to the resetCode 
-//    Replaced gameWinStat with postGameStats were custom stuff can added up or handled at the end of the game
-//    Added Armor::onTrigger to better track stats on player, and to remove duplicate code 
-//    Added a handfull of new varables to track, too many to list.
-//    Surival time is now acurite also simplified the code  
-//    Removed turrets stats other then kills death
-//
-//    6.5 Fixes
-//    Misc fixes from 6.0 additions/changes 
-//    Added option to view the other game types within the leaderboard stuff 
-//    Bumped up distance for mortar midAirs so it's just outside its damage radius something strange is going on there
-//    Added game type arrays for display and processing
-//
-//    6.6
-//    Added game id to track individual games 
-//    Removed misc turret stuff
-//    Removed vehicle menus 
-//    Misc fixes
-//    
-//    6.7
-//    Escort fix moved
-//    Stats now allways save no matter the condition, this should reduce some edge cases problems and to have a more complete data set
-//    Added gamePCT becuase of the change to always save to track witch maps/games were cut short or joined in the middle of a match   
-//    MapID Gen to track map specific stats 
-//
-//    7.0
-//    Way to many changes to list so here are the major changes
-//    Super heavy opmtiation and rework, new changes has improved some areas by 25-75% in terms of speed/impact on the server
-//    Player Map Stats - like totals but done per map, this is also used to build map based leaderboards 
-//    Server/Map Stats - track whats being played and whats being skipped as well as server health  
-//    Added fail safe options load after and load slow  in case the amount of stat tracking grows too large
-//    Ton of new stat values added 
-//    Score hud UI mostly Reworked
-// 
-//    7.1
-//    Combined save game and save total into one function 
-//    Switched client leave for onDrop as client leave is tied to game type and does not work in between maps
-//    changed vote override too serverCmdStartNewVote just so this script works in base and default classic
-//    Few misc stats fixes 
-//    Vote for map stat now gens an map id, so it will now show on the list
-//    Renamed var for server hangs and host hangs, as they were not saving  
-//    Removed a few stats that have no relevance 
-//    Typo for ping avg var fix
-//    Fixed gameID now saves and was moved to MissonLoadDone
-//    Added mapGameID for parsers 
-//    Fixed chat stats 
-//    Added LeftID to better track what game the client left mainly for stat resetting 
-//    Added deploy stats
-//    Fixed issue were if a player left during the game over screen and it hasent saved yet, it would delete the stats before saving 
-//    Score restore optimization 
-//    
-//    7.2
-//    Map stats sorting and load optimization
-//    Added version number global, and saved in player stats  
-//    Added lastPlay, mapReconnects and mapDisconnectsScore for server stats 
-//    Stats ui cleanup 
-//    Fix for onDeploy was missing return %obj;
-//    incGameStats now has $dtStats::mapStats to completely disable this feature if need be 
-//    Fixed armor vs armor total
-//    Added a global var to control build/sort speed of stats and set it back to 128
-//    Few new stats
-//    Disabled some mine disc stats as they were not accurate, may revisit later  
-//    Fixed Flipflop stat
-//
-//    7.3 
-//    Stat fixes to do copy paste mistakes  
-//
-//    7.35
-//    Mine Disc Kill Stat 
-//    Some extra lightning stats
-//    Stat name and rename fixes
-//    Fixed pixel margin on LMB and LB page
-//    clientDmgStats optimization and cleanup
-//    Score hud bug with viewing last month map stats 
-//    Remove dtTurret stat unused 
-//
-//    7.4
-//    Fix for mine disc kill stat
-//    Fix for name to client id function not working in lak
-//    Reworked a ugly fix for %kPlayer var in clientKillStats 
-//    Lightning stats tweak 
-//    Changed time restriction on flag escort from 3 to 5 
-//    Adjusted clientShotsFired, to fix warnings, still unsure why flyingVehicleObject is getting passed into a onFire?
-//    Added server crashing tracking, not 100% accurate 
-//
-//    7.5
-//    Fixed averages was useing the total avg instead of game avg 
-//    Removed distance calc from weapon score on throwables 
-//    Fixed killStreaks 
-//    Fixed unused vars reset 
-//
-//    7.6
-//    Removed the cross check form mine disc, as the timer cross check is enough 
-//    Converted kdr to decimal to better match website and is less confusing 
-//    Commented out nexusCampingKills/Deaths as we currenlty dont support hunters
-//    Commented out server stat client crash, it will just echo to the console if it sees any
-//    Removed lockout schedule on chain kills, left the multi kill one in as its kind of nessaary in how it functions 
-//    Renamed mid air distance vars to know at a glance how its tracking, Ex: instead of cgMaDist renamed to cgMAHitDist 
-//    Fixed land spike turret stats 
-//
-//    7.7 
-//    Added teamScore to player game files for correct team scores
-//    KDR adjustment  
-//    Adjusted cleanup function 
-//    Mine disc kill fix
-//
-//    7.8
-//    Added Armor Timers 
 
-//    7.9
-//    Added Concussion Stats
-//    Invy use stat
-//
-//    8.0
-//    Added check for teams for concuss
-//    Adjust crash log player count to > 1 
-//
-//    8.1
-//    Misc stat fixes  
-//    Added mpb glitch stat
-//    Added flag tossing and catching stats
-//
-//    8.2
-//    Misc Fixes and clean up    
-//    Removed beta tags 
-//    Added seconed pages to leaderboards and rearranged them
-//    Added few new misc stats 
-//    Packet loss and high ping avg added to server monitor 
-//
-//    8.3
-//    Removed client crash code, does not catch anything
-//    Added event logs to server panel
-//    Added server event for tracking when ping stops updateing do to loss of transmission 
-//    Added Projecitle tracking function for wierd edge cases when it comes to stats
-//    Added second page to lctf stats
-//    Eight new stats 
-//
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 8.3; 
+$dtStats::version = 8.4; 
 //disable stats system 
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -1070,37 +877,37 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "onInput";
 $dtStats::FV[$dtStats::FC["Avg"]++,"Avg"] = "onInput";
 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHead";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHead";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHeadFront";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHeadFront";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHeadBack";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHeadBack";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHeadRight";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHeadRight";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHeadLeft";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHeadLeft";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHead";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHeadFront";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHeadFront";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHeadBack";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHeadBack";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHeadRight";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHeadRight";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitHeadLeft";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenHeadLeft";
 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorso";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorso";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorsoFrontR";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorsoFrontR";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorsoFrontL";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorsoFrontL";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorsoBackR";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorsoBackR";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorsoBackL";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorsoBackL";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorso";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorsoFrontR";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorsoFrontR";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorsoFrontL";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorsoFrontL";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorsoBackR";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorsoBackR";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTorsoBackL";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenTorsoBackL";
 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegs";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegs";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegFrontR";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegFrontR";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegFrontL";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegFrontL";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegBackR";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegBackR";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegBackL";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegBackL";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegs";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegFrontR";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegFrontR";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegFrontL";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegFrontL";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegBackR";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegBackR";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitLegBackL";
+//$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hitTakenLegBackL";
 
 
 
@@ -2088,29 +1895,37 @@ package dtStats{
             case "DiscProjectile":
                %vec =  vectorNormalize(vectorSub(%pos,%proj.initialPosition));
                %initVec = %proj.initialDirection;
-               %angleDeg = mRadToDeg(mACos(vectorDot(%vec, %initVec)));
-               if(%angleDeg > 1)
-                  %sourceClient.discReflect = getSimTime();
+               %ray = containerRayCast(%proj.initialPosition, VectorAdd(%proj.initialPosition, VectorScale(VectorNormalize(%initVec), 5000)), $TypeMasks::WaterObjectType);
+               if(%ray){
+                  %angleRad = mACos(vectorDot(%initVec, "0 0 1"));
+                  %angleDeg = mRadToDeg(%angleRad)-90;
+                  //echo(%angleDeg);
+                  if(%angleDeg <= 15 && %angleDeg > 0){
+                     %sourceClient.discReflect = getSimTime();      
+                     //error("disc bounce" SPC %angleDeg);  
+                  }
+               }
                else 
                   %sourceClient.discReflect = 0;
             
                if(vectorDist(%pos,%proj.sourceObject.getPosition()) < 4){
                    %sourceClient.lastDiscJump = getSimTime();  
                }
-               
             case "EnergyBolt":
                %vec =  vectorNormalize(vectorSub(%pos,%proj.initialPosition));
                %initVec = %proj.initialDirection;
                %angleRad = mACos(vectorDot(%vec, %initVec));
                %angleDeg = mRadToDeg(%angleRad);
-               if(%angleDeg > 1)
+               //error(%angleDeg);
+               if(%angleDeg > 10){
                   %sourceClient.blasterReflect = getSimTime();
+               }
                else
                   %sourceClient.blasterReflect = 0;
             case "ShoulderMissile": 
-               error(%proj.lastTargetType);
                if(%proj.lastTargetType $= "FlareProjectile"){
-                  %sourceClient.flareHit =getSimTime(); 
+                  %sourceClient.flareHit = getSimTime(); 
+                  %sourceClient.flareSource = %proj.targetSource.client;
                }
                else
                   %sourceClient.flareHit = 0;
@@ -2329,6 +2144,7 @@ function projectileTracker(%p){
    if(isObject(%p)){
       if(isObject(%p.getTargetObject())){
          %p.lastTargetType = %p.getTargetObject().getClassName();
+         %p.targetSource = %p.getTargetObject().sourceObject;
          //error(%p.lastTargetType);
       }
       schedule(256,0,"projectileTracker",%p);
@@ -5527,8 +5343,12 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
 //------------------------------------------------------------------------------ 
    if(%clKiller.team == %clVictim.team && %clKiller != %clVictim){
       %killerDT.teamkillCount++;
-      if(%damageType  == $DamageType::Missile)
+      if(%damageType  == $DamageType::Missile){
          %killerDT.missileTK++;
+         if(getSimTime() - %clKiller.flareHit < 256){
+            %clKiller.flareSource.dtStats.flareKill++;
+         }
+      }
    }
    if(getSimtime() - %clKiller.lastDiscJump < 256){
       if(%clKiller == %clVictim){
@@ -5729,7 +5549,6 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
             else if(%kcAir == 2 && %vcAir == 1){%killerDT.missileKillAir++;%victimDT.missileDeathAir++;%killerDT.missileKillGroundAir++;%victimDT.missileDeathGroundAir++;}
             else if(%kcAir == 1 && %vcAir == 2){%killerDT.missileKillGround++;%victimDT.missileDeathGround++;%killerDT.missileKillAirGround++;%victimDT.missileDeathAirGround++;}
             else if(%kcAir == 2 && %vcAir == 2){%killerDT.missileKillGround++;%victimDT.missileDeathGround++;%killerDT.missileKillGroundGround++; %victimDT.missileDeathGroundGround++;}
-            if(getSimTime() - %clKiller.flareHit < 256){%killerDT.flareKill++;}
          case $DamageType::ShockLance:
             %killerDT.shockKills++;
             %victimDT.shockDeaths++;
@@ -6047,8 +5866,10 @@ function clientDmgStats(%data, %position, %sourceObject, %targetObject, %damageT
                if(getSimtime() - %sourceClient.lastDiscJump < 256)
                   %sourceDT.discJump++;
             }
-            if(%sourceClass $= "Player" && %targetClient.team == %sourceClient.team && %sourceObject != %targetObject)
+            if(%sourceClass $= "Player" && %targetClient.team == %sourceClient.team && %sourceObject != %targetObject){
                %sourceDT.friendlyFire++;
+               if(getSimTime() - %sourceClient.flareHit < 256){%sourceClient.flareSource.dtStats.flareHit++;}
+            }
             if(%sourceClass $= "Player" && %targetClient.team != %sourceClient.team && %sourceObject != %targetObject){
                %dis = vectorDist(%targetObject.getPosition(),%sourceObject.getPosition());
                if(!%targetObject.combo[%sourceClient,%damageType]){
@@ -6081,27 +5902,27 @@ function clientDmgStats(%data, %position, %sourceObject, %targetObject, %damageT
                
                %dmgL = %targetObject.getDamageLocation(%position);
                switch$(getWord(%dmgL,0)){
-                  case "legs": %sourceDT.hitLegs++;%targetDT.hitTakenLegs++;
-                      switch$(getWord(%dmgL,1)){
-                        case "front_right":%sourceDT.hitLegFrontR++;%targetDT.hitTakenLegFrontR++;
-                        case "front_Left":%sourceDT.hitLegFrontL++;%targetDT.hitTakenLegFrontL++;
-                        case "back_right":%sourceDT.hitLegBackR++;%targetDT.hitTakenLegBackR++;
-                        case "back_Left":%sourceDT.hitLegBackL++;%targetDT.hitTakenLegBackL++;
-                     }
-                  case "torso": %sourceDT.hitTorso++;%targetDT.hitTakenTorso++;
-                      switch$(getWord(%dmgL,1)){
-                        case "front_right":%sourceDT.hitTorsoFrontR++;%targetDT.hitTakenTorsoFrontR++;
-                        case "front_Left":%sourceDT.hitTorsoFrontL++;%targetDT.hitTakenTorsoFrontL++;
-                        case "back_right":%sourceDT.hitTorsoBackR++;%targetDT.hitTakenTorsoBackR++;
-                        case "back_Left":%sourceDT.hitTorsoBackL++;%targetDT.hitTakenTorsoBackL++;
-                     }
-                  case "head":%sourceDT.hitHead++; %targetDT.hitTakenHead++;
-                      switch$(getWord(%dmgL,1)){
-                        case "middle_front":%sourceDT.hitHeadFront++;%targetDT.hitTakenHeadFront++;
-                        case "middle_back":%sourceDT.hitHeadBack++;  %targetDT.hitTakenHeadBack++;
-                        case "right_middle":%sourceDT.hitHeadRight++;%targetDT.hitTakenHeadRight++;
-                        case "left_middle":%sourceDT.hitHeadLeft++;  %targetDT.hitTakenHeadLeft++;
-                     }   
+                  case "legs": %sourceDT.hitLegs++;//%targetDT.hitTakenLegs++;
+                      //switch$(getWord(%dmgL,1)){
+                        //case "front_right":%sourceDT.hitLegFrontR++;%targetDT.hitTakenLegFrontR++;
+                        //case "front_Left":%sourceDT.hitLegFrontL++;%targetDT.hitTakenLegFrontL++;
+                        //case "back_right":%sourceDT.hitLegBackR++;%targetDT.hitTakenLegBackR++;
+                        //case "back_Left":%sourceDT.hitLegBackL++;%targetDT.hitTakenLegBackL++;
+                     //}
+                  case "torso": %sourceDT.hitTorso++;//%targetDT.hitTakenTorso++;
+                      //switch$(getWord(%dmgL,1)){
+                        //case "front_right":%sourceDT.hitTorsoFrontR++;%targetDT.hitTakenTorsoFrontR++;
+                        //case "front_Left":%sourceDT.hitTorsoFrontL++;%targetDT.hitTakenTorsoFrontL++;
+                        //case "back_right":%sourceDT.hitTorsoBackR++;%targetDT.hitTakenTorsoBackR++;
+                        //case "back_Left":%sourceDT.hitTorsoBackL++;%targetDT.hitTakenTorsoBackL++;
+                     //}
+                  case "head":%sourceDT.hitHead++; //%targetDT.hitTakenHead++;
+                      //switch$(getWord(%dmgL,1)){
+                        //case "middle_front":%sourceDT.hitHeadFront++;%targetDT.hitTakenHeadFront++;
+                        //case "middle_back":%sourceDT.hitHeadBack++;  %targetDT.hitTakenHeadBack++;
+                        //case "right_middle":%sourceDT.hitHeadRight++;%targetDT.hitTakenHeadRight++;
+                        //case "left_middle":%sourceDT.hitHeadLeft++;  %targetDT.hitTakenHeadLeft++;
+                     //}   
                }
                %rayTest = rayTestDis(%targetObject); 
                if(%rayTest >= $dtStats::midAirHeight && %damageType != $DamageType::Bullet){
@@ -6264,7 +6085,6 @@ function clientDmgStats(%data, %position, %sourceObject, %targetObject, %damageT
                      }        
                      if(%sourceDT.missileHitSV <  %sourceObject.client.dtShotSpeed){%sourceDT.missileHitSV = %sourceObject.client.dtShotSpeed;}     
                      if(%sourceDT.missileHitVV < %vv){%sourceDT.missileHitVV = %vv;}
-                     if(getSimTime() - %sourceObject.client.flareHit < 256){%sourceDT.flareHit++;}
                   case $DamageType::ShockLance:
                      if(%targetClient.rearshot){
                         %sourceDT.shockRearShot++;
@@ -6668,10 +6488,6 @@ function statsMenu(%client,%game){
          %b2 = ($dtServer::hostHangTotal ? "<color:00FF00>" @ $dtServer::hostHangTotal : 0);
          %b3 = (($dtServer::hostHangLast !$= "") ? "<color:00FF00>" @ $dtServer::hostHangLast : 0);
          %b4 = ($dtServer::hostHangTime ? "<color:00FF00>" @ $dtServer::hostHangTime : 0);
-         
-         //%c1 = ($dtStats::pingAvg ? $dtStats::pingAvg : 0);
-         //%line = 'Server Ping Avg = %1';
-         //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%c1@"ms"); 
          
          %line = '<color:0befe7>Server Hangs - This Map = %1<color:0befe7> - All Time = %2';
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%a1,%a2); 
@@ -9364,84 +9180,84 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
                
-               %var1 = "discReflectHitTG";  %var1Title = "Disc Reflect Hit:";  %var1Name = "Disc Reflect Hit";  %var1TypeName = "Total";
-               %var2 = "discReflectKillTG"; %var2Title = "Disc Reflect Kill:"; %var2Name = "Disc Reflect Kill"; %var2TypeName = "Total";
-               %var3 = "killerDiscJumpTG";  %var3Title = "Disc Jump Kill:";    %var3Name = "Disc Jump Kill";    %var3TypeName = "Total";
-               %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
-               %client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
-               %client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
-               %line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
-               %nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
-               %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
-               %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
-               
-               %var1 = "blasterReflectHitTG";  %var1Title = "Blaster Bounce Hit:";  %var1Name = "Blaster Bounce Hit";  %var1TypeName = "Total";
-               %var2 = "blasterReflectKillTG"; %var2Title = "Blaster Bounce Kill:"; %var2Name = "Blaster Bounce Kill"; %var2TypeName = "Total";
-               %var3 = "discJumpTG";           %var3Title = "Disc Jumps:";          %var3Name = "Disc Jumps";          %var3TypeName = "Total";
-               %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
-               %client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
-               %client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
-               %line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
-               %nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
-               %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
-               %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
-               
-               %var1 = "flareKillTG"; %var1Title = "Flare Kills:"; %var1Name = "Flare Kills";        %var1TypeName = "Total";
-               %var2 = "flareHitTG";  %var2Title = "Flare Hits:";  %var2Name = "Flare Hits";         %var2TypeName = "Total";
-               %var3 = "missileTKTG"; %var3Title = "Missile TKs:"; %var3Name = "Missile Team Kills"; %var3TypeName = "Total";
-               %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
-               %client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
-               %client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
-               %line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
-               %nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
-               %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
-               %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
-               
+               //%var1 = "discReflectHitTG";  %var1Title = "Disc Reflect Hit:";  %var1Name = "Disc Reflect Hit";  %var1TypeName = "Total";
+               //%var2 = "discReflectKillTG"; %var2Title = "Disc Reflect Kill:"; %var2Name = "Disc Reflect Kill"; %var2TypeName = "Total";
+               //%var3 = "killerDiscJumpTG";  %var3Title = "Disc Jump Kill:";    %var3Name = "Disc Jump Kill";    %var3TypeName = "Total";
+               //%i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
+               //%client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
+               //%client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
+               //%line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
+               //%nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
+               //%nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
+               //%nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
+               //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
+               //
+               //%var1 = "blasterReflectHitTG";  %var1Title = "Blaster Bounce Hit:";  %var1Name = "Blaster Bounce Hit";  %var1TypeName = "Total";
+               //%var2 = "blasterReflectKillTG"; %var2Title = "Blaster Bounce Kill:"; %var2Name = "Blaster Bounce Kill"; %var2TypeName = "Total";
+               //%var3 = "discJumpTG";           %var3Title = "Disc Jumps:";          %var3Name = "Disc Jumps";          %var3TypeName = "Total";
+               //%i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
+               //%client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
+               //%client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
+               //%line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
+               //%nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
+               //%nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
+               //%nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
+               //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
+               //
+               //%var1 = "flareKillTG"; %var1Title = "Flare Kills:"; %var1Name = "Flare Kills";        %var1TypeName = "Total";
+               //%var2 = "flareHitTG";  %var2Title = "Flare Hits:";  %var2Name = "Flare Hits";         %var2TypeName = "Total";
+               //%var3 = "missileTKTG"; %var3Title = "Missile TKs:"; %var3Name = "Missile Team Kills"; %var3TypeName = "Total";
+               //%i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
+               //%client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
+               //%client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
+               //%line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
+               //%nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
+               //%nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
+               //%nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
+               //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
+               //
          
             case "SCtfGame":
-            
-               %var1 = "discReflectHitTG";  %var1Title = "Disc Reflect Hit:";  %var1Name = "Disc Reflect Hit";  %var1TypeName = "Total";
-               %var2 = "discReflectKillTG"; %var2Title = "Disc Reflect Kill:"; %var2Name = "Disc Reflect Kill"; %var2TypeName = "Total";
-               %var3 = "killerDiscJumpTG";  %var3Title = "Disc Jump Kill:";    %var3Name = "Disc Jump Kill";    %var3TypeName = "Total";
-               %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
-               %client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
-               %client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
-               %line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
-               %nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
-               %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
-               %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
-               
-               %var1 = "blasterReflectHitTG";  %var1Title = "Blaster Bounce Hit:";  %var1Name = "Blaster Bounce Hit";  %var1TypeName = "Total";
-               %var2 = "blasterReflectKillTG"; %var2Title = "Blaster Bounce Kill:"; %var2Name = "Blaster Bounce Kill"; %var2TypeName = "Total";
-               %var3 = "discJumpTG";           %var3Title = "Disc Jumps:";          %var3Name = "Disc Jumps";          %var3TypeName = "Total";
-               %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
-               %client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
-               %client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
-               %client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
-               %line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
-               %nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
-               %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
-               %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
-               messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
-            
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, "Dont look not done yet :( ",%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
+               //%var1 = "discReflectHitTG";  %var1Title = "Disc Reflect Hit:";  %var1Name = "Disc Reflect Hit";  %var1TypeName = "Total";
+               //%var2 = "discReflectKillTG"; %var2Title = "Disc Reflect Kill:"; %var2Name = "Disc Reflect Kill"; %var2TypeName = "Total";
+               //%var3 = "killerDiscJumpTG";  %var3Title = "Disc Jump Kill:";    %var3Name = "Disc Jump Kill";    %var3TypeName = "Total";
+               //%i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
+               //%client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
+               //%client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
+               //%line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
+               //%nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
+               //%nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
+               //%nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
+               //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
+               //
+               //%var1 = "blasterReflectHitTG";  %var1Title = "Blaster Bounce Hit:";  %var1Name = "Blaster Bounce Hit";  %var1TypeName = "Total";
+               //%var2 = "blasterReflectKillTG"; %var2Title = "Blaster Bounce Kill:"; %var2Name = "Blaster Bounce Kill"; %var2TypeName = "Total";
+               //%var3 = "discJumpTG";           %var3Title = "Disc Jumps:";          %var3Name = "Disc Jumps";          %var3TypeName = "Total";
+               //%i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
+               //%client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
+               //%client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
+               //%line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
+               //%nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
+               //%nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
+               //%nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
+               //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
+            //
             //case "LakRabbitGame":   
             
             default:// the rest
@@ -12443,6 +12259,7 @@ $dtStats::prefTestTime = 512;// the lower the better tracking
 $dtStats::prefTestIdleTime = 10*1000;// if no one is playing just run slow
 $dtStats::prefTolerance = 128;//this number is to account for base line preformance and differences between engine simTime and realtime  
 $dtStats::prefLog = 0; // enable logging of server hangs
+$dtStats::eventLockout = 5*1000;//every 5 sec
 function prefTest(%time,%skip){
    %real  = getRealTime();
    %plCount = $HostGamePlayerCount - $HostGameBotCount;
@@ -12455,7 +12272,7 @@ function prefTest(%time,%skip){
          $dtServer::serverHangMap[cleanMapName($CurrentMission),Game.class]++;
          $dtServer::serverHangLast = formattimestring("hh:nn:a mm-dd-yy");
          $dtServer::serverHangTime = %dif;
-         dtEventLog("Server Hang" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Delay =" SPC %dif @ "ms" SPC "Player Count =" SPC %plCount);
+         dtEventLog("Server Hang" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Delay =" SPC %dif @ "ms" SPC "Player Count =" SPC %plCount, 0);
          %skip = 1;  
       }
       else
@@ -12470,7 +12287,7 @@ function prefTest(%time,%skip){
    }
 }
 function dtPingAvg(){
-   %ping = %pingT = %pc = 0;
+   %ping = %pingT = %pc = %txStop = 0;
    %plCount = 0;
    for(%i = 0; %i < ClientGroup.getCount(); %i++){
       %cl = ClientGroup.getObject(%i);
@@ -12486,6 +12303,7 @@ function dtPingAvg(){
          
       if(!%cl.isAIControlled()){
          %ping = %cl.getPing(); 
+         
          if(%ping == %cl.lastPing){
             %cl.lpC++;
             if(%cl.lpC > 2){
@@ -12494,8 +12312,10 @@ function dtPingAvg(){
             }
          }
          else
-            %cl.lpC = 0;   
+            %cl.lpC = 0;
+               
          %cl.lastPing = %ping;
+         
          if(%ping > 500)
             %cl.dtStats.lagSpikes++;
          if( %cl.getPacketLoss() > 0){
@@ -12506,51 +12326,67 @@ function dtPingAvg(){
          %pingT += %ping;  
       }
    }
-   if(%pc > 0){
-      $dtStats::pingAvg = %pingT / %pc;
-   }
    if(%pc > 3){ 
-      if(%txStop > 1){
-         %msg = "Transmission Loss Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "TX Count / Player Count" SPC %txStop @ "/" @ %pc SPC "UpTime:" SPC dtFormatTime(getSimTime()); 
-         if($dtStats::debugEchos){error(%msg);}    
-         dtEventLog("TX Loss" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "TX Loss Count =" SPC %txStop SPC "Player Count =" SPC %pc);
+      $dtStats::pingAvg = %pingT / %pc;
+      if(%txStop / %pc  > 0.5){
+         if(getSimTime() - $dtStats:evTime[0] > $dtStats::eventLockout){
+            %msg = "Transmission Loss Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "TX Count" SPC %txStop SPC "Player Count" SPC %pc SPC "UpTime:" SPC dtFormatTime(getSimTime()); 
+            if($dtStats::debugEchos){error(%msg);}    
+            dtEventLog("TX Loss" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "TX Loss Count =" SPC %txStop SPC "Player Count =" SPC %pc, 0);
+            $dtStats:evTime[0] = getSimTime();
+         }
       }
-      if(%plCount > 1){ 
-         %msg = "Packet Loss Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Pl Count / Player Count" SPC %plCount @ "/" @ %pc SPC "UpTime:" SPC dtFormatTime(getSimTime()); 
-         dtEventLog("Packet Loss" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Packet Loss Count =" SPC %plCount SPC "Player Count =" SPC %pc);
-         if($dtStats::debugEchos){error(%msg);} 
+      
+      if(%plCount / %pc > 0.5){ 
+         if(getSimTime() - $dtStats:evTime[1] > $dtStats::eventLockout){
+            %msg = "Packet Loss Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Pl Count" SPC %plCount SPC "PlayerCount" SPC %pc SPC "UpTime:" SPC dtFormatTime(getSimTime()); 
+            dtEventLog("Packet Loss" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Packet Loss Count =" SPC %plCount SPC "Player Count =" SPC %pc, 0);
+            if($dtStats::debugEchos){error(%msg);} 
+            $dtStats:evTime[1] = getSimTime();
+         }
       }
+      
       if($dtStats::pingAvg > 1000){//network issues 
-         %msg = "Host Hang Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "PingAvg" SPC $dtStats::pingAvg @ "ms" SPC "Player Count" SPC %pc SPC "UpTime:" SPC dtFormatTime(getSimTime());
-         if($dtStats::debugEchos){error(%msg);}
-         dtEventLog("Host Hang" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc);
-         $dtServer::hostHangMap[cleanMapName($CurrentMission),Game.class]++;
-         $dtServer::hostHangTotal++;
-         $dtServer::hostHangLast = formattimestring("hh:nn:a mm-dd-yy"); 
-         $dtServer::hostHangTime = %pingT / %pc;
+         if(getSimTime() - $dtStats:evTime[2] > $dtStats::eventLockout){
+            %msg = "Host Hang Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "PingAvg" SPC $dtStats::pingAvg @ "ms" SPC "Player Count" SPC %pc SPC "UpTime:" SPC dtFormatTime(getSimTime());
+            if($dtStats::debugEchos){error(%msg);}
+            dtEventLog("Host Hang" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc, 0);
+            $dtServer::hostHangMap[cleanMapName($CurrentMission),Game.class]++;
+            $dtServer::hostHangTotal++;
+            $dtServer::hostHangLast = formattimestring("hh:nn:a mm-dd-yy"); 
+            $dtServer::hostHangTime = %pingT / %pc;
+            $dtStats:evTime[2] = getSimTime();
+         }
       }
       else if($dtStats::pingAvg > 500){
-         %msg = "500+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC "Player Count" SPC %pc;
-         if($dtStats::debugEchos){error(%msg);}
-         dtEventLog("500+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc);
+         if(getSimTime() - $dtStats:evTime[3] > $dtStats::eventLockout){
+            %msg = "500+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC "Player Count" SPC %pc;
+            if($dtStats::debugEchos){error(%msg);}
+            dtEventLog("500+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc, 0);
+            $dtStats:evTime[3] = getSimTime();
+         }
       }
       else if($dtStats::pingAvg > 200){
-         %msg = "200+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC "Player Count" SPC %pc;
-         if($dtStats::debugEchos){error(%msg);}
-         dtEventLog("200+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc);
+         if(getSimTime() - $dtStats:evTime[4] > $dtStats::eventLockout){
+            %msg = "200+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC "Player Count" SPC %pc;
+            if($dtStats::debugEchos){error(%msg);}
+            dtEventLog("200+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc, 0);
+            $dtStats:evTime[4] = getSimTime();
+         }
       }
    }
 } 
-$dtStats::eventMax = 200; 
-function dtEventLog(%log){
+$dtStats::eventMax = 100; 
+function dtEventLog(%log,%save){
    %count = $dtServer::eventLogCount++;
    if($dtServer::eventMax < $dtStats::eventMax)
       $dtServer::eventMax++;
    if(%count > $dtStats::eventMax-1)
       %count = $dtServer::eventLogCount = 0;
-   $dtServer::eventLog[%count] = %log;  
-   export("$dtServer::event*", "serverStats/eventLog.cs", false );
-   $dtStats:lastEvent = getSimTime();  
+   $dtServer::eventLog[%count] = %log; 
+   $dtStats:lastEvent = getSimTime(); 
+   if(%save)
+      export("$dtServer::event*", "serverStats/eventLog.cs", false ); 
 }
 function startMonitor(){
    if(!$dtStats::prefEnable){// if we are running dont start again 
@@ -12577,6 +12413,7 @@ function dtSaveServerVars(){
    schedule(7000,0,"export", "$dtServer::skipCount*", "serverStats/skipCount.cs", false );
    schedule(8000,0,"export", "$dtServer::maxPlayers*", "serverStats/maxPlayers.cs", false );
    schedule(9000,0,"export", "$mapID::*", "serverStats/mapIDList.cs", false );
+   //schedule(10000,0,"export", "$dtServer::event*", "serverStats/eventLog.cs", false );
 }
 function dtLoadServerVars(){// keep function at the bottom
    if($dtStats::Enable){
@@ -12625,12 +12462,12 @@ function dtLoadServerVars(){// keep function at the bottom
          if(isFile("serverStats/maxPlayers.cs"))
             exec("serverStats/maxPlayers.cs");
          $dtServer::eventLogCount = -1;
-         if(isFile("serverStats/eventLog.cs"))
-            exec("serverStats/eventLog.cs");
+         //if(isFile("serverStats/eventLog.cs"))
+            //exec("serverStats/eventLog.cs");
          if(%crash)
-            dtEventLog("Server Crash" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Plr Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC $dtServerVars::lastMission);
+            dtEventLog("Server Crash" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Plr Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC $dtServerVars::lastMission, 0);
             
-         dtEventLog("Server Start" SPC formattimestring("hh:nn:a mm-dd-yy"));
+         dtEventLog("Server Start" SPC formattimestring("hh:nn:a mm-dd-yy"), 0);
    
          genBlanks();
          buildVarList();
@@ -12653,3 +12490,206 @@ function testVarsRandomAll(%max){
       }
    } 
 }
+
+
+//ChangeLog
+//    4.0
+//    *Removed most redudent/repeating code
+//       *Menus - removed redudent menus
+//       *Global arrays - reorganized to get rid of repeating field values 
+//       *Save Load - removed unused functions from the load/save fast methods
+//       *Stats -  condensed the stats handling code by 50%
+//    *Fixed bug with saveing weapon stats after a person has left
+//    *Removed $dtStats::fullGames, as it was not necessary becuase $dtStats::fgPercentage gives the same level of contorl
+//    *Null GUID protection, just to prevent garbage or null data
+//
+//    5.0
+//    Rework functions to remove dependencies on other .vl2 this script now works in base, classic, and some variants of the two. 
+//    Arena and Duel Mod Support added  
+//    MA stats across all weapons/items
+//    Mine Grenades Satchel Turrets Vehicles stats added
+//    Stats menu clean up and rework, some stuff was not even working 
+//    Remvoed ProjectileData::onCollision hook for stats collection, everything is now under clientDmg
+//    Make processGameLink into one funciton for all game types
+//    Added fail safe to getCNameToCID to prevent blank names 
+//    Reduce decimal places and scale down large numbers in the menus 
+//    Added $dtStats::debugEchos for debuging issues 
+//    Fix issue with reset when player joins the game
+//    Fix issue with back button bricking the score hud, as well as add a fail safe so this cant happen
+//    Added to options to control whats displayed
+//    Reworked history to remove redudent menus and to add the ablity to view weapon history, may expand on later
+//    Cleaned up the field value array removed unused and unnecessary values
+//    Total stats now reset onces a value has getting near the 32 bit int limit 
+//    Added Live View so players can watch there stats in realtime with the added feature of being able to pin it and keep that window in place
+//    Added Player/Armror kill stats
+//
+//    5.5 fixes
+//    Rework hand grenade stats collection 
+//    Moved commonly overridden functions in its own package and uses DefaultGame- 
+//    -activate/deactivatePackages to correctly postion them on top of gameType 
+//    -overrides this fixes issues with lakRabbitGame overrides
+//    Reworked some of the values on live screen to be more correct 
+//    Moved resetDtStats to MissionDropReady so that liveStats work in lan game
+//    
+//    6.0
+//    Full lan/no guid support - function will gen a uid  and associate it with the players name
+//    Overhall of the way we store stats - NOTE this breaks compatibility with older versions so delete serverStats folder 
+//    Leader Board/Best Of System - this info is compled during non peak server hours  see $dtStats::buildSetTime 
+//    Rename set/getFieldValue to set/getDynamicField to be less confuseing with the other field functions that deal with strings
+//    Added setValueField function to handel the new way of stats storage 
+//    Made skip zeros the the only method for running averages there for removed extra code  
+//    Removed timeLimitReached and scoreLimitReached, not sure why i needed them in the first place everything runs threw gameover anyways  
+//    Removed $dtStats::slowLoadTime its not used any more with the new system as theres only 2 files to load vs 11  at a given time 
+//    History menu redone added a page system  to allow for larger then 10 game history    
+//    System now self maintains files and will delete when out of date see $dtStats::expireMax
+//    Removed AI checks and added in ai support for better testing
+//    Fix some divide by zero issues useing conditional ternary operator example condition ? result1 : result2
+//    Fix few dynamic fields that were named wrong resulting in stats just showing 0 
+//    Score resetting is handeld in script to better handel end game saving
+//    Added unused varable array uFV for short, this is only to reset the values we dont track directly or unused gametype values  
+//    Renamed the arrays to keep them shorter, example fieldValue is now FV
+//    Added max array to allow recording of varables we only want the max of example being longest sniper shot
+//    Added an averaging array to be able to store current averages, keeps code complexity down on loaderboard stuff, may rework later 
+//    setValueField will now default to 0 is value is "" 
+//    Fixed mine disc code forgot to add %targetClient to the resetCode 
+//    Replaced gameWinStat with postGameStats were custom stuff can added up or handled at the end of the game
+//    Added Armor::onTrigger to better track stats on player, and to remove duplicate code 
+//    Added a handfull of new varables to track, too many to list.
+//    Surival time is now acurite also simplified the code  
+//    Removed turrets stats other then kills death
+//
+//    6.5 Fixes
+//    Misc fixes from 6.0 additions/changes 
+//    Added option to view the other game types within the leaderboard stuff 
+//    Bumped up distance for mortar midAirs so it's just outside its damage radius something strange is going on there
+//    Added game type arrays for display and processing
+//
+//    6.6
+//    Added game id to track individual games 
+//    Removed misc turret stuff
+//    Removed vehicle menus 
+//    Misc fixes
+//    
+//    6.7
+//    Escort fix moved
+//    Stats now allways save no matter the condition, this should reduce some edge cases problems and to have a more complete data set
+//    Added gamePCT becuase of the change to always save to track witch maps/games were cut short or joined in the middle of a match   
+//    MapID Gen to track map specific stats 
+//
+//    7.0
+//    Way to many changes to list so here are the major changes
+//    Super heavy opmtiation and rework, new changes has improved some areas by 25-75% in terms of speed/impact on the server
+//    Player Map Stats - like totals but done per map, this is also used to build map based leaderboards 
+//    Server/Map Stats - track whats being played and whats being skipped as well as server health  
+//    Added fail safe options load after and load slow  in case the amount of stat tracking grows too large
+//    Ton of new stat values added 
+//    Score hud UI mostly Reworked
+// 
+//    7.1
+//    Combined save game and save total into one function 
+//    Switched client leave for onDrop as client leave is tied to game type and does not work in between maps
+//    changed vote override too serverCmdStartNewVote just so this script works in base and default classic
+//    Few misc stats fixes 
+//    Vote for map stat now gens an map id, so it will now show on the list
+//    Renamed var for server hangs and host hangs, as they were not saving  
+//    Removed a few stats that have no relevance 
+//    Typo for ping avg var fix
+//    Fixed gameID now saves and was moved to MissonLoadDone
+//    Added mapGameID for parsers 
+//    Fixed chat stats 
+//    Added LeftID to better track what game the client left mainly for stat resetting 
+//    Added deploy stats
+//    Fixed issue were if a player left during the game over screen and it hasent saved yet, it would delete the stats before saving 
+//    Score restore optimization 
+//    
+//    7.2
+//    Map stats sorting and load optimization
+//    Added version number global, and saved in player stats  
+//    Added lastPlay, mapReconnects and mapDisconnectsScore for server stats 
+//    Stats ui cleanup 
+//    Fix for onDeploy was missing return %obj;
+//    incGameStats now has $dtStats::mapStats to completely disable this feature if need be 
+//    Fixed armor vs armor total
+//    Added a global var to control build/sort speed of stats and set it back to 128
+//    Few new stats
+//    Disabled some mine disc stats as they were not accurate, may revisit later  
+//    Fixed Flipflop stat
+//
+//    7.3 
+//    Stat fixes to do copy paste mistakes  
+//
+//    7.35
+//    Mine Disc Kill Stat 
+//    Some extra lightning stats
+//    Stat name and rename fixes
+//    Fixed pixel margin on LMB and LB page
+//    clientDmgStats optimization and cleanup
+//    Score hud bug with viewing last month map stats 
+//    Remove dtTurret stat unused 
+//
+//    7.4
+//    Fix for mine disc kill stat
+//    Fix for name to client id function not working in lak
+//    Reworked a ugly fix for %kPlayer var in clientKillStats 
+//    Lightning stats tweak 
+//    Changed time restriction on flag escort from 3 to 5 
+//    Adjusted clientShotsFired, to fix warnings, still unsure why flyingVehicleObject is getting passed into a onFire?
+//    Added server crashing tracking, not 100% accurate 
+//
+//    7.5
+//    Fixed averages was useing the total avg instead of game avg 
+//    Removed distance calc from weapon score on throwables 
+//    Fixed killStreaks 
+//    Fixed unused vars reset 
+//
+//    7.6
+//    Removed the cross check form mine disc, as the timer cross check is enough 
+//    Converted kdr to decimal to better match website and is less confusing 
+//    Commented out nexusCampingKills/Deaths as we currenlty dont support hunters
+//    Commented out server stat client crash, it will just echo to the console if it sees any
+//    Removed lockout schedule on chain kills, left the multi kill one in as its kind of nessaary in how it functions 
+//    Renamed mid air distance vars to know at a glance how its tracking, Ex: instead of cgMaDist renamed to cgMAHitDist 
+//    Fixed land spike turret stats 
+//
+//    7.7 
+//    Added teamScore to player game files for correct team scores
+//    KDR adjustment 
+//    Adjusted cleanup function 
+//    Mine disc kill fix
+//
+//    7.8
+//    Added Armor Timers 
+
+//    7.9
+//    Added Concussion Stats
+//    Invy use stat
+//
+//    8.0
+//    Added check for teams for concuss
+//    Adjust crash log player count to > 1 
+//
+//    8.1
+//    Misc stat fixes  
+//    Added mpb glitch stat
+//    Added flag tossing and catching stats
+//
+//    8.2
+//    Misc Fixes and clean up    
+//    Removed beta tags 
+//    Added seconed pages to leaderboards and rearranged them
+//    Added few new misc stats 
+//    Packet loss and high ping avg added to server monitor 
+//
+//    8.3
+//    Removed client crash code, does not catch anything
+//    Added event logs to server panel
+//    Added server event for tracking when ping stops updateing do to loss of transmission 
+//    Added Projecitle tracking function for wierd edge cases when it comes to stats
+//    Added second page to lctf stats
+//    Eight new stats 
+//
+//    8.4
+//    Stat Fixes
+//    Tweaks to event logging to be less spammy 
+//    Disabled eventlog saving as its meant to monitor the server on the fly and the console log keeps a record of the events
+//    Comment out hit locaiton stats 

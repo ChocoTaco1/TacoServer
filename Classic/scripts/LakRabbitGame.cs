@@ -733,10 +733,6 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			%amount *= 1.5;
 	}
 
-   //error("Armor::damageObject( "@%data@", "@%targetObject@", "@%sourceObject@", "@%position@", "@%amount@", "@%damageType@", "@%momVec@" )");
-   if(%targetObject.invincible || %targetObject.getState() $= "Dead")
-      return;
-
    %targetClient = %targetObject.getOwnerClient();
    if(isObject(%mineSC))
       %sourceClient = %mineSC;

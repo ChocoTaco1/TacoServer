@@ -575,20 +575,23 @@ function SCtFGame::gameOver(%game)
    else if ($teamScore[2] > $teamScore[1])
       %winner = %game.getTeamName(2);
 
-   if (%winner $= 'Storm')
-      messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.stowins.wav" );
-   else if (%winner $= 'Inferno')
-      messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.infwins.wav" );
-   else if (%winner $= 'Starwolf')
-      messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.swwin.wav" );
-   else if (%winner $= 'Blood Eagle')
-      messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.bewin.wav" );
-   else if (%winner $= 'Diamond Sword')
-      messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.dswin.wav" );
-   else if (%winner $= 'Phoenix')
-      messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.pxwin.wav" );
-   else
-      messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
+   switch$(%winner)
+   {
+	   case 'Storm':
+		  messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.stowins.wav");
+	   case 'Inferno':
+		  messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.infwins.wav");
+	   case 'Starwolf':
+		  messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.swwin.wav");
+	   case 'Blood Eagle':
+		  messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.bewin.wav");
+	   case 'Diamond Sword':
+		  messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.dswin.wav");
+	   case 'Phoenix':
+		  messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.pxwin.wav");
+	   default:
+		  messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav");
+   }
 
    messageAll('MsgClearObjHud', "");
    for(%i = 0; %i < ClientGroup.getCount(); %i ++) 

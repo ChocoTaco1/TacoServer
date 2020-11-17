@@ -393,6 +393,13 @@ function TargetingLaserImage::onFire(%data,%obj,%slot)
 
 function ShockLanceImage::onFire(%this, %obj, %slot)
 {
+	//Added Spawn Invinciblity check
+	if(%obj.client > 0)
+	{
+		%obj.setInvincibleMode(0, 0.00);
+		%obj.setInvincible( false );
+	}
+   
    // z0dd - ZOD, 4/10/04. ilys - Added rapidfire shocklance fix
    if(%obj.cantfire !$= "")
       return;

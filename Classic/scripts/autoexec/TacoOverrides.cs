@@ -200,20 +200,6 @@ function GameBaseData::onAdd(%data, %obj)
       %obj.target = -1;
 }
 
-//Fix for shocklance spawn invinciblity on spawn
-function ShockLanceImage::onFire(%this, %obj, %slot)
-{
-	%p = parent::onFire(%this, %obj, %slot);
-	
-	if(%obj.client > 0)
-	{
-		%obj.setInvincibleMode(0, 0.00);
-		%obj.setInvincible( false );
-	}
-	
-	return %p;
-}
-
 };
 
 // Prevent package from being activated if it is already

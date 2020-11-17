@@ -1155,12 +1155,12 @@ function LakRabbitGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, 
 {
 	switch$ (%typeName)
 	{
-	case "VoteDuelMode":
-		%game.voteDuelMode(%admin, %arg1, %arg2, %arg3, %arg4);
-	case "VoteSplashDamage":
-		%game.voteSplashDamage(%admin, %arg1, %arg2, %arg3, %arg4);
-	case "VotePro":
-		%game.VotePro(%admin, %arg1, %arg2, %arg3, %arg4);
+		case "VoteDuelMode":
+			%game.voteDuelMode(%admin, %arg1, %arg2, %arg3, %arg4);
+		case "VoteSplashDamage":
+			%game.voteSplashDamage(%admin, %arg1, %arg2, %arg3, %arg4);
+		case "VotePro":
+			%game.VotePro(%admin, %arg1, %arg2, %arg3, %arg4);
 	}
 
 	parent::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4);

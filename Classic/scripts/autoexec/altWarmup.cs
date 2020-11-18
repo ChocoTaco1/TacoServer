@@ -8,7 +8,7 @@
 // Enable or Disable
 $AW::EnableALTWarmUp = 1;
 // Normal Warmup Time (In Seconds) - 20 is 20 Seconds
-$AW::DefaultWarmUpTime = 20
+$AW::DefaultWarmUpTime = 20;
 // The amount of time you want to allow for players to switch teams (In seconds) - 60 is 60 seconds
 $AW::ALTWarmUpTime = 60;
 // Minimum Population to Activate

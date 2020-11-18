@@ -21,13 +21,11 @@ function DefaultGame::setupClientTeams(%game)
 {
    $Host::warmupTime = $AW::DefaultWarmUpTime;
    if($HostGamePlayerCount >= $AW::MinALTWarmUpPop && $AW::EnableALTWarmUp && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF"))
-   {
 	   %altWarmup = 1;
-	   $Host::warmupTime = $AW::ALTWarmUpTime;
-   }
    
    if(%altWarmup)
    {
+	   $Host::warmupTime = $AW::ALTWarmUpTime;
 	   for(%i = 0; %i < ClientGroup.getCount(); %i ++) 
 	   {
 		  %client = ClientGroup.getObject(%i);
@@ -56,6 +54,7 @@ function serverCmdClientJoinTeam(%client, %team, %admin)
       else
          %team = 1;
    }
+   
    if(isObject(Game) && Game.kickClient != %client)
    {
       if(%client.team != %team)   

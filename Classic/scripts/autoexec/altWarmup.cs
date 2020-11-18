@@ -5,14 +5,11 @@
 //
 // exec("scripts/autoexec/altWarmup.cs");
 
-// Dont touch this
-$AW::DefaultWarmUpTime = $Host::warmupTime;
-
-
 // Enable or Disable
 $AW::EnableALTWarmUp = 1;
-// The amount of time you want to allow for players to switch teams
-// In seconds - 60 is 60 seconds
+// Normal Warmup Time (In Seconds) - 20 is 20 Seconds
+$AW::DefaultWarmUpTime = 20
+// The amount of time you want to allow for players to switch teams (In seconds) - 60 is 60 seconds
 $AW::ALTWarmUpTime = 60;
 // Minimum Population to Activate
 $AW::MinALTWarmUpPop = 8;
@@ -23,7 +20,7 @@ package altWarmup
 function DefaultGame::setupClientTeams(%game)
 {
    $Host::warmupTime = $AW::DefaultWarmUpTime;
-   if($HostGamePlayerCount >= $AW::MinALTWarmUpPop && $AW::EnableALTWarmUp)
+   if($HostGamePlayerCount >= $AW::MinALTWarmUpPop && $AW::EnableALTWarmUp && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF"))
    {
 	   %altWarmup = 1;
 	   $Host::warmupTime = $AW::ALTWarmUpTime;
@@ -36,7 +33,6 @@ function DefaultGame::setupClientTeams(%game)
 		  %client = ClientGroup.getObject(%i);
 		  
 		  //Put everyone in observer
-		  %client.team = 0;
 		  %client.lastTeam = 0;
 	   }
    }
@@ -117,24 +113,6 @@ function serverCmdClientJoinTeam(%client, %team, %admin)
 	     }
 	  }
    }   
-}
-
-
-// So flag snatch sound wont play at the end of the match
-function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
-{
-   if(!$missionRunning)
-		return;
-   
-   parent::playerTouchEnemyFlag(%game, %player, %flag);
-}
-
-function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
-{
-   if(!$missionRunning)
-		return;
-   
-   parent::playerTouchEnemyFlag(%game, %player, %flag);
 }
 
 };

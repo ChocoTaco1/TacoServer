@@ -2012,6 +2012,7 @@ function LakRabbitGame::gameOver(%game)
 
 	  //Put everyone in observer
 	  //Mainly for switching to CTF
+	  %client.team = 0;
 	  %client.lastTeam = 0;
    }
 

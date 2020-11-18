@@ -31,6 +31,7 @@ function DefaultGame::setupClientTeams(%game)
 		  %client = ClientGroup.getObject(%i);
 		  
 		  //Put everyone in observer
+		  %client.team = 0;
 		  %client.lastTeam = 0;
 	   }
    }
@@ -112,6 +113,23 @@ function serverCmdClientJoinTeam(%client, %team, %admin)
 	     }
 	  }
    }   
+}
+
+// So flag snatch sound wont play at the end of the match
+function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
+{
+   if(!$missionRunning)
+		return;
+   
+   parent::playerTouchEnemyFlag(%game, %player, %flag);
+}
+
+function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
+{
+   if(!$missionRunning)
+		return;
+   
+   parent::playerTouchEnemyFlag(%game, %player, %flag);
 }
 
 };

@@ -1,6 +1,6 @@
 // altWarmup.cs
 //
-// This script allows players time before a match pick teams
+// This script allows players time before a match to pick teams
 // Puts everyone in observer at mission end
 //
 // exec("scripts/autoexec/altWarmup.cs");
@@ -41,7 +41,7 @@ function DefaultGame::setupClientTeams(%game)
 }
 
 // Re-done for our needs
-// If team change too low can crash server --z0dd - ZOD
+// If team change time too low can crash server --z0dd - ZOD
 function serverCmdClientJoinTeam(%client, %team, %admin)
 {
    // z0dd - ZOD, 4/10/04. ilys - if the client does not enter a team, uses a team less than -1,

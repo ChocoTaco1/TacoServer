@@ -1791,8 +1791,8 @@ package dtStats{
    }
    function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned){ // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
       parent::clientChangeTeam(%game, %client, %team, %fromObs, %respawned);
-	   if($dtStats::Enable)
-	       %client.dtStats.switchteamCount++;
+	  if($dtStats::Enable && isGameRun())
+		   %client.dtStats.switchteamCount++;
    }
    function RepairPack::onThrow(%data,%obj,%shape){
       parent::onThrow(%data,%obj,%shape);

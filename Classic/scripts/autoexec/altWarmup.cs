@@ -19,9 +19,12 @@ package altWarmup
 
 function DefaultGame::setupClientTeams(%game)
 {
-   $Host::warmupTime = $AW::DefaultWarmUpTime;
-   if($HostGamePlayerCount >= $AW::MinALTWarmUpPop && $AW::EnableALTWarmUp && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF"))
-	   %altWarmup = 1;
+   if($AW::EnableALTWarmUp)
+   {
+	   $Host::warmupTime = $AW::DefaultWarmUpTime;
+	   if($HostGamePlayerCount >= $AW::MinALTWarmUpPop && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF"))
+		   %altWarmup = 1;
+   }
    
    if(%altWarmup)
    {
@@ -60,7 +63,7 @@ function serverCmdClientJoinTeam(%client, %team, %admin)
    {
       if(%client.team != %team)   
       {
-		 if(!$MatchStarted && $AW::EnableALTWarmUp)
+		 if(!$MatchStarted)
 	     {
 			 if(!%client.waitStart || (getSimTime() - %client.waitStart) > 5000 || %client.isAdmin)
 			 {

@@ -32,7 +32,8 @@ function CreateServer( %mission, %missionType )
 	
 	// Auto Daily Hard Server Restart at a specific time
 	// getTimeDif from zDarkTigerStats.cs
-	schedule(getTimeDif("10\t00\tam"),0,"quit");
+	if($dtStats::version)
+		schedule(getTimeDif("10\t00\tam"),0,"quit");
 }
 
 };

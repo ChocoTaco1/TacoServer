@@ -107,6 +107,7 @@ $Host::VoteSpread = 20;
 $Host::TeamDamageOn = 1;
 $Host::Siege::Halftime = 20000;
 $Host::CRCTextures = 0;
+$Host::ShowIngamePlayerScores = 1;
 
 // 0: .v12 (1.2 kbits/sec), 1: .v24 (2.4 kbits/sec), 2: .v29 (2.9kbits/sec)
 // 3:  GSM (6.6 kbits/sec)

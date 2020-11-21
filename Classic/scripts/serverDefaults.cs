@@ -197,7 +197,7 @@ $Host::VoteCooldown = 120;															//Time cooldown to allow a player to vo
 $Host::TKMax = 12;																	//Max tks before kick
 $Host::TKWarn1 = 4;																	//Max tks before 1st warning
 $Host::TKWarn2 = 8;																	//Max tks before 2nd warning
-$Host::KickObserverStartOnJoin = 1;													//Start KickObserver Timer as soon as player joins server
+$Host::KickObserverStartOnJoin = 0;													//Start KickObserver Timer as soon as player joins server
 $Host::KickObserverTimeout = 1200;													//How long player can stay in observer before being booted (1200 is 20 mins)
 
 //LakRabbit

@@ -716,6 +716,10 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		}
 
 		Game.recalcScore(%sourceObject.client);
+		
+		//Code for DarkTigers discordBot
+		if(discord.lastState $= "Connected")
+			discordBotProcess("lakMApoints", %sourceObject, %points, %hitType, %weapon, %distance, %vel);
 	}
 
 	// borlak -- make a sound when you hit someone

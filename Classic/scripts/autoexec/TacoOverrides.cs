@@ -200,6 +200,40 @@ function GameBaseData::onAdd(%data, %obj)
       %obj.target = -1;
 }
 
+// Throw Spam fix
+function serverCmdThrow(%client, %data)
+{
+    if(%client.tossLock)
+		return;
+	
+	if(getSimTime() - %client.tossTime < 128)
+    {
+        %client.tossCounter++;
+        if(%client.tossCounter > 30)
+        {
+            echo(%client.nameBase SPC "was Banned for exceeding" SPC %client.tossCounter SPC "Toss Limit.");
+            messageAll('msgAll',"\c3" @ %client.namebase SPC "is attempting to lag the server!");
+            messageClient(%client, 'onClientBanned', "");
+            messageAllExcept( %client, -1, 'MsgClientDrop', "", %client.name, %client );
+            if(isObject(%client.player))
+                %client.player.scriptKill(0);
+            if (isObject(%client))
+            {
+                %client.setDisconnectReason("Item Spew scripts are not allowed on this server." );
+                %client.schedule(700, "delete");
+            }
+            BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
+            %client.tossLock = 1;
+            return;
+        }
+    }
+    else
+        %client.tossCounter = 0;
+
+    parent::serverCmdThrow(%client, %data);
+    %client.tossTime = getSimTime();
+}
+
 };
 
 // Prevent package from being activated if it is already

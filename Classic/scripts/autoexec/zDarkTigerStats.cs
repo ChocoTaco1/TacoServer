@@ -14,7 +14,7 @@
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 8.5; 
+$dtStats::version = 8.6; 
 //disable stats system
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -78,9 +78,12 @@ $dtStats::sm  = 1;
 $dtStats::lsm  = 1;
 $dtStats::lsmMap  = 1; 
 
+$Host::ShowIngamePlayerScores  = 1; 
+
 //debug stuff 
 $dtStats::enableRefresh = 0;
 $dtStats::debugEchos = 1;// echos function calls
+ 
 //$dtStats::returnToMenuTimer = (303*1000);
 //$pref::NoClearConsole = 1;
 //setLogMode(1);
@@ -280,6 +283,7 @@ $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "flagTossCatch";
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "interceptedFlag";
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "maInterceptedFlag";
 $dtStats::FV[$dtStats::FC["CTFGame","Max"]++,"CTFGame","Max"] = "interceptSpeed";
+$dtStats::FV[$dtStats::FC["CTFGame","Max"]++,"CTFGame","Max"] = "interceptFlagSpeed";
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "friendlyFire";
 
 /////////////////////////////////////////////////////////////////////////////
@@ -374,6 +378,7 @@ $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "flagTossCatch";
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "interceptedFlag";
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "maInterceptedFlag";
 $dtStats::FV[$dtStats::FC["SCtFGame","Max"]++,"SCtFGame","Max"] = "interceptSpeed";
+$dtStats::FV[$dtStats::FC["SCtFGame","Max"]++,"SCtFGame","Max"] = "interceptFlagSpeed";
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "friendlyFire";
 ////////////////////////////Unused LCTF Vars/////////////////////////////////////
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "tkDestroys";
@@ -529,6 +534,7 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "crashDeaths";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "missileTK";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "inventoryKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "inventoryDeaths";
+$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "repairEnemy";
 
 //Damage Stats
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "cgDmg";
@@ -1791,8 +1797,8 @@ package dtStats{
    }
    function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned){ // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
       parent::clientChangeTeam(%game, %client, %team, %fromObs, %respawned);
-	  if($dtStats::Enable && isGameRun())
-		   %client.dtStats.switchteamCount++;
+	   if($dtStats::Enable && isGameRun())
+	       %client.dtStats.switchteamCount++;
    }
    function RepairPack::onThrow(%data,%obj,%shape){
       parent::onThrow(%data,%obj,%shape);
@@ -1903,8 +1909,10 @@ package dtStats{
                   %angleDeg = mRadToDeg(%angleRad)-90;
                   //echo(%angleDeg);
                   if(%angleDeg <= 15 && %angleDeg > 0){
-                     %sourceClient.discReflect = getSimTime();      
-                     //error("disc bounce" SPC %angleDeg);  
+                     %wdist = vectorDist(getWords(%ray,1,3),%pos);
+                     if(%wdist > 20)
+                        %sourceClient.discReflect = getSimTime();   
+                     //error("disc bounce" SPC %angleDeg SPC %wdist);  
                   }
                }
                else 
@@ -2337,6 +2345,19 @@ package dtStatsGame{
          %obj.client.gt = %obj.client.at = 0;// resets fly/ground time
       }
    }
+   function RepairGunImage::onRepair(%this, %obj, %slot){
+       Parent::onRepair(%this, %obj, %slot);
+       if($dtStats::Enable){
+          %target = %obj.repairing;
+          if(%target && %target.team != %obj.team){
+             if(%target != %obj.rpEnemy){
+                %obj.rpEnemy = %target;
+                %obj.client.dtStats.repairEnemy++;
+             }
+          }
+       }
+   }
+
    ////////////////////////////////////////////////////////////////////////////////
    function CTFGame::playerDroppedFlag(%game, %player){
       if($dtStats::Enable){
@@ -2429,6 +2450,7 @@ package dtStatsGame{
                %player.client.dtStats.interceptedFlag++;
                %speed = vectorLen(%player.getVelocity() * 3.6);
                %player.client.dtStats.interceptSpeed = (%player.client.dtStats.interceptSpeed > %speed) ? %player.client.dtStats.interceptSpeed : %speed; 
+               %player.client.dtStats.interceptFlagSpeed = (%player.client.dtStats.interceptFlagSpeed > %flag.speed) ? %player.client.dtStats.interceptFlagSpeed : %flag.speed;
                if(rayTest(%player, $dtStats::midAirHeight))
                   %player.client.dtStats.maInterceptedFlag++;
             }
@@ -2528,6 +2550,7 @@ package dtStatsGame{
                %player.client.dtStats.interceptedFlag++;
                %speed = vectorLen(%player.getVelocity() * 3.6);
                %player.client.dtStats.interceptSpeed = (%player.client.dtStats.interceptSpeed > %speed) ? %player.client.dtStats.interceptSpeed : %speed; 
+               %player.client.dtStats.interceptFlagSpeed = (%player.client.dtStats.interceptFlagSpeed > %flag.speed) ? %player.client.dtStats.interceptFlagSpeed : %flag.speed;
                if(rayTest(%player, $dtStats::midAirHeight))
                   %player.client.dtStats.maInterceptedFlag++;
             }
@@ -3862,7 +3885,7 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    if(%realName !$= "")
       %name = %realName;
    else 
-      %name =  stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9" );
+      %name =  stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9\c0" );
       
    if(!isObject(%client.dtStats)){
       for (%i = 0; %i < statsGroup.getCount(); %i++){ // check to see if my old data is still there
@@ -4382,10 +4405,10 @@ function getCNameToCID(%name){
             return %name; // not a name its a client so return it
       }
       else{
-         %name = stripChars(%name, "\cp\co\c6\c7\c8\c9" );
+         %name = stripChars(%name, "\cp\co\c6\c7\c8\c9\c0" );
          for (%i = 0; %i < ClientGroup.getCount(); %i++){
             %client = ClientGroup.getObject(%i);
-            if(stripChars( getTaggedString( %client.name ), "\cp\co\c6\c7\c8\c9" ) $=  %name){
+            if(stripChars( getTaggedString( %client.name ), "\cp\co\c6\c7\c8\c9\c0" ) $=  %name){
                return %client;
             }
          }
@@ -4958,7 +4981,7 @@ function cropFloat(%num,%x){
        %int =getSubStr(%num,0,%dot);
       %decLen = %length - strLen(%int)-1;
       %x  = %decLen >= %x ? %x : %decLen;
-      error(%x);
+      //error(%x);
       %dec = getSubStr(%num,%dot,%dot+%x);
       return %int @ %dec;
    }
@@ -6586,7 +6609,7 @@ function statsMenu(%client,%game){
             $dtServer::serverHangTime = 0; 
             $dtServer::serverHangLast = 0;
             $dtServer::hostHang = 0;
-            $dtServer::hostTime = 0;   
+            $dtServer::hostTime = 0;  
             $dtServer::hostHangLast = 0;
             %client.cat = %cat = 1;
          }
@@ -9229,7 +9252,21 @@ function statsMenu(%client,%game){
                %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
-               
+                        
+               %var1 = "inventoryKillsTG";   %var1Title = "Invy Kills:";    %var1Name = "Inventory Kills";  %var1TypeName = "Total";
+               %var2 = "inventoryDeathsTG";  %var2Title = "Invy Deaths:";   %var2Name = "Inventory Deaths"; %var2TypeName = "Total";
+               %var3 = "repairEnemyTG";      %var3Title = "Enemy Repairs:"; %var3Name = "Enemy Repairs";    %var3TypeName = "Total";
+               %i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               %i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               %i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               %client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
+               %client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
+               %client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
+               %line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
+               %nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
+               %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
+               %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
+               messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
          
             case "SCtfGame":
                messageClient( %client, 'SetLineHud', "", %tag, %index++, "Dont look not done yet :( ",%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
@@ -9263,6 +9300,20 @@ function statsMenu(%client,%game){
                %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
                messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
             
+               //%var1 = "inventoryKillsTG";      %var1Title = "Invy Kills:";           %var1Name = "Inventory Kills";      %var1TypeName = "Total";
+               //%var2 = "inventoryDeathsTG";     %var2Title = "Invy Deaths:";          %var2Name = "Inventory Deaths";     %var2TypeName = "Total";
+               //%var3 = "interceptFlagSpeedMax"; %var3Title = "Intercept Flag Speed:"; %var3Name = "Intercept Flag Speed"; %var3TypeName = "Speed KM/H";
+               //%i1 = getField($lData::data[%var1,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var1,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i2 = getField($lData::data[%var2,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var2,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%i3 = getField($lData::data[%var3,%client.lgame,%lType,%mon,%year],0) ? getField($lData::name[%var3,%client.lgame,%lType,%mon,%year],0) : %NA; 
+               //%client.statsFieldSet[%vsc1 = %f++] = %var1 TAB %var1Name TAB %var1TypeName;
+               //%client.statsFieldSet[%vsc2 = %f++] = %var2 TAB %var2Name TAB %var2TypeName;
+               //%client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
+               //%line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
+               //%nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
+               //%nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
+               //%nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
+               //messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
             //case "LakRabbitGame":   
             
             default:// the rest
@@ -9739,7 +9790,6 @@ function statsMenu(%client,%game){
          %client.statsFieldSet[%vsc3 = %f++] = %var3 TAB %var3Name TAB %var3TypeName;
          %line = '<tab:1,198,395><font:univers condensed:18>\t<a:gamelink\tS\tLB\t%1\t%2\t%6><clip:197>%3</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%7><clip:197>%4</clip></a>\t<a:gamelink\tS\tLB\t%1\t%2\t%8><clip:197>%5</clip></a>';
          %nameTitle1 = "<color:0befe7>" @ %var1Title SPC "<color:03d597>" @ %i1;
-         error(strLen(%nameTitle1));
          %nameTitle2 = "<color:0befe7>" @ %var2Title SPC "<color:03d597>" @ %i2;
          %nameTitle3 = "<color:0befe7>" @ %var3Title SPC "<color:03d597>" @ %i3;
          messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%vClient,0,%nameTitle1,%nameTitle2,%nameTitle3,%vsc1,%vsc2,%vsc3); 
@@ -12428,17 +12478,17 @@ function prefTest(%time,%skip){
    if(isGameRun() && !$dtStats::building && %plCount > 1){// only track during run time  
       %dif = (%real - %time) - $dtStats::prefTestTime; 
       if(%dif > $dtStats::prefTolerance && !%skip){ 
-         %msg = "Server Hang Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC %dif SPC "ms";
+         %msg = "Server Hang" SPC dtFormatTime(getSimTime()) SPC "Delay =" SPC %dif @ "ms" SPC "Player Count =" SPC %plCount;
          if($dtStats::debugEchos){error(%msg);}
          $dtServer::serverHangTotal++;
          $dtServer::serverHangMap[cleanMapName($CurrentMission),Game.class]++;
          $dtServer::serverHangLast = formattimestring("hh:nn:a mm-dd-yy");
          $dtServer::serverHangTime = %dif;
-         dtEventLog("Server Hang" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Delay =" SPC %dif @ "ms" SPC "Player Count =" SPC %plCount, 0);
+         dtEventLog(%msg, 0);
          %skip = 1;  
       }
       else
-         %skip = 0; 
+         %skip = 0;
        dtPingAvg();     
    }
    if($dtStats::prefEnable){
@@ -12449,8 +12499,10 @@ function prefTest(%time,%skip){
    }
 }
 function dtPingAvg(){
-   %ping = %pingT = %pc = %txStop = 0;
+   %ping = %pingT = %pc = %txStop = %hPing = 0;
    %plCount = 0;
+   %min = 100000;
+   %max = -100000;
    for(%i = 0; %i < ClientGroup.getCount(); %i++){
       %cl = ClientGroup.getObject(%i);
       if(isObject(%cl.player)){
@@ -12465,7 +12517,8 @@ function dtPingAvg(){
          
       if(!%cl.isAIControlled()){
          %ping = %cl.getPing(); 
-         
+         %min  =  (%ping < %min) ? %ping : %min;
+         %max  =  (%ping > %max) ? %ping : %max;
          if(%ping == %cl.lastPing){
             %cl.lpC++;
             if(%cl.lpC > 2){
@@ -12477,8 +12530,9 @@ function dtPingAvg(){
             %cl.lpC = 0;
                
          %cl.lastPing = %ping;
-         
-         if(%ping > 500)
+         if(%ping > 200)
+          %hPing++;
+         else if(%ping > 500)
             %cl.dtStats.lagSpikes++;
          if( %cl.getPacketLoss() > 0){
             %cl.dtStats.packetLoss++;  
@@ -12490,50 +12544,59 @@ function dtPingAvg(){
    }
    if(%pc > 3){ 
       $dtStats::pingAvg = %pingT / %pc;
-      if(%txStop / %pc  > 0.5){
+      if(%txStop / %pc  >= 0.5){
          if(getSimTime() - $dtStats:evTime[0] > $dtStats::eventLockout){
-            %msg = "Transmission Loss Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "TX Count" SPC %txStop SPC "Player Count" SPC %pc SPC "UpTime:" SPC dtFormatTime(getSimTime()); 
+            %msg = "TX Loss" SPC dtFormatTime(getSimTime()) SPC "TX Loss Count =" SPC %txStop SPC "Player Count =" SPC %pc;
             if($dtStats::debugEchos){error(%msg);}    
-            dtEventLog("TX Loss" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "TX Loss Count =" SPC %txStop SPC "Player Count =" SPC %pc, 0);
+            dtEventLog(%msg, 0);
             $dtStats:evTime[0] = getSimTime();
          }
       }
       
-      if(%plCount / %pc > 0.5){ 
+      if(%plCount / %pc >= 0.5){ 
          if(getSimTime() - $dtStats:evTime[1] > $dtStats::eventLockout){
-            %msg = "Packet Loss Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Pl Count" SPC %plCount SPC "PlayerCount" SPC %pc SPC "UpTime:" SPC dtFormatTime(getSimTime()); 
-            dtEventLog("Packet Loss" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Packet Loss Count =" SPC %plCount SPC "Player Count =" SPC %pc, 0);
+            %msg = "Packet Loss" SPC dtFormatTime(getSimTime()) SPC "Packet Loss Count =" SPC %plCount SPC "Player Count =" SPC %pc;
+            dtEventLog(%msg, 0);
             if($dtStats::debugEchos){error(%msg);} 
             $dtStats:evTime[1] = getSimTime();
          }
       }
-      
-      if($dtStats::pingAvg > 1000){//network issues 
-         if(getSimTime() - $dtStats:evTime[2] > $dtStats::eventLockout){
-            %msg = "Host Hang Event" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "PingAvg" SPC $dtStats::pingAvg @ "ms" SPC "Player Count" SPC %pc SPC "UpTime:" SPC dtFormatTime(getSimTime());
-            if($dtStats::debugEchos){error(%msg);}
-            dtEventLog("Host Hang" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc, 0);
-            $dtServer::hostHangMap[cleanMapName($CurrentMission),Game.class]++;
-            $dtServer::hostHangTotal++;
-            $dtServer::hostHangLast = formattimestring("hh:nn:a mm-dd-yy"); 
-            $dtServer::hostHangTime = %pingT / %pc;
-            $dtStats:evTime[2] = getSimTime();
+      %hpct =  (%hPing > 0) ? (%hPing/%pc) : 0;
+      if(%hpct >= 0.5){
+         if($dtStats::pingAvg > 1000){//network issues 
+            if(getSimTime() - $dtStats:evTime[2] > $dtStats::eventLockout){
+               %msg = "Host Hang" SPC dtFormatTime(getSimTime()) SPC "Ping/Min/Max =" SPC $dtStats::pingAvg @ "/" @ %min @ "/" @ %max @ "ms" SPC "Player Count =" SPC %pc;
+               if($dtStats::debugEchos){error(%msg);}
+               dtEventLog(%msg, 0);
+               $dtServer::hostHangMap[cleanMapName($CurrentMission),Game.class]++;
+               $dtServer::hostHangTotal++;
+               $dtServer::hostHangLast = formattimestring("hh:nn:a mm-dd-yy"); 
+               $dtServer::hostHangTime = %pingT / %pc;
+               $dtStats:evTime[2] = getSimTime();
+            }
+         }
+         else if($dtStats::pingAvg > 500){
+            if(getSimTime() - $dtStats:evTime[3] > $dtStats::eventLockout){
+               %msg = "500+ Ping Avg" SPC dtFormatTime(getSimTime()) SPC "Ping/Min/Max =" SPC $dtStats::pingAvg @ "/" @ %min @ "/" @ %max @ "ms" SPC "Player Count =" SPC %pc;
+               if($dtStats::debugEchos){error(%msg);}
+               dtEventLog(%msg, 0);
+               $dtStats:evTime[3] = getSimTime();
+            }
+         }
+         else if($dtStats::pingAvg > 200){
+            if(getSimTime() - $dtStats:evTime[4] > $dtStats::eventLockout){
+               %msg = "200+ Ping Avg" SPC dtFormatTime(getSimTime()) SPC "Ping/Min/Max =" SPC $dtStats::pingAvg @ "/" @ %min @ "/" @ %max @ "ms" SPC "Player Count =" SPC %pc;
+               if($dtStats::debugEchos){error(%msg);}
+               dtEventLog(%msg, 0);
+               $dtStats:evTime[4] = getSimTime();
+            }
          }
       }
-      else if($dtStats::pingAvg > 500){
-         if(getSimTime() - $dtStats:evTime[3] > $dtStats::eventLockout){
-            %msg = "500+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC "Player Count" SPC %pc;
-            if($dtStats::debugEchos){error(%msg);}
-            dtEventLog("500+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc, 0);
-            $dtStats:evTime[3] = getSimTime();
-         }
-      }
-      else if($dtStats::pingAvg > 200){
-         if(getSimTime() - $dtStats:evTime[4] > $dtStats::eventLockout){
-            %msg = "200+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC $dtStats::pingAvg SPC "ms" SPC "Player Count" SPC %pc;
-            if($dtStats::debugEchos){error(%msg);}
-            dtEventLog("200+ Ping Avg" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Ping Avg =" SPC $dtStats::pingAvg  @ "ms" SPC "Player Count =" SPC %pc, 0);
-            $dtStats:evTime[4] = getSimTime();
+      if(%min > 200){
+         if(getSimTime() - $dtStats:evTime[5] > $dtStats::eventLockout){
+            %msg = "Ping Min Event" SPC dtFormatTime(getSimTime()) SPC "Min/Max =" SPC %min @ "/" @ %max  @ "ms" SPC "Player Count =" SPC %pc;
+            dtEventLog(%msg, 0);
+            $dtStats:evTime[5] = getSimTime();
          }
       }
    }
@@ -12627,7 +12690,7 @@ function dtLoadServerVars(){// keep function at the bottom
          //if(isFile("serverStats/eventLog.cs"))
             //exec("serverStats/eventLog.cs");
          if(%crash)
-            dtEventLog("Server Crash" SPC formattimestring("hh:nn:a mm-dd-yy") SPC "Plr Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC $dtServerVars::lastMission, 0);
+            dtEventLog("Server Crash" SPC %date SPC "Plr Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC $dtServerVars::lastMission, 0);
             
          dtEventLog("Server Start" SPC formattimestring("hh:nn:a mm-dd-yy"), 0);
    
@@ -12651,19 +12714,6 @@ function testVarsRandomAll(%max){
          setDynamicField(%client,%varName,%val);
       }
    } 
-}
-
-function resetCustom(){
-    $dtStats::resetList["discReflectHitTG"] = 1;
-    $dtStats::resetList["discReflectKillTG"] = 1;
-    $dtStats::resetList["killerDiscJumpTG"] = 1;
-    $dtStats::resetList["blasterReflectHitTG"] = 1;
-    $dtStats::resetList["blasterReflectKillTG"] = 1;
-    $dtStats::resetList["discJumpTG"] = 1;
-    $dtStats::resetList["flareKillTG"] = 1;
-    $dtStats::resetList["flareHitTG"] = 1;
-    $dtStats::resetList["missileTKTG"] = 1;
-    error("custom reset list set");
 }
 
 //ChangeLog
@@ -12846,7 +12896,7 @@ function resetCustom(){
 //    Misc stat fixes  
 //    Added mpb glitch stat
 //    Added flag tossing and catching stats
-//
+// 
 //    8.2
 //    Misc Fixes and clean up    
 //    Removed beta tags 
@@ -12875,3 +12925,9 @@ function resetCustom(){
 //    Added inventory kill death stat 
 //    Fix blank size for total stats it was off by 1
 //    Fix flag intercept speed on CTF
+//
+//    8.6
+//    Stat Fixes
+//    New Stat enemy repair, flag speed 
+//    Added \c0 to stripChars
+//    Reworked server monitor

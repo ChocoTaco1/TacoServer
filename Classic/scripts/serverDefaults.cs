@@ -95,8 +95,8 @@ $Host::MaxBotDifficulty = 0.75;
 $Host::NoSmurfs = 1;
 $Host::VoteTime = 30;               // amount of time before votes are calculated
 $Host::VotePassPercent = 60;        // percent needed to pass a vote
-$Host::KickBanTime = 300;           // specified in seconds
-$Host::BanTime = 1800;              // specified in seconds
+$Host::KickBanTime = 1;             // specified in days
+$Host::BanTime = 365;               // specified in days
 $Host::PlayerRespawnTimeout = 60;   // time before a dead player is forced into observer mode
 $Host::warmupTime = 20;
 $Host::TournamentMode = 0;
@@ -153,7 +153,6 @@ $Host::LoadScreenMOTD1 = "Blaster is here to stay!";								//MOTD or Events Lin
 $Host::LoadScreenMOTD2 = "Come play Arena on Wednesday Nights!";					//MOTD or Events Line 2 Message (Debrief LoadScreen Only)
 $Host::LoadScreenMOTD3 = "Lak crowd early evenings after work during the week.";	//MOTD or Events Line 3 Message (Debrief LoadScreen Only)
 $Host::LoadScreenMOTD4 = "Big CTF games Fridays, Saturdays, and Sundays!";			//MOTD or Events Line 4 Message	(Debrief LoadScreen Only)
-$Host::ClassicBanlist = "prefs/banlist.cs";
 $Host::ClassicAdminLog = 1;
 $Host::ClassicAdminLogPath = "logs/Admin/log.txt";
 $Host::ClassicChatLog = 1;
@@ -199,6 +198,8 @@ $Host::TKWarn1 = 4;																	//Max tks before 1st warning
 $Host::TKWarn2 = 8;																	//Max tks before 2nd warning
 $Host::KickObserverStartOnJoin = 0;													//Start KickObserver Timer as soon as player joins server
 $Host::KickObserverTimeout = 1200;													//How long player can stay in observer before being booted (1200 is 20 mins)
+//$Host::ClassicBanlist = "prefs/banlist.cs";
+$Host::dtBanlist = "prefs/dtBanlist.cs";											//Alternate Ban System
 
 //LakRabbit
 $Host::LakRabbitUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled

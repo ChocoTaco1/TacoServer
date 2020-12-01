@@ -3,8 +3,10 @@
 //year year banned 2020
 //365 How long to ban (1 year)
 
-if(isFile("prefs/dtBanlist.cs"))
-   exec("prefs/dtBanlist.cs");
+//$Host::dtBanlist = "prefs/dtBanlist.cs";
+
+if(isFile($Host::dtBanlist))
+   exec($Host::dtBanlist);
 
 package dtBan{
    function BanList::add(%guid, %ipAddress, %days){
@@ -22,7 +24,7 @@ package dtBan{
       }
 
       // write out the updated bans to the file
-      export("$dtBanList*", "prefs/dtBanlist.cs");
+      export("$dtBanList*", $Host::dtBanlist);
    }
    function banList_checkIP(%client){
       %ip = %client.getAddress();

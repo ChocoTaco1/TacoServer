@@ -1,7 +1,7 @@
 //$dtBanList::IP192_168_0_133 = "336\t2020\t365";
 //336 day of the year banned Dec1
-//year year banned 2020
-//365 How long to ban (1 year)
+//2020 year banned
+//365 How long to ban (365 days = 1 year)
 
 //$Host::dtBanlist = "prefs/dtBanlist.cs";
 

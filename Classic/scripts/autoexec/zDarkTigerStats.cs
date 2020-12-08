@@ -14,7 +14,7 @@
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 8.6; 
+$dtStats::version = 8.7; 
 //disable stats system
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -12499,8 +12499,8 @@ function prefTest(%time,%skip){
    }
 }
 function dtPingAvg(){
-   %ping = %pingT = %pc = %txStop = %hPing = 0;
-   %plCount = 0;
+   %ping = %pingT = %pc = %txStop = %lowAvg = 0;
+   %xPing = %plCount = %hpCount = %lowPing = 0;
    %min = 100000;
    %max = -100000;
    for(%i = 0; %i < ClientGroup.getCount(); %i++){
@@ -12530,10 +12530,18 @@ function dtPingAvg(){
             %cl.lpC = 0;
                
          %cl.lastPing = %ping;
-         if(%ping > 200)
-          %hPing++;
-         else if(%ping > 500)
+         if(%ping > 500){
             %cl.dtStats.lagSpikes++;
+            %vhPing++;
+            %hpCount++;
+         }
+         else if(%ping > 200){
+            %hpCount++;
+         }
+         else{
+            %lowCount++;
+            %lowPing += %ping;   
+         }
          if( %cl.getPacketLoss() > 0){
             %cl.dtStats.packetLoss++;  
             %plCount++;
@@ -12542,7 +12550,8 @@ function dtPingAvg(){
          %pingT += %ping;  
       }
    }
-   if(%pc > 3){ 
+   if(%pc > 3){
+      %lowAvg =  (%lowCount > 0) ? (%lowPing/%lowCount) : 0;
       $dtStats::pingAvg = %pingT / %pc;
       if(%txStop / %pc  >= 0.5){
          if(getSimTime() - $dtStats:evTime[0] > $dtStats::eventLockout){
@@ -12552,7 +12561,7 @@ function dtPingAvg(){
             $dtStats:evTime[0] = getSimTime();
          }
       }
-      
+       
       if(%plCount / %pc >= 0.5){ 
          if(getSimTime() - $dtStats:evTime[1] > $dtStats::eventLockout){
             %msg = "Packet Loss" SPC dtFormatTime(getSimTime()) SPC "Packet Loss Count =" SPC %plCount SPC "Player Count =" SPC %pc;
@@ -12561,11 +12570,11 @@ function dtPingAvg(){
             $dtStats:evTime[1] = getSimTime();
          }
       }
-      %hpct =  (%hPing > 0) ? (%hPing/%pc) : 0;
+      %hpct =  (%hpCount > 0) ? (%hpCount/%pc) : 0;
       if(%hpct >= 0.5){
          if($dtStats::pingAvg > 1000){//network issues 
             if(getSimTime() - $dtStats:evTime[2] > $dtStats::eventLockout){
-               %msg = "Host Hang" SPC dtFormatTime(getSimTime()) SPC "Ping/Min/Max =" SPC $dtStats::pingAvg @ "/" @ %min @ "/" @ %max @ "ms" SPC "Player Count =" SPC %pc;
+               %msg = "Host Hang" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC %hpCount  @ "/" @ %vhPing @ "/" @ %pc;
                if($dtStats::debugEchos){error(%msg);}
                dtEventLog(%msg, 0);
                $dtServer::hostHangMap[cleanMapName($CurrentMission),Game.class]++;
@@ -12577,7 +12586,7 @@ function dtPingAvg(){
          }
          else if($dtStats::pingAvg > 500){
             if(getSimTime() - $dtStats:evTime[3] > $dtStats::eventLockout){
-               %msg = "500+ Ping Avg" SPC dtFormatTime(getSimTime()) SPC "Ping/Min/Max =" SPC $dtStats::pingAvg @ "/" @ %min @ "/" @ %max @ "ms" SPC "Player Count =" SPC %pc;
+               %msg = "500+ Ping" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC %hpCount  @ "/" @ %vhPing @ "/" @ %pc;
                if($dtStats::debugEchos){error(%msg);}
                dtEventLog(%msg, 0);
                $dtStats:evTime[3] = getSimTime();
@@ -12585,7 +12594,7 @@ function dtPingAvg(){
          }
          else if($dtStats::pingAvg > 200){
             if(getSimTime() - $dtStats:evTime[4] > $dtStats::eventLockout){
-               %msg = "200+ Ping Avg" SPC dtFormatTime(getSimTime()) SPC "Ping/Min/Max =" SPC $dtStats::pingAvg @ "/" @ %min @ "/" @ %max @ "ms" SPC "Player Count =" SPC %pc;
+               %msg = "200+ Ping" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC  %hpCount @ "/" @ %pc;
                if($dtStats::debugEchos){error(%msg);}
                dtEventLog(%msg, 0);
                $dtStats:evTime[4] = getSimTime();
@@ -12594,7 +12603,7 @@ function dtPingAvg(){
       }
       if(%min > 200){
          if(getSimTime() - $dtStats:evTime[5] > $dtStats::eventLockout){
-            %msg = "Ping Min Event" SPC dtFormatTime(getSimTime()) SPC "Min/Max =" SPC %min @ "/" @ %max  @ "ms" SPC "Player Count =" SPC %pc;
+            %msg = "Ping Min Event" SPC dtFormatTime(getSimTime()) SPC "Min:" SPC %min SPC "Max:" SPC %max SPC "Player Count =" SPC %pc;
             dtEventLog(%msg, 0);
             $dtStats:evTime[5] = getSimTime();
          }
@@ -12931,3 +12940,6 @@ function testVarsRandomAll(%max){
 //    New Stat enemy repair, flag speed 
 //    Added \c0 to stripChars
 //    Reworked server monitor
+//
+//    8.7
+//    Server monitor fix/tweaks 

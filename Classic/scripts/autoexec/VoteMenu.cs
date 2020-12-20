@@ -34,7 +34,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 {
 	%isAdmin = (%client.isAdmin || %client.isSuperAdmin);
 	%multipleTeams = %game.numTeams > 1;
-
+	
 	// ********************************************
 	//    Admin Vote For ... Submenu
 	// ********************************************
@@ -47,19 +47,31 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 		{
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTournamentMode', 'change server to Tournament.', 'Vote Tournament Mode');         
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
-			if(%multipleTeams)
-			{
-				if($teamDamage)
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-				else
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-			}
+			// if(%multipleTeams)
+			// {
+				// if($teamDamage)
+					// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
+				// else
+					// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
+			// }
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
 			messageClient(%client, 'MsgVoteItem',"",  %key, 'ForceVote', 'Cancel Force Vote', "Cancel 'Vote To...'");
 			return; // Display no further vote options
 		}
 	}
+	
+	if($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF")
+		messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win", 
+		$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win");
+	else
+	{
+		if($CurrentMissionType $= "LakRabbit") %cap = "2000 Points to Win";
+		else %cap = "25 Points to Win"; //DM
+		messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
+		$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
+	}
+	
 	// TEAM OPTIONS
 	if(!$Host::TournamentMode)
 	{
@@ -98,13 +110,13 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				if($Host::AllowPlayerVoteTimeLimit)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 				
-				if(%multipleTeams)
-				{
-					if($teamDamage)
-						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-					else
-						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-				}
+				// if(%multipleTeams)
+				// {
+					// if($teamDamage)
+						// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
+					// else
+						// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
+				// }
 				
 				if($Host::AllowPlayerVoteSkipMission)  
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
@@ -118,13 +130,13 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 
-				if(%multipleTeams)
-				{
-					if($teamDamage)
-						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-					else
-						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-				}
+				// if(%multipleTeams)
+				// {
+					// if($teamDamage)
+						// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
+					// else
+						// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
+				// }
 			}
 		}
 		else
@@ -155,13 +167,13 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				else
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');			
 			}
-			if(%multipleTeams)
-			{
-				if($teamDamage)
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
-				else
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
-			}
+			// if(%multipleTeams)
+			// {
+				// if($teamDamage)
+					// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
+				// else
+					// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
+			// }
 
 			//Toggle Tournament Net Client
 			if(%client.isAdmin && $Host::EnableNetTourneyClient)

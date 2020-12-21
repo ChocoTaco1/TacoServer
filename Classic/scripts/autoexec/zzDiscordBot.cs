@@ -185,6 +185,11 @@ function dtEventLog(%log, %save)
 	if(discord.lastState $= "Connected")
 		sendToDiscord(%log, 1);
 }
+function LogMessage(%client, %msg, %cat){
+   if(discord.lastState $= "Connected")
+      sendToDiscord("Message" SPC %client.nameBase SPC %msg, 1);
+   parent::LogMessage(%client, %msg, %cat);
+}
 
 };
 
@@ -196,20 +201,8 @@ function sendToDiscord(%msg,%channel)
    if(isObject(discord) && %msg !$= "")
    {
       if(discord.lastState $= "Connected")
-	  {
-         switch(%channel)
-		 {
-            case 1:
-               discord.send("MSG1" SPC %msg @ "\n");
-            case 2:
-               discord.send("MSG2" SPC %msg @ "\n");
-            case 3:
-               discord.send("MSG3" SPC %msg @ "\n");
-            case 4:
-               discord.send("MSG4" SPC %msg @ "\n");
-            case 5:
-               discord.send("MSG5" SPC %msg @ "\n");
-         }
+	   {
+         discord.send("MSG" SPC (%channel-1) SPC %msg @ "\r\n");
       }
    }
 }
@@ -253,7 +246,7 @@ function discord::onDNSResolved(%this){
 function discord::onConnected(%this){
    %this.lastState = "Connected";
    error(%this.lastState);
-   discord.send("AUTH" SPC $discordBot::AuthKey[$discordBot::AuthSet]);
+   discord.send("AUTH" SPC $discordBot::AuthKey[$discordBot::AuthSet] @ "\r\n");
 }
 
 function discord::onDisconnect(%this){
@@ -269,13 +262,14 @@ function discord::onLine(%this, %line){
    %lineStrip = stripChars(%line,"\r\n");
    %cmd = getWord(%lineStrip,0);
    switch$(%cmd){
-      case "Discord":
+      //case "Discord":
          //messageAll( 'MsgDiscord', '\c3Discord: \c4%1 %2',getWord(%lineStrip,1),getWords(%lineStrip,2,getWordCount(%lineStrip) -1)); 
       case "PING":
-         discord.send("PONG");
+         discord.send("PONG" @ "\r\n");
+      case "PINGX":
+         discord.send("PINGY" @ "\r\n");
       default:
-         error("Bad Command");
-         error( %line );
+         error("Bad Command" SPC %line);
    }
 }
 if(!isObject(discord) && $discordBot::autoStart)

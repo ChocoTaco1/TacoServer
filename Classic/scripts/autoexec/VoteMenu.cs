@@ -61,15 +61,19 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 		}
 	}
 	
-	if($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF")
-		messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win", 
-		$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win");
-	else
+	//Mission Info Header - Mission Name, Type, Caps to Win
+	if(%client.canVote)
 	{
-		if($CurrentMissionType $= "LakRabbit") %cap = "2000 Points to Win";
-		else %cap = "25 Points to Win"; //DM
-		messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
-		$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
+		if($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF")
+			messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win", 
+			$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win");
+		else
+		{
+			if($CurrentMissionType $= "LakRabbit") %cap = "2000 Points to Win";
+			else %cap = "25 Points to Win"; //DM
+			messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
+			$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
+		}
 	}
 	
 	// TEAM OPTIONS

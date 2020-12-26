@@ -60,6 +60,9 @@ $dtLoadingScreen::Delay = 0;
 $dtLoadingScreen::ShowFullScreen = 0;
 // Enable/Disable Images
 $dtLoadingScreen::ShowImages = 0;
+// Enable/Disable Server Logo
+$dtLoadingScreen::ShowLogo = 0;
+$dtLoadingScreen::LogoName = "dpub/DPUB_logo";
 
 
 
@@ -70,14 +73,17 @@ if( $Host::LoadScreenColor2 $= " " ) $Host::LoadScreenColor2 = "29DEE7";
 if( $Host::LoadScreenColor3 $= " " ) $Host::LoadScreenColor3 = "33CCCC";
 
 // So ServerDefaults wont replace a "" value when meant to be blank
-for(%x = 1; %x <= 4; %x++) 
+function DLSBlank()
 {
-	if( $Host::LoadScreenMOTD[%x] $= "")
+	for(%x = 1; %x <= 4; %x++) 
 	{
-		$Host::LoadScreenMOTD[%x] = " ";
+		if( $Host::LoadScreenMOTD[%x] $= "")
+		{
+			$Host::LoadScreenMOTD[%x] = " ";
+		}
 	}
 }
-
+DLSBlank();
 
 // Keep it in a package to be neat and organized!
 package LoadScreenPackage
@@ -229,6 +235,27 @@ function ALTsendModInfoToClient(%client)
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 	}
+	else if($dtLoadingScreen::ShowLogo)
+	{
+		if(%client.dmpVersion $=$DMP::Version)
+		{
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<bitmap:" @ $dtLoadingScreen::LogoName @ ">";
+			
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+		}
+		else if(%client.dmpVersion $="" || %client.dmpVersion < $DMP::Version)
+		{
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><color:fd3b3b>!! This server uses the DMP Discord Map Pack !!";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><color:fd3b3b>Get the latest here: <a:files.playt2.com/Testing>files.playt2.com/Testing</a>";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
+		}
+	}
 
 	// Full screen things
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,7 +394,7 @@ function NORMALsendModInfoToClient(%client)
 	if($Host::TimeLimit $= "999" || $Host::TimeLimit $= "unlimited") %timeloadingvar = "Unlimited"; else %timeloadingvar = $Host::TimeLimit;
 
 	%time = "<color:" @ $Host::LoadScreenColor1 @ ">Time limit: <color:" @ $Host::LoadScreenColor2 @ ">" @ %timeloadingvar;
-	%max = "<color:" @ $Host::LoadScreenColor1 @ ">Max players: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::MaxPlayers;
+	%max =  "<color:" @ $Host::LoadScreenColor1 @ ">Max players: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::MaxPlayers;
 	%net = "<color:" @ $Host::LoadScreenColor1 @ ">Packets Rate / Size: <color:" @ $Host::LoadScreenColor2 @ ">" @ $pref::Net::PacketRateToClient @ " / " @ $pref::Net::PacketSize;
 	%smurf = "<color:" @ $Host::LoadScreenColor1 @ ">Refuse smurfs: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::NoSmurfs ? "On" : "Off");
    

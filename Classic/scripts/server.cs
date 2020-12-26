@@ -101,7 +101,7 @@ function CreateServer(%mission, %missionType)
    exec("scripts/camera.cs");
    exec("scripts/particleEmitter.cs");    // Must exist before item.cs and explosion.cs
    exec("scripts/particleDummies.cs");
-   exec("scripts/projectiles.cs");        // Must exits before item.cs
+   exec("scripts/projectiles.cs");        // Must exist before item.cs
    exec("scripts/player.cs");
    exec("scripts/gameBase.cs");
    exec("scripts/staticShape.cs");
@@ -137,7 +137,7 @@ function CreateServer(%mission, %missionType)
    exec("scripts/practice.cs"); // z0dd - ZOD, 3/13/02. Execute practice mode server functions.
    exec("scripts/serverTasks.cs");
    exec("scripts/admin.cs");
-   exec("prefs/banlist.cs");
+   exec("prefs/dtBanlist.cs");
 
    // -------------------------------------------------------------------
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here.

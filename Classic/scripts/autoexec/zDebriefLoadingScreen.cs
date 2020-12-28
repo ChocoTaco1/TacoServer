@@ -252,7 +252,7 @@ function ALTsendModInfoToClient(%client)
 		{
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><color:fd3b3b>!! This server uses the DMP Discord Map Pack !!";
-			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><color:fd3b3b>Get the latest here: <a:files.playt2.com/Testing>files.playt2.com/Testing</a>";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><Font:univers:18><color:fd3b3b>Get the latest here: <a:files.playt2.com/Mappacks>files.playt2.com/Mappacks</a>";
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 		}
 	}

@@ -19,6 +19,7 @@
 //
 // v3.38 Nov 2020
 // Added Observer GameOver (Mainly for switching to CTF)
+// Added Missile Lak Fix
 //
 // v3.37 Aug 2020
 // Nerfed Blaster damage (Less spam)
@@ -662,6 +663,12 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 					%sourceObject.client.totalChainHits++;
 				}
 				%weapon = "Chaingun";
+			case $DamageType::Missile:
+				// doesn't matter if it's MA
+				%ma = 0;
+				if((getSimTime() - $LakRabbit::MissileHeistTime > 10000) || !$LakRabbit::MissileHeistTime)
+					return;
+				%weapon = "Missile";
 		}
 	}
 
@@ -709,6 +716,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		{
 			missileEveryone(%sourceObject);
 			%sound = '~wfx/Bonuses/horz_straipass2_heist.wav';
+			$LakRabbit::MissileHeistTime = getSimTime();
 		}
 		else if(%points >= 100)
 		{

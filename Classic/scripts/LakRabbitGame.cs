@@ -345,7 +345,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	&&  %sourceObject.getDataBlock().getClassName() $= "PlayerData"
 	&&  %targetObject.client == %sourceObject.client)
 	{
-		if(%damageType == $DamageType::Disc && (%sourceObject.freeDJ || $Host::LakRabbitUnlimitedDJ))
+		if(%damageType == $DamageType::Disc && %sourceObject.freeDJ)
 		{
 			%amount = 0;
 			%sourceObject.freeDJ--;
@@ -669,7 +669,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			case $DamageType::Missile:
 				// doesn't matter if it's MA
 				%ma = 0;
-				if(((getSimTime() - $LakRabbit::MissileHeistTime > 10000) || !$LakRabbit::MissileHeistTime) && $InvBanList[LakRabbit, "MissileLauncher"])
+				if((getSimTime() - $LakRabbit::MissileHeistTime > 10000) || !$LakRabbit::MissileHeistTime)
 					return;
 				%weapon = "Missile";
 		}
@@ -1543,8 +1543,10 @@ function LakRabbitGame::playerSpawned(%game, %player)
    %player.schedule(250,"selectWeaponSlot", 0);
    %player.setEnergyLevel(%player.getDatablock().maxEnergy);
 
-	 %player.freeDJ = 1; // free diskjump
-
+	 if($Host::LakRabbitUnlimitedDJ == 1)
+ 		%player.freeDJ = 999; // free diskjump
+ 	else
+		%player.freeDJ = 1; // free diskjump
 }
 
 

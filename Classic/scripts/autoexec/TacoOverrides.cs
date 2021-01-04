@@ -18,12 +18,12 @@ function serverCmdEndThrowCount(%client, %data)
    // ---------------------------------------------------------------
    // z0dd - ZOD, 8/6/02. New throw str features
    %throwStrength = (getSimTime() - %client.player.throwStart) / 150;
-   if(%throwStrength > $maxThrowStr) 
-      %throwStrength = $maxThrowStr; 
+   if(%throwStrength > $maxThrowStr)
+      %throwStrength = $maxThrowStr;
    else if(%throwStrength < 0.5)
       %throwStrength = 0.5;
    // ---------------------------------------------------------------
-   
+
    %throwScale = %throwStrength / 2;
    %client.player.throwStrength = %throwScale;
 
@@ -40,13 +40,13 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
         game.vehicleDestroyed(%obj, %destroyer);
         //error("vehicleDestroyed( "@ %obj @", "@ %destroyer @")");
     }
-    
+
 	radiusVehicleExplosion(%data, %obj);
-	
+
    if(%obj.turretObject)
       if(%obj.turretObject.getControllingClient())
          %obj.turretObject.getDataBlock().playerDismount(%obj.turretObject);
-	 
+
    for(%i = 0; %i < %obj.getDatablock().numMountPoints; %i++)
    {
       if (%obj.getMountNodeObject(%i)) {
@@ -58,10 +58,10 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
          %flingVel = %xVel @ " " @ %yVel @ " " @ %zVel;
          %flingee.applyImpulse(%flingee.getTransform(), %flingVel);
          echo("got player..." @ %flingee.getClassName());
-         %flingee.damage(0, %obj.getPosition(), 0.4, $DamageType::Crash); 
+         %flingee.damage(0, %obj.getPosition(), 0.4, $DamageType::Crash);
       }
    }
-   
+
    // From AntiLou.vl2
    // Info: MPB just destroyed. Change the variable
    if(%data.getName() $= "MobileBaseVehicle") // If the vehicle is the MPB, change %obj.station.isDestroyed to 1
@@ -75,7 +75,7 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
       // %obj.setFrozenState(true);
       %obj.schedule(500, "delete"); //was 2000
       //%data.schedule(500, 'onAvoidCollisions', %obj);
-	  
+
 	  //Transfer the vehicle far away
       %obj.schedule(1, "setPosition", vectorAdd(%obj.getPosition(), "40 -27 10000")); //Lowered: was 500
    }
@@ -84,13 +84,13 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
       // %obj.setFrozenState(true);
       %obj.schedule(2000, "delete"); //was 2000
       //%data.schedule(500, 'onAvoidCollisions', %obj);
-	  
+
 	  //Transfer the vehicle far away
       %obj.schedule(100, "setPosition", vectorAdd(%obj.getPosition(), "40 -27 10000")); //Lowered: was 500
    }
    else
    {
-      %obj.setFrozenState(true); 
+      %obj.setFrozenState(true);
       %obj.schedule(500, "delete"); //was 500
    }
    // -----------------------------------------------------------------------------------------
@@ -98,13 +98,13 @@ function VehicleData::onDestroyed(%data, %obj, %prevState)
 
 // stationTrigger::onEnterTrigger(%data, %obj, %colObj)
 // Info: If the MPB is destroyed, don't allow players to use the inv
-function stationTrigger::onEnterTrigger(%data, %obj, %colObj)  
+function stationTrigger::onEnterTrigger(%data, %obj, %colObj)
 {
    //make sure it's a player object, and that that object is still alive
    if(%colObj.getDataBlock().className !$= "Armor" || %colObj.getState() $= "Dead")
       return;
 
-   // z0dd - ZOD, 7/13/02 Part of hack to keep people from mounting 
+   // z0dd - ZOD, 7/13/02 Part of hack to keep people from mounting
    // vehicles in disallowed armors.
    if(%obj.station.getDataBlock().getName() !$= "StationVehicle")
       %colObj.client.inInv = true;
@@ -153,11 +153,11 @@ function stationTrigger::onEnterTrigger(%data, %obj, %colObj)
 
 //OG Blaster Buff
 function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
-{	
+{
     //Takes 10 blaster shots to kill a heavy, 13 normal.
 	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
 		%amount *= 1.3;
-	
+
 	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
 }
 
@@ -165,7 +165,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 function DefaultGame::missionLoadDone(%game)
 {
    parent::missionLoadDone(%game);
-   
+
    for(%i = 0; %i < MissionGroup.getCount(); %i++)
    {
       %obj = MissionGroup.getObject(%i);
@@ -191,7 +191,7 @@ function GameBaseData::onAdd(%data, %obj)
       {
          if(%obj.name !$= "")
             %nameTag = %obj.nameTag = addTaggedString(%obj.name);
-         else 
+         else
             %nameTag = %obj.nameTag = addTaggedString("Base"); // fail safe so it shows up on cc
       }
        %obj.target = createTarget(%obj, %nameTag, "", "", %data.targetTypeTag, 0, 0);
@@ -204,27 +204,45 @@ function GameBaseData::onAdd(%data, %obj)
 function serverCmdThrow(%client, %data)
 {
     if(%client.tossLock)
-		return;
-	
+		{
+			if(getSimTime() - %client.tossLockTime < 30000)
+				return;
+			else
+				%client.tossLock = 0;
+		}
+
 	if(getSimTime() - %client.tossTime < 128)
-    {
+  {
         %client.tossCounter++;
         if(%client.tossCounter > 30)
         {
-            echo(%client.nameBase SPC "was Banned for exceeding" SPC %client.tossCounter SPC "Toss Limit.");
-            messageAll('msgAll',"\c3" @ %client.namebase SPC "is attempting to lag the server!");
-            messageClient(%client, 'onClientBanned', "");
-            messageAllExcept( %client, -1, 'MsgClientDrop', "", %client.name, %client );
-            if(isObject(%client.player))
-                %client.player.scriptKill(0);
-            if (isObject(%client))
-            {
-                %client.setDisconnectReason("Item Spew scripts are not allowed on this server." );
-                %client.schedule(700, "delete");
-            }
-            BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
-            %client.tossLock = 1;
-            return;
+						if(%client.tossLockWarning)
+						{
+							echo(%client.nameBase SPC "was Banned for exceeding" SPC %client.tossCounter SPC "Toss Limit.");
+							messageAll('msgAll',"\c3" @ %client.namebase SPC "is attempting to lag the server!");
+							messageClient(%client, 'onClientBanned', "");
+							messageAllExcept( %client, -1, 'MsgClientDrop', "", %client.name, %client );
+							if(isObject(%client.player))
+								%client.player.scriptKill(0);
+							if (isObject(%client))
+							{
+								%client.setDisconnectReason("Item Spew scripts are not allowed on this server." );
+								%client.schedule(700, "delete");
+							}
+							BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
+							%client.tossLock = 1;
+							return;
+						}
+						else
+						{
+							echo(%client.nameBase SPC "throwing items has been temporarily suspended for exceeding" SPC %client.tossCounter SPC "throw limit.");
+							centerprint(%client, "You are recieving this warning for throw spamming items.\nContinuing to use throw spew scripts will result in a ban.", 10, 2);
+							messageClient(%client, '', "Throwing items has been temporarily suspended.");
+							%client.tossLockTime = getSimTime();
+							%client.tossLock = 1;
+							%client.tossLockWarning = 1;
+	            return;
+						}
         }
     }
     else

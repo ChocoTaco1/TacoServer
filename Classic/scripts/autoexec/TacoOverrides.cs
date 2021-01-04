@@ -230,8 +230,6 @@ function serverCmdThrow(%client, %data)
 					%client.schedule(700, "delete");
 				}
 				BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
-				%client.tossLock = 1;
-				return;
 			}
 			else
 			{
@@ -239,10 +237,10 @@ function serverCmdThrow(%client, %data)
 				centerprint(%client, "You are recieving this warning for throw spamming items.\nContinuing to use throw spew scripts will result in a ban.", 10, 2);
 				messageClient(%client, '', "Throwing items has been temporarily suspended.");
 				%client.tossLockTime = getSimTime();
-				%client.tossLock = 1;
 				%client.tossLockWarning = 1;
-			  return;
 			}
+			%client.tossLock = 1;
+			return;
 		}
   }
   else

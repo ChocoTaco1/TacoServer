@@ -203,53 +203,53 @@ function GameBaseData::onAdd(%data, %obj)
 // Throw Spam fix
 function serverCmdThrow(%client, %data)
 {
-    if(%client.tossLock)
-		{
-			if(getSimTime() - %client.tossLockTime < 30000)
-				return;
-			else
-				%client.tossLock = 0;
-		}
+	if(%client.tossLock)
+	{
+		if(getSimTime() - %client.tossLockTime < 30000)
+			return;
+		else
+			%client.tossLock = 0;
+	}
 
 	if(getSimTime() - %client.tossTime < 128)
   {
-        %client.tossCounter++;
-        if(%client.tossCounter > 30)
-        {
-						if(%client.tossLockWarning)
-						{
-							echo(%client.nameBase SPC "was Banned for exceeding" SPC %client.tossCounter SPC "Toss Limit.");
-							messageAll('msgAll',"\c3" @ %client.namebase SPC "is attempting to lag the server!");
-							messageClient(%client, 'onClientBanned', "");
-							messageAllExcept( %client, -1, 'MsgClientDrop', "", %client.name, %client );
-							if(isObject(%client.player))
-								%client.player.scriptKill(0);
-							if (isObject(%client))
-							{
-								%client.setDisconnectReason("Item Spew scripts are not allowed on this server." );
-								%client.schedule(700, "delete");
-							}
-							BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
-							%client.tossLock = 1;
-							return;
-						}
-						else
-						{
-							echo(%client.nameBase SPC "throwing items has been temporarily suspended for exceeding" SPC %client.tossCounter SPC "throw limit.");
-							centerprint(%client, "You are recieving this warning for throw spamming items.\nContinuing to use throw spew scripts will result in a ban.", 10, 2);
-							messageClient(%client, '', "Throwing items has been temporarily suspended.");
-							%client.tossLockTime = getSimTime();
-							%client.tossLock = 1;
-							%client.tossLockWarning = 1;
-	            return;
-						}
-        }
-    }
-    else
-        %client.tossCounter = 0;
+		%client.tossCounter++;
+		if(%client.tossCounter > 30)
+		{
+			if(%client.tossLockWarning)
+			{
+				echo(%client.nameBase SPC "was Banned for exceeding" SPC %client.tossCounter SPC "Toss Limit.");
+				messageAll('msgAll',"\c3" @ %client.namebase SPC "is attempting to lag the server!");
+				messageClient(%client, 'onClientBanned', "");
+				messageAllExcept( %client, -1, 'MsgClientDrop', "", %client.name, %client );
+				if(isObject(%client.player))
+					%client.player.scriptKill(0);
+				if (isObject(%client))
+				{
+					%client.setDisconnectReason("Item Spew scripts are not allowed on this server." );
+					%client.schedule(700, "delete");
+				}
+				BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
+				%client.tossLock = 1;
+				return;
+			}
+			else
+			{
+				echo(%client.nameBase SPC "throwing items has been temporarily suspended for exceeding" SPC %client.tossCounter SPC "throw limit.");
+				centerprint(%client, "You are recieving this warning for throw spamming items.\nContinuing to use throw spew scripts will result in a ban.", 10, 2);
+				messageClient(%client, '', "Throwing items has been temporarily suspended.");
+				%client.tossLockTime = getSimTime();
+				%client.tossLock = 1;
+				%client.tossLockWarning = 1;
+			  return;
+			}
+		}
+  }
+  else
+      %client.tossCounter = 0;
 
-    parent::serverCmdThrow(%client, %data);
-    %client.tossTime = getSimTime();
+  parent::serverCmdThrow(%client, %data);
+  %client.tossTime = getSimTime();
 }
 
 };

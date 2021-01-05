@@ -212,7 +212,7 @@ function serverCmdThrow(%client, %data)
 	}
 
 	if(getSimTime() - %client.tossTime < 128)
-  {
+	{
 		%client.tossCounter++;
 		if(%client.tossCounter > 30)
 		{
@@ -242,12 +242,12 @@ function serverCmdThrow(%client, %data)
 			%client.tossLock = 1;
 			return;
 		}
-  }
-  else
-      %client.tossCounter = 0;
+	}
+	else
+		%client.tossCounter = 0;
 
-  parent::serverCmdThrow(%client, %data);
-  %client.tossTime = getSimTime();
+	parent::serverCmdThrow(%client, %data);
+	%client.tossTime = getSimTime();
 }
 
 };

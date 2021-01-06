@@ -87,6 +87,7 @@ function banList_checkGUID(%guid){
 if (!isActivePackage(dtBan))
 	activatePackage(dtBan);
 
+
 function  getBanCount(%d, %year, %h, %n){
    %dif = formattimestring("yy") - %year;
    %days += 365 * (%dif-1);
@@ -109,6 +110,21 @@ function  getBanCount(%d, %year, %h, %n){
    }
    return mfloor((%days * 1440) +  (%ht*60) + %nt);
    //return mfloor((%days * 1440) +  (%ht*60) + %nt) TAB (%days * 1440) TAB (%ht*60) TAB %nt;
+}
+
+function dtBanDay(){
+   %date = formattimestring("mm dd yy");
+   %m = getWord(%date,0);%d = getWord(%date,1);%y = getWord(%date,2);
+   %count = 0;
+   if(%y % 4 < 1){%days[2] = "29";}else{%days[2] = "28";} // leap year
+   %days[1] = "31";%days[3] = "31";
+   %days[4] = "30"; %days[5] = "31"; %days[6] = "30";
+   %days[7] = "31"; %days[8] = "31"; %days[9] = "30";
+   %days[10] = "31"; %days[11] = "30"; %days[12] = "31";
+   for(%i = 1; %i <= %m-1; %i++){
+      %count += %days[%i];
+   }
+   return %count + %d;
 }
 
 function dtBanMark(){

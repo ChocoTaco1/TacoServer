@@ -40,7 +40,7 @@ function FlipFlop::objectiveInit(%data, %flipflop)
 
    %flipflop.projector = 0;
    %folder = %flipflop.getGroup();
-   for(%i = 0; %i < %folder.getCount(); %i++) 
+   for(%i = 0; %i < %folder.getCount(); %i++)
    {
       %proj = %folder.getObject(%i);
       // weird, but line below prevents console error
@@ -48,7 +48,7 @@ function FlipFlop::objectiveInit(%data, %flipflop)
       // z0dd - ZOD, 5/19/03. Added TSStatic for spam fix
       if(%proj.getClassName() !$= "SimGroup" && %proj.getClassName() !$= "InteriorInstance" && %proj.getClassName() !$= "TSStatic")
       {
-         if(%proj.getDatablock().getName() $= "LogoProjector") 
+         if(%proj.getDatablock().getName() $= "LogoProjector")
          {
             %flipflop.projector = %proj;
             %flipflop.projector.holo = 0;
@@ -79,7 +79,7 @@ function FlipFlop::playerTouch(%data, %flipflop, %player)
 
    if(%flipTeam == %client.team)
       return false;
-   
+
    %teamName = game.getTeamName(%client.team);
    // Let the observers know:
    messageTeam( 0, 'MsgClaimFlipFlop', '\c2%1 claimed %2 for %3.~wfx/misc/flipflop_taken.wav', %client.name, Game.cleanWord( %flipflop.name ), %teamName );
@@ -102,7 +102,7 @@ function FlipFlop::playerTouch(%data, %flipflop, %player)
       // axe the old projected holo, if one exists
       if(%projector.holo > 0)
          %projector.holo.delete();
-          
+
       %newHolo = getTaggedString(game.getTeamSkin(%client.team)) @ "Logo";
 
       %projTransform = %projector.getTransform();
@@ -116,7 +116,7 @@ function FlipFlop::playerTouch(%data, %flipflop, %player)
       %holoZ = getWord(%projPos, 2) + %hHeight;
       %holoPos = firstWord(%projPos) SPC getWord(%projPos,1) SPC %holoZ;
 
-      %holo = new StaticShape() 
+      %holo = new StaticShape()
       {
          rotation = %projRot;
          position = %holoPos;
@@ -130,14 +130,14 @@ function FlipFlop::playerTouch(%data, %flipflop, %player)
 
    // convert the resources associated with the flipflop
    Game.claimFlipflopResources(%flipflop, %client.team);
-   
+
    if(Game.countFlips())
       for(%i = 1; %i <= Game.numTeams; %i++)
       {
          %teamHeld = Game.countFlipsHeld(%i);
          messageAll('MsgFlipFlopsHeld', "", %i, %teamHeld);
       }
-   
+
    //call the ai function
    if(%player.client.isAIControlled()) // z0dd - ZOD, 5/19/03. check to see if the player is a bot, duh.
       Game.AIplayerCaptureFlipFlop(%player, %flipflop);
@@ -150,57 +150,57 @@ function FlipFlop::playerTouch(%data, %flipflop, %player)
 
 function DefaultGame::initGameVars(%game)
 {
-   %game.SCORE_PER_SUICIDE = 0; 
+   %game.SCORE_PER_SUICIDE = 0;
    %game.SCORE_PER_TEAMKILL = 0;
-   %game.SCORE_PER_DEATH = 0;  
+   %game.SCORE_PER_DEATH = 0;
 
-   %game.SCORE_PER_KILL = 0; 
+   %game.SCORE_PER_KILL = 0;
 
    %game.SCORE_PER_TURRET_KILL = 0;
 }
 
 //-- tracking  ---
-// .deaths .kills .suicides .teamKills .turretKills 
+// .deaths .kills .suicides .teamKills .turretKills
 
 function DefaultGame::claimFlipflopResources(%game, %flipflop, %team)
 {
    %group = %flipflop.getGroup();
    %group.setTeam(%team);
-   
+
    // make this always visible in the commander map (gets reset when sensor group gets changed)
    setTargetAlwaysVisMask(%flipflop.getTarget(), 0xffffffff);
 }
 
 //------------------------------------------------------------------------------
 function DefaultGame::selectSpawnSphere(%game, %team)
-{ 
+{
    // - walks the objects in the 'teamdrops' group for this team
    // - find a random spawn point which has a running sum less more than
-   //   0->total sphere weight       
-   
+   //   0->total sphere weight
+
    %teamDropsGroup = "MissionCleanup/TeamDrops" @ %team;
-   
+
    %group = nameToID(%teamDropsGroup);
    if (%group != -1)
    {
       %count = %group.getCount();
       if (%count != 0)
       {
-         // Get total weight of those spheres not filtered by mission types list- 
+         // Get total weight of those spheres not filtered by mission types list-
          %overallWeight = 0;
-         for (%i = 0; %i < %count; %i++) 
+         for (%i = 0; %i < %count; %i++)
          {
             %sphereObj = %group.getObject(%i);
             if ( ! %sphereObj.isHidden() )
                %overallWeight += %sphereObj.sphereWeight;
          }
-         
+
          if (%overallWeight > 0)
          {
-            // Subtract a little from this as hedge against any rounding offness- 
+            // Subtract a little from this as hedge against any rounding offness-
             %randSum = getRandom(%overallWeight) - 0.05;
             // echo("randSum = " @ %randSum);
-         
+
             for (%i = 0; %i < %count; %i++)
             {
                %sphereObj = %group.getObject(%i);
@@ -224,7 +224,7 @@ function DefaultGame::selectSpawnSphere(%game, %team)
    }
    else
       error(%teamDropsGroup @ " not found in selectSpawnSphere().");
-      
+
    return -1;
 }
 
@@ -235,15 +235,15 @@ function DefaultGame::selectSpawnZone(%game, %sphere)
    %index = mFloor(getRandom() * (%overallWeight - 0.1)) + 1;
    if ((%index - %sphere.indoorWeight) > 0)
       return false; //do not pick an indoor spawn
-   else 
+   else
       return true;  //pick an indoor spawn
-}     
+}
 
 function DefaultGame::selectSpawnFacing(%game, %src, %target, %zone)
-{   
+{
    //this used only when spawn loc is not on an interior.  This points spawning player to the ctr of spawnshpere
-   %target = setWord(%target, 2, 0);      
-   %src = setWord(%src, 2, 0);      
+   %target = setWord(%target, 2, 0);
+   %src = setWord(%src, 2, 0);
 
    if(VectorDist(%target, %src) == 0)
       return " 0 0 1 0  ";
@@ -252,11 +252,11 @@ function DefaultGame::selectSpawnFacing(%game, %src, %target, %zone)
 
    if(%src < %target)
      return(" 0 0 1 " @ %angle);
-   else                            
-     return(" 0 0 1 " @ -%angle);   
-}  
+   else
+     return(" 0 0 1 " @ -%angle);
+}
 
-function DefaultGame::pickTeamSpawn(%game, %team) 
+function DefaultGame::pickTeamSpawn(%game, %team)
 {
    // early exit if no nav graph
    if (!navGraphExists())
@@ -264,17 +264,17 @@ function DefaultGame::pickTeamSpawn(%game, %team)
       echo("No navigation graph is present.  Build one.");
       return -1;
    }
-   
+
    for (%attempt = 0; %attempt < 20; %attempt++)
    {
       //  finds a random spawn sphere
       //  selects inside/outside on this random sphere
-      //  if the navgraph exists, then uses it to grab a random node as spawn 
+      //  if the navgraph exists, then uses it to grab a random node as spawn
       //   location/rotation
       %sphere = %game.selectSpawnSphere(%team);
       if (%sphere == -1)
       {
-         echo("No spawn spheres found for team " @ %team);   
+         echo("No spawn spheres found for team " @ %team);
          return -1;
       }
 
@@ -285,7 +285,7 @@ function DefaultGame::pickTeamSpawn(%game, %team)
          %area = "indoor";
       else
          %area = "outdoor";
-                           
+
       %radius = %sphere.radius;
       %sphereTrans = %sphere.getTransform();
       %sphereCtr = getWord(%sphereTrans, 0) @ " " @ getWord(%sphereTrans, 1) @ " " @ getWord(%sphereTrans, 2);   //don't need full transform here, just x, y, z
@@ -301,12 +301,12 @@ function DefaultGame::pickTeamSpawn(%game, %team)
          {
             %loc = navGraph.randNodeLoc(%nodeIndex);
             %adjUp = VectorAdd(%loc, "0 0 1.0");   // don't go much below
-            
+
             if (ContainerBoxEmpty( %avoidThese, %adjUp, 2.0))
                break;
          }
       }
-      
+
       if (%nodeIndex >= 0)
       {
          %loc = navGraph.randNodeLoc(%nodeIndex);
@@ -317,14 +317,14 @@ function DefaultGame::pickTeamSpawn(%game, %team)
          }
          else
          {
-            %rot = %game.selectSpawnFacing(%loc, %sphereCtr, %zone);               
+            %rot = %game.selectSpawnFacing(%loc, %sphereCtr, %zone);
             %spawnLoc = %loc @ %rot;
-         }          
-         return %spawnLoc;            
+         }
+         return %spawnLoc;
       }
    }
-}            
-                     
+}
+
 //------------------------------------------------------------
 
 function DefaultGame::pickObserverSpawn(%game, %client, %next)
@@ -336,8 +336,8 @@ function DefaultGame::pickObserverSpawn(%game, %client, %next)
    {
       echo("no observer spawn points found");
       return -1;
-   }    
-    
+   }
+
    if(%client.lastObserverSpawn == -1)
    {
       %client.lastObserverSpawn = 0;
@@ -353,7 +353,7 @@ function DefaultGame::pickObserverSpawn(%game, %client, %next)
       %spawnIdx = %count - 1;
    else if(%spawnIdx >= %count)
       %spawnIdx = 0;
-      
+
    %client.lastObserverSpawn = %spawnIdx;
    //echo("Observer spawn point found");
    return %group.getObject(%spawnIdx);
@@ -368,13 +368,13 @@ function DefaultGame::spawnPlayer( %game, %client, %respawn )
 
 }
 
-                        
+
 //------------------------------------------------------------
 function DefaultGame::playerSpawned(%game, %player)
 {
    if( %player.client.respawnTimer )
       cancel(%player.client.respawnTimer);
-   
+
    %player.client.observerStartTime = "";
    %game.equip(%player);
 
@@ -413,9 +413,9 @@ function DefaultGame::equip(%game, %player)
    %player.setInventory(Beacon, 3);
    %player.setInventory(TargetingLaser, 1);
    %player.weaponCount = 3;
-   
+
    %player.use("Blaster");
-}                  
+}
 
 //------------------------------------------------------------
 function DefaultGame::pickPlayerSpawn(%game, %client, %respawn)
@@ -437,7 +437,7 @@ function DefaultGame::createPlayer(%game, %client, %spawnLoc, %respawn)
       error("Players should not be added to team0!");
 
    // defaultplayerarmor is in 'players.cs'
-   if(%spawnLoc == -1)      
+   if(%spawnLoc == -1)
       %spawnLoc = "0 0 300 1 0 0 0";
    //else
    //  echo("Spawning player at " @ %spawnLoc);
@@ -454,8 +454,8 @@ function DefaultGame::createPlayer(%game, %client, %spawnLoc, %respawn)
       //dataBlock = $DefaultPlayerArmor;
       dataBlock = %armor;
    };
-   
-   
+
+
    if(%respawn)
    {
       %player.setInvincible(true);
@@ -464,7 +464,7 @@ function DefaultGame::createPlayer(%game, %client, %spawnLoc, %respawn)
       %player.respawnCloakThread = %player.schedule($InvincibleTime * 50, "setRespawnCloakOff"); // z0dd - ZOD, 8/6/02. Don't spawn players cloaked //was 1000
       %player.schedule($InvincibleTime * 1000, "setInvincible", false);
    }
-   
+
    %player.setTransform( %spawnLoc );
    MissionCleanup.add(%player);
 
@@ -532,17 +532,17 @@ function DefaultGame::startMatch(%game)
       %game.resetScore(%cl);
       %game.populateTeamRankArray(%cl);
    }
-   
+
    // set all clients control to their player
    %count = ClientGroup.getCount();
    for( %i = 0; %i < %count; %i++ )
    {
       %cl = ClientGroup.getObject(%i);
-      
+
       // Siege game will set the clock differently
       if(%game.class !$= "SiegeGame")
          messageClient(%cl, 'MsgSystemClock', "", $Host::TimeLimit, %curTimeLeftMS);
-      
+
       if( !$Host::TournamentMode && %cl.matchStartReady && %cl.camera.mode $= "pre-game")
       {
          commandToClient(%cl, 'setHudMode', 'Standard');
@@ -556,7 +556,7 @@ function DefaultGame::startMatch(%game)
             {
                %cl.observerMode = "";
                commandToClient(%cl, 'setHudMode', 'Standard');
-               
+
                if(isObject(%cl.player))
                   %cl.setControlObject( %cl.player );
                else
@@ -567,7 +567,7 @@ function DefaultGame::startMatch(%game)
          }
       }
    }
-   
+
    // on with the show this is it!
    AISystemEnabled( true );
 }
@@ -618,7 +618,7 @@ function DefaultGame::gameOver( %game )
          messageClient( %client, 'SetScoreHudHeader', "", "" );
          messageClient( %client, 'SetScoreHudSubheader', "", "");
          messageClient( %client, 'ClearHud', "", 'scoreScreen', 0 );
-         
+
          // clean up the players' HUDs:
          %client.setWeaponsHudClearAll();
          %client.setInventoryHudClearAll();
@@ -639,10 +639,12 @@ function DefaultGame::gameOver( %game )
    $VehicleMax[ScoutFlyer]       = 4;
    $VehicleMax[BomberFlyer]      = 2;
    $VehicleMax[HAPCFlyer]        = 2;
-   
+
    // Choco - reset turret maxes after each round.
-   $TeamDeployableMin[TurretIndoorDeployable] = 4;
+   $TeamDeployableMin[TurretIndoorDeployable]  = 4;
    $TeamDeployableMin[TurretOutdoorDeployable] = 4;
+   $TeamDeployableMax[TurretIndoorDeployable]   = 10;
+   $TeamDeployableMax[TurretOutdoorDeployable]  = 10;
 }
 
 //------------------------------------------------------------------------------
@@ -769,7 +771,7 @@ function DefaultGame::sendDebriefing( %game, %client )
          messageClient( %client, 'MsgDebriefAddLine', "", '<lmargin:0><clip%%:60> %1</clip><lmargin%%:60><clip%%:40> %2</clip>', %cl.name, %score);
       }
    }
-   
+
    if($Host::ClassicEvoStats)
       sendEvoDebriefing(%client);
 }
@@ -800,7 +802,7 @@ function DefaultGame::clearDeployableMaxes(%game)
 
 // called from player scripts
 function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %sourceObject)
-{ 
+{
    //set the vars if it was a turret
    if (isObject(%sourceObject))
    {
@@ -810,7 +812,7 @@ function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType
 
    if (%sourceClassType $= "TurretData")
    {
-      // jff: are there special turret types which makes this needed?   
+      // jff: are there special turret types which makes this needed?
       // tinman:  yes, we don't want bots stopping to fire on the big outdoor turrets, which they
       // will just get mowed down.  deployables only.
       if (%sourceType $= "TurretDeployedFloorIndoor" || %sourceType $= "TurretDeployedWallIndoor" ||
@@ -819,9 +821,9 @@ function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType
          %clVictim.lastDamageTurretTime = getSimTime();
          %clVictim.lastDamageTurret = %sourceObject;
       }
-   
+
       %turretAttacker = %sourceObject.getControllingClient();
-      
+
       //-------------------------------------------------------------------
       // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
       if(%turretAttacker)
@@ -832,13 +834,13 @@ function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType
 
       // should get a damagae message from friendly fire turrets also
       if(%turretAttacker && %turretAttacker != %clVictim && %turretAttacker.team == %clVictim.team)
-      {   
+      {
          if (%game.numTeams > 1 && %turretAttacker.player.causedRecentDamage != %clVictim.player)    //is a teamgame & player just damaged a teammate
          {
             %turretAttacker.player.causedRecentDamage = %clVictim.player;
             %turretAttacker.player.schedule(1000, "causedRecentDamage", "");   //allow friendly fire message every x ms
-            %game.friendlyFireMessage(%clVictim, %turretAttacker);          
-         }        
+            %game.friendlyFireMessage(%clVictim, %turretAttacker);
+         }
       }
    }
    else if (%sourceClassType $= "PlayerData")
@@ -846,13 +848,13 @@ function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType
       %client = %clAttacker; // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
       //now see if both were on the same team
       if(%clAttacker && %clAttacker != %clVictim && %clVictim.team == %clAttacker.team)
-      {   
+      {
          if (%game.numTeams > 1 && %clAttacker.player.causedRecentDamage != %clVictim.player)    //is a teamgame & player just damaged a teammate
          {
                %clAttacker.player.causedRecentDamage = %clVictim.player;
             %clAttacker.player.schedule(1000, "causedRecentDamage", "");   //allow friendly fire message every x ms
-            %game.friendlyFireMessage(%clVictim, %clAttacker);          
-         }        
+            %game.friendlyFireMessage(%clVictim, %clAttacker);
+         }
       }
       if (%clAttacker && %clAttacker != %clVictim)
       {
@@ -860,7 +862,7 @@ function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType
          %clVictim.lastDamageClient = %clAttacker;
          if (%clVictim.isAIControlled())
             %clVictim.clientDetected(%clAttacker);
-      }   
+      }
    }
    // ------------------------------------------------------------------
    // z0dd - ZOD, 5/29/02. Play a sound to client when they hit a player
@@ -904,7 +906,7 @@ function DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType
       // 30) Tank Mortar
       // 31) Satchel
       if (%client.team != %clVictim.team)
-      {	
+      {
          if ((%damageType > 0  && %damageType < 11) ||
              (%damageType == 13)                    ||
              (%damageType > 15 && %damageType < 24) ||
@@ -976,9 +978,9 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
    {
       schedule(15000, %plVictim.lastVehicle,"vehicleAbandonTimeOut", %plVictim.lastVehicle);
       %plVictim.lastVehicle.lastPilot = "";
-   }   
+   }
 
-   // unmount pilot or remove sight from bomber   
+   // unmount pilot or remove sight from bomber
    if(%plVictim.isMounted())
    {
       if(%plVictim.vehicleTurret)
@@ -994,14 +996,14 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
       commandToClient(%plVictim.client,'setStationKeys', false);
    %clVictim.camera.mode = "playerDeath";
 
-   // reset who triggered this station and cancel outstanding armor switch thread   
+   // reset who triggered this station and cancel outstanding armor switch thread
    if(%plVictim.station)
    {
       %plVictim.station.triggeredBy = "";
       %plVictim.station.getDataBlock().stationTriggered(%plVictim.station,0);
       if(%plVictim.armorSwitchSchedule)
          cancel(%plVictim.armorSwitchSchedule);
-   }   
+   }
 
    //Close huds if player dies...
    messageClient(%clVictim, 'CloseHud', "", 'inventoryScreen');
@@ -1011,7 +1013,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
    // $weaponslot from item.cs
    %plVictim.setRepairRate(0);
    %plVictim.setImageTrigger($WeaponSlot, false);
-   
+
    playDeathAnimation(%plVictim, %damageLocation, %damageType);
    playDeathCry(%plVictim);
 
@@ -1029,10 +1031,10 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
       {
          if(%index == $FlagSlot)
             %plVictim.throwObject(%plVictim.holdingFlag);
-         else 
+         else
             %plVictim.throw(%image.item);
       }
-   } 
+   }
 
    // target manager update
    setTargetDataBlock(%clVictim.target, 0);
@@ -1044,7 +1046,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
    %clVictim.setAmmoHudCount(-1);
 
    // clear out weapons, inventory and pack huds
-   messageClient(%clVictim, 'msgDeploySensorOff', "");  //make sure the deploy hud gets shut off 
+   messageClient(%clVictim, 'msgDeploySensorOff', "");  //make sure the deploy hud gets shut off
    messageClient(%clVictim, 'msgPackIconOff', "");  // clear the pack icon
 
    //clear the deployable HUD
@@ -1060,7 +1062,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
    // reset control object on this player: also sets 'playgui' as content
    serverCmdResetControlObject(%clVictim);
 
-   // set control object to the camera   
+   // set control object to the camera
    %clVictim.player = 0;
    %transform = %plVictim.getTransform();
 
@@ -1102,12 +1104,12 @@ function DefaultGame::forceObserver( %game, %client, %reason )
    // first kill this player
    if(%client.player)
       %client.player.scriptKill(0);
-   
+
    if( %client.respawnTimer )
       cancel(%client.respawnTimer);
-   
+
    %client.respawnTimer = "";
-   
+
    // remove them from the team rank array
    %game.removeFromTeamRankArray(%client);
 
@@ -1115,7 +1117,7 @@ function DefaultGame::forceObserver( %game, %client, %reason )
    %client.lastObserverSpawn = -1;
    %client.observerStartTime = getSimTime();
    %adminForce = 0;
-   
+
    switch$ ( %reason )
    {
       case "playerChoose":
@@ -1125,18 +1127,18 @@ function DefaultGame::forceObserver( %game, %client, %reason )
          %client.lastTeam = %client.team;
 
 		   %scheduleAutoKick = true;
-      
+
       case "AdminForce":
          %client.camera.getDataBlock().setMode( %client.camera, "observerFly" );
          messageClient(%client, 'MsgClientJoinTeam', '\c2You have been forced into observer mode by the admin.', %client.name, %game.getTeamName(0), %client, 0 );
          logEcho(%client.nameBase@" (cl "@%client@") was forced into observer mode by admin");
          %client.lastTeam = %client.team;
          %adminForce = 1;
-         
+
          if($Host::TournamentMode)
          {
             if(!$matchStarted)
-            {   
+            {
                if(%client.camera.Mode $= "pickingTeam")
                {
                   commandToClient( %client, 'processPickTeam');
@@ -1149,7 +1151,7 @@ function DefaultGame::forceObserver( %game, %client, %reason )
                }
             }
          }
-         
+
       case "spawnTimeout":
          %client.camera.getDataBlock().setMode( %client.camera, "observerTimeout" );
          messageClient(%client, 'MsgClientJoinTeam', '\c2You have been placed in observer mode due to delay in respawning.', %client.name, %game.getTeamName(0), %client, 0 );
@@ -1159,21 +1161,21 @@ function DefaultGame::forceObserver( %game, %client, %reason )
 
 		   %scheduleAutoKick = true;
    }
-   
-   if(%scheduleAutoKick && !%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout) 
+
+   if(%scheduleAutoKick && !%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout)
    {
-	   if(isEventPending(%client.okschedule)) 
+	   if(isEventPending(%client.okschedule))
 		   cancel(%client.okschedule);
-      
+
       %minutes = $Host::KickObserverTimeout / 60;
       messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
-       
+
       %key = mFloor(getRandom() * 1000);
       %client.okkey = %key;
-       
+
       %client.okschedule = schedule(($Host::KickObserverTimeout * 1000), 0, "cmdAutoKickObserver", %client, %key);
    }
-   
+
    // switch client to team 0 (observer)
    %client.team = 0;
    %client.player.team = 0;
@@ -1183,12 +1185,12 @@ function DefaultGame::forceObserver( %game, %client, %reason )
    // set their control to the obs. cam
    %client.setControlObject( %client.camera );
    commandToClient(%client, 'setHudMode', 'Observer');
-   
+
    // display the hud
    //displayObserverHud(%client, 0);
    updateObserverFlyHud(%client);
 
-   
+
    // message everyone about this event
    if( !%adminForce )
       messageAllExcept(%client, -1, 'MsgClientJoinTeam', '\c2%1 has become an observer.', %client.name, %game.getTeamName(0), %client, 0 );
@@ -1196,10 +1198,10 @@ function DefaultGame::forceObserver( %game, %client, %reason )
       messageAllExcept(%client, -1, 'MsgClientJoinTeam', '\c2The admin has forced %1 to become an observer.', %client.name, %game.getTeamName(0), %client, 0 );
 
    updateCanListenState( %client );
-   
+
    // call the onEvent for this game type
-   %game.onClientEnterObserverMode(%client);  //Bounty uses this to remove this client from others' hit lists 
-   
+   %game.onClientEnterObserverMode(%client);  //Bounty uses this to remove this client from others' hit lists
+
 }
 
 // cmdAutoKickObserver(%client)
@@ -1209,7 +1211,7 @@ function cmdAutoKickObserver(%client, %key) // Edit GG
    if (($Host::TournamentMode) || (!$MissionRunning) || (%client.isAdmin) || (%client.team != 0) || (!%client.okkey) || (%client.okkey != %key))
       return;
 
-   if(isEventPending(%client.okschedule)) 
+   if(isEventPending(%client.okschedule))
       cancel(%client.okschedule);
 
    %client.okkey = "";
@@ -1238,9 +1240,9 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
    %victimName = %clVictim.name;
    %killerName = %clKiller.name;
    //error("DamageType = " @ %damageType @ ", implement = " @ %implement @ ", implement class = " @ %implement.getClassName() @ ", is controlled = " @ %implement.getControllingClient());
-   
+
    if(%damageType == $DamageType::Explosion)
-   {      
+   {
       messageAll('msgExplosionKill', $DeathMessageExplosion[mFloor(getRandom() * $DeathMessageExplosionCount)], %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
       logEcho(%clVictim.nameBase@" (pl "@%clVictim.player@"/cl "@%clVictim@") killed by a nearby explosion.");
    }
@@ -1269,7 +1271,7 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
 		if( ( %controller = %implement.getControllingClient() ) > 0)
 		{
 	      %killerGender = (%controller.sex $= "Male" ? 'him' : 'her');
-	      %killerPoss = (%controller.sex $= "Male" ? 'his' : 'her');           
+	      %killerPoss = (%controller.sex $= "Male" ? 'his' : 'her');
 	      %killerName = %controller.name;
 			messageAll('msgVehicleKill', $DeathMessageVehicle[mFloor(getRandom() * $DeathMessageVehicleCount)], %victimName, %victimGender, %victimPoss, %killerName ,%killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
 	      logEcho(%clVictim.nameBase@" (pl "@%clVictim.player@"/cl "@%clVictim@") killed by a vehicle controlled by "@%controller);
@@ -1281,7 +1283,7 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
 		}
 	}
    // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   // z0dd - ZOD, 5/15/02. Added Hover Vehicle so we get proper 
+   // z0dd - ZOD, 5/15/02. Added Hover Vehicle so we get proper
    // death messages when killed with Wildcat chaingun
    //else if (isObject(%implement) && (%implement.getClassName() $= "Turret" || %implement.getClassName() $= "VehicleTurret" || %implement.getClassName() $= "FlyingVehicle"))   //player killed by a turret
    else if (isObject(%implement) && (%implement.getClassName() $= "Turret" || %implement.getClassName() $= "VehicleTurret" || %implement.getClassName() $= "FlyingVehicle" || %implement.getClassName() $= "HoverVehicle"))
@@ -1290,12 +1292,12 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
       {
          %controller = %implement.getControllingClient();
          %killerGender = (%controller.sex $= "Male" ? 'him' : 'her');
-         %killerPoss = (%controller.sex $= "Male" ? 'his' : 'her');           
+         %killerPoss = (%controller.sex $= "Male" ? 'his' : 'her');
          %killerName = %controller.name;
 
          if (%controller == %clVictim)
             messageAll('msgTurretSelfKill', $DeathMessageTurretSelfKill[mFloor(getRandom() * $DeathMessageTurretSelfKillCount)],%victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
-         else if (%controller.team == %clVictim.team) //controller TK'd a friendly     
+         else if (%controller.team == %clVictim.team) //controller TK'd a friendly
             messageAll('msgCTurretKill', $DeathMessageCTurretTeamKill[%damageType, mFloor(getRandom() * $DeathMessageCTurretTeamKillCount)],%victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
          else //controller killed an enemy
             messageAll('msgCTurretKill', $DeathMessageCTurretKill[%damageType, mFloor(getRandom() * $DeathMessageCTurretKillCount)],%victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
@@ -1303,13 +1305,13 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
       }
       // use the handle associated with the deployed object to verify valid owner
       else if (isObject(%implement.owner))
-      {        
+      {
          %owner = %implement.owner;
          //error("Owner is " @ %owner @ "   Handle is " @ %implement.ownerHandle);
          //error("Turret is still owned");
          //turret is uncontrolled, but is owned - treat the same as controlled.
          %killerGender = (%owner.sex $= "Male" ? 'him' : 'her');
-         %killerPoss = (%owner.sex $= "Male" ? 'his' : 'her');          
+         %killerPoss = (%owner.sex $= "Male" ? 'his' : 'her');
          %killerName = %owner.name;
 
          if (%owner.team == %clVictim.team)  //player got in the way of a teammates deployed but uncontrolled turret.
@@ -1329,7 +1331,7 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
       messageAll('msgSelfKill', $DeathMessageSelfKill[%damageType,mFloor(getRandom() * $DeathMessageSelfKillCount)], %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
       logEcho(%clVictim.nameBase @ "(pl " @ %clVictim.player @ "/cl " @ %clVictim @ ") killed self (" @ getTaggedString($DamageTypeText[%damageType]) @ ")");
    }
-   
+
    else if (%damageType == $DamageType::OutOfBounds) //killer died due to Out-of-Bounds damage
    {
       messageAll('msgOOBKill', $DeathMessageOOB[mFloor(getRandom() * $DeathMessageOOBCount)], %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
@@ -1347,7 +1349,7 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
       messageAll('msgTeamKill', $DeathMessageTeamKill[%damageType, mFloor(getRandom() * $DeathMessageTeamKillCount)],  %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
       logEcho(%clVictim.nameBase@" (pl "@%clVictim.player@"/cl "@%clVictim@") teamkilled by "@%clKiller.nameBase@" (pl "@%clKiller.player@"/cl "@%clKiller@")");
    }
-   
+
    else if (%damageType == $DamageType::Lava)   //player died by falling in lava
    {
       messageAll('msgLavaKill',  $DeathMessageLava[mFloor(getRandom() * $DeathMessageLavaCount)], %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
@@ -1364,10 +1366,10 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
          messageAll('MsgRogueMineKill', $DeathMessageRogueMine[%damageType, mFloor(getRandom() * $DeathMessageRogueMineCount)], %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
    }
    else  //was a legitimate enemy kill
-   {  
+   {
       if(%damageType == 6 && (%clVictim.headShot))
-      {	          
-         // laser headshot just occurred         
+      {
+         // laser headshot just occurred
          messageAll('MsgHeadshotKill', $DeathMessageHeadshot[%damageType, mFloor(getRandom() * $DeathMessageHeadshotCount)], %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
       }
       // ----------------------------------------------------
@@ -1377,8 +1379,8 @@ function DefaultGame::displayDeathMessages(%game, %clVictim, %clKiller, %damageT
          // shocklance rearshot just occurred
          messageAll('MsgRearshotKill', $DeathMessageRearshot[%damageType, mFloor(getRandom() * $DeathMessageRearshotCount)], %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
       }
-      // ----------------------------------------------------      
-      else   
+      // ----------------------------------------------------
+      else
          messageAll('MsgLegitKill', $DeathMessage[%damageType, mFloor(getRandom() * $DeathMessageCount)], %victimName, %victimGender, %victimPoss, %killerName, %killerGender, %killerPoss, %damageType, $DamageTypeText[%damageType]);
       logEcho(%clVictim.nameBase @ " (pl " @ %clVictim.player @ "/cl " @ %clVictim @ ") killed by " @ %clKiller.nameBase @ " (pl " @ %clKiller.player @ "/cl " @%clKiller @ ") using " @ getTaggedString($DamageTypeText[%damageType]));
    }
@@ -1394,7 +1396,7 @@ function DefaultGame::assignClientTeam(%game, %client, %respawn )
    //   setTargetSkin(%client.target, %client.skin);
    //   return;
    //}
-      
+
    //  camera is responsible for creating a player
    //  - counts the number of players per team
    //  - puts this player on the least player count team
@@ -1414,15 +1416,15 @@ function DefaultGame::assignClientTeam(%game, %client, %respawn )
    %leastTeam = 1;
    for(%i = 2; %i <= %game.numTeams; %i++)
    {
-      if( (%numTeamPlayers[%i] < %leastPlayers) || 
-         ( (%numTeamPlayers[%i] == %leastPlayers) && 
+      if( (%numTeamPlayers[%i] < %leastPlayers) ||
+         ( (%numTeamPlayers[%i] == %leastPlayers) &&
          ($teamScore[%i] < $teamScore[%leastTeam] ) ))
       {
          %leastTeam = %i;
          %leastPlayers = %numTeamPlayers[%i];
       }
    }
-   
+
    %client.team = %leastTeam;
    %client.lastTeam = %team;
 
@@ -1458,7 +1460,7 @@ function DefaultGame::assignClientTeam(%game, %client, %respawn )
    logEcho(%client.nameBase@" (cl "@%client@") joined team "@%client.team);
 
    //Cancel clients observer kick schedule if he/she has one
-   if(isEventPending(%client.okschedule)) 
+   if(isEventPending(%client.okschedule))
       cancel(%client.okschedule);
 }
 
@@ -1486,7 +1488,7 @@ function DefaultGame::clientJoinTeam( %game, %client, %team, %respawn )
 
    if( %respawn $= "" )
       %respawn = 1;
-      
+
    %client.team = %team;
    %client.lastTeam = %team;
    setTargetSkin( %client.target, %game.getTeamSkin(%team) );
@@ -1498,13 +1500,13 @@ function DefaultGame::clientJoinTeam( %game, %client, %team, %respawn )
 
    messageAllExcept( %client, -1, 'MsgClientJoinTeam', '\c1%1 joined %2.', %client.name, %game.getTeamName(%team), %client, %team );
    messageClient( %client, 'MsgClientJoinTeam', '\c1You joined the %2 team.', $client.name, %game.getTeamName(%client.team), %client, %client.team );
-   
+
    updateCanListenState( %client );
 
    logEcho(%client.nameBase@" (cl "@%client@") joined team "@%client.team);
 
    //Cancel clients observer kick schedule if he/she has one
-   if(isEventPending(%client.okschedule)) 
+   if(isEventPending(%client.okschedule))
       cancel(%client.okschedule);
 }
 
@@ -1556,7 +1558,7 @@ function DefaultGame::AIChangeTeam(%game, %client, %newTeam)
          setTargetSkin( %client.target, 'basebbot' );
       }
    }
-   
+
    messageAllExcept( %client, -1, 'MsgClientJoinTeam', '\c1bot %1 has switched to team %2.', %client.name, %game.getTeamName(%client.team), %client, %client.team );
 }
 
@@ -1566,7 +1568,7 @@ function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawn
    //first, remove the client from the team rank array
    //the player will be added to the new team array as soon as he respawns...
    %game.removeFromTeamRankArray(%client);
-   
+
    %pl = %client.player;
    if(isObject(%pl))
    {
@@ -1597,7 +1599,7 @@ function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawn
 
    // Spawn the player:
    %client.lastSpawnPoint = %game.pickPlayerSpawn( %client );
-   
+
    %game.createPlayer( %client, %client.lastSpawnPoint, $MatchStarted );
 
    if($MatchStarted)
@@ -1607,12 +1609,12 @@ function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawn
       %client.camera.getDataBlock().setMode(%client.camera, "pre-game", %client.player);
       %client.setControlObject(%client.camera);
    }
-   
+
    // call the onEvent for this game type
-   %game.onClientEnterObserverMode(%client);  //Bounty uses this to remove this client from others' hit lists 
+   %game.onClientEnterObserverMode(%client);  //Bounty uses this to remove this client from others' hit lists
 
    if(%fromObs $= "" || !%fromObs)
-   {   
+   {
       //-------------------------------------------------------------------------
       // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature
       if(!%respawned)
@@ -1629,7 +1631,7 @@ function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawn
    }
 
    updateCanListenState( %client );
-   
+
    // MES - switch objective hud lines when client switches teams
    messageClient(%client, 'MsgCheckTeamLines', "", %client.team);
    logEcho(%client.nameBase@" (cl "@%client@") switched to team "@%client.team);
@@ -1639,7 +1641,7 @@ function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawn
 function DefaultGame::missionLoadDone(%game)
 {
    //  walks through the mission group and sets the power stuff up
-   //   - groups get initialized with power count 0 then iterated to 
+   //   - groups get initialized with power count 0 then iterated to
    //     increment powercount if an object within is powered
    //   - powers objects up/down
    //MissionGroup.objectiveInit();
@@ -1681,7 +1683,7 @@ function DefaultGame::missionLoadDone(%game)
 
    //initialize the AI system
    %game.aiInit();
-   
+
    //need to reset the teams if we switch from say, CTF to Bounty...
    // assign the bots team
    if ($currentMissionType !$= $previousMissionType)
@@ -1694,7 +1696,7 @@ function DefaultGame::missionLoadDone(%game)
             %game.assignClientTeam(%cl);
       }
    }
-   
+
    //Save off respawn or Siege Team switch information...
    if(%game.class !$= "SiegeGame")
       MissionGroup.setupPositionMarkers(true);
@@ -1721,47 +1723,47 @@ function DefaultGame::clientMissionDropReady(%game, %client)
 {
    //synchronize the clock HUD
    messageClient(%client, 'MsgSystemClock', "", 0, 0);
-   
+
    %game.sendClientTeamList( %client );
    %game.setupClientHuds( %client );
-   
+
    if($CurrentMissionType $= "SinglePlayer")
-   {  
+   {
       //CommandToClient( %client, 'setPlayContent');
       return;
    }
-      
+
    %observer = false;
    if( !$Host::TournamentMode )
    {
       if( %client.camera.mode $= "observerFly" || %client.camera.mode $= "justJoined")
       {
          %observer = true;
-		 
+
 		 %client.observingFlag = false;
 		 %client.flagObserved = "";
 		 %client.flagObsTeam = "";
-		 
+
          %client.observerStartTime = getSimTime();
          commandToClient(%client, 'setHudMode', 'Observer');
          %client.setControlObject( %client.camera );
-		 
+
          //displayObserverHud( %client, 0 );
          // Eolk - flag stats stuff
          //updateObserverFlyHud(%client);
          if($Host::ClassicEvoStats && $CurrentMissionType $= "CTF")
             schedule(10000, %client, updateObserverFlyHud, %client);
       }
-         
+
       if( !%observer )
       {
          if(!$MatchStarted && !$CountdownStarted) // server has not started anything yet
-         {   
+         {
             %client.setControlObject( %client.camera );
             commandToClient(%client, 'setHudMode', 'Observer');
          }
          else if(!$MatchStarted && $CountdownStarted) // server has started the countdown
-         {   
+         {
             commandToClient(%client, 'setHudMode', 'Observer');
             %client.setControlObject( %client.camera );
          }
@@ -1769,7 +1771,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
          {
             commandToClient(%client, 'setHudMode', 'Standard'); // the game has already started
             %client.setControlObject( %client.player );
-         }   
+         }
       }
 
       if( $Host::ClassicEvoStats && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF") )
@@ -1784,30 +1786,30 @@ function DefaultGame::clientMissionDropReady(%game, %client)
       }
    }
    else
-   {                                                                                                                      
+   {
       // set all players into obs mode. setting the control object will handle further procedures...
       %client.camera.getDataBlock().setMode( %client.camera, "ObserverFly" );
       commandToClient(%client, 'setHudMode', 'Observer');
       %client.setControlObject( %client.camera );
       messageAll( 'MsgClientJoinTeam', "",%client.name, $teamName[0], %client, 0 );
       %client.team = 0;
-      
+
       if( !$MatchStarted && !$CountdownStarted)
-      {   
+      {
          if($TeamDamage)
             %damMess = "ENABLED";
          else
             %damMess = "DISABLED";
-         
+
          if(%game.numTeams > 1)
-            BottomPrint(%client, "Server is Running in Tournament Mode.\nPick a Team\nTeam Damage is " @ %damMess, 0, 3 ); 
+            BottomPrint(%client, "Server is Running in Tournament Mode.\nPick a Team\nTeam Damage is " @ %damMess, 0, 3 );
       }
       else
       {
-         BottomPrint( %client, "\nServer is Running in Tournament Mode", 0, 3 ); 
-      }   
+         BottomPrint( %client, "\nServer is Running in Tournament Mode", 0, 3 );
+      }
    }
-   
+
    //make sure the objective HUD indicates your team on top and in green...
    if (%client.team > 0)
       messageClient(%client, 'MsgCheckTeamLines', "", %client.team);
@@ -1815,7 +1817,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
    // were ready to go.
    %client.matchStartReady = true;
    echo("Client" SPC %client SPC "is ready.");
-   
+
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
    $stats::tk[%client] = "";
    %client.midairs = 0;
@@ -1828,16 +1830,16 @@ function DefaultGame::clientMissionDropReady(%game, %client)
    {
       if(!%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout)
       {
-         if(isEventPending(%client.okschedule)) 
+         if(isEventPending(%client.okschedule))
             cancel(%client.okschedule);
-         
+
          %time = ($Host::KickObserverTimeout) + ($Host::KickObserverTimeout/2);
          //%minutes = %time / 60;
          //messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
-         
+
          %key = mFloor(getRandom() * 1000);
          %client.okkey = %key;
-         
+
          %client.okschedule = schedule((%time * 1000), 0, "cmdAutoKickObserver", %client, %key);
       }
    }
@@ -1868,12 +1870,12 @@ function DefaultGame::setupClientHuds(%game, %client)
          %client.setInventoryHudBitmap($InventoryHudData[%i, slot], $InventoryHudData[%i, itemDataName], $InventoryHudData[%i, bitmapName]);
    }
    %client.setInventoryHudBitmap( 0, "", "gui/hud_handgren" );
-      
+
    %client.setWeaponsHudBackGroundBmp("gui/hud_new_panel");
    %client.setWeaponsHudHighLightBmp("gui/hud_new_weaponselect");
    %client.setWeaponsHudInfiniteAmmoBmp("gui/hud_infinity");
    %client.setInventoryHudBackGroundBmp("gui/hud_new_panel");
- 
+
    // tell the client if we are protecting statics (so no health bar will be displayed)
    commandToClient(%client, 'protectingStaticObjects', %game.allowsProtectedStatics());
    commandToClient(%client, 'setPowerAudioProfiles', sPowerUp.getId(), sPowerDown.getId());
@@ -1922,10 +1924,10 @@ function DefaultGame::findProjector(%game, %flipflop)
    // if one exists, associate it with the flipflop
    %flipflop.projector = 0;
    %folder = %flipflop.getGroup();
-   for(%i = 0; %i < %folder.getCount(); %i++) 
+   for(%i = 0; %i < %folder.getCount(); %i++)
    {
       %proj = %folder.getObject(%i);
-      if(%proj.getDatablock().getName() $= "LogoProjector") 
+      if(%proj.getDatablock().getName() $= "LogoProjector")
       {
          %flipflop.projector = %proj;
          %flipflop.projector.holo = 0;
@@ -1942,10 +1944,10 @@ function DefaultGame::findProjector(%game, %flipflop)
 //Function -- onEnterTrigger (%game, %name, %data, %obj, %colObj)
 //                %game = Current game type object
 //                %name = Trigger name - defined when trigger is created
-//                %data = Trigger Data Block 
-//                %obj = Trigger Object 
+//                %data = Trigger Data Block
+//                %obj = Trigger Object
 //                %colObj = Object that collided with the trigger
-//Decription -- Called when trigger has been triggered 
+//Decription -- Called when trigger has been triggered
 ////////////////////////////////////////////////////////////////////////////////
 // from 'trigger.cs'
 function DefaultGame::onEnterTrigger(%game, %triggerName, %data, %obj, %colobj)
@@ -1957,8 +1959,8 @@ function DefaultGame::onEnterTrigger(%game, %triggerName, %data, %obj, %colobj)
 //Function -- onLeaveTrigger (%game, %name, %data, %obj, %colObj)
 //                %game = Current game type object
 //                %name = Trigger name - defined when trigger is created
-//                %data = Trigger Data Block 
-//                %obj = Trigger Object 
+//                %data = Trigger Data Block
+//                %obj = Trigger Object
 //                %colObj = Object that collided with the trigger
 //Decription -- Called when trigger has been untriggered
 ////////////////////////////////////////////////////////////////////////////////
@@ -1972,8 +1974,8 @@ function DefaultGame::onLeaveTrigger(%game, %triggerName, %data, %obj, %colobj)
 //Function -- onTickTrigger(%game, %name, %data, %obj)
 //                %game = Current game type object
 //                %name = Trigger name - defined when trigger is created
-//                %data = Trigger Data Block 
-//                %obj = Trigger Object 
+//                %data = Trigger Data Block
+//                %obj = Trigger Object
 //Decription -- Called every tick if triggered
 ////////////////////////////////////////////////////////////////////////////////
 // from 'trigger.cs'
@@ -1984,11 +1986,11 @@ function DefaultGame::onTickTrigger(%game, %triggerName, %data, %obj)
 
 
 function DefaultGame::setUpTeams(%game)
-{  
+{
    %group = nameToID("MissionGroup/Teams");
    if(%group == -1)
       return;
-   
+
    // create a team0 if it does not exist
    %team = nameToID("MissionGroup/Teams/team0");
    if(%team == -1)
@@ -1996,7 +1998,7 @@ function DefaultGame::setUpTeams(%game)
       %team = new SimGroup("team0");
       %group.add(%team);
    }
-   
+
    // 'team0' is not counted as a team here
    %game.numTeams = 0;
    while(%team != -1)
@@ -2082,7 +2084,7 @@ function SimGroup::setTeam(%this, %team)
       }
    }
 }
- 
+
 function DefaultGame::claimSpawn(%game, %obj, %newTeam, %oldTeam)
 {
    if(%newTeam == %oldTeam)
@@ -2094,10 +2096,10 @@ function DefaultGame::claimSpawn(%game, %obj, %newTeam, %oldTeam)
       %oldSpawnGroup = nameToId("MissionCleanup/TeamDrops" @ %oldTeam);
       %oldSpawnGroup.remove(%obj);
    }
-   %newSpawnGroup.add(%obj);   
+   %newSpawnGroup.add(%obj);
 }
 
-// recursive function to assign teams to all mission objects        
+// recursive function to assign teams to all mission objects
 
 function SimGroup::swapTeams(%this)
 {
@@ -2189,9 +2191,9 @@ function AIObjective::objectRestore(%object)
    // don't do anything for AI Objectives
 }
 
-function DefaultGame::checkObjectives(%game)  
-{  
-   //any special objectives that can be met by gametype   
+function DefaultGame::checkObjectives(%game)
+{
+   //any special objectives that can be met by gametype
    //none for default game
 }
 
@@ -2209,7 +2211,7 @@ function DefaultGame::checkTimeLimit(%game, %forced)
       %game.timeCheck = %game.schedule(20000, "checkTimeLimit");
       return;
    }
-   
+
    %curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
 
    if (%curTimeLeftMS <= 0)
@@ -2420,7 +2422,7 @@ function DefaultGame::recalcTeamRanks(%game, %client)
 function DefaultGame::recalcScore(%game, %cl)
 {
    %game.recalcTeamRanks(%cl);
-}  
+}
 
 function DefaultGame::testKill(%game, %victimID, %killerID)
 {
@@ -2428,20 +2430,20 @@ function DefaultGame::testKill(%game, %victimID, %killerID)
 }
 
 function DefaultGame::testSuicide(%game, %victimID, %killerID, %damageType)
-{     
-   return ((%victimID == %killerID) || (%damageType == $DamageType::Ground) || (%damageType == $DamageType::Suicide));      
+{
+   return ((%victimID == %killerID) || (%damageType == $DamageType::Ground) || (%damageType == $DamageType::Suicide));
 }
-   
+
 function DefaultGame::testTeamKill(%game, %victimID, %killerID)
 {
-   return (%killerID.team == %victimID.team);   
+   return (%killerID.team == %victimID.team);
 }
 
 function DefaultGame::testTurretKill(%game, %implement)
 {
    if(%implement == 0)
       return false;
-   else     
+   else
       return (%implement.getClassName() $= "Turret");
 }
 
@@ -2450,12 +2452,12 @@ function DefaultGame::testTurretKill(%game, %implement)
 //    %cl.flagCaps++;
 //    $TeamScore[%cl.team] += %game.SCORE_PER_TEAM_FLAG_CAP;
 //    messageAll('MsgCTFTeamScore', "", %cl.team, $TeamScore[%cl.team]);
-// 
+//
 //    if (%game.SCORE_PER_PLYR_FLAG_CAP > 1)
 //      %plural = "s";
 //    else
 //      %plural = "";
-// 
+//
 //    if (%game.SCORE_PER_PLYR_FLAG_CAP != 0)
 //         messageClient(%cl, 'scoreFlaCapMsg', 'You received %1 point%2 for capturing the flag.', %game.SCORE_PER_PLYR_FLAG_CAP, %plural);
 //    %game.recalcScore(%cl);
@@ -2473,7 +2475,7 @@ function DefaultGame::awardScoreTurretKill(%game, %victimID, %implement)
    {
       if (%killer == %victimID)
            %game.awardScoreSuicide(%victimID);
-      else if (%killer.team == %victimID.team) //player controlling a turret killed a teammate     
+      else if (%killer.team == %victimID.team) //player controlling a turret killed a teammate
       {
            %killer.teamKills++;
         %game.awardScoreTurretTeamKill(%victimID, %killer);
@@ -2484,29 +2486,29 @@ function DefaultGame::awardScoreTurretKill(%game, %victimID, %implement)
          %killer.turretKills++;
          %game.recalcScore(%killer);
          %game.awardScoreDeath(%victimID);
-      }     
-   }   
+      }
+   }
    else if ((%killer = %implement.owner) != 0) //if it isn't controlled, award score to whoever deployed it
    {
-       if (%killer.team == %victimID.team)       
+       if (%killer.team == %victimID.team)
        {
             %game.awardScoreDeath(%victimID);
        }
-       else       
+       else
        {
           %killer.turretKills++;
          %game.recalcScore(%killer);
          %game.awardScoreDeath(%victimID);
       }
-   }   
-   //default is, no one was controlling it, no one owned it.  No score given.   
+   }
+   //default is, no one was controlling it, no one owned it.  No score given.
 }
 
 function DefaultGame::awardScoreDeath(%game, %victimID)
 {
    %victimID.deaths++;
    if ( %game.SCORE_PER_DEATH != 0 )
-   {      
+   {
 //       %plural = (abs(%game.SCORE_PER_DEATH) != 1 ? "s" : "");
 //       messageClient(%victimID, 'MsgScoreDeath', '\c0You have been penalized %1 point%2 for dying.', abs(%game.SCORE_PER_DEATH), %plural);
       %game.recalcScore(%victimID);
@@ -2515,52 +2517,52 @@ function DefaultGame::awardScoreDeath(%game, %victimID)
 
 function DefaultGame::awardScoreKill(%game, %killerID)
 {
-   %killerID.kills++;   
-   %game.recalcScore(%killerID);    
-} 
+   %killerID.kills++;
+   %game.recalcScore(%killerID);
+}
 
 function DefaultGame::awardScoreSuicide(%game, %victimID)
 {
    %victimID.suicides++;
 //    if (%game.SCORE_PER_SUICIDE != 0)
-//       messageClient(%victimID, 'MsgScoreSuicide', '\c0You have been penalized for killing yourself.');      
+//       messageClient(%victimID, 'MsgScoreSuicide', '\c0You have been penalized for killing yourself.');
    %game.recalcScore(%victimID);
 }
-   
+
 function DefaultGame::awardScoreTeamkill(%game, %victimID, %killerID)
 {
    %killerID.teamKills++;
-   if (%game.SCORE_PER_TEAMKILL != 0)   
-      messageClient(%killerID, 'MsgScoreTeamkill', '\c0You have been penalized for killing teammate %1.', %victimID.name); 
+   if (%game.SCORE_PER_TEAMKILL != 0)
+      messageClient(%killerID, 'MsgScoreTeamkill', '\c0You have been penalized for killing teammate %1.', %victimID.name);
 
    %game.recalcScore(%killerID);
 }
- 
+
 function DefaultGame::awardScoreTurretTeamKill(%game, %victimID, %killerID)
 {
    %killerID.teamKills++;
-   if (%game.SCORE_PER_TEAMKILL != 0)   
-      messageClient(%killerID, 'MsgScoreTeamkill', '\c0You have been penalized for killing your teammate %1, with a turret.', %victimID.name);  
+   if (%game.SCORE_PER_TEAMKILL != 0)
+      messageClient(%killerID, 'MsgScoreTeamkill', '\c0You have been penalized for killing your teammate %1, with a turret.', %victimID.name);
 
    %game.recalcScore(%killerID);
 }
 
 
 function DefaultGame::objectRepaired(%game, %obj, %objName)
-{     
+{
    %item = %obj.getDataBlock().getName();
-   //echo("Item repaired is a " @ %item); 
+   //echo("Item repaired is a " @ %item);
    switch$ (%item)
    {
       case generatorLarge :
          %game.genOnRepaired(%obj, %objName);
       case stationInventory :
          %game.stationOnRepaired(%obj, %objName);
-      case sensorMediumPulse : 
+      case sensorMediumPulse :
          %game.sensorOnRepaired(%obj, %objName);
-      case sensorLargePulse : 
+      case sensorLargePulse :
          %game.sensorOnRepaired(%obj, %objName);
-      case turretBaseLarge : 
+      case turretBaseLarge :
          %game.turretOnRepaired(%obj, %objName);
       case stationVehicle : %game.vStationOnRepaired(%obj, %objName);
       default:  //unused by current gametypes.  Add more checks here if desired
@@ -2583,7 +2585,7 @@ function DefaultGame::cleanWord(%game, %this)
       if(%char $= "_")
       {
          %next =  getSubStr(%this, (%i+1), 1);
-         if(%next $= "_") 
+         if(%next $= "_")
          {
             %char = "'";   //apostrophe (2 chars)
             %i++;
@@ -2630,7 +2632,7 @@ function DefaultGame::leaveMissionArea(%game, %playerData, %player)
 {
    if(%player.getState() $= "Dead")
       return;
-   
+
    %player.client.outOfBounds = true;
    messageClient(%player.client, 'LeaveMissionArea', '\c1You left the mission area.~wfx/misc/warning_beep.wav');
 }
@@ -2639,8 +2641,8 @@ function DefaultGame::enterMissionArea(%game, %playerData, %player)
 {
    if(%player.getState() $= "Dead")
       return;
-   
-   %player.client.outOfBounds = false; 
+
+   %player.client.outOfBounds = false;
    messageClient(%player.client, 'EnterMissionArea', '\c1You are back in the mission area.');
 }
 
@@ -2727,7 +2729,7 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
    {
       if ( $Host::allowAdminPlayerVotes && !%isTargetBot ) // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
          messageClient( %client, 'MsgPlayerPopupItem', "", %key, "AdminPlayer", "", 'Vote to Make Admin', 2 );
-      
+
       if ( !%isTargetSelf )
       {
          messageClient( %client, 'MsgPlayerPopupItem', "", %key, "KickPlayer", "", 'Vote to Kick', 3 );
@@ -2783,21 +2785,21 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
             messageClient( %client, 'MsgPlayerPopupItem', "", %key, "StripAdmin", "", 'Strip admin', 14 );
 
          if ( %game.numTeams > 1 )
-         {   
+         {
             if ( %isTargetObserver )
             {
                %action = %isTargetSelf ? "Join " : "Change to ";
-               %str1 = %action @ getTaggedString( %game.getTeamName(1) );      
-               %str2 = %action @ getTaggedString( %game.getTeamName(2) );      
+               %str1 = %action @ getTaggedString( %game.getTeamName(1) );
+               %str2 = %action @ getTaggedString( %game.getTeamName(2) );
 
                messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str1, 6 );
                messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str2, 7 );
             }
             else
             {
-               %changeTo = %targetClient.team == 1 ? 2 : 1;   
+               %changeTo = %targetClient.team == 1 ? 2 : 1;
                %str = "Switch to " @ getTaggedString( %game.getTeamName(%changeTo) );
-               %caseId = 5 + %changeTo;      
+               %caseId = 5 + %changeTo;
 
                messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str, %caseId );
 
@@ -2831,12 +2833,12 @@ function DefaultGame::sendGameVoteMenu( %game, %client, %key )
                messageClient( %client, 'MsgVoteItem', "", %key, 'ChooseTeam', "", 'Change your Team' );
          messageClient( %client, 'MsgVoteItem', "", %key, 'MakeObserver', "", 'Become an Observer' );
       }
-      else 
-      {   
+      else
+      {
          if(!%multipleTeams && !$Host::TournamentMode)
             messageClient( %client, 'MsgVoteItem', "", %key, 'JoinGame', "", 'Join the Game' );
       }
-      
+
       //%totalSlots = $Host::maxPlayers - ($HostGamePlayerCount + $HostGameBotCount);
      // if( $HostGameBotCount > 0 && %totalSlots > 0 && %client.isAdmin)
          //messageClient( %client, 'MsgVoteItem', "", %key, 'Addbot', "", 'Add a Bot' );
@@ -2846,7 +2848,7 @@ function DefaultGame::sendGameVoteMenu( %game, %client, %key )
       return;
 
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
-   
+
    if ( %game.scheduleVote $= "" )
    {
       if(!%client.isAdmin)
@@ -2857,15 +2859,15 @@ function DefaultGame::sendGameVoteMenu( %game, %client, %key )
          messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
 
          //if( $Host::TournamentMode )
-         //{   
+         //{
          //   messageClient( %client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode' );
-         //   
+         //
          //  if(!$MatchStarted && !$CountdownStarted)
          //      messageClient( %client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Vote to Start the Match' );
          //}
          //else
          //   messageClient( %client, 'MsgVoteItem', "", %key, 'VoteTournamentMode', 'Change server to Tournament.', 'Vote Tournament Mode' );
-         
+
          if ( %multipleTeams )
          {
             if(!$MatchStarted && !$Host::TournamentMode)
@@ -2897,15 +2899,15 @@ function DefaultGame::sendGameVoteMenu( %game, %client, %key )
          messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Skip the Mission' );
 
          if( $Host::TournamentMode )
-         {   
+         {
             messageClient( %client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Free For All Mode' );
-            
+
             if(!$MatchStarted && !$CountdownStarted)
                messageClient( %client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Start Match' );
          }
          else
             messageClient( %client, 'MsgVoteItem', "", %key, 'VoteTournamentMode', 'Change server to Tournament.', 'Tournament Mode' );
-      
+
          if ( %multipleTeams )
          {
             if(!$MatchStarted)
@@ -3054,25 +3056,25 @@ function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typ
       return;
    }
 
-   if(%admin) 
+   if(%admin)
    {
-      messageAll('MsgAdminChangeMission', '\c2The Admin %3 has changed the mission to %1 (%2).', %missionDisplayName, %typeDisplayName, $AdminCl.name );   
+      messageAll('MsgAdminChangeMission', '\c2The Admin %3 has changed the mission to %1 (%2).', %missionDisplayName, %typeDisplayName, $AdminCl.name );
       logEcho($AdminCl.nameBase @ ": mission changed to "@%missionDisplayName@"/"@%typeDisplayName@" (admin)");
       %game.gameOver();
-      loadMission( %mission, %missionType, false );   
+      loadMission( %mission, %missionType, false );
    }
-   else 
+   else
    {
       %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
 	  if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         messageAll('MsgVotePassed', '\c2The mission was changed to %1 (%2) by vote.', %missionDisplayName, %typeDisplayName ); 
+         messageAll('MsgVotePassed', '\c2The mission was changed to %1 (%2) by vote.', %missionDisplayName, %typeDisplayName );
          logEcho("mission changed to "@%missionDisplayName@"/"@%typeDisplayName@" (vote)");
          %game.gameOver();
-         loadMission( %mission, %missionType, false );   
+         loadMission( %mission, %missionType, false );
       }
       else
-         messageAll('MsgVoteFailed', '\c2Change mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100)); 
+         messageAll('MsgVoteFailed', '\c2Change mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
    }
 }
 
@@ -3081,48 +3083,48 @@ function DefaultGame::voteTeamDamage(%game, %admin)
 {
    %setto = "";
    %cause = "";
-   if(%admin) 
+   if(%admin)
    {
       if($teamDamage)
       {
-         messageAll('MsgAdminForce', '\c2The Admin %1 has disabled team damage.', $AdminCl.name);   
+         messageAll('MsgAdminForce', '\c2The Admin %1 has disabled team damage.', $AdminCl.name);
          $Host::TeamDamageOn = $TeamDamage = 0;
          %setto = "disabled";
       }
-      else 
+      else
       {
-         messageAll('MsgAdminForce', '\c2The Admin %1 has enabled team damage.', $AdminCl.name);   
+         messageAll('MsgAdminForce', '\c2The Admin %1 has enabled team damage.', $AdminCl.name);
          $Host::TeamDamageOn = $TeamDamage = 1;
          %setto = "enabled";
       }
       %cause = "(admin)";
    }
-   else 
+   else
    {
       %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         if($teamDamage) 
+         if($teamDamage)
          {
-            messageAll('MsgVotePassed', '\c2Team damage was disabled by vote.'); 
+            messageAll('MsgVotePassed', '\c2Team damage was disabled by vote.');
             $Host::TeamDamageOn = $TeamDamage = 0;
             %setto = "disabled";
          }
-         else 
+         else
          {
-            messageAll('MsgVotePassed', '\c2Team damage was enabled by vote.');  
+            messageAll('MsgVotePassed', '\c2Team damage was enabled by vote.');
             $Host::TeamDamageOn = $TeamDamage = 1;
             %setto = "enabled";
          }
          %cause = "(vote)";
       }
-      else 
+      else
       {
          if($teamDamage)
-            messageAll('MsgVoteFailed', '\c2Disable team damage vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));  
-         else 
-            messageAll('MsgVoteFailed', '\c2Enable team damage vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));   
+            messageAll('MsgVoteFailed', '\c2Disable team damage vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
+         else
+            messageAll('MsgVoteFailed', '\c2Enable team damage vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
       }
    }
    if(%setto !$= "")
@@ -3147,19 +3149,19 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
    }
 
    %cause = "";
-   if (%admin) 
+   if (%admin)
    {
       messageAll( 'MsgAdminForce', '\c2The Admin %2 has switched the server to Tournament mode (%1).', %missionDisplayName, $AdminCl.name );
       setModeTournament( %mission, %missionType );
       %cause = "(admin)";
    }
-   else 
+   else
    {
       %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
-      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100)) 
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         messageAll('MsgVotePassed', '\c2Server switched to Tournament mode by vote (%1): %2 percent.', %missionDisplayName, mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100)); 
+         messageAll('MsgVotePassed', '\c2Server switched to Tournament mode by vote (%1): %2 percent.', %missionDisplayName, mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
          setModeTournament( %mission, %missionType );
          %cause = "(vote)";
       }
@@ -3198,19 +3200,19 @@ function DefaultGame::voteMatchStart( %game, %admin)
          return;
       }
       else
-      {  
+      {
          %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
          // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
 		 if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
 		 {
-            messageAll('MsgVotePassed', '\c2The match has been started by vote: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));  
+            messageAll('MsgVotePassed', '\c2The match has been started by vote: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
             startTourneyCountdown();
-         } 
+         }
          else
-            messageAll('MsgVoteFailed', '\c2Start Match vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100)); 
+            messageAll('MsgVoteFailed', '\c2Start Match vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
       }
    }
-   
+
    if(%cause !$= "")
       logEcho($AdminCl.nameBase @ ": start match "@%cause, 1);
 }
@@ -3220,25 +3222,25 @@ function DefaultGame::voteFFAMode( %game, %admin, %client )
 {
    %cause = "";
    %name = getTaggedString(%client.name);
-   
+
    if (%admin)
    {
-      messageAll('MsgAdminForce', '\c2The Admin %1 has switched the server to Free For All mode.', $AdminCl.name);   
-      setModeFFA($CurrentMission, $CurrentMissionType); 
+      messageAll('MsgAdminForce', '\c2The Admin %1 has switched the server to Free For All mode.', $AdminCl.name);
+      setModeFFA($CurrentMission, $CurrentMissionType);
       %cause = "(admin)";
    }
-   else 
+   else
    {
       %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         messageAll('MsgVotePassed', '\c2Server switched to Free For All mode by vote.', %client); 
-         setModeFFA($CurrentMission, $CurrentMissionType); 
+         messageAll('MsgVotePassed', '\c2Server switched to Free For All mode by vote.', %client);
+         setModeFFA($CurrentMission, $CurrentMissionType);
          %cause = "(vote)";
       }
-      else 
-         messageAll('MsgVoteFailed', '\c2Free For All mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100)); 
+      else
+         messageAll('MsgVoteFailed', '\c2Free For All mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
    }
    if(%cause !$= "")
       logEcho($AdminCl.nameBase @ ": free for all set "@%cause, 1);
@@ -3251,7 +3253,7 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
       %display = "unlimited";
    else
       %display = %newLimit;
-      
+
    %cause = "";
    if ( %admin )
    {
@@ -3265,12 +3267,12 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         messageAll('MsgVotePassed', '\c2The mission time limit was set to %1 minutes by vote.', %display);   
+         messageAll('MsgVotePassed', '\c2The mission time limit was set to %1 minutes by vote.', %display);
          $Host::TimeLimit = %newLimit;
          %cause = "(vote)";
       }
-      else 
-         messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100)); 
+      else
+         messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
    }
 
    //if the time limit was actually changed...
@@ -3309,12 +3311,12 @@ function DefaultGame::voteResetServer( %game, %admin, %client )
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         messageAll('MsgVotePassed', '\c2The Server has been reset by vote.' );  
+         messageAll('MsgVotePassed', '\c2The Server has been reset by vote.' );
          resetServerDefaults();
          %cause = "(vote)";
       }
-      else 
-         messageAll('MsgVoteFailed', '\c2The vote to reset Server to defaults did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));  
+      else
+         messageAll('MsgVoteFailed', '\c2The vote to reset Server to defaults did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
    }
    if(%cause !$= "")
       logEcho($AdminCl.nameBase @ ": server reset "@%cause, 1);
@@ -3325,33 +3327,33 @@ function DefaultGame::voteResetServer( %game, %admin, %client )
 function DefaultGame::voteKickPlayer(%game, %admin, %client)
 {
    %cause = "";
-   
-   if(%admin) 
+
+   if(%admin)
    {
       kick(%client, %admin, %client.guid );
       %cause = "(admin)";
    }
-   else 
+   else
    {
       %team = %client.team;
       %totalVotes = %game.votesFor[%game.kickTeam] + %game.votesAgainst[%game.kickTeam];
-      if(%totalVotes > 0 && (%game.votesFor[%game.kickTeam] / %totalVotes) > ($Host::VotePasspercent / 100)) 
+      if(%totalVotes > 0 && (%game.votesFor[%game.kickTeam] / %totalVotes) > ($Host::VotePasspercent / 100))
       {
          kick(%client, %admin, %game.kickGuid);
          %cause = "(vote)";
       }
       else
-      {   
-         for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ ) 
+      {
+         for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
          {
             %cl = ClientGroup.getObject( %idx );
 
             if (%cl.team == %game.kickTeam && !%cl.isAIControlled())
-               messageClient( %cl, 'MsgVoteFailed', '\c2Kick player vote did not pass' ); 
+               messageClient( %cl, 'MsgVoteFailed', '\c2Kick player vote did not pass' );
          }
       }
    }
-   
+
    %game.kickTeam = "";
    %game.kickGuid = "";
    %game.kickClientName = "";
@@ -3365,12 +3367,12 @@ function DefaultGame::banPlayer(%game, %admin, %client)
 {
    %cause = "";
    %name = %client.nameBase;
-   if( %admin ) 
+   if( %admin )
    {
       ban( %client, %admin );
       %cause = "(admin)";
    }
-   
+
    if(%cause !$= "")
       logEcho($AdminCl.nameBase @ ": " @ %name@" (cl "@%client@") banned "@%cause, 1);
 }
@@ -3379,20 +3381,20 @@ function DefaultGame::banPlayer(%game, %admin, %client)
 function DefaultGame::voteAdminPlayer(%game, %admin, %client)
 {
    %cause = "";
-   
-   if (%admin) 
+
+   if (%admin)
    {
-      messageAll('MsgAdminAdminPlayer', '\c2The Admin %3 made %2 an admin.', %client, %client.name, $AdminCl.name);  
+      messageAll('MsgAdminAdminPlayer', '\c2The Admin %3 made %2 an admin.', %client, %client.name, $AdminCl.name);
       %client.isAdmin = 1;
       %cause = "(admin)";
    }
-   else 
+   else
    {
       %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         messageAll('MsgAdminPlayer', '\c2%2 was made an admin by vote.', %client, %client.name);  
+         messageAll('MsgAdminPlayer', '\c2%2 was made an admin by vote.', %client, %client.name);
          %client.isAdmin = 1;
          %cause = "(vote)";
       }
@@ -3411,7 +3413,7 @@ function DefaultGame::processGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4
    if ((%client.team == 0) && isObject(%targetClient) && (%targetClient.team != 0))
    {
       %prevObsClient = %client.observeClient;
-      
+
       // update the observer list for this client
       observerFollowUpdate( %client, %targetClient, %prevObsClient !$= "" );
 
@@ -3420,8 +3422,8 @@ function DefaultGame::processGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4
 
       if (%targetClient != %prevObsClient)
       {
-         messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);  
-         messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);  
+         messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
+         messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
       }
    }
 }
@@ -3431,17 +3433,17 @@ function DefaultGame::voteRandomTeams(%game, %admin)
 {
    %setto = "";
    %cause = "";
-   if(%admin) 
+   if(%admin)
    {
       if($RandomTeams)
       {
-         messageAll( 'MsgAdminForce', '\c3%1\c2: RANDOM TEAMS DISABLED. Changes will take place next mission.', $AdminCl.name);   
+         messageAll( 'MsgAdminForce', '\c3%1\c2: RANDOM TEAMS DISABLED. Changes will take place next mission.', $AdminCl.name);
          $Host::ClassicRandomizeTeams = $RandomTeams = 0;
          %setto = "disabled";
       }
       else
       {
-         messageAll( 'MsgAdminForce', '\c3%1\c2: RANDOM TEAMS ENABLED. Changes will take place next mission.', $AdminCl.name);  
+         messageAll( 'MsgAdminForce', '\c3%1\c2: RANDOM TEAMS ENABLED. Changes will take place next mission.', $AdminCl.name);
          $Host::ClassicRandomizeTeams = $RandomTeams = 1;
          %setto = "enabled";
       }
@@ -3453,7 +3455,7 @@ function DefaultGame::voteRandomTeams(%game, %admin)
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         if($RandomTeams) 
+         if($RandomTeams)
          {
             messageAll('MsgVotePassed', '\c3Vote\c2: RANDOM TEAMS DISABLED. Changes will take place next mission.');
             $Host::ClassicRandomizeTeams = $RandomTeams = 0;
@@ -3461,7 +3463,7 @@ function DefaultGame::voteRandomTeams(%game, %admin)
          }
          else
          {
-            messageAll('MsgVotePassed', '\c3Vote\c2: RANDOM TEAMS ENABLED. Changes will take place next mission.');  
+            messageAll('MsgVotePassed', '\c3Vote\c2: RANDOM TEAMS ENABLED. Changes will take place next mission.');
             $Host::ClassicRandomizeTeams = $RandomTeams = 1;
             %setto = "enabled";
          }
@@ -3470,9 +3472,9 @@ function DefaultGame::voteRandomTeams(%game, %admin)
       else
       {
          if($RandomTeams)
-            messageAll('MsgVoteFailed', '\c2Disable randomize teams vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));  
+            messageAll('MsgVoteFailed', '\c2Disable randomize teams vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
          else
-            messageAll('MsgVoteFailed', '\c2Enable randomize teams vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));   
+            messageAll('MsgVoteFailed', '\c2Enable randomize teams vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
       }
    }
    if(%setto !$= "")
@@ -3484,17 +3486,17 @@ function DefaultGame::voteFairTeams(%game, %admin)
 {
    %setto = "";
    %cause = "";
-   if(%admin) 
+   if(%admin)
    {
       if($FairTeams)
       {
-         messageAll( 'MsgAdminForce', '\c3%1\c2: FAIR TEAMS DISABLED. Changes will take place next mission.', $AdminCl.name);   
+         messageAll( 'MsgAdminForce', '\c3%1\c2: FAIR TEAMS DISABLED. Changes will take place next mission.', $AdminCl.name);
          $Host::ClassicFairTeams = $FairTeams = 0;
          %setto = "disabled";
       }
       else
       {
-         messageAll( 'MsgAdminForce', '\c3%1\c2: FAIR TEAMS ENABLED. Changes will take place next mission.', $AdminCl.name);  
+         messageAll( 'MsgAdminForce', '\c3%1\c2: FAIR TEAMS ENABLED. Changes will take place next mission.', $AdminCl.name);
          $Host::ClassicFairTeams = $FairTeams = 1;
          %setto = "enabled";
       }
@@ -3506,7 +3508,7 @@ function DefaultGame::voteFairTeams(%game, %admin)
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         if($FairTeams) 
+         if($FairTeams)
          {
             messageAll('MsgVotePassed', '\c3Vote\c2: FAIR TEAMS DISABLED. Changes will take place next mission.');
             $Host::ClassicFairTeams = $FairTeams = 0;
@@ -3514,7 +3516,7 @@ function DefaultGame::voteFairTeams(%game, %admin)
          }
          else
          {
-            messageAll('MsgVotePassed', '\c3Vote\c2: FAIR TEAMS ENABLED. Changes will take place next mission.');  
+            messageAll('MsgVotePassed', '\c3Vote\c2: FAIR TEAMS ENABLED. Changes will take place next mission.');
             $Host::ClassicFairTeams = $FairTeams = 1;
             %setto = "enabled";
          }
@@ -3523,9 +3525,9 @@ function DefaultGame::voteFairTeams(%game, %admin)
       else
       {
          if($FairTeams)
-            messageAll('MsgVoteFailed', '\c2Disable fair teams vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));  
+            messageAll('MsgVoteFailed', '\c2Disable fair teams vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
          else
-            messageAll('MsgVoteFailed', '\c2Enable fair teams vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));   
+            messageAll('MsgVoteFailed', '\c2Enable fair teams vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
       }
    }
    if(%setto !$= "")
@@ -3611,7 +3613,7 @@ function DefaultGame::clearserver(%game, %admin)
 
 function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
-   if(%admin) 
+   if(%admin)
    {
       messageAll('MsgAdminForce', '\c2The Admin %1 has skipped to the next mission.',$AdminCl.name );
       echo($AdminCl.nameBase @ ": mission skipped (admin)");
@@ -3625,11 +3627,11 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
-         messageAll('MsgVotePassed', '\c2The mission was skipped to next by vote.'); 
+         messageAll('MsgVotePassed', '\c2The mission was skipped to next by vote.');
          echo("mission skipped (vote)");
          %game.gameOver();
          //loadMission( findNextCycleMission(), $CurrentMissionType, false );
-         cycleMissions();   
+         cycleMissions();
       }
       else
          messageAll('MsgVoteFailed', '\c2Skip mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
@@ -3643,7 +3645,7 @@ function DefaultGame::updateScoreHud(%game, %client, %tag)
    if (Game.numTeams > 1)
    {
       // Send header:
-      messageClient( %client, 'SetScoreHudHeader', "", '<tab:15,315>\t%1<rmargin:260><just:right>%2<rmargin:560><just:left>\t%3<just:right>%4', 
+      messageClient( %client, 'SetScoreHudHeader', "", '<tab:15,315>\t%1<rmargin:260><just:right>%2<rmargin:560><just:left>\t%3<just:right>%4',
             %game.getTeamName(1), $TeamScore[1], %game.getTeamName(2), $TeamScore[2] );
 
       // Send subheader:
@@ -3698,13 +3700,13 @@ function DefaultGame::updateScoreHud(%game, %client, %tag)
          //if the client is not an observer, send the message
          if (%client.team != 0)
          {
-            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20,320>\t<spush>%5<clip:200>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200>%3</clip><just:right>%4', 
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20,320>\t<spush>%5<clip:200>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200>%3</clip><just:right>%4',
                   %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style );
          }
          //else for observers, create an anchor around the player name so they can be observed
          else
          {
-            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20,320>\t<spush>%5<clip:200><a:gamelink\t%7>%1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8>%3</a></clip><just:right>%4', 
+            messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:20,320>\t<spush>%5<clip:200><a:gamelink\t%7>%1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:200><a:gamelink\t%8>%3</a></clip><just:right>%4',
                   %team1Client.name, %team1ClientScore, %team2Client.name, %team2ClientScore, %col1Style, %col2Style, %team1Client, %team2Client );
          }
 
@@ -3765,20 +3767,20 @@ function DefaultGame::updateScoreHud(%game, %client, %tag)
          if (%client.team != 0)
          {
             if ( %numColumns == 2 )
-               messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:25,325>\t<spush>%5<clip:195>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:195>%3</clip><just:right>%4', 
+               messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:25,325>\t<spush>%5<clip:195>%1</clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:195>%3</clip><just:right>%4',
                      %col1Client.name, %col1ClientScore, %col2Client.name, %col2ClientScore, %col1Style, %col2Style );
             else
-               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:25>\t%3<clip:195>%1</clip><rmargin:260><just:right>%2', 
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:25>\t%3<clip:195>%1</clip><rmargin:260><just:right>%2',
                      %col1Client.name, %col1ClientScore, %col1Style );
          }
          //else for observers, create an anchor around the player name so they can be observed
          else
          {
             if ( %numColumns == 2 )
-               messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:25,325>\t<spush>%5<clip:195><a:gamelink\t%7>%1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:195><a:gamelink\t%8>%3</a></clip><just:right>%4', 
+               messageClient(%client, 'SetLineHud', "", %tag, %index, '<tab:25,325>\t<spush>%5<clip:195><a:gamelink\t%7>%1</a></clip><rmargin:260><just:right>%2<spop><rmargin:560><just:left>\t%6<clip:195><a:gamelink\t%8>%3</a></clip><just:right>%4',
                      %col1Client.name, %col1ClientScore, %col2Client.name, %col2ClientScore, %col1Style, %col2Style, %col1Client, %col2Client );
             else
-               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:25>\t%3<clip:195><a:gamelink\t%4>%1</a></clip><rmargin:260><just:right>%2', 
+               messageClient( %client, 'SetLineHud', "", %tag, %index, '<tab:25>\t%3<clip:195><a:gamelink\t%4>%1</a></clip><rmargin:260><just:right>%2',
                      %col1Client.name, %col1ClientScore, %col1Style, %col1Client );
          }
       }
@@ -3843,25 +3845,25 @@ function notifyMatchStart(%time)
 function notifyMatchEnd(%time)
 {
    %seconds = mFloor(%time / 1000);
-   
+
    if (%seconds > 1) {
       MessageAll('MsgMissionEnd', '\c2Match ends in %1 seconds.~wfx/misc/hunters_%1.wav', %seconds);
    }
    else if (%seconds == 1)
       MessageAll('MsgMissionEnd', '\c2Match ends in 1 second.~wfx/misc/hunters_1.wav');
-  
+
    UpdateClientTimes(%time);
 }
 
 function notifyMatchEndMinutes(%time)
 {
    %seconds = mFloor(%time / 1000);
-   
+
    if (%seconds == 180)
       MessageAll('MsgMissionEndMinutes', '\c2Match ends in 3 minutes.~wfx/misc/flagself.wav');
    else if (%seconds == 120)
       MessageAll('MsgMissionEndMinutes', '\c2Match ends in 2 minutes.~wfx/misc/flagself.wav');
-  
+
    UpdateClientTimes(%time);
 }
 

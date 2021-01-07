@@ -4859,8 +4859,12 @@ function incGameStats(%dtStats,%game) {// record that games stats and inc by one
                    %mapVal = getField(%dtStats.mapStats[getMapIDName(%game),%game],%varID);
                else
                   %mapVal = 0;
-               if(%val < %mapVal && %val != 0 || !%mapVal){  setValueField(%dtStats,getMapIDName(%game),"m",%game,%varID,%val);}
-               else{                                         setValueField(%dtStats,getMapIDName(%game),"m",%game,%varID,%mapVal);}
+               if(%val < %mapVal && %val != 0 || !%mapVal){
+				   setValueField(%dtStats,getMapIDName(%game),"m",%game,%varID,%val);
+			   }
+               else{
+				   setValueField(%dtStats,getMapIDName(%game),"m",%game,%varID,%mapVal);
+			   }
                setValueField(%dtStats,"varName","m",%game,%varID,%varNameType);
             }
             for(%x = 1; %x <= 9; %x+=2){

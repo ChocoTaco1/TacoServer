@@ -14,7 +14,7 @@
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 8.7; 
+$dtStats::version = 8.8; 
 //disable stats system
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -26,7 +26,9 @@ $dtStats::viewSelf = 0;
 $dtStats::MaxNumOfGames = 100;
 //number of games for running average 
 $dtStats::avgCount = 10;
+// number of players to start tracking totals
 
+$dtStats::minTotal = 6;
 //how high the player has to be off the ground before it will count
 $dtStats::midAirHeight = 10;
 
@@ -353,8 +355,8 @@ $dtStats::FVG[$dtStats::FCG["SCtFGame","TG"]++,"SCtFGame","TG"] = "escortAssists
 $dtStats::FVG[$dtStats::FCG["SCtFGame","TG"]++,"SCtFGame","TG"] = "defenseScore";
 $dtStats::FVG[$dtStats::FCG["SCtFGame","TG"]++,"SCtFGame","TG"] = "offenseScore";
 $dtStats::FVG[$dtStats::FCG["SCtFGame","TG"]++,"SCtFGame","TG"] = "flagDefends";
-
-$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "winCount";// in this script only
+// in this script only
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "winCount";
 $dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "lossCount";
 $dtStats::FV[$dtStats::FC["SCtFGame","Min"]++,"SCtFGame","Min"] = "heldTimeSec";
 $dtStats::FV[$dtStats::FC["SCtFGame","Min"]++,"SCtFGame","Min"] = "heldTimeSecLow";
@@ -634,7 +636,6 @@ $dtStats::FV[$dtStats::FC["Max"]++,"Max"] = "maxSpeed";
 $dtStats::FV[$dtStats::FC["Avg"]++,"Avg"] = "avgSpeed";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "comboCount";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "distMov";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "weaponScore"; 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "firstKill"; 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lastKill"; 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "deathKills";
@@ -1023,20 +1024,6 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaDeathGroundGround";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "blasterDeathGroundGround";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mineDeathGroundGround";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelDeathGroundGround";
-
-
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "cgScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "discScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "hGrenadeScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "grenadeScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "laserScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mortarScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "missileScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "shockScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "blasterScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mineScore";
-$dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "satchelScore";
 
 
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "cgKillAir"; // air kills
@@ -4032,31 +4019,6 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
    
    %dtStats.gamePCT = mFloor(%game.getGamePct() - %dtStats.joinPCT);
    
-   %dtStats.cgScore         = (%dtStats.cgKill      + %dtStats.cgMA       + %dtStats.cgKillAir        + (%dtStats.cgKillDist/100)      + %dtStats.cgCom) / 100;
-   %dtStats.discScore       = %dtStats.discKill     + %dtStats.discMA     + %dtStats.discKillAir      + (%dtStats.discKillDist/100)    + %dtStats.discCom;
-   %dtStats.hGrenadeScore   = %dtStats.hGrenadeKill + %dtStats.hGrenadeMA + %dtStats.hGrenadeKillAir  + (%dtStats.hGrenadeKillDist/20) + %dtStats.hGrenadeCom;
-   %dtStats.grenadeScore    = %dtStats.grenadeKill  + %dtStats.grenadeMA  + %dtStats.grenadeKillAir   + (%dtStats.grenadeKillDist/100) + %dtStats.grenadeCom;
-   %dtStats.laserScore      = %dtStats.laserKill    + %dtStats.laserMA    + %dtStats.laserKillAir     + (%dtStats.laserKillDist/250)   + %dtStats.laserCom    + %dtStats.laserHeadShot;
-   %dtStats.mortarScore     = %dtStats.mortarKill   + %dtStats.mortarMA   + %dtStats.mortarKillAir    + (%dtStats.mortarKillDist/50)   + %dtStats.mortarCom;
-   %dtStats.missileScore    = (%dtStats.missileKill + %dtStats.missileMA  + %dtStats.missileKillAir   + (%dtStats.missileKillDist/500) + %dtStats.missileCom) / 10;
-   %dtStats.shockScore      = %dtStats.shockKill    + %dtStats.shockMA    + %dtStats.shockKillAir     + (%dtStats.shockKillDist/2)     + %dtStats.shockCom    + %dtStats.shockRearShot;
-   %dtStats.plasmaScore     = %dtStats.plasmaKill   + %dtStats.plasmaMA   + %dtStats.plasmaKillAir    + (%dtStats.plasmaKillDist/50)   + %dtStats.plasmaCom;
-   %dtStats.blasterScore    = %dtStats.blasterKill  + %dtStats.blasterMA  + %dtStats.blasterKillAir   + (%dtStats.blasterKillDist/50)  + %dtStats.blasterCom;
-   %dtStats.mineScore       = %dtStats.mineKill     + %dtStats.mineMA     + %dtStats.mineKillAir      + %dtStats.mineCom;
-   %dtStats.satchelScore    = %dtStats.satchelKill  + %dtStats.satchelMA  + %dtStats.satchelKillAir   + %dtStats.satchelCom;
-   
-   %dtStats.weaponScore =   %dtStats.cgScore + 
-                           %dtStats.discScore + 
-                           %dtStats.grenadeScore + 
-                           %dtStats.laserScore + 
-                           %dtStats.mortarScore + 
-                           %dtStats.shockScore + 
-                           %dtStats.plasmaScore + 
-                           %dtStats.blasterScore + 
-                           %dtStats.hGrenadeScore + 
-                           %dtStats.missileScore + 
-                           %dtStats.mineScore;
-   
    %dtStats.totalMA = %dtStats.discMA + 
                      %dtStats.grenadeMA + 
                      %dtStats.laserMA + 
@@ -4114,7 +4076,7 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
       %dtStats.grenadeDmgACC = 0;
    }
    
-   if(%dtStats.laserShotsFired < 5)
+   if(%dtStats.laserShotsFired < 10)
       %dtStats.laserACC = 0;
    
    if(%dtStats.mortarShotsFired < 10){
@@ -4122,7 +4084,7 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
       %dtStats.mortarDmgACC = 0;
    }
    
-   if(%dtStats.shockShotsFired < 5)
+   if(%dtStats.shockShotsFired < 10)
       %dtStats.shockACC = 0;
    
    if(%dtStats.plasmaShotsFired < 10){
@@ -4135,16 +4097,6 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
    
    if(%dtStats.hGrenadeShotsFired < 6)
       %dtStats.hGrenadeACC = 0;
-   
-   //if(%dtStats.mineShotsFired < 10){
-      //%dtStats.mineACC = 0;
-      //%dtStats.mineDiscPct = 0;
-      //%dtStats.mineDiscAccMP = 0;
-      //
-   //}
-   
-   //if(%dtStats.mineDiscShots < 5)
-      //%dtStats.mineDiscAcc = 0;
       
    if(%dtStats.satchelShotsFired < 5)
       %dtStats.satchelACC = 0;
@@ -8102,14 +8054,14 @@ function statsMenu(%client,%game){
             }
             messageClient( %client, 'SetScoreHudSubheader', "", '<a:gamelink\tS\tView\t%1>  Back</a>  -  <a:gamelink\tS\tReset\t%1>Return To Score Screen</a>',%vClient,%lType);
             
-            %header = '<tab:0,50,65,200,320,460>\t<color:0befe7> \t# \t%2\tScore\tWeapons\tScore';
+            %header = '<tab:0,50,65,200,320,460>\t<color:0befe7> \t# \t%2\tScore\tKills\tTotal';
             messageClient( %client, 'SetLineHud', "", %tag, %index++, %header,%vClient,$dtStats::gtNameLong[%client.lgame]);
             
             for(%i = 0; %i < 10; %i++){
                %scoreName  = getField($lData::name["scoreTG",%client.lgame,%lType,%mon,%year],%i);
                %gameScore  = getField($lData::data["scoreTG",%client.lgame,%lType,%mon,%year],%i);
-               %wepName  = getField($lData::name["weaponScoreTG",%client.lgame,%lType,%mon,%year],%i);
-               %wepScore  = getField($lData::data["weaponScoreTG",%client.lgame,%lType,%mon,%year],%i);
+               %wepName  = getField($lData::name["killsTG",%client.lgame,%lType,%mon,%year],%i);
+               %wepScore  = getField($lData::data["killsTG",%client.lgame,%lType,%mon,%year],%i);
                if(%gameScore){
                   %line = '<tab:0,50,65,200,320,460>\t<font:univers condensed:18> \t%3. \t<color:0befe7><clip:138>%1</clip><color:03d597>\t%4\t<color:0befe7><clip:138>%2</clip><color:03d597>\t%5';
                   messageClient( %client, 'SetLineHud', "", %tag, %index++, %line,%scoreName,%wepName,%i+1,%gameScore,mFloor(%wepScore+0.5));
@@ -12478,7 +12430,7 @@ function prefTest(%time,%skip){
    if(isGameRun() && !$dtStats::building && %plCount > 1){// only track during run time  
       %dif = (%real - %time) - $dtStats::prefTestTime; 
       if(%dif > $dtStats::prefTolerance && !%skip){ 
-         %msg = "Server Hang" SPC dtFormatTime(getSimTime()) SPC "Delay =" SPC %dif @ "ms" SPC "Player Count =" SPC %plCount;
+         %msg = "Server Hang" SPC dtFormatTime(getSimTime()) SPC "Delay =" SPC %dif @ "ms" SPC "Player Count =" SPC %plCount SPC $CurrentMission;
          if($dtStats::debugEchos){error(%msg);}
          $dtServer::serverHangTotal++;
          $dtServer::serverHangMap[cleanMapName($CurrentMission),Game.class]++;
@@ -12532,7 +12484,6 @@ function dtPingAvg(){
          %cl.lastPing = %ping;
          if(%ping > 500){
             %cl.dtStats.lagSpikes++;
-            %vhPing++;
             %hpCount++;
          }
          else if(%ping > 200){
@@ -12574,7 +12525,7 @@ function dtPingAvg(){
       if(%hpct >= 0.5){
          if($dtStats::pingAvg > 1000){//network issues 
             if(getSimTime() - $dtStats:evTime[2] > $dtStats::eventLockout){
-               %msg = "Host Hang" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC %hpCount  @ "/" @ %vhPing @ "/" @ %pc;
+               %msg = "Host Hang" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC %hpCount  @ "/" @ %pc;
                if($dtStats::debugEchos){error(%msg);}
                dtEventLog(%msg, 0);
                $dtServer::hostHangMap[cleanMapName($CurrentMission),Game.class]++;
@@ -12586,17 +12537,17 @@ function dtPingAvg(){
          }
          else if($dtStats::pingAvg > 500){
             if(getSimTime() - $dtStats:evTime[3] > $dtStats::eventLockout){
-               %msg = "500+ Ping" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC %hpCount  @ "/" @ %vhPing @ "/" @ %pc;
+               %msg = "500+ Ping" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC %hpCount @ "/" @ %pc;
                if($dtStats::debugEchos){error(%msg);}
                dtEventLog(%msg, 0);
                $dtStats:evTime[3] = getSimTime();
             }
          }
-         else if($dtStats::pingAvg > 200){
+         else if($dtStats::pingAvg > 250){
             if(getSimTime() - $dtStats:evTime[4] > $dtStats::eventLockout){
-               %msg = "200+ Ping" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC  %hpCount @ "/" @ %pc;
+               %msg = "250+ Ping" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC  %hpCount @ "/" @ %pc;
                if($dtStats::debugEchos){error(%msg);}
-               dtEventLog(%msg, 0);
+               error(%msg, 0);
                $dtStats:evTime[4] = getSimTime();
             }
          }
@@ -12610,7 +12561,7 @@ function dtPingAvg(){
       }
    }
 } 
-$dtStats::eventMax = 100; 
+$dtStats::eventMax = 100;
 function dtEventLog(%log,%save){
    %count = $dtServer::eventLogCount++;
    if($dtServer::eventMax < $dtStats::eventMax)
@@ -12943,3 +12894,8 @@ function testVarsRandomAll(%max){
 //
 //    8.7
 //    Server monitor fix/tweaks 
+//
+//    8.8
+//    Removed arbitrary weapon scores  replaced with total kills
+//    Added map name to server hang in case its a map issue we need to keep an eye on
+//    200+ server warning now only echos to console 

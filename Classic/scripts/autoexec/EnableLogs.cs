@@ -85,6 +85,34 @@ function voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
    }
 }
 
+// votePercentLog(%client, %typeName, %key, %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, %game.totalVotesNone)
+// Info: Logs voting percent events
+function votePercentLog(%display, %typeName, %key, %voteYay, %voteNay, %voteTotal, %voteNone) //%voteNone = Did Not Vote (DNV)
+{
+   if($Host::ClassicVoteLog)
+   { 
+	  // Dif calc for "VoteKickPlayer"
+	  if(%typeName $= "VoteKickPlayer")
+	  {
+		   %percent = mFloor((%voteYay/ClientGroup.getCount()) * 100);
+		   %voteNone = "N/A";
+		   %display = %typeName SPC "[" @ %display.nameBase @ "]";
+	  }
+	  else
+	  {
+		  %percent = mFloor((%voteYay/(ClientGroup.getCount() - %voteNone)) * 100);
+		  %display = %typeName SPC "[" @ %display @ "]";
+	  }
+
+	  $VoteLog = "[" @ %key @ "]" SPC %display SPC "Yay[" @ %voteYay @ "] Nay[" @ %voteNay @ "] Total[" @ %voteTotal @ "] Vote%[" @ %percent @ "] DNV[" @ %voteNone @ "]";
+
+      // this is the info that will be logged
+	  %logpath = $Host::ClassicVoteLogPath;
+	  export("$VoteLog", %logpath, true);
+	  logEcho($VoteLog);
+   }
+}
+
 // From Goon
 // Slightly more elegant solution rather than spamming console
 function ClassicChatLog(%client, %id, %team, %msg)

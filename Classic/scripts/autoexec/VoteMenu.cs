@@ -704,6 +704,7 @@ function DefaultGame::cancelMatchStart(%game, %admin)
 function DefaultGame::voteKickPlayer(%game, %admin, %client)
 {
    %cause = "";
+   %typeName = "VoteKickPlayer";
 
    if(isObject(%admin))
    {
@@ -718,6 +719,8 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
       {
          kick(%client, %admin, %game.kickGuid);
          %cause = "(vote)";
+		  
+		 %key = "Passed";
       }
       else
       {
@@ -728,8 +731,12 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
             if (%cl.team == %game.kickTeam && !%cl.isAIControlled())
                messageClient( %cl, 'MsgVoteFailed', '\c2Kick player vote did not pass.' );
          }
+		 %key = "Failed";
       }
    }
+
+   //Log Vote %
+   votePercentLog(%client, %typeName, %key, %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, %game.totalVotesNone);
 
    %game.kickTeam = "";
    %game.kickGuid = "";
@@ -742,6 +749,8 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
 //------------------------------------------------------------------------------
 function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typeDisplayName, %missionId, %missionTypeId)
 {
+   %typeName = "VoteChangeMission";
+   
    %mission = $HostMissionFile[%missionId];
    if ( %mission $= "" )
    {
@@ -770,17 +779,30 @@ function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typ
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          messageAll('MsgVotePassed', '\c2The mission was changed to %1 (%2) by vote.', %missionDisplayName, %typeDisplayName );
+
+		 //Log Vote % - Must be before Game Over
+		 %key = "Passed";
+		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
+
          %game.gameOver();
          loadMission( %mission, %missionType, false );
       }
       else
+	  {
          messageAll('MsgVoteFailed', '\c2Change mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
+
+		 //Log Vote %
+		 %key = "Failed";
+		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
+	  }
    }
 }
 
 //------------------------------------------------------------------------------
 function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %typeDisplayName, %missionId, %missionTypeId )
 {
+   %typeName = "VoteTournamentMode";
+   
    %mission = $HostMissionFile[%missionId];
    if ( %mission $= "" )
    {
@@ -808,10 +830,21 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100)) 
       {
          messageAll('MsgVotePassed', '\c2Server switched to Tournament mode by vote (%1): %2 percent.', %missionDisplayName, mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
+		 
+		 //Log Vote % - Must be before Game Over
+		 %key = "Passed";
+		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
+		 
          setModeTournament( %mission, %missionType );
       }
       else
-         messageAll('MsgVoteFailed', '\c2Tournament mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
+	  {
+		 //Log Vote %
+		 %key = "Failed";
+		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
+		 
+		 messageAll('MsgVoteFailed', '\c2Tournament mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
+	  }
    }
 
    if(%cause !$= "")
@@ -821,6 +854,8 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
 //------------------------------------------------------------------------------
 function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
 {
+   %typeName = "VoteChangeTimeLimit";
+   
    if( %newLimit == 999 )
       %display = "unlimited";
    else
@@ -844,13 +879,19 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
 		 ResetVOTimeChanged(%game);
 		 // Reset the voted time limit when changing mission
          $TimeLimitChanged = 1;
+
+		 %key = "Passed";
       }
       else
 	  {
          messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
 		 // VoteOvertime
 		 ResetVOall(%game);
+
+		 %key = "Failed";
 	  }
+	  //Log Vote %
+	  votePercentLog(%newLimit, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
    }
 
    //if the match has been started, reset the end of match countdown
@@ -894,6 +935,8 @@ function DefaultGame::voteFFAMode( %game, %admin, %client )
 
 function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
+   %typeName = "VoteSkipMission";
+   
    if(isObject(%admin))
    {
       messageAll('MsgAdminForce', '\c2The Admin %1 has skipped to the next mission.',%admin.name );
@@ -908,13 +951,24 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          messageAll('MsgVotePassed', '\c2The mission was skipped to next by vote.');
+		 
+		 //Log Vote % - Must be before Game Over
+		 %key = "Passed";
+		 votePercentLog("N/A", %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
+		 
          echo("mission skipped (vote)");
          %game.gameOver();
          //loadMission( findNextCycleMission(), $CurrentMissionType, false );
          cycleMissions();
       }
       else
+	  {
          messageAll('MsgVoteFailed', '\c2Skip mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
+		 
+		 //Log Vote %
+		 %key = "Failed";
+		 votePercentLog("N/A", %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
+	  }
    }
 }
 

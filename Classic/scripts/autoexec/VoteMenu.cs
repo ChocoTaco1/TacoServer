@@ -880,18 +880,21 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
 		 // Reset the voted time limit when changing mission
          $TimeLimitChanged = 1;
 
+		 //Log Vote %
 		 %key = "Passed";
+		 votePercentLog(%newLimit, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
       }
       else
 	  {
          messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
+
+		 //Log Vote %
+		 %key = "Failed";
+	     votePercentLog(%newLimit, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
+		 
 		 // VoteOvertime
 		 ResetVOall(%game);
-
-		 %key = "Failed";
 	  }
-	  //Log Vote %
-	  votePercentLog(%newLimit, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
    }
 
    //if the match has been started, reset the end of match countdown

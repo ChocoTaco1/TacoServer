@@ -765,15 +765,16 @@ function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typ
    }
    else
    {
-		  %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-		  if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100))
+	  %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+      // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          messageAll('MsgVotePassed', '\c2The mission was changed to %1 (%2) by vote.', %missionDisplayName, %typeDisplayName );
          %game.gameOver();
          loadMission( %mission, %missionType, false );
       }
       else
-         messageAll('MsgVoteFailed', '\c2Change mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+         messageAll('MsgVoteFailed', '\c2Change mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
    }
 }
 
@@ -802,14 +803,15 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
    }
    else
    {
-		  %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-		  if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100))
+      %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+      // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100)) 
       {
-         messageAll('MsgVotePassed', '\c2Server switched to Tournament mode by vote (%1): %2 percent.', %missionDisplayName, mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+         messageAll('MsgVotePassed', '\c2Server switched to Tournament mode by vote (%1): %2 percent.', %missionDisplayName, mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
          setModeTournament( %mission, %missionType );
       }
       else
-         messageAll('MsgVoteFailed', '\c2Tournament mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+         messageAll('MsgVoteFailed', '\c2Tournament mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
    }
 
    if(%cause !$= "")
@@ -832,8 +834,9 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
    }
    else
    {
-		  %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-		  if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100))
+      %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+      // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          messageAll('MsgVotePassed', '\c2The mission time limit was set to %1 minutes by vote.', %display);
          $Host::TimeLimit = %newLimit;
@@ -844,7 +847,7 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
       }
       else
 	  {
-         messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+         messageAll('MsgVoteFailed', '\c2The vote to change the mission time limit did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
 		 // VoteOvertime
 		 ResetVOall(%game);
 	  }
@@ -877,14 +880,15 @@ function DefaultGame::voteFFAMode( %game, %admin, %client )
    }
    else
    {
-		  %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-		  if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100))
+      %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+      // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          messageAll('MsgVotePassed', '\c2Server switched to Free For All mode by vote.', %client);
          setModeFFA($CurrentMission, $CurrentMissionType);
       }
       else
-         messageAll('MsgVoteFailed', '\c2Free For All mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+         messageAll('MsgVoteFailed', '\c2Free For All mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
    }
 }
 
@@ -899,8 +903,9 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
    }
    else
    {
-		  %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-		  if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100))
+      %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+      // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          messageAll('MsgVotePassed', '\c2The mission was skipped to next by vote.');
          echo("mission skipped (vote)");
@@ -909,7 +914,7 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
          cycleMissions();
       }
       else
-         messageAll('MsgVoteFailed', '\c2Skip mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+         messageAll('MsgVoteFailed', '\c2Skip mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
    }
 }
 
@@ -941,14 +946,15 @@ function DefaultGame::voteMatchStart( %game, %admin)
       }
       else
       {
-			 	 %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-	       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100))
+		%totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+		// Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
+		if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
          {
-            messageAll('MsgVotePassed', '\c2The match has been started by vote: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+            messageAll('MsgVotePassed', '\c2The match has been started by vote: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
             startTourneyCountdown();
          }
          else
-            messageAll('MsgVoteFailed', '\c2Start Match vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+            messageAll('MsgVoteFailed', '\c2Start Match vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
       }
    }
 }
@@ -975,8 +981,9 @@ function DefaultGame::voteTeamDamage(%game, %admin)
    }
    else
    {
-		  %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-		  if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100))
+      %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
+      // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          if($teamDamage)
          {
@@ -994,9 +1001,9 @@ function DefaultGame::voteTeamDamage(%game, %admin)
       else
       {
          if($teamDamage)
-            messageAll('MsgVoteFailed', '\c2Disable team damage vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+            messageAll('MsgVoteFailed', '\c2Disable team damage vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
          else
-            messageAll('MsgVoteFailed', '\c2Enable team damage vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
+            messageAll('MsgVoteFailed', '\c2Enable team damage vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
       }
    }
 }

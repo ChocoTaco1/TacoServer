@@ -87,7 +87,7 @@ function voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
 
 // votePercentLog(%client, %typeName, %key, %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, %game.totalVotesNone)
 // Info: Logs voting percent events
-function votePercentLog(%display, %typeName, %key, %voteYay, %voteNay, %voteTotal, %voteNone) //%voteNone = Did Not Vote (DNV)
+function votePercentLog(%display, %typeName, %key, %voteYay, %voteNay, %voteTotal, %voteNone) //%voteNone = Did Not Vote (DNV) (Abstain)
 {
    if($Host::ClassicVoteLog)
    { 
@@ -104,7 +104,7 @@ function votePercentLog(%display, %typeName, %key, %voteYay, %voteNay, %voteTota
 		  %display = %typeName SPC "[" @ %display @ "]";
 	  }
 
-	  $VoteLog = "[" @ %key @ "]" SPC %display SPC "Yay[" @ %voteYay @ "] Nay[" @ %voteNay @ "] Total[" @ %voteTotal @ "] Vote%[" @ %percent @ "] DNV[" @ %voteNone @ "]";
+   $VoteLog = "[" @ %key @ "]" SPC %display SPC "Yay[" @ %voteYay @ "] Nay[" @ %voteNay @ "] Abstain[" @ %voteNone @ "] Total[" @ %voteTotal @ "] Vote%[" @ %percent @ "]";
 
       // this is the info that will be logged
 	  %logpath = $Host::ClassicVoteLogPath;

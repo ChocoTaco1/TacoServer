@@ -738,7 +738,7 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
    //Log Vote %
    votePercentLog(%client, %typeName, %key, %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, %game.totalVotesNone);
    //Show Vote %
-   messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Total: %3 [%4%5]', %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, mfloor((%game.votesFor[%game.kickTeam] / %totalVotes) * 100), "%", %key);
+   messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Total: %3 [%4%5]', %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, mfloor((%game.votesFor[%game.kickTeam] / %totalVotes) * 100), "%", %key);
 
    %game.kickTeam = "";
    %game.kickGuid = "";
@@ -786,7 +786,7 @@ function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typ
 		 %key = "Passed";
 		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
-		 messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
+		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
 
          %game.gameOver();
          loadMission( %mission, %missionType, false );
@@ -799,7 +799,7 @@ function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typ
 		 %key = "Failed";
 		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
-		 messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
+		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
 	  }
    }
 }
@@ -841,7 +841,7 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
 		 %key = "Passed";
 		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
-		 messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
+		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
 		 
          setModeTournament( %mission, %missionType );
       }
@@ -851,7 +851,7 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
 		 %key = "Failed";
 		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
-		 messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
+		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
 		 
 		 messageAll('MsgVoteFailed', '\c2Tournament mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
 	  }
@@ -894,7 +894,7 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
 		 %key = "Passed";
 		 votePercentLog(%newLimit, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
-		 messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
+		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
       }
       else
 	  {
@@ -904,7 +904,7 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
 		 %key = "Failed";
 	     votePercentLog(%newLimit, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
-		 messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
+		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
 		 
 		 // VoteOvertime
 		 ResetVOall(%game);
@@ -973,7 +973,7 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 		 %key = "Passed";
 		 votePercentLog("N/A", %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
-		 messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
+		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
 		 
          echo("mission skipped (vote)");
          %game.gameOver();
@@ -988,7 +988,7 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 		 %key = "Failed";
 		 votePercentLog("N/A", %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
-		 messageAll('', '\c1Vote %6: \c0Yay: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
+		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
 	  }
    }
 }

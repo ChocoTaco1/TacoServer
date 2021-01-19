@@ -12517,7 +12517,7 @@ function dtPingAvg(){
          }
       }
 
-      if(%plCount / %pc >= 0.5){
+      if(%plCount / %pc > 0.5){
          if(getSimTime() - $dtStats:evTime[1] > $dtStats::eventLockout){
             %msg = "Packet Loss" SPC dtFormatTime(getSimTime()) SPC "Packet Loss Count =" SPC %plCount SPC "Player Count =" SPC %pc;
             dtEventLog(%msg, 0);
@@ -12526,7 +12526,7 @@ function dtPingAvg(){
          }
       }
       %hpct =  (%hpCount > 0) ? (%hpCount/%pc) : 0;
-      if(%hpct >= 0.5){
+      if(%hpct > 0.5){
          if($dtStats::pingAvg > 1000){//network issues
             if(getSimTime() - $dtStats:evTime[2] > $dtStats::eventLockout){
                %msg = "Host Hang" SPC dtFormatTime(getSimTime()) SPC "Avg:" @ $dtStats::pingAvg @ "/" @ %lowAvg SPC "Min:" @ %min SPC "Max:" @ %max SPC "Counts =" SPC %hpCount  @ "/" @ %pc;

@@ -212,7 +212,7 @@ function Flag::objectiveInit(%data, %flag)
    // -------------------------------------------------------------------------------------------
 }
 
-// AI consoel spam
+// AI console spam
 function AIThrowObject(%object)
 {
 	return;
@@ -313,6 +313,9 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	if(%targetObject.invincible || %targetObject.getState() $= "Dead")
 		return;
 
+	if(%damageType == $DamageType::SatchelCharge && $InvBanList[LakRabbit, "SatchelCharge"] $= 1)
+		return;
+
 	//rabbit can't DJ in duel mode
 	// if(Game.duelMode && %targetObject.holdingFlag && %targetObject == %sourceObject
 	// && %damageType == $DamageType::Disc
@@ -342,10 +345,13 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	&&  %sourceObject.getDataBlock().getClassName() $= "PlayerData"
 	&&  %targetObject.client == %sourceObject.client)
 	{
-		if(%damageType == $DamageType::Disc && %sourceObject.freeDJ)
+		if(%sourceObject.holdingFlag $= "") //Not holding a flag (NonRabbit)
 		{
-			%amount = 0;
-			%sourceObject.freeDJ--;
+			if(%damageType == $DamageType::Disc && (%sourceObject.freeDJ || $Host::LakRabbitUnlimitedDJ))
+			{
+				%amount = 0;
+				%sourceObject.freeDJ--;
+			}
 		}
 	}
 
@@ -626,7 +632,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				}
 				%weapon = "Plasma";
 			case $DamageType::Laser:
-			    if($InvBanList[LakRabbit, "SniperRifle"]) //banned
+			  if($InvBanList[LakRabbit, "SniperRifle"] $= 1) //banned
 					return;
 
 				if(%energy > 0.5 || %players > 7)
@@ -666,8 +672,11 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 			case $DamageType::Missile:
 				// doesn't matter if it's MA
 				%ma = 0;
-				if((getSimTime() - $LakRabbit::MissileHeistTime > 10000) || !$LakRabbit::MissileHeistTime)
-					return;
+				if($InvBanList[LakRabbit, "MissileLauncher"] $= 1)
+				{
+					if((getSimTime() - $LakRabbit::MissileHeistTime > 10000) || !$LakRabbit::MissileHeistTime)
+						return;
+				}
 				%weapon = "Missile";
 		}
 	}
@@ -724,7 +733,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		}
 
 		Game.recalcScore(%sourceObject.client);
-		
+
 		//Code for DarkTigers discordBot
 		if(discord.lastState $= "Connected")
 			discordBotProcess("lakMApoints", %sourceObject, %points, %hitType, %weapon, %distance, %vel);
@@ -786,14 +795,14 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	   case $DamageType::Disc:
 		  if((getSimTime() - %targetClient.mdcTime1) < 256)
 			%targetClient.mineDisc = true;
-			
-		  %targetClient.mdcTime2 = getSimTime(); 
+
+		  %targetClient.mdcTime2 = getSimTime();
 
 	   case $DamageType::Mine:
 		  if((getSimTime() - %targetClient.mdcTime2) < 256)
 			%targetClient.mineDisc = true;
-			
-		  %targetClient.mdcTime1 = getSimTime(); 
+
+		  %targetClient.mdcTime1 = getSimTime();
 	}
 	// -- End Mine+Disc insert.
 
@@ -814,7 +823,8 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
       // should this guy be blown apart?
       if( %damageType == $DamageType::Explosion ||
           %damageType == $DamageType::Mortar ||
-          %damageType == $DamageType::Missile )
+          %damageType == $DamageType::Missile ||
+					%damageType == $DamageType::SatchelCharge )
       {
          if( %previousDamage >= 0.35 ) // only if <= 35 percent damage remaining
          {
@@ -972,7 +982,7 @@ $InvBanList[LakRabbit, "Plasma"] = 0;
 $InvBanList[LakRabbit, "Blaster"] = 0;
 $InvBanList[LakRabbit, "EnergyPack"] = 0;
 $InvBanList[LakRabbit, "Mine"] = 0;
-$InvBanList[LakRabbit, "TargetingLaser"] = 0;
+$InvBanList[LakRabbit, "TargetingLaser"] = 1;
 
 
 // borlak functions
@@ -1525,26 +1535,22 @@ function LakRabbitGame::playerSpawned(%game, %player)
 
    else
    {
-	%player.clearInventory();
-	%player.setInventory(Disc,1);
-	%player.setInventory(Blaster,1);
-	%player.setInventory(Plasma,1);
-	%player.setInventory(DiscAmmo,30);
-	%player.setInventory(PlasmaAmmo,40);
-	%player.setInventory(Mine,6);
-	%player.setInventory(RepairKit,1);
-	%player.setInventory(EnergyPack,1);
-   	%player.use("Disc");
+			%player.clearInventory();
+			%player.setInventory(Disc,1);
+			%player.setInventory(Blaster,1);
+			%player.setInventory(Plasma,1);
+			%player.setInventory(DiscAmmo,30);
+			%player.setInventory(PlasmaAmmo,40);
+			%player.setInventory(Mine,6);
+			%player.setInventory(RepairKit,1);
+			%player.setInventory(EnergyPack,1);
+   		%player.use("Disc");
    }
 
    %player.schedule(250,"selectWeaponSlot", 0);
    %player.setEnergyLevel(%player.getDatablock().maxEnergy);
 
-	if($Host::LakRabbitUnlimitedDJ == 1)
-		%player.freeDJ = 999; // free diskjump
-	else
-		%player.freeDJ = 1; // free diskjump
-
+	 %player.freeDJ = 1; // free diskjump
 }
 
 

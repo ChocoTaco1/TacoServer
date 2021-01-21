@@ -27,7 +27,7 @@ $Host::holoName[6] = "Harbinger";
 // -----------------------------------------
 // z0dd - ZOD, 9/29/02. Removed T2 demo code
 $Host::GameName = "Tribes 2 Test";
-$Host::Info = " ";
+$Host::Info = "This is a Tribes 2 Classic server. More information in Discord. <a:playt2.com/discord>playt2.com/discord</a>";
 $Host::Map = "VaubanLak";
 $Host::MaxPlayers = 30;
 $Host::MissionType = "LakRabbit";
@@ -81,8 +81,8 @@ $Host::ClassicLoadVRamChanges = 0;                    // Vehicles take damage wh
 // ------------------------------------------------
 
 $Host::AdminList = "";       // all players that will be automatically an admin upon joining server
-$Host::SuperAdminList = "";  // all players that will be automatically a super admin upon joining server               
-$Host::BindAddress = "";     // set to an ip address if the server wants to specify which NIC/IP to use                        
+$Host::SuperAdminList = "";  // all players that will be automatically a super admin upon joining server
+$Host::BindAddress = "";     // set to an ip address if the server wants to specify which NIC/IP to use
 $Host::Port = 28000;
 $Host::Password = "";
 $Host::PureServer = 0;
@@ -95,8 +95,8 @@ $Host::MaxBotDifficulty = 0.75;
 $Host::NoSmurfs = 1;
 $Host::VoteTime = 30;               // amount of time before votes are calculated
 $Host::VotePassPercent = 60;        // percent needed to pass a vote
-$Host::KickBanTime = 1;				// specified in days
-$Host::BanTime = 30;				// specified in days
+$Host::KickBanTime = 20;				// specified in minutes
+$Host::BanTime = 43200;				// specified in minutes (43200 is one month)
 $Host::PlayerRespawnTimeout = 60;   // time before a dead player is forced into observer mode
 $Host::warmupTime = 20;
 $Host::TournamentMode = 0;

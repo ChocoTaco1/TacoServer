@@ -45,7 +45,7 @@
 //Small Maps
 /////////////////////////////////////////////////////////////////////
 
-addRotationMap("SmallCrossing",					"CTF",1,1,-1,16);
+//addRotationMap("SmallCrossing",				"CTF",1,1,-1,16); //Using Small Crossing: DMP Version
 addRotationMap("TWL2_CanyonCrusadeDeluxe",		"CTF",1,1,-1,18);
 addRotationMap("RoundTheMountain",				"CTF",1,1,-1,18);
 addRotationMap("oasisintensity",				"CTF",1,1,-1,12);
@@ -65,48 +65,51 @@ addRotationMap("Bulwark",						"CTF",1,1,-1,12);
 //addRotationMap("FrostPipe",					"CTF",1,0,-1,12);
 addRotationMap("Blink",							"CTF",1,1,-1,10);
 addRotationMap("Discord",						"CTF",1,1,6,16);
-addRotationMap("StarFallCTF",					"CTF",1,1,6,12);
-addRotationMap("TWL2_MidnightMayhemDeluxe",		"CTF",1,1,8,12);
+addRotationMap("TWL2_MidnightMayhemDeluxe",		"CTF",1,0,8,12);
 addRotationMap("Sentry",						"CTF",1,1,6,12);
-addRotationMap("TWL2_Skylight",					"CTF",1,1,6,12);
-addRotationMap("Cinerarium",					"CTF",1,1,-1,10);
-addRotationMap("Exhumed",						"CTF",1,0,-1,10);
+addRotationMap("TWL2_Skylight",					"CTF",1,0,6,12);
+addRotationMap("Exhumed",						"CTF",1,1,-1,10);
 //addRotationMap("TWL2_FrozenHope",				"CTF",1,0,8,20);
-addRotationMap("FrozenHope",					"CTF",1,0,8,12);
+addRotationMap("FrozenHope",					"CTF",1,1,8,12);
+addRotationMap("ClusterUnFuct",					"CTF",1,1,8,12);
+addRotationMap("Raspian",						"CTF",1,0,8,12);
+addRotationMap("Zilch",							"CTF",1,1,8,12);
+addRotationMap("Cinerarium",					"CTF",1,0,-1,12);
+addRotationMap("StarFallCTF",					"CTF",1,0,6,12);
 
 //Medium Maps
 /////////////////////////////////////////////////////////////////////
 
 addRotationMap("HighOctane",					"CTF",1,1,8,24);
-addRotationMap("S5_Mordacity",					"CTF",1,1,8,24);
-addRotationMap("S5_Damnation",					"CTF",1,0,8,20);
-addRotationMap("TWL2_JaggedClaw",				"CTF",1,1,8,24);
+addRotationMap("S5_Mordacity",					"CTF",1,1,12,24);
+addRotationMap("S5_Damnation",					"CTF",1,0,12,20);
+addRotationMap("TWL2_JaggedClaw",				"CTF",1,1,12,24);
 addRotationMap("S5_Massive",					"CTF",1,1,10,26);
 addRotationMap("TWL_Stonehenge",				"CTF",1,1,8,20);
-addRotationMap("TWL_Feign",						"CTF",1,1,10,20);
-addRotationMap("TheFray",						"CTF",1,1,10,20);
+addRotationMap("TWL_Feign",						"CTF",1,0,10,20);
+addRotationMap("TheFray",						"CTF",1,0,10,20);
 addRotationMap("DangerousCrossing_nef",			"CTF",1,1,8,20);
-addRotationMap("TWL2_Ocular",					"CTF",1,1,12,-1);
-addRotationMap("Dire",							"CTF",1,0,10,16);
-addRotationMap("berlard",						"CTF",1,1,12,24);
+addRotationMap("TWL2_Ocular",					"CTF",1,1,16,-1);
+addRotationMap("Dire",							"CTF",1,1,10,16);
+addRotationMap("berlard",						"CTF",1,0,12,24);
 addRotationMap("S8_Opus",						"CTF",1,0,8,24);
 addRotationMap("BeggarsRun",					"CTF",1,0,8,24);
 addRotationMap("Headstone",						"CTF",1,0,8,20);
 addRotationMap("Signal",						"CTF",1,0,8,26);
-addRotationMap("S5_Woodymyrk",					"CTF",1,1,8,26);
-addRotationMap("TenebrousCTF",					"CTF",1,1,8,12);
-addRotationMap("Pariah",						"CTF",1,1,8,16);
-addRotationMap("Prismatic",						"CTF",1,0,12,26);
-addRotationMap("TWL_WilderZone",				"CTF",1,1,8,20);
+addRotationMap("S5_Woodymyrk",					"CTF",1,1,10,26);
+addRotationMap("TenebrousCTF",					"CTF",1,0,8,12);
+addRotationMap("Pariah",						"CTF",1,0,8,16);
+addRotationMap("Prismatic",						"CTF",1,1,12,26);
+addRotationMap("TWL_WilderZone",				"CTF",1,0,8,20);
 //addRotationMap("Mirage",						"CTF",1,0,8,20);
 addRotationMap("S5_Mimicry",					"CTF",1,0,8,24);
 //addRotationMap("TWL_Snowblind",				"CTF",1,0,12,-1);
-addRotationMap("ShortFall",						"CTF",1,0,12,24);
+addRotationMap("ShortFall",						"CTF",1,1,12,24);
 //addRotationMap("IceRidge_nef",				"CTF",1,0,8,20);
 //addRotationMap("Disjointed",					"CTF",1,0,8,20);
-addRotationMap("TWL2_MuddySwamp",				"CTF",1,1,8,20);
+addRotationMap("TWL2_MuddySwamp",				"CTF",1,0,8,20);
 addRotationMap("HighAnxiety",					"CTF",1,0,8,20);
-addRotationMap("S5_Centaur",					"CTF",1,1,8,20);
+addRotationMap("S5_Centaur",					"CTF",1,0,8,20);
 addRotationMap("S8_Cardiac",					"CTF",1,1,12,-1);
 addRotationMap("CirclesEdge",					"CTF",1,1,10,24);
 addRotationMap("S5_Icedance",					"CTF",1,1,8,24);
@@ -133,20 +136,20 @@ addRotationMap("Cinereous",						"CTF",1,0,12,20);
 //addRotationMap("Coppersky",					"CTF",1,0,8,20);
 //addRotationMap("TWL2_Crevice",				"CTF",1,0,10,20);
 //addRotationMap("TWL_SubZero",					"CTF",1,0,10,20);
-//addRotationMap("TWL_Titan",					"CTF",1,0,10,20);
-//addRotationMap("Confusco",					"CTF",1,0,10,20);
+addRotationMap("TWL_Titan",					    "CTF",1,0,12,20);
+addRotationMap("Confusco",						"CTF",1,0,10,20);
 //addRotationMap("Fallout",						"CTF",1,0,10,20);
 //addRotationMap("TheClocktower",				"CTF",1,0,10,20);
 //addRotationMap("SoylentGreen",				"CTF",1,0,10,20);
 //addRotationMap("Ramparts",					"CTF",1,0,10,20);
 //addRotationMap("Blastside_nef",				"CTF",1,0,10,24);
-//addRotationMap("Burstside",					"CTF",1,0,10,20);
+addRotationMap("Burstside",					    "CTF",1,0,10,20);
 //addRotationMap("Infernus",					"CTF",1,0,18,26);
 //addRotationMap("NatureMagic",					"CTF",1,0,10,20);
 //addRotationMap("TWL_Damnation",				"CTF",1,0,10,20);
 addRotationMap("TWL_DangerousCrossing",			"CTF",1,1,10,20);
-//addRotationMap("TWL_DeadlyBirdsSong",			"CTF",1,0,10,20);
-addRotationMap("Vauban",						"CTF",1,0,18,-1);
+addRotationMap("TWL_DeadlyBirdsSong",			"CTF",1,0,10,20);
+//addRotationMap("Vauban",						"CTF",1,0,18,-1);
 //addRotationMap("TWL_Pandemonium",				"CTF",1,0,10,24);
 
 //Vehicle Maps
@@ -154,12 +157,13 @@ addRotationMap("Vauban",						"CTF",1,0,18,-1);
 
 addRotationMap("Logans_Run",					"CTF",1,1,8,28);
 addRotationMap("Rollercoaster_nef",				"CTF",1,1,8,28);
-addRotationMap("HostileLoch",					"CTF",1,1,12,24);
+//addRotationMap("Rollercoaster_nef_FZ",		"CTF",1,1,8,28);
+addRotationMap("HostileLoch",					"CTF",1,0,12,24);
 addRotationMap("TWL_BeachBlitz",				"CTF",1,1,12,24);
 addRotationMap("TWL2_Magnum",					"CTF",1,1,12,28);
-addRotationMap("MoonDance",						"CTF",1,1,12,28);
+addRotationMap("MoonDance",						"CTF",1,0,12,28);
 addRotationMap("Raindance_nef",					"CTF",1,1,12,28);
-addRotationMap("TWL_Magmatic",					"CTF",1,0,18,28);
+addRotationMap("TWL_Magmatic",					"CTF",1,0,14,28);
 addRotationMap("TWL2_FrozenGlory",				"CTF",1,1,12,24);
 addRotationMap("LandingParty",					"CTF",1,1,12,28);
 //addRotationMap("TitanV",						"CTF",1,0,12,28);
@@ -170,9 +174,9 @@ addRotationMap("TWL_Crossfire",					"CTF",1,1,14,28);
 //Vehicle Maps: Voteable, But Not in Rotation
 /////////////////////////////////////////////////////////////////////
 
-//addRotationMap("SubZeroV",					"CTF",1,0,12,24);
-//addRotationMap("S8_Geothermal",				"CTF",1,0,12,24);
-//addRotationMap("Lakefront",					"CTF",1,0,12,24);
+addRotationMap("SubZeroV",						"CTF",1,0,12,24);
+addRotationMap("S8_Geothermal",					"CTF",1,0,12,24);
+addRotationMap("Lakefront",					    "CTF",1,0,12,24);
 //addRotationMap("ShockRidge",					"CTF",1,0,12,24);
 addRotationMap("TWL2_BlueMoon",					"CTF",1,1,18,28);
 addRotationMap("TWL_Katabatic",					"CTF",1,0,16,28);
@@ -185,37 +189,89 @@ addRotationMap("TWL_Katabatic",					"CTF",1,0,16,28);
 //addRotationMap("FilteredDust",				"CTF",1,0,12,24);
 //addRotationMap("Choke",						"CTF",1,0,12,24);
 //addRotationMap("TWL_Chokepoint",				"CTF",1,0,12,24);
-//addRotationMap("Nightdance",					"CTF",1,0,10,24);
+addRotationMap("Nightdance",					"CTF",1,0,10,24);
 //addRotationMap("TWL_Abaddon",					"CTF",1,0,16,24);
 
 //BIG Vehicle Maps
 /////////////////////////////////////////////////////////////////////
 
-addRotationMap("Circleofstones",				"CTF",1,1,12,-1);
-addRotationMap("TWL2_Ruined",					"CTF",1,1,18,-1);
+addRotationMap("Circleofstones",				"CTF",1,1,16,-1);
+//addRotationMap("TWL2_Ruined",					"CTF",1,1,18,-1);
+addRotationMap("Ruined",						"CTF",1,0,16,-1);
 //addRotationMap("Agorazscium",					"CTF",1,0,24,-1);
 //addRotationMap("FullCircle",					"CTF",1,0,18,30);
 //addRotationMap("Surro",						"CTF",1,0,18,24);
 //addRotationMap("TWL2_RoughLand",				"CTF",1,0,20,-1);
-addRotationMap("HarvestDance",					"CTF",1,1,20,-1);
+addRotationMap("HarvestDance",					"CTF",1,1,16,-1);
 //addRotationMap("WindyGap",					"CTF",1,0,24,-1);
-addRotationMap("Fenix",							"CTF",1,1,28,-1);
-addRotationMap("Hillside",						"CTF",1,1,28,-1);
+addRotationMap("Fenix",							"CTF",1,1,24,-1);
+addRotationMap("Hillside",						"CTF",1,1,24,-1);
 //addRotationMap("Sangre_de_Grado",				"CTF",1,0,20,-1);
 //addRotationMap("Slapdash",					"CTF",1,0,20,-1);
-addRotationMap("BerylBasin",					"CTF",1,1,16,-1);
+addRotationMap("BerylBasin",					"CTF",1,0,16,-1);
 //addRotationMap("TWL_Frozen",					"CTF",1,0,20,-1);
 addRotationMap("TWL_Harvester",					"CTF",1,1,24,-1);
 //addRotationMap("Archipelago",					"CTF",1,0,20,-1);
 addRotationMap("TWL2_Bleed",					"CTF",1,0,18,-1);
-addRotationMap("Pantheon",						"CTF",1,1,20,-1);
+addRotationMap("Pantheon",						"CTF",1,0,20,-1);
 addRotationMap("DeathBirdsFly1",				"CTF",1,1,24,-1);
-//addRotationMap("Scarabrae_nef",				"CTF",1,0,28,-1);
+addRotationMap("Scarabrae_nef",					"CTF",1,0,28,-1);
 addRotationMap("aabaa",							"CTF",1,1,28,-1);
 addRotationMap("TWL_Reversion",					"CTF",1,1,28,-1);
 //addRotationMap("Glade",						"CTF",1,1,28,-1);
-//addRotationMap("TWL_Horde",					"CTF",1,0,28,-1);
+addRotationMap("TWL_Horde",						"CTF",1,1,24,-1);
 addRotationMap("CloakofNightV",					"CTF",1,1,24,-1);
+
+//DMP Mappack
+/////////////////////////////////////////////////////////////////////
+addRotationMap("DMP_Agroleon",					"CTF",1,0,16,28);
+addRotationMap("DMP_Astro",						"CTF",1,1,8,18);
+addRotationMap("DMP_BastardForge",				"CTF",1,1,6,24);
+addRotationMap("DMP_BitterGorge",				"CTF",1,0,18,24);
+addRotationMap("DMP_Bunkered",					"CTF",1,1,6,12);
+addRotationMap("DMP_Cinerarium",				"CTF",1,1,6,12);
+addRotationMap("DMP_DermCity",					"CTF",1,0,-1,-1);
+addRotationMap("DMP_Embers",					"CTF",1,0,6,12);
+addRotationMap("DMP_EmeraldSpit",				"CTF",1,1,10,20);
+addRotationMap("DMP_FaceCrossing",				"CTF",1,0,10,20);
+addRotationMap("DMP_Hoth",						"CTF",1,0,24,-1);
+addRotationMap("DMP_IceGiant",					"CTF",1,0,16,28);
+addRotationMap("DMP_IsleDeBatalla",				"CTF",1,0,10,20);
+addRotationMap("DMP_LavaGods",					"CTF",1,1,10,20);
+addRotationMap("DMP_Magellan",					"CTF",1,1,10,18);
+addRotationMap("DMP_MoonDance",					"CTF",1,1,12,28);
+addRotationMap("DMP_Pantheon",					"CTF",1,0,18,28);
+addRotationMap("DMP_Paranoia",					"CTF",1,1,6,10);
+addRotationMap("DMP_Pariah",					"CTF",1,1,8,16);
+addRotationMap("DMP_PipeDream",					"CTF",1,1,8,16);
+addRotationMap("DMP_RavineV",					"CTF",1,0,12,28);
+addRotationMap("DMP_ScorchedEarth",				"CTF",1,0,14,-1);
+addRotationMap("DMP_SimpleFlagArena",			"CTF",1,1,6,12);
+addRotationMap("DMP_SpinCycle",					"CTF",1,1,8,16);
+addRotationMap("DMP_StarFall",					"CTF",1,1,6,12);
+addRotationMap("DMP_Tyre",						"CTF",1,1,16,24);
+addRotationMap("DMP_Wasteland",					"CTF",1,1,10,20);
+
+addRotationMap("SC_Normal",						"CTF",1,1,-1,16); 
+// addRotationMap("SC_Badlands",				"CTF",1,1,-1,16);
+// addRotationMap("SC_Desert",					"CTF",1,1,-1,16);
+// addRotationMap("SC_Lush",					"CTF",1,1,-1,16);
+addRotationMap("SC_Ice",						"CTF",1,1,-1,16);
+// addRotationMap("SC_Night",					"CTF",1,1,-1,16);
+// addRotationMap("DX_Badlands",				"CTF",1,1,10,20);
+// addRotationMap("DX_Desert",					"CTF",1,1,10,20);
+addRotationMap("DX_Ice",						"CTF",1,0,10,20);
+// addRotationMap("HO_Badlands",				"CTF",1,1,8,24);
+// addRotationMap("HO_Desert",					"CTF",1,1,8,24);
+addRotationMap("HO_Ice",						"CTF",1,1,8,24);
+// addRotationMap("HO_Lush",					"CTF",1,1,8,24);
+addRotationMap("Attrition",						"CTF",1,0,-1,-1);
+// addRotationMap("Chasmaclysmic",				"CTF",1,1,-1,-1);
+// addRotationMap("DBS_Smoothed",				"CTF",1,1,-1,-1);
+// addRotationMap("PuliVeivari",				"CTF",1,1,-1,-1);
+addRotationMap("PlanetX",						"CTF",1,0,-1,-1);
+// addRotationMap("Ravine",						"CTF",1,1,-1,-1);
+addRotationMap("Stripmine",						"CTF",1,0,-1,-1);
 
 //Not In Rotation - Not Voteable
 /////////////////////////////////////////////////////////////////////
@@ -303,7 +359,7 @@ addRotationMap("DesertofDeathLak",				"Lakrabbit",1,1,-1,-1);
 addRotationMap("Raindance_nefLak",				"Lakrabbit",1,1,-1,-1);
 addRotationMap("SunDriedLak",					"Lakrabbit",1,1,-1,-1);
 addRotationMap("SkinnyDipLak",					"Lakrabbit",1,1,-1,-1);
-addRotationMap("SaddiesHill",					"Lakrabbit",1,0,-1,-1);
+addRotationMap("SaddiesHill",					"Lakrabbit",1,1,-1,-1);
 addRotationMap("HavenLak",						"Lakrabbit",1,0,-1,-1);
 addRotationMap("LushLak",						"Lakrabbit",1,1,8,-1);
 addRotationMap("BoxLak",						"Lakrabbit",1,1,-1,10);
@@ -315,6 +371,7 @@ addRotationMap("CankerLak",						"Lakrabbit",1,1,-1,-1);
 addRotationMap("DustRunLak",					"Lakrabbit",1,1,-1,-1);
 addRotationMap("CrossfiredLak",					"Lakrabbit",1,0,-1,-1);
 addRotationMap("CloakofLak",					"Lakrabbit",1,1,-1,-1);
+addRotationMap("SpectreLak",					"Lakrabbit",1,1,-1,-1);
 
 //Voteable, But not in rotation
 /////////////////////////////////////////////////////////////////////
@@ -327,7 +384,7 @@ addRotationMap("EquinoxLak",					"Lakrabbit",1,0,-1,-1);
 addRotationMap("PhasmaDustLak",					"Lakrabbit",1,1,-1,12);
 addRotationMap("GodsRiftLak",					"Lakrabbit",1,0,-1,-1);
 addRotationMap("SolsDescentLak",				"Lakrabbit",1,0,-1,-1);
-addRotationMap("Crater71Lak",					"Lakrabbit",1,1,6,-1);
+addRotationMap("Crater71Lak",					"Lakrabbit",1,0,6,-1);
 
 //Not Voteable, Not in rotation
 /////////////////////////////////////////////////////////////////////
@@ -395,6 +452,7 @@ addRotationMap("PariahLT",						"sctf",1,1,-1,16);
 addRotationMap("S8_ZilchLT",					"sctf",1,1,-1,-1);
 addRotationMap("TWL_BeachBlitzLT",				"sctf",1,1,-1,-1);
 addRotationMap("FrozenHopeLT",					"sctf",1,1,-1,-1);
+addRotationMap("Confusco",						"sctf",1,0,6,-1);
 //addRotationMap("TWL2_JaggedClawLT",			"sctf",1,1,-1,-1);
 
 //Voteable, But not in rotation
@@ -406,6 +464,21 @@ addRotationMap("S5_WoodymyrkLT",				"sctf",1,1,-1,-1);
 //addRotationMap("TWL2_Celerity",				"sctf",1,0,-1,-1);
 addRotationMap("S8_Opus",						"sctf",1,0,-1,-1);
 addRotationMap("TWL_DangerousCrossing",			"sctf",1,0,-1,-1);
+
+//DMP Mappack
+/////////////////////////////////////////////////////////////////////
+// addRotationMap("Attrition",					"sctf",1,0,-1,-1);
+addRotationMap("Rush",							"sctf",1,1,-1,-1);
+addRotationMap("HillKingLT",					"sctf",1,1,-1,-1);
+addRotationMap("DMP_BastardForge",				"sctf",1,1,-1,-1);
+addRotationMap("VanDamnedLT",					"sctf",1,1,-1,-1);
+addRotationMap("DMP_Paranoia",					"sctf",1,0,-1,-1);
+addRotationMap("DMP_Spincycle",					"sctf",1,1,-1,-1);
+addRotationMap("Ravine",						"sctf",1,1,-1,-1);
+// addRotationMap("DX_Badlands",				"sctf",1,0,-1,-1);
+// addRotationMap("DX_Desert",					"sctf",1,0,-1,-1);
+// addRotationMap("DX_Ice",						"sctf",1,0,-1,-1);
+//addRotationMap("Moonwalk",					"sctf",1,0,-1,-1);
 
 
 //Not Voteable, Not in rotation

@@ -669,7 +669,7 @@ datablock GrenadeProjectileData(BasicGrenade)
    emitterDelay        = -1;
    directDamage        = 0.0;
    hasDamageRadius     = true;
-   indirectDamage      = 0.40
+   indirectDamage      = 0.40;
    damageRadius        = 15.0;
    radiusDamageType    = $DamageType::Grenade;
    kickBackStrength    = 1500;

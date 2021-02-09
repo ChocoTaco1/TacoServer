@@ -217,13 +217,11 @@ function CreateServer(%mission, %missionType)
    // z0dd - ZOD, 07/19/03. fix for stuttering dual processor servers.
    // Moved here because it seems server must be created first.
    if(($Host::ClassicUseHighPerformanceCounter $= "0") || ($Host::ClassicUseHighPerformanceCounter == 0))
-   {
       setPerfCounterEnable(0);
-   }
-   else
-   {
+   else if(($Host::ClassicUseHighPerformanceCounter $= "1") || ($Host::ClassicUseHighPerformanceCounter == 1))
       setPerfCounterEnable(1);
-   }
+   else if(($Host::ClassicUseHighPerformanceCounter $= "2") || ($Host::ClassicUseHighPerformanceCounter == 2))
+      setPerfCounterEnable(2);
    
    // Load Banlist
    ClassicLoadBanlist();

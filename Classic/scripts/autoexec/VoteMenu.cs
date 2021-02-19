@@ -1,5 +1,6 @@
 //$Host::AllowAdmin2Admin = 0;
 //$Host::AllowAdminBan = 0;
+//$Host::AllowAdminKick = 1;
 //$Host::AllowAdminVotes = 1;
 //$Host::AllowAdminStopVote = 1;
 //$Host::AllowAdminPassVote = 1;
@@ -1148,12 +1149,13 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
    // Admin only options on players:
    else if ( %isAdmin ) // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
    {
-      if ( !%isTargetBot && !%isTargetAdmin )
+      if ( !%isTargetBot && !%isTargetAdmin && (%isSuperAdmin || %isAdmin && $Host::AllowAdmin2Admin))
          messageClient( %client, 'MsgPlayerPopupItem', "", %key, "AdminPlayer", "", 'Make Admin', 2 );
 
       if ( !%isTargetSelf && %outrankTarget )
       {
-         messageClient( %client, 'MsgPlayerPopupItem', "", %key, "KickPlayer", "", 'Kick', 3 );
+         if(%isSuperAdmin || %isAdmin && $Host::AllowAdminKick)
+			   messageClient( %client, 'MsgPlayerPopupItem', "", %key, "KickPlayer", "", 'Kick', 3 );
 
          if ( !%isTargetBot )
          {
@@ -1164,11 +1166,11 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
                messageClient( %client, 'MsgPlayerPopupItem', "", %key, "StripAdmin", "", 'Strip admin', 14 );
 
             messageClient( %client, 'MsgPlayerPopupItem', "", %key, "SendMessage", "", 'Send Private Message', 15 );
-            messageClient( %client, 'MsgPlayerPopupItem', "", %key, "PrintClientInfo", "", 'Client Info', 16 ); // z0dd - ZOD - MeBad, 7/13/03. Send client information.
 
             if( %client.isSuperAdmin )
             {
-               messageClient( %client, 'MsgPlayerPopupItem', "", %key, "BanPlayer", "", 'Ban', 4 );
+               messageClient( %client, 'MsgPlayerPopupItem', "", %key, "PrintClientInfo", "", 'Client Info', 16 ); // z0dd - ZOD - MeBad, 7/13/03. Send client information.
+			   messageClient( %client, 'MsgPlayerPopupItem', "", %key, "BanPlayer", "", 'Ban', 4 );
 
                if ( %targetClient.isGagged )
                   messageClient( %client, 'MsgPlayerPopupItem', "", %key, "UnGagPlayer", "", 'UnGag Player', 17);

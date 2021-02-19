@@ -1,6 +1,7 @@
 $Host::AdminPassword = "changethis";
 $Host::AllowAdmin2Admin = 0;
 $Host::AllowAdminBan = 0;
+$Host::AllowAdminKick = 1;
 $Host::AllowAdminPassVote = 1;
 $Host::allowAdminPlayerVotes = "0";
 $Host::AllowAdminStopVote = 1;

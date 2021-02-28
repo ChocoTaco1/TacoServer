@@ -222,6 +222,8 @@ function CreateServer(%mission, %missionType)
       setPerfCounterEnable(1);
    else if(($Host::ClassicUseHighPerformanceCounter $= "2") || ($Host::ClassicUseHighPerformanceCounter == 2))
       setPerfCounterEnable(2);
+   else if(($Host::ClassicUseHighPerformanceCounter $= "3") || ($Host::ClassicUseHighPerformanceCounter == 3))
+      setPerfCounterEnable(3);
    
    // Load Banlist
    ClassicLoadBanlist();

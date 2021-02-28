@@ -33,7 +33,7 @@ function Autobalance( %game )
 		return;
 
 	$Autobalance::UseAllMode = 0;
-	$Autobalance::FallbackTime = "";
+	$Autobalance::FallbackTime = getSimTime();
 	%otherTeam = $BigTeam == 1 ? 2 : 1;
 	$Autobalance::AMThreshold = mCeil(MissionGroup.CTF_scoreLimit/3) * 100;
 
@@ -101,9 +101,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
 		if($TeamRank[$BigTeam, count] - $TeamRank[%otherTeam, count] >= 2)
 		{
 			%fallback = 0;
-			if($Autobalance::FallbackTime $= "")
-				$Autobalance::FallbackTime = getSimTime();
-			else if((getSimTime() - $Autobalance::FallbackTime) < $Autobalance::Fallback)
+			if((getSimTime() - $Autobalance::FallbackTime) > $Autobalance::Fallback)
 				%fallback = 1;
 
 			//damageType 0: If someone switches to observer or disconnects

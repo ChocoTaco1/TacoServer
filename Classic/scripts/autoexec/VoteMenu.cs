@@ -171,6 +171,11 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
 				else
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');
+					
+				if(!$IFFColors)
+					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleIFFColors', 'Enable Alt IFF Colors', 'Enable Alt IFF Colors');
+				else
+					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleIFFColors', 'Disable Alt IFF Colors', 'Disable Alt IFF Colors');
 			}
 			// if(%multipleTeams)
 			// {
@@ -543,6 +548,25 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				}
 			}
 			return;
+		case "ToggleIFFColors":
+			if (%client.isAdmin && $Host::TournamentMode)
+			{
+				if(!$IFFColors)
+				{
+					// Red Green Blue Alpha - may need some fine tuning
+					setSensorGroupColor(0, 1 << 1, "0 0 255 255");
+					setSensorGroupColor(0, 1 << 2, "255 0 0 255");
+					$IFFColors = 1;
+				}
+				else
+				{
+					// Red Green Blue Alpha - may need some fine tuning
+					setSensorGroupColor(0, 1 << 1, "0 255 0 255");
+					setSensorGroupColor(0, 1 << 2, "255 0 0 255");
+					$IFFColors = 0;
+				}
+			}
+				
 		case "ForceVote":
 			if (%client.isAdmin && $Host::AllowAdminVotes)
 			{

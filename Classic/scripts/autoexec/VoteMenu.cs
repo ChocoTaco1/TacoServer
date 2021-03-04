@@ -565,8 +565,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					setSensorGroupColor(0, 1 << 2, "255 0 0 255");
 					$IFFColors = 0;
 				}
-			}
-				
+			}	
 		case "ForceVote":
 			if (%client.isAdmin && $Host::AllowAdminVotes)
 			{

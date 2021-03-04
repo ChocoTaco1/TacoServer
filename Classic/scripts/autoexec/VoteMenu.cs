@@ -557,6 +557,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					setSensorGroupColor(0, 1 << 1, "0 0 255 255");
 					setSensorGroupColor(0, 1 << 2, "255 0 0 255");
 					$IFFColors = 1;
+					messageClient( %client, '', "Alternate IFF Colors have been enabled. (This will Reset after every match)~wfx/powered/vehicle_screen_on.wav" );
 				}
 				else
 				{
@@ -564,6 +565,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					setSensorGroupColor(0, 1 << 1, "0 255 0 255");
 					setSensorGroupColor(0, 1 << 2, "255 0 0 255");
 					$IFFColors = 0;
+					messageClient( %client, '', "Alternate IFF Colors have been disabled.~wfx/powered/vehicle_screen_on.wav" );
 				}
 			}	
 		case "ForceVote":

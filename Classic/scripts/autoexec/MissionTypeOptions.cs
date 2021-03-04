@@ -48,6 +48,10 @@ function loadMissionStage2()
 		$Host::NoBaseRapeEnabled = 0;
 	else
 		$Host::NoBaseRapeEnabled = 1;
+	
+    //Reset IFF Colors
+	if($IFFColors)
+		$IFFColors = 0;
    
     parent::loadMissionStage2();
 }

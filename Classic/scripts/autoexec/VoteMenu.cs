@@ -705,6 +705,11 @@ function DefaultGame::gameOver(%game)
 
 	//Reset ClassicMaxMapChangeVotes
 	deleteVariables("$CMHasVoted*"); // Eolk - let people who have voted vote again
+	
+	//Reset IFF Colors
+	if($IFFColors)
+		$IFFColors = 0;
+
 }
 
 function DefaultGame::cancelMatchStart(%game, %admin)

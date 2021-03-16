@@ -136,7 +136,7 @@ function serverCmdObserveFirstFlag(%client)
     return;
   
   // client must be an observer
-  if(%client.team > 0)
+  if(%client.team > 0 || !$Observers) //$Observers added; Serverside var; Needs to have value to work correctly
     return;
   
   // check if the flag is carried by someone
@@ -154,7 +154,7 @@ function serverCmdObserveSecondFlag(%client)
     return;
   
   // client must be an observer
-  if(%client.team > 0)
+  if(%client.team > 0 || !$Observers) //$Observers added; Serverside var; Needs to have value to work correctly
     return;
   
   // check if the flag is carried by someone

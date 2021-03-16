@@ -658,11 +658,14 @@ function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
    %flag.carrier = %player;  //this %flag is carried by %player
 
    // attach the camera to the flag.carrier
-   for(%i = 0; %i < $Observers; %i++)
+   if($Observers)
    {
-      %cl = $ObserverArray[%i];
-	  if(%cl.observingFlag)
-		observeFlag(%cl, %player.client, 2, %flag.team);
+	   for(%i = 0; %i < ClientGroup.getCount(); %i++)
+	   {
+			%cl = ClientGroup.getObject(%i);
+			if(%cl.team <= 0 && %cl.observingFlag && %cl.flagObsTeam == %flag.team)
+				observeFlag(%cl, %player.client, 2, %flag.team);
+	   }
    }
    
    %player.mountImage(FlagImage, $FlagSlot, true, %game.getTeamSkin(%flag.team));
@@ -795,11 +798,14 @@ function SCtFGame::playerDroppedFlag(%game, %player)
    $flagStatus[%flag.team] = "<In the Field>";
    
    // attach the camera to the flag
-   for(%i = 0; %i < $Observers; %i++)
+   if($Observers)
    {
-      %cl = $ObserverArray[%i];
-      if(%cl.observingFlag)
-		 observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
+	   for(%i = 0; %i < ClientGroup.getCount(); %i++)
+	   {
+			%cl = ClientGroup.getObject(%i);
+			if(%cl.team <= 0 && %cl.observingFlag && %cl.flagObsTeam == %flag.team)
+				observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
+	   }
    }
    
    %player.unMountImage($FlagSlot);   
@@ -829,11 +835,14 @@ function SCtFGame::flagCap(%game, %player)
    %flag.carrier = "";
    
    // when a player cap the flag, attach to flag again
-   for(%i = 0; %i < $Observers; %i++)
+   if($Observers)
    {
-      %cl = $ObserverArray[%i];
-	  if(%cl.observingFlag)
-		 observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
+	   for(%i = 0; %i < ClientGroup.getCount(); %i++)
+	   {
+			%cl = ClientGroup.getObject(%i);
+			if(%cl.team <= 0 && %cl.observingFlag && %cl.flagObsTeam == %flag.team)
+				observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
+	   }
    }
 
    %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
@@ -978,11 +987,14 @@ function SCtFGame::flagReturn(%game, %flag, %player)
    %teamName = %game.getTeamName(%flag.team);
    
    // when the flag return, attach to flag again
-   for(%i = 0; %i < $Observers; %i++)
+   if($Observers)
    {
-      %cl = $ObserverArray[%i];
-	  if(%cl.observingFlag)
-	     observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
+	   for(%i = 0; %i < ClientGroup.getCount(); %i++)
+	   {
+			%cl = ClientGroup.getObject(%i);
+			if(%cl.team <= 0 && %cl.observingFlag && %cl.flagObsTeam == %flag.team)
+				observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
+	   }
    }
    
    if (%player !$= "")

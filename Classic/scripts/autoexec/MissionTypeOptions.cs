@@ -26,6 +26,7 @@ function loadMissionStage2()
 					$Host::Password = $Host::PUGPassword;
 				else if( !$Host::TournamentMode )
 					$Host::Password = "";
+					$LockedTeams = 0;
 
 				//Set server mode to SPEED
 				$Host::HiVisibility = "0";
@@ -34,6 +35,7 @@ function loadMissionStage2()
 			{
 				$Host::Password = "";
 				$Host::TournamentMode = 0;
+				$LockedTeams = 0;
 
 				//Set server mode to DISTANCE
 				$Host::HiVisibility = "1";
@@ -48,6 +50,9 @@ function loadMissionStage2()
 		$Host::NoBaseRapeEnabled = 0;
 	else
 		$Host::NoBaseRapeEnabled = 1;
+		
+	if(isActivePackage(LockedTeams) && !$LockedTeams)
+		deactivatePackage(LockedTeams);
    
     parent::loadMissionStage2();
 }

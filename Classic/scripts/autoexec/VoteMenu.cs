@@ -171,6 +171,11 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
 				else
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');
+					
+				if($LockedTeams)
+					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Disable Locked Teams', 'Disable Locked Teams');
+				else
+					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Enable Locked Teams', 'Enable Locked Teams');
 			}
 			// if(%multipleTeams)
 			// {
@@ -511,6 +516,27 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				   $Host::Password = $Host::PUGPassword;
 				   messageClient( %client, '', "PUG password been enabled.~wfx/powered/vehicle_screen_on.wav" );
 				   adminLog(%client, " has enabled pug password." );
+				}
+			}
+			return;
+		case "ToggleLockedTeams":
+			if (%client.isAdmin)
+			{
+				if(!$LockedTeams)
+				{
+					if(!isActivePackage(LockedTeams))
+						activatePackage(LockedTeams);
+					$LockedTeams = 1;
+					messageClient( %client, '', "Locked Teams has been enabled.~wfx/powered/vehicle_screen_on.wav" );
+					adminLog(%client, " has enabled Locked Teams.");
+				}
+				else
+				{
+					if(isActivePackage(LockedTeams))
+						deactivatePackage(LockedTeams);
+					$LockedTeams = 0;
+					messageClient( %client, '', "Locked Teams has been disabled.~wfx/powered/vehicle_screen_on.wav" );
+					adminLog(%client, " has disabled Locked Teams.");
 				}
 			}
 			return;

@@ -1415,7 +1415,11 @@ function calcVotes(%typeName, %arg1, %arg2, %arg3, %arg4)
       }
    }
 
-   Game.evalVote(%typeName, false, %arg1, %arg2, %arg3, %arg4);
+   if((Game.totalVotesFor + Game.totalVotesAgainst) >= mFloor(ClientGroup.getCount()/2))
+      Game.evalVote(%typeName, false, %arg1, %arg2, %arg3, %arg4);
+   else
+      messageAll('MsgVoteFailed', '\c2Vote minimum participation not reached. Total votes %1 out of %2 required.',(Game.totalVotesFor + Game.totalVotesAgainst),mFloor(ClientGroup.getCount()/2));
+
    Game.scheduleVote = "";
    Game.scheduleVoteArgs = "";
    Game.kickClient = "";

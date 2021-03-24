@@ -1,4 +1,33 @@
-//LockedTeams.cs
+// LockedTeams.cs
+
+// Toggled in serverCmdStartNewVote in VoteMenu.cs
+//
+// case "ToggleLockedTeams":
+// 	if (%client.isAdmin)
+// 	{
+// 		if(!$LockedTeams)
+// 		{
+// 			if(!isActivePackage(LockedTeams))
+// 				activatePackage(LockedTeams);
+// 			$LockedTeams = 1;
+// 			messageClient( %client, '', "Locked Teams has been enabled.~wfx/powered/vehicle_screen_on.wav" );
+// 			adminLog(%client, " has enabled Locked Teams.");
+// 		}
+// 		else
+// 		{
+// 			if(isActivePackage(LockedTeams))
+// 				deactivatePackage(LockedTeams);
+// 			$LockedTeams = 0;
+// 			messageClient( %client, '', "Locked Teams has been disabled.~wfx/powered/vehicle_screen_on.wav" );
+// 			adminLog(%client, " has disabled Locked Teams.");
+// 		}
+// 	}
+// 	return;
+
+// Reset in MissionTypeOptions.cs
+//
+// if(isActivePackage(LockedTeams) && !$LockedTeams)
+// 	deactivatePackage(LockedTeams);
 
 package LockedTeams
 {

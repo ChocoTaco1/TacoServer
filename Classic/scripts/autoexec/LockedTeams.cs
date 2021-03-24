@@ -46,7 +46,7 @@ function serverCmdClientJoinGame(%client)
 {
 	if ($LockedTeams)
 	{
-		messageClient( %client, '', "Teams are locked. Asked the admin to set your team." );
+		messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
 		return;
 	}
 	Parent::serverCmdClientJoinGame(%client);
@@ -59,7 +59,7 @@ function serverCmdClientPickedTeam(%client, %option)
 	{		
 		if($Host::TournamentMode && %client.team !$= 0) //Added
 		{	
-			messageClient( %client, '', "Teams are locked. Asked the admin to set your team." );
+			messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
 			serverCmdClientMakeObserver( %client );
 		}	
 		return;
@@ -70,7 +70,7 @@ function serverCmdClientTeamChange(%client, %option)
 {
 	if ($LockedTeams)
 	{
-		messageClient( %client, '', "Teams are locked. Asked the admin to set your team." );
+		messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
 		return;
 	}
 	Parent::serverCmdClientTeamChange(%client, %option);

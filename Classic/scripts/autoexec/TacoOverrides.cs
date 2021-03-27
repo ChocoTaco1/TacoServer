@@ -166,11 +166,11 @@ function DefaultGame::missionLoadDone(%game)
 {
    parent::missionLoadDone(%game);
 
-   for(%i = 0; %i < MissionGroup.getCount(); %i++)
+   InitContainerRadiusSearch("0 0 0",  2048, $TypeMasks::WaterObjectType);
+   while ((%itemObj = containerSearchNext()) != 0)
    {
-      %obj = MissionGroup.getObject(%i);
-      if(%obj.getClassName() $= "WaterBlock")
-         %obj.viscosity = $globalviscosity;
+      if(%itemObj.getClassName() $= "WaterBlock")
+         %itemObj.viscosity = $globalviscosity;
    }
 }
 
@@ -257,7 +257,7 @@ function VehicleData::respawn(%data, %marker)
    {
 	   %mask = $TypeMasks::PlayerObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::TurretObjectType;
 	   InitContainerRadiusSearch(%marker.getWorldBoxCenter(), %data.checkRadius, %mask);
-	   if(containerSearchNext() == 0)    
+	   if(containerSearchNext() == 0)
 	   {
 		  %newObj = %data.create(%marker.curTeam, %marker);
 		  %newObj.startFade(1000, 0, false);
@@ -285,7 +285,7 @@ function VehicleData::createPositionMarker(%data, %obj)
       deployed = %obj.deployed;
       curTeam = %obj.team;
       respawnTime = %obj.respawnTime;
-   };   
+   };
    %marker.setTransform(%obj.getTransform());
    MissionCleanup.add(%marker);
    return %marker;

@@ -171,6 +171,11 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
 				else
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');
+					
+				if($LockedTeams)
+					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Disable Locked Teams', 'Disable Locked Teams');
+				else
+					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Enable Locked Teams', 'Enable Locked Teams');
 			}
 			// if(%multipleTeams)
 			// {
@@ -514,6 +519,27 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				}
 			}
 			return;
+		case "ToggleLockedTeams":
+			if (%client.isAdmin)
+			{
+				if(!$LockedTeams)
+				{
+					if(!isActivePackage(LockedTeams))
+						activatePackage(LockedTeams);
+					$LockedTeams = 1;
+					messageClient( %client, '', "Locked Teams has been enabled.~wfx/powered/vehicle_screen_on.wav" );
+					adminLog(%client, " has enabled Locked Teams.");
+				}
+				else
+				{
+					if(isActivePackage(LockedTeams))
+						deactivatePackage(LockedTeams);
+					$LockedTeams = 0;
+					messageClient( %client, '', "Locked Teams has been disabled.~wfx/powered/vehicle_screen_on.wav" );
+					adminLog(%client, " has disabled Locked Teams.");
+				}
+			}
+			return;
 		case "ToggleTourneyNetClient":
 			if (%client.isAdmin)
 			{
@@ -542,7 +568,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				   adminLog(%client, " has enabled Net Tourney Client checking.");
 				}
 			}
-			return;
+			return;	
 		case "ForceVote":
 			if (%client.isAdmin && $Host::AllowAdminVotes)
 			{
@@ -1389,7 +1415,11 @@ function calcVotes(%typeName, %arg1, %arg2, %arg3, %arg4)
       }
    }
 
-   Game.evalVote(%typeName, false, %arg1, %arg2, %arg3, %arg4);
+   if((Game.totalVotesFor + Game.totalVotesAgainst) >= mFloor(ClientGroup.getCount()/2))
+      Game.evalVote(%typeName, false, %arg1, %arg2, %arg3, %arg4);
+   else
+      messageAll('MsgVoteFailed', '\c2Vote minimum participation not reached. Total votes %1 out of %2 required.',(Game.totalVotesFor + Game.totalVotesAgainst),mFloor(ClientGroup.getCount()/2));
+
    Game.scheduleVote = "";
    Game.scheduleVoteArgs = "";
    Game.kickClient = "";

@@ -4,13 +4,16 @@
 
 //exec("scripts/autoexec/zzDiscordBot.cs");
 
-$discordBot::AuthKey[0] = "";
-$discordBot::IP[0] = "";
+//note first channel is for monitoring 
+$discordBot::discordCHID = "";
+$discordBot::IP = "";
 $discordBot::reconnectTimeout = 3 * 60000;
-$discordBot::AuthSet = 0;
 $discordBot::autoStart = 1;
-
-
+//used on the bot to help split thigns up
+$discordBot::cmdSplit = "%cmd%";
+//These correspond with $discordBot::discordCHID
+$discordBot::monitorChannel = 1;
+$discordBot::serverFeed = 2;
 package discordPackage
 {
 
@@ -40,7 +43,7 @@ function messageAll(%msgType, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8
 		%message =  strreplace(%message,"%7",getTaggedString(%a7)); 
 		%message =  strreplace(%message,"%8",getTaggedString(%a8)); 
 		%message = stripChars(%message, "\cp\co\c0\c6\c7\c8\c9");
-		sendToDiscord(%message,2);
+		sendToDiscordEmote(%message, $discordBot::serverFeed);
 	}
 }
 
@@ -104,7 +107,7 @@ function discordBotProcess(%type, %var1, %var2, %var3, %var4, %var5, %var6)
 	if(%msg !$= "")
 	{
 		%msg = stripChars(%msg, "\cp\co\c0\c6\c7\c8\c9");
-		sendToDiscord(%msg, 2);
+		sendToDiscordEmote(%msg, $discordBot::serverFeed);
 	}
 }
 
@@ -183,11 +186,11 @@ function dtEventLog(%log, %save)
 {
 	parent::dtEventLog(%log, %save);
 	if(discord.lastState $= "Connected")
-		sendToDiscord(%log, 1);
+		sendToDiscord(%log, $discordBot::monitorChannel);
 }
 function LogMessage(%client, %msg, %cat){
    if(discord.lastState $= "Connected")
-      sendToDiscord("Message" SPC %client.nameBase SPC %msg, 1);
+      sendToDiscord("Message" SPC %client.nameBase SPC %msg, $discordBot::monitorChannel);
    parent::LogMessage(%client, %msg, %cat);
 }
 
@@ -202,11 +205,20 @@ function sendToDiscord(%msg,%channel)
    {
       if(discord.lastState $= "Connected")
 	   {
-         discord.send("MSG" SPC (%channel-1) SPC %msg @ "\r\n");
+         discord.send("MSG"  @ $discordBot::cmdSplit @  (%channel-1) @ $discordBot::cmdSplit @ %msg @ "\r\n");
       }
    }
 }
-
+function sendToDiscordEmote(%msg,%channel)//emote filter will be applyed used in server feed
+{
+   if(isObject(discord) && %msg !$= "")
+   {
+      if(discord.lastState $= "Connected")
+	   {
+         discord.send("MSGE" @ $discordBot::cmdSplit @ (%channel-1) @ $discordBot::cmdSplit @ %msg @ "\r\n");
+      }
+   }
+}
 function discordCon(){  
    if(discord.lastState !$= "Connected"){
       if(isEventPending($discordBot::reconnectEvent))
@@ -215,7 +227,7 @@ function discordCon(){
          discord.delete();
       new TCPObject(discord);  
       discord.lastState = "Connecting";
-      discord.connect($discordBot::IP[$discordBot::AuthSet]);  
+      discord.connect($discordBot::IP);  
    }
 }
 function discordKill(){
@@ -246,7 +258,7 @@ function discord::onDNSResolved(%this){
 function discord::onConnected(%this){
    %this.lastState = "Connected";
    error(%this.lastState);
-   discord.send("AUTH" SPC $discordBot::AuthKey[$discordBot::AuthSet] @ "\r\n");
+   discord.send("AUTH" @ $discordBot::cmdSplit @ $discordBot::discordCHID @ $discordBot::cmdSplit @ $Host::GameName @ "\r\n");
 }
 
 function discord::onDisconnect(%this){
@@ -265,9 +277,44 @@ function discord::onLine(%this, %line){
       //case "Discord":
          //messageAll( 'MsgDiscord', '\c3Discord: \c4%1 %2',getWord(%lineStrip,1),getWords(%lineStrip,2,getWordCount(%lineStrip) -1)); 
       case "PING":
-         discord.send("PONG" @ "\r\n");
-      case "PINGX":
-         discord.send("PINGY" @ "\r\n");
+         discord.send("PONG" @ $discordBot::cmdSplit @ "\r\n");
+      case "PINGAVG":
+      %min = 10000;
+      %max = -10000;
+         for(%i = 0; %i < ClientGroup.getCount(); %i++){
+            %cl = ClientGroup.getObject(%i);               
+            %ping = %cl.isAIControlled() ? 0 : %cl.getPing(); 
+               %min  =  (%ping < %min) ? %ping : %min;
+               %max  =  (%ping > %max) ? %ping : %max;
+               if(%ping < 250){
+                  %lowCount++;
+                  %lowPing += %ping;   
+               }
+               %pc++;
+               %pingT += %ping;  
+         }
+         %lowCount = %lowPing = (%lowCount == 0) ? 1 : %lowCount;
+         if(!%pc){
+            sendToDiscord("Ping AVG:" @ 0 SPC "Low Avg:" @ 0 SPC "Min:" @ 0 SPC "Max:" @ 0, $discordBot::monitorChannel);   
+         }
+         else{
+            %avg = mFloor(%pingT/%pc);
+            %lavg = mFloor(%lowPing/%lowCount);
+            sendToDiscord("Ping AVG:" @ %avg SPC "Low Avg:" @ %lavg SPC "Min:" @ %min SPC "Max:" @ %max, $discordBot::monitorChannel);
+         }
+      case "PINGLIST":
+         if(isObject(discord) && discord.lastState $= "Connected"){
+            %channel = 1;
+            if(ClientGroup.getCount() > 0){
+               for(%i = 0; %i < ClientGroup.getCount(); %i++){
+                  %cl = ClientGroup.getObject(%i);               
+                  %ping = %cl.isAIControlled() ? 0 : %cl.getPing(); 
+                  %msg = %cl.namebase @ "-" @ %ping @ "-" @ %i;
+                  discord.schedule(%i*32,"send","MSGSTACK" @ $discordBot::cmdSplit @ (%channel-1) @ $discordBot::cmdSplit @ %msg @ "\r\n");
+               }
+               discord.schedule((%i+1)*32,"send","PROCSTACK" @ $discordBot::cmdSplit @ (%channel-1) @ $discordBot::cmdSplit @ "MessageEmbed" @ "\r\n");
+            }
+         }
       default:
          error("Bad Command" SPC %line);
    }

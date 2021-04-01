@@ -8,7 +8,7 @@
 $discordBot::discordCHID = "";
 $discordBot::IP = "";
 $discordBot::reconnectTimeout = 3 * 60000;
-$discordBot::autoStart = 1;
+$discordBot::autoStart = 0;
 //used on the bot to help split thigns up
 $discordBot::cmdSplit = "%cmd%";
 $discordBot::cmdSubSplit = "%tab%";

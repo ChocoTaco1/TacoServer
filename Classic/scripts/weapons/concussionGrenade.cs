@@ -161,7 +161,7 @@ datablock ExplosionData(ConcussionGrenadeExplosion)
    camShakeFreq = "4.0 5.0 4.5";
    camShakeAmp = "140.0 140.0 140.0";
    camShakeDuration = 1.0;
-   camShakeRadius = 15.0;
+   camShakeRadius = 18.0; //was 15
 };
 
 //--------------------------------------------------------------------------
@@ -176,7 +176,7 @@ datablock ItemData(ConcussionGrenadeThrown)
    pickupRadius = 2;
    maxDamage = 0.5;
    explosion = ConcussionGrenadeExplosion;
-   damageRadius        = 15.0;
+   damageRadius        = 18.0; //was 15
    radiusDamageType    = $DamageType::Grenade;
    kickBackStrength    = 3500;
 

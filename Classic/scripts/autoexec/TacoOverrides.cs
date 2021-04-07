@@ -27,7 +27,7 @@ function serverCmdEndThrowCount(%client, %data)
    %throwScale = %throwStrength / 2;
    %client.player.throwStrength = %throwScale;
 
-   %client.player.throwStart = 5; //was 0
+   %client.player.throwStart = 2; //was 0
 }
 
 //Tank UE code by Keen
@@ -152,14 +152,14 @@ function stationTrigger::onEnterTrigger(%data, %obj, %colObj)
 }
 
 //OG Blaster Buff
-function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
-{
+// function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
+// {
     //Takes 10 blaster shots to kill a heavy, 13 normal.
-	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
-		%amount *= 1.3;
+	// if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
+		// %amount *= 1.3;
 
-	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
-}
+	// Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
+// }
 
 // Global water viscosity
 function DefaultGame::missionLoadDone(%game)

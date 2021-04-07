@@ -291,6 +291,13 @@ function VehicleData::createPositionMarker(%data, %obj)
    return %marker;
 }
 
+//Normal Conc Throw (Like Normal Grenades)
+function ConcussionGrenadeThrown::onThrow(%this, %gren)
+{
+   AIGrenadeThrown(%gren);
+   %gren.detThread = schedule(1500, %gren, "detonateGrenade", %gren);
+}
+
 };
 
 // Prevent package from being activated if it is already

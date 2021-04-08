@@ -291,11 +291,11 @@ function VehicleData::createPositionMarker(%data, %obj)
    return %marker;
 }
 
-//Normal Conc Throw (Like Normal Grenades)
+//Conc Throw (Almost Normal Grenades) 1500 Normal
 function ConcussionGrenadeThrown::onThrow(%this, %gren)
 {
    AIGrenadeThrown(%gren);
-   %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren);
+   %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren); // Was 2000
 }
 
 };

@@ -152,14 +152,14 @@ function stationTrigger::onEnterTrigger(%data, %obj, %colObj)
 }
 
 //OG Blaster Buff
-// function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
-// {
-    //Takes 10 blaster shots to kill a heavy, 13 normal.
-	// if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
-		// %amount *= 1.3;
+function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
+{
+    //Takes 11 blaster shots to kill a heavy, 13 normal.
+	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
+		%amount *= 1.15;
 
-	// Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
-// }
+	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
+}
 
 // Global water viscosity
 function DefaultGame::missionLoadDone(%game)
@@ -295,7 +295,7 @@ function VehicleData::createPositionMarker(%data, %obj)
 function ConcussionGrenadeThrown::onThrow(%this, %gren)
 {
    AIGrenadeThrown(%gren);
-   %gren.detThread = schedule(1500, %gren, "detonateGrenade", %gren);
+   %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren);
 }
 
 };

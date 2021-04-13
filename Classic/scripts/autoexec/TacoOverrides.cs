@@ -27,7 +27,7 @@ function serverCmdEndThrowCount(%client, %data)
    %throwScale = %throwStrength / 2;
    %client.player.throwStrength = %throwScale;
 
-   %client.player.throwStart = 5; //was 0
+   %client.player.throwStart = 2; //was 0
 }
 
 //Tank UE code by Keen
@@ -154,9 +154,9 @@ function stationTrigger::onEnterTrigger(%data, %obj, %colObj)
 //OG Blaster Buff
 function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
 {
-    //Takes 10 blaster shots to kill a heavy, 13 normal.
+    //Takes 11 blaster shots to kill a heavy, 13 normal.
 	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
-		%amount *= 1.3;
+		%amount *= 1.15;
 
 	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
 }
@@ -289,6 +289,13 @@ function VehicleData::createPositionMarker(%data, %obj)
    %marker.setTransform(%obj.getTransform());
    MissionCleanup.add(%marker);
    return %marker;
+}
+
+//Conc Throw (Almost Normal Grenades) 1500 Normal
+function ConcussionGrenadeThrown::onThrow(%this, %gren)
+{
+   AIGrenadeThrown(%gren);
+   %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren); // Was 2000
 }
 
 };

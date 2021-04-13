@@ -1833,7 +1833,8 @@ function DefaultGame::clientMissionDropReady(%game, %client)
          if(isEventPending(%client.okschedule))
             cancel(%client.okschedule);
 
-         %time = ($Host::KickObserverTimeout) + ($Host::KickObserverTimeout/2);
+		 %time = $Host::KickObserverTimeout;
+         //%time = ($Host::KickObserverTimeout) + ($Host::KickObserverTimeout/2);
          //%minutes = %time / 60;
          //messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);
 

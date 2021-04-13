@@ -54,13 +54,7 @@ function GetTeamCounts(%game)
 				$AllPlayerCount = $HostGamePlayerCount;
 				
 				//Observers
-				$Observers = 0;
-				for(%i = 0; %i < ClientGroup.getCount(); %i++)
-				{
-					%cl = ClientGroup.getObject(%i);
-					if(%cl.team $= 0)
-						$Observers++;
-				}
+				$Observers = $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]);
 				
 				//echo("$PlayerCount[0] " @  $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]));
 				//echo("$PlayerCount[1] " @  $TeamRank[1, count]);

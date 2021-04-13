@@ -61,6 +61,9 @@ function Autobalance( %game )
 	//Select lower half of team rank as canidates for team change
 	if(!$Autobalance::UseAllMode)
 	{
+		//Reset clients canidate var
+		ResetABClients();
+
 		$Autobalance::Max = mFloor($TeamRank[$BigTeam, count]/2);
 		for(%i = $Autobalance::Max; %i < $TeamRank[$BigTeam, count]; %i++)
 		{
@@ -124,17 +127,14 @@ function DefaultGame::gameOver(%game)
 {
 	Parent::gameOver(%game);
 
-	if($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF")
-	{
-		//Reset Autobalance
-		$BigTeam = "";
+	//Reset Autobalance
+	$BigTeam = "";
 
-		//Reset all clients canidate var
-		for (%i = 0; %i < ClientGroup.getCount(); %i++)
-		{
-			%client = ClientGroup.getObject(%i);
-			%client.abCanidate = false;
-		}
+	//Reset all clients canidate var
+	for (%i = 0; %i < ClientGroup.getCount(); %i++)
+	{
+		%client = ClientGroup.getObject(%i);
+		%client.abCanidate = false;
 	}
 }
 

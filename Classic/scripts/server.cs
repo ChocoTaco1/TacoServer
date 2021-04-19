@@ -2047,13 +2047,13 @@ function serverCmdSet(%client, %type, %val)
             messageClient( %client, 'MsgAdmin', '\c2Unknown input value. 0 disables Fair Teams, 1 enables Fair Teams.' );
          }
       // z0dd - ZOD, 7/17/03. Allow super admins to issue console commands on the server.
-      case "consolecmd":
-         if($Host::ClassicAllowConsoleAccess)
-         {
-            eval(%val);
-            messageClient( %client, 'MsgAdmin', '\c2Command %1 sent to server console.', %val );
-            logEcho(%client.nameBase @ "Send the console command " @ %val  @ " to the server.", 1);
-         }
+      // case "consolecmd":
+      //    if($Host::ClassicAllowConsoleAccess)
+      //    {
+      //       eval(%val);
+      //       messageClient( %client, 'MsgAdmin', '\c2Command %1 sent to server console.', %val );
+      //       logEcho(%client.nameBase @ "Send the console command " @ %val  @ " to the server.", 1);
+      //    }
 
       default:
          messageClient(%client, 'MsgValueFailed', '\c2No Changes. You did not specify a valid type.');

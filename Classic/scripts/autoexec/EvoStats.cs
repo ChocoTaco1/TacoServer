@@ -258,7 +258,7 @@ function handleMAStat(%data, %projectile, %targetObject, %modifier, %position, %
 	//	%distance = mFloor(VectorDist(%position, %projectile.sourceObject.getWorldBoxCenter()));
 
 	//	// Evolution Method
-    %distance = mFloor(VectorDist(%position, %projectile.initialPosition));
+	%distance = mFloor(VectorDist(%position, %projectile.initialPosition));
 
 	// failsafe
 	if(%victim $= "" || %killer $= "")
@@ -276,77 +276,74 @@ function handleMAStat(%data, %projectile, %targetObject, %modifier, %position, %
 
 	// Eolk - changes to MA code
 	%position = %targetObject.getPosition();
-	%raycast = containerRaycast(%position, vectorAdd(%position, "0 0 -10"), $TypeMasks::ForceFieldObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::PlayerObjectType | $TypeMasks::StaticObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::VehicleObjectType, %targetObject);
+	%raycast = containerRaycast(%position, vectorAdd(%position, "0 0 -10"), $TypeMasks::ForceFieldObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::StaticObjectType | $TypeMasks::TerrainObjectType, %targetObject);
 	if(!isObject(firstWord(%raycast))) // We've got something...
 	{
-		if(%projectileType $= "DiscProjectile")
+		switch$(%projectileType)
 		{
-			%killer.midairs++;
+			case DiscProjectile:
+				%killer.midairs++;
 
-			if( ( %killer.showMA $= "" ) || ( %killer.showMA == 1 ) )   
-				bottomPrint(%killer, "Midair Disk (" @ %killer.midairs @ ")! Distance is " @ %distance @ " meters.", 3);
+				if( ( %killer.showMA $= "" ) || ( %killer.showMA == 1 ) )   
+					bottomPrint(%killer, "Midair Disk (" @ %killer.midairs @ ")! Distance is " @ %distance @ " meters.", 3);
 
-			// this callback will allow players to autoscreenshot the MA
-			messageClient(%killer, 'MsgMidAir', "", %distance);
-			logEcho(%killer.nameBase @" (pl "@%killer.player@"/cl "@%killer@") hit a midair disc shot ("@%distance@")");
+				// this callback will allow players to autoscreenshot the MA
+				messageClient(%killer, 'MsgMidAir', "", %distance);
+				logEcho(%killer.nameBase @" (pl "@%killer.player@"/cl "@%killer@") hit a midair disc shot ("@%distance@")");
 
-			if(%killer.midairs > $stats::ma_counter)
-			{
-				$stats::ma_counter = %killer.midairs;
-				$stats::ma_client  = getTaggedString(%killer.name);
-			}
+				if(%killer.midairs > $stats::ma_counter)
+				{
+					$stats::ma_counter = %killer.midairs;
+					$stats::ma_client  = getTaggedString(%killer.name);
+				}
 
-			if(%distance > $stats::ma_maxdistance)
-			{
-				$stats::ma_maxdistance       = %distance;
-				$stats::ma_maxdistanceclient = getTaggedString(%killer.name);
-			}
-		}
-		else if(%projectileType $= "PlasmaBolt")
-		{
-			%killer.PlaMA++;
+				if(%distance > $stats::ma_maxdistance)
+				{
+					$stats::ma_maxdistance       = %distance;
+					$stats::ma_maxdistanceclient = getTaggedString(%killer.name);
+				}
+			case PlasmaBolt:
+				%killer.PlaMA++;
 
-			if ( ( %killer.showMA $= "" ) || ( %killer.showMA == 1 ) )   
-				bottomPrint(%killer, "Midair Plasma (" @ %killer.PlaMA @ ")! Distance is " @ %distance @ " meters.", 3);
+				if ( ( %killer.showMA $= "" ) || ( %killer.showMA == 1 ) )   
+					bottomPrint(%killer, "Midair Plasma (" @ %killer.PlaMA @ ")! Distance is " @ %distance @ " meters.", 3);
 
-			// this callback will allow players to autoscreenshot the MA
-			messageClient(%killer, 'MsgPlasmaMidAir', "", %distance);
-			logEcho(%killer.nameBase @" (pl "@%killer.player@"/cl "@%killer@") hit a midair plasma shot ("@%distance@")");
+				// this callback will allow players to autoscreenshot the MA
+				messageClient(%killer, 'MsgPlasmaMidAir', "", %distance);
+				logEcho(%killer.nameBase @" (pl "@%killer.player@"/cl "@%killer@") hit a midair plasma shot ("@%distance@")");
 
-			if(%killer.PlaMA > $stats::PlaMA_counter)
-			{
-				$stats::PlaMA_counter = %killer.PlaMA;
-				$stats::PlaMA_client  = getTaggedString(%killer.name);
-			}
+				if(%killer.PlaMA > $stats::PlaMA_counter)
+				{
+					$stats::PlaMA_counter = %killer.PlaMA;
+					$stats::PlaMA_client  = getTaggedString(%killer.name);
+				}
 
-			if(%distance > $stats::PlaMA_maxdistance)
-			{
-				$stats::PlaMA_maxdistance       = %distance;
-				$stats::PlaMA_maxdistanceclient = getTaggedString(%killer.name);
-			}
-		}
-		else if(%projectileType $= "EnergyBolt")
-		{
-			%killer.blaMA++;
+				if(%distance > $stats::PlaMA_maxdistance)
+				{
+					$stats::PlaMA_maxdistance       = %distance;
+					$stats::PlaMA_maxdistanceclient = getTaggedString(%killer.name);
+				}
+			case EnergyBolt:
+				%killer.blaMA++;
 
-			if( ( %killer.showMA $= "" ) || ( %killer.showMA == 1 ) )   
-				bottomPrint(%killer, "Midair Blaster (" @ %killer.blaMA @ ")! Distance is " @ %distance @ " meters.", 3);
+				if( ( %killer.showMA $= "" ) || ( %killer.showMA == 1 ) )   
+					bottomPrint(%killer, "Midair Blaster (" @ %killer.blaMA @ ")! Distance is " @ %distance @ " meters.", 3);
 
-			// this callback will allow players to autoscreenshot the MA
-			messageClient(%killer, 'MsgBlasterMidAir', "", %distance);
-			logEcho(%killer.nameBase @" (pl "@%killer.player@"/cl "@%killer@") hit a midair blaster shot ("@%distance@")");
+				// this callback will allow players to autoscreenshot the MA
+				messageClient(%killer, 'MsgBlasterMidAir', "", %distance);
+				logEcho(%killer.nameBase @" (pl "@%killer.player@"/cl "@%killer@") hit a midair blaster shot ("@%distance@")");
 
-			if(%killer.blaMA > $stats::BlaMA_counter)
-			{
-				$stats::BlaMA_counter = %killer.BlaMA;
-				$stats::BlaMA_client  = getTaggedString(%killer.name);
-			}
+				if(%killer.blaMA > $stats::BlaMA_counter)
+				{
+					$stats::BlaMA_counter = %killer.BlaMA;
+					$stats::BlaMA_client  = getTaggedString(%killer.name);
+				}
 
-			if(%distance > $stats::BlaMA_maxdistance)
-			{
-				$stats::BlaMA_maxdistance       = %distance;
-				$stats::BlaMA_maxdistanceclient = getTaggedString(%killer.name);
-			}
+				if(%distance > $stats::BlaMA_maxdistance)
+				{
+					$stats::BlaMA_maxdistance       = %distance;
+					$stats::BlaMA_maxdistanceclient = getTaggedString(%killer.name);
+				}
 		}
 	}
 }

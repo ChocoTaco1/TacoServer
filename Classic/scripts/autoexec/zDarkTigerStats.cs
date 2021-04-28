@@ -5759,7 +5759,7 @@ function GameConnection::dtMessage(%this,%message,%sfx,%bypass){
 
 function rayTest(%targetObject,%dis){
    if(isObject(%targetObject)){
-      %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+      %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::ForceFieldObjectType | $TypeMasks::VehicleObjectType;
       %rayStart = %targetObject.getWorldBoxCenter();
       %rayEnd = VectorAdd(%rayStart,"0 0" SPC ((%dis+1.15) * -1));
       %ground = !ContainerRayCast(%rayStart, %rayEnd, %mask, %targetObject);
@@ -5770,7 +5770,7 @@ function rayTest(%targetObject,%dis){
 }
 function rayTestDis(%targetObject){
    if(isObject(%targetObject)){
-      %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+      %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::ForceFieldObjectType | $TypeMasks::VehicleObjectType;
       %rayStart = %targetObject.getWorldBoxCenter();
       %rayEnd = VectorAdd(%rayStart,"0 0" SPC -5000);
       %ray = ContainerRayCast(%rayStart, %rayEnd, %mask, %targetObject);

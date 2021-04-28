@@ -131,7 +131,7 @@ function maDirect(%client)// tests for direct hit with aoe weapons
 
 function maRayTestDis(%targetObject)// tests for height of target
 {
-	%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+	%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::ForceFieldObjectType | $TypeMasks::VehicleObjectType;
 	%rayStart = %targetObject.getWorldBoxCenter();
 	%rayEnd = VectorAdd(%rayStart,"0 0" SPC -5000);
 	%ray = ContainerRayCast(%rayStart, %rayEnd, %mask, %targetObject); 

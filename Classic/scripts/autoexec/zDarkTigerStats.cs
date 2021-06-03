@@ -14,7 +14,7 @@
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 9.0;
+$dtStats::version = 9.1;
 //disable stats system
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -2471,16 +2471,16 @@ package dtStatsGame{
          %dtStats = %player.client.dtStats;
          %time = ((getSimTime() - $missionStartTime)/1000)/60;
          if(%clTeam == 1){
-            if(!%dtStats.teamOneCapTimes)
-               %dtStats.teamOneCapTimes = cropFloat(%time,1);
+            if(!$dtStats::teamOneCapTimes)
+               $dtStats::teamOneCapTimes = cropFloat(%time,1);
             else
-               %dtStats.teamOneCapTimes  = %dtStats.teamOneCapTimes  @ "," @ cropFloat(%time,1);
+               $dtStats::teamOneCapTimes = $dtStats::teamOneCapTimes  @ "," @ cropFloat(%time,1);
          }
          else{
-            if(!%dtStats.teamTwoCapTimes)
-               %dtStats.teamTwoCapTimes = cropFloat(%time,1);
+            if(!$dtStats::teamTwoCapTimes)
+               $dtStats::teamTwoCapTimes = cropFloat(%time,1);
             else
-               %dtStats.teamTwoCapTimes  = %dtStats.teamTwoCapTimes  @ "," @ cropFloat(%time,1);
+               $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
          }
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
@@ -2585,16 +2585,16 @@ package dtStatsGame{
          %dtStats = %player.client.dtStats;
          %time = ((getSimTime() - $missionStartTime)/1000)/60;
          if(%clTeam == 1){
-            if(!%dtStats.teamOneCapTimes)
-               %dtStats.teamOneCapTimes = cropFloat(%time,1);
+            if(!$dtStats::teamOneCapTimes)
+               $dtStats::teamOneCapTimes = cropFloat(%time,1);
             else
-               %dtStats.teamOneCapTimes  = %dtStats.teamOneCapTimes  @ "," @ cropFloat(%time,1);
+               $dtStats::teamOneCapTimes = $dtStats::teamOneCapTimes  @ "," @ cropFloat(%time,1);
          }
          else{
-            if(!%dtStats.teamTwoCapTimes)
-               %dtStats.teamTwoCapTimes = cropFloat(%time,1);
+            if(!$dtStats::teamTwoCapTimes)
+               $dtStats::teamTwoCapTimes = cropFloat(%time,1);
             else
-               %dtStats.teamTwoCapTimes  = %dtStats.teamTwoCapTimes  @ "," @ cropFloat(%time,1);
+               $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
          }
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
@@ -4013,7 +4013,7 @@ function dtStatsClientLeaveGame(%client){
       %client.dtStats.clientLeft = 1;
       %client.dtStats.leftTime = getSimTime();
       %client.dtStats.leftID = $dtStats::leftID;
-      %client.dtStats.leftPCT = (isGameRun() == 1) ? %game.getGamePct() : 0;
+      %client.dtStats.leftPCT = %game.getGamePct();
       if(isObject(Game) && isGameRun() && %client.score != 0)
          bakGameStats(%client,Game.class);//back up there current game in case they lost connection
    }
@@ -4079,8 +4079,10 @@ function dtStatsGameOver( %game ){
    }
 }
 function dtSaveDone(){
-  $dtStats::statsSave = 0;
-  $dtStats::leftID++;
+   $dtStats::statsSave = 0;
+   $dtStats::leftID++;
+   $dtStats::teamOneCapTimes = 0;
+   $dtStats::teamTwoCapTimes = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4196,6 +4198,8 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
 
 
    if(%game.class $= "CTFGame" || %game.class $= "SCtFGame"){
+      %dtStats.teamOneCapTimes  = $dtStats::teamOneCapTimes;
+      %dtStats.teamTwoCapTimes  = $dtStats::teamTwoCapTimes;
       %dtStats.teamScore =  $TeamScore[%dtStats.dtTeam];
 
       %dtStats.destruction =  %dtStats.genDestroys +
@@ -12967,3 +12971,8 @@ function testVarsRandomAll(%max){
 //    Added startPCt and endPct for game progress info
 //    Added clientQuit to make filtering easier
 //    Some code cleanup
+//
+//    9.1
+//    Stat fixes
+//       - had cap times tied to the client instead of being global
+//       - fixed endPCt/leftPCT

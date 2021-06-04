@@ -14,7 +14,7 @@
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 9.1;
+$dtStats::version = 9.2;
 //disable stats system
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -2471,17 +2471,20 @@ package dtStatsGame{
          %dtStats = %player.client.dtStats;
          %time = ((getSimTime() - $missionStartTime)/1000)/60;
          if(%clTeam == 1){
-            if(!$dtStats::teamOneCapTimes)
+            $dtStats::teamOneCapCount++;
+            if($dtStats::teamOneCapCount == 1)
                $dtStats::teamOneCapTimes = cropFloat(%time,1);
             else
                $dtStats::teamOneCapTimes = $dtStats::teamOneCapTimes  @ "," @ cropFloat(%time,1);
          }
          else{
-            if(!$dtStats::teamTwoCapTimes)
+            $dtStats::teamTwoCapCount++;
+            if($dtStats::teamTwoCapCount == 1)
                $dtStats::teamTwoCapTimes = cropFloat(%time,1);
             else
                $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
          }
+         error($dtStats::teamOneCapTimes SPC $dtStats::teamTwoCapTimes);
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
             if(%heldTime < %dtStats.heldTimeSec || !%dtStats.heldTimeSec){
@@ -2584,14 +2587,16 @@ package dtStatsGame{
          %flag = %player.holdingFlag;
          %dtStats = %player.client.dtStats;
          %time = ((getSimTime() - $missionStartTime)/1000)/60;
-         if(%clTeam == 1){
-            if(!$dtStats::teamOneCapTimes)
+          if(%clTeam == 1){
+            $dtStats::teamOneCapCount++;
+            if($dtStats::teamOneCapCount == 1)
                $dtStats::teamOneCapTimes = cropFloat(%time,1);
             else
                $dtStats::teamOneCapTimes = $dtStats::teamOneCapTimes  @ "," @ cropFloat(%time,1);
          }
          else{
-            if(!$dtStats::teamTwoCapTimes)
+            $dtStats::teamTwoCapCount++;
+            if($dtStats::teamTwoCapCount == 1)
                $dtStats::teamTwoCapTimes = cropFloat(%time,1);
             else
                $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
@@ -4083,6 +4088,8 @@ function dtSaveDone(){
    $dtStats::leftID++;
    $dtStats::teamOneCapTimes = 0;
    $dtStats::teamTwoCapTimes = 0;
+   $dtStats::teamOneCapCount = 0;
+   $dtStats::teamTwoCapCount = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -12660,6 +12667,10 @@ function dtLoadServerVars(){// keep function at the bottom
    if($dtStats::Enable){
       if(!statsGroup.serverStart){
          statsGroup.serverStart = 1;
+         $dtStats::teamOneCapTimes = 0;
+         $dtStats::teamTwoCapTimes = 0;
+         $dtStats::teamOneCapCount = 0;
+         $dtStats::teamTwoCapCount = 0;
          $dtServerVars::upTimeCount = -1;
          %crash = 0;
          if(isFile("serverStats/serverVars.cs")){
@@ -12669,7 +12680,7 @@ function dtLoadServerVars(){// keep function at the bottom
             %mis = $dtServerVars::lastMission;
             if($dtStats::debugEchos){schedule(6000,0,"error","last server uptime = " SPC %date @ "-" @ %upTime @ "-" @ %mis);}
             $dtServerVars::upTime[$dtServerVars::upTimeCount++] = %date @ "-" @ %upTime @ "-" @ %mis;
-            if($dtServerVars::lastPlayerCount > 1){
+            if($dtServerVars::lastPlayerCount > 3){
                $dtServerVars::serverCrash[%mis, $dtServerVars::lastGameType]++;
                $dtServerVars::crashLog[$dtServerVars::crashLogCount++] =%date @ "-" @ %upTime @ "-" @ %mis @ "-" @  $dtServerVars::lastGameType @ "-" @ $dtServerVars::lastPlayerCount;
                $dtServerVars::lastPlayerCount = 0;
@@ -12705,8 +12716,8 @@ function dtLoadServerVars(){// keep function at the bottom
          $dtServer::eventLogCount = -1;
          //if(isFile("serverStats/eventLog.cs"))
             //exec("serverStats/eventLog.cs");
-         if(%crash)
-            dtEventLog("Server Crash" SPC %date SPC "Plr Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC $dtServerVars::lastMission, 0);
+         if(%crash)// delay it so bot has a chance to connect and report the crash
+            schedule(15000,0,"dtEventLog","Server Crash" SPC %date SPC "Pl Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC $dtServerVars::lastMission SPC "Up Time =" SPC dtFormatTime($dtServerVars::lastSimTime), 0);
 
          dtEventLog("Server Start" SPC formattimestring("hh:nn:a mm-dd-yy"), 0);
 
@@ -12974,5 +12985,9 @@ function testVarsRandomAll(%max){
 //
 //    9.1
 //    Stat fixes
-//       - had cap times tied to the client instead of being global
+//       - made cap timers global instead of client... oops
 //       - fixed endPCt/leftPCT
+//
+//    9.2
+//    Added a delay for server crash to be able to report it to the bot on server start
+//    Fix Cap timers a 3rd time

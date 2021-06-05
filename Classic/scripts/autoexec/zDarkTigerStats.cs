@@ -2484,7 +2484,7 @@ package dtStatsGame{
             else
                $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
          }
-         error($dtStats::teamOneCapTimes SPC $dtStats::teamTwoCapTimes);
+         //error($dtStats::teamOneCapTimes SPC $dtStats::teamTwoCapTimes);
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
             if(%heldTime < %dtStats.heldTimeSec || !%dtStats.heldTimeSec){
@@ -4018,7 +4018,7 @@ function dtStatsClientLeaveGame(%client){
       %client.dtStats.clientLeft = 1;
       %client.dtStats.leftTime = getSimTime();
       %client.dtStats.leftID = $dtStats::leftID;
-      %client.dtStats.leftPCT = %game.getGamePct();
+      %client.dtStats.leftPCT = Game.getGamePct();
       if(isObject(Game) && isGameRun() && %client.score != 0)
          bakGameStats(%client,Game.class);//back up there current game in case they lost connection
    }

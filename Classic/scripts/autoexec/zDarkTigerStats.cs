@@ -4008,12 +4008,14 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    }
 }
 function dtStatsClientLeaveGame(%client){
+   $dtServerVars::lastPlayerCount =  $HostGamePlayerCount - $HostGameBotCount;
+   
    if(isGameRun()){// if they dc during game over dont count it
       $dtServer::mapDisconnects[cleanMapName($CurrentMission),Game.class]++;
       if(%client.score != 0)
          $dtServer::mapDisconnectsScore[cleanMapName($CurrentMission),Game.class]++;
    }
-
+   
    if(isObject(%client.dtStats)){
       %client.dtStats.clientLeft = 1;
       %client.dtStats.leftTime = getSimTime();
@@ -12644,7 +12646,7 @@ function startMonitor(){
    }
 }
 
-function dtSaveServerVars(){
+function dtSaveServerVars(){ 
    $dtServerVars::lastSimTime = getSimTime();
    $dtServerVars::lastDate = formattimestring("mm/dd/yy hh:nn:a");
    $dtServerVars::lastMission = cleanMapName($CurrentMission);
@@ -12672,7 +12674,7 @@ function dtLoadServerVars(){// keep function at the bottom
          $dtStats::teamOneCapCount = 0;
          $dtStats::teamTwoCapCount = 0;
          $dtServerVars::upTimeCount = -1;
-         %crash = 0;
+
          if(isFile("serverStats/serverVars.cs")){
             exec("serverStats/serverVars.cs");
             %date = $dtServerVars::lastDate;
@@ -12682,9 +12684,8 @@ function dtLoadServerVars(){// keep function at the bottom
             $dtServerVars::upTime[$dtServerVars::upTimeCount++] = %date @ "-" @ %upTime @ "-" @ %mis;
             if($dtServerVars::lastPlayerCount > 3){
                $dtServerVars::serverCrash[%mis, $dtServerVars::lastGameType]++;
-               $dtServerVars::crashLog[$dtServerVars::crashLogCount++] =%date @ "-" @ %upTime @ "-" @ %mis @ "-" @  $dtServerVars::lastGameType @ "-" @ $dtServerVars::lastPlayerCount;
-               $dtServerVars::lastPlayerCount = 0;
-               %crash = 1;
+               $dtServerVars::crashLog[$dtServerVars::crashLogCount++] = %date @ "-" @ %upTime @ "-" @ %mis @ "-" @  $dtServerVars::lastGameType @ "-" @ $dtServerVars::lastPlayerCount;
+               schedule(15000,0,"dtEventLog","Server Crash" SPC %date SPC "Pl Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC %mis SPC "Up Time =" SPC %upTime, 0);
             }
          }
          if($dtServerVars::upTimeCount >= 30)
@@ -12692,6 +12693,7 @@ function dtLoadServerVars(){// keep function at the bottom
          if($dtServerVars::crashLogCount >= 15)
             $dtServerVars::crashLogCount = 0;
 
+         $dtServerVars::lastPlayerCount = 0;
          $dtServerVars::lastSimTime = getSimTime();
          $dtServerVars::lastDate =  formattimestring("mm/dd/yy hh:nn:a");
          export( "$dtServerVars::*", "serverStats/serverVars.cs", false );
@@ -12716,8 +12718,6 @@ function dtLoadServerVars(){// keep function at the bottom
          $dtServer::eventLogCount = -1;
          //if(isFile("serverStats/eventLog.cs"))
             //exec("serverStats/eventLog.cs");
-         if(%crash)// delay it so bot has a chance to connect and report the crash
-            schedule(15000,0,"dtEventLog","Server Crash" SPC %date SPC "Pl Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC $dtServerVars::lastMission SPC "Up Time =" SPC dtFormatTime($dtServerVars::lastSimTime), 0);
 
          dtEventLog("Server Start" SPC formattimestring("hh:nn:a mm-dd-yy"), 0);
 
@@ -12991,3 +12991,4 @@ function testVarsRandomAll(%max){
 //    9.2
 //    Added a delay for server crash to be able to report it to the bot on server start
 //    Fix Cap timers a 3rd time
+//    Server crash messsage fix

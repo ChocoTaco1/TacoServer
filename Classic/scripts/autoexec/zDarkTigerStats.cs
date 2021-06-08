@@ -14,7 +14,7 @@
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 9.2;
+$dtStats::version = 9.3;
 //disable stats system
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -2473,14 +2473,14 @@ package dtStatsGame{
          if(%clTeam == 1){
             $dtStats::teamOneCapCount++;
             if($dtStats::teamOneCapCount == 1)
-               $dtStats::teamOneCapTimes = cropFloat(%time,1);
+               $dtStats::teamOneCapTimes = 0 @ "," @ cropFloat(%time,1);
             else
                $dtStats::teamOneCapTimes = $dtStats::teamOneCapTimes  @ "," @ cropFloat(%time,1);
          }
          else{
             $dtStats::teamTwoCapCount++;
             if($dtStats::teamTwoCapCount == 1)
-               $dtStats::teamTwoCapTimes = cropFloat(%time,1);
+               $dtStats::teamTwoCapTimes = 0 @ "," @ cropFloat(%time,1);
             else
                $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
          }
@@ -2590,14 +2590,14 @@ package dtStatsGame{
           if(%clTeam == 1){
             $dtStats::teamOneCapCount++;
             if($dtStats::teamOneCapCount == 1)
-               $dtStats::teamOneCapTimes = cropFloat(%time,1);
+               $dtStats::teamOneCapTimes = 0 @ "," @ cropFloat(%time,1);
             else
                $dtStats::teamOneCapTimes = $dtStats::teamOneCapTimes  @ "," @ cropFloat(%time,1);
          }
          else{
             $dtStats::teamTwoCapCount++;
             if($dtStats::teamTwoCapCount == 1)
-               $dtStats::teamTwoCapTimes = cropFloat(%time,1);
+               $dtStats::teamTwoCapTimes = 0 @ "," @ cropFloat(%time,1);
             else
                $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
          }
@@ -12992,3 +12992,6 @@ function testVarsRandomAll(%max){
 //    Added a delay for server crash to be able to report it to the bot on server start
 //    Fix Cap timers a 3rd time
 //    Server crash messsage fix
+//
+//    9.3
+//    Stat format change for flag cap times, they now start at 0 

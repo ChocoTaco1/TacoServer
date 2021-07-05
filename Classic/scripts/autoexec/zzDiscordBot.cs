@@ -4,7 +4,7 @@
 
 //exec("scripts/autoexec/zzDiscordBot.cs");
 
-//note first channel is for monitoring 
+//note first channel is for monitoring
 $discordBot::discordCHID = "";
 $discordBot::IP = "";
 $discordBot::reconnectTimeout = 3 * 60000;
@@ -32,21 +32,21 @@ function messageAll(%msgType, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8
    %type = getTaggedString(%msgType);
 	switch$(%type)
 	{
-		case "msgExplosionKill" or "msgSuicide" or "msgVehicleSpawnKill" or "msgVehicleCrash" or "msgVehicleKill" or "msgTurretSelfKill" or "msgTurretSelfKill" or "msgCTurretKill" or "msgTurretKill" or 
+		case "msgExplosionKill" or "msgSuicide" or "msgVehicleSpawnKill" or "msgVehicleCrash" or "msgVehicleKill" or "msgTurretSelfKill" or "msgTurretSelfKill" or "msgCTurretKill" or "msgTurretKill" or
 			 "msgSelfKill" or "msgOOBKill" or "msgCampKill" or "msgTeamKill" or "msgLavaKill" or "msgLightningKill" or "MsgRogueMineKill" or "MsgHeadshotKill" or "MsgRearshotKill" or "MsgLegitKill" or
-			 "MsgClientJoin" or "MsgClientDrop":  
+			 "MsgClientJoin" or "MsgClientDrop":
 		%message = getTaggedString(%msgString);
-		%message =  strreplace(%message,"%1",getTaggedString(%a1)); 
-		%message =  strreplace(%message,"%2",getTaggedString(%a2)); 
-		%message =  strreplace(%message,"%3",getTaggedString(%a3)); 
-		%message =  strreplace(%message,"%4",getTaggedString(%a4)); 
-		%message =  strreplace(%message,"%5",getTaggedString(%a5)); 
-		%message =  strreplace(%message,"%6",getTaggedString(%a6)); 
-		%message =  strreplace(%message,"%7",getTaggedString(%a7)); 
-		%message =  strreplace(%message,"%8",getTaggedString(%a8)); 
+		%message =  strreplace(%message,"%1",getTaggedString(%a1));
+		%message =  strreplace(%message,"%2",getTaggedString(%a2));
+		%message =  strreplace(%message,"%3",getTaggedString(%a3));
+		%message =  strreplace(%message,"%4",getTaggedString(%a4));
+		%message =  strreplace(%message,"%5",getTaggedString(%a5));
+		%message =  strreplace(%message,"%6",getTaggedString(%a6));
+		%message =  strreplace(%message,"%7",getTaggedString(%a7));
+		%message =  strreplace(%message,"%8",getTaggedString(%a8));
 		%message = stripChars(%message, "\cp\co\c0\c6\c7\c8\c9");
 		sendToDiscordEmote(%message, $discordBot::serverFeed);
-	}  
+	}
 	if($missionName !$= $discordBot::cm && ClientGroup.getCount() > 2){
 		   sendToDiscordEmote("The mission changed to" SPC  $missionName, $discordBot::serverFeed);
 		   $discordBot::cm = $missionName;
@@ -139,11 +139,11 @@ function LogMessage(%client, %msg, %cat){
 
 if(!isActivePackage(discordPackage))
    activatePackage(discordPackage);
-   
+
 function discordBotProcess(%type, %var1, %var2, %var3, %var4, %var5, %var6)
 {
 	//echo(%type SPC %var1 SPC %var2 SPC %var3 SPC %var4 SPC %var5 SPC %var6);
-	
+
 	switch$ (%type)
 	{
 		case "flagCap":
@@ -162,7 +162,7 @@ function discordBotProcess(%type, %var1, %var2, %var3, %var4, %var5, %var6)
 				if(%flag.isHome)
 					%msg = getTaggedString(%player.client.name) SPC "took the" SPC getTaggedString(%game.getTeamName(%flag.team)) SPC "flag. (Speed:" SPC %grabspeed @ "Kph)";
 				else if(!%flag.isHome)
-					%msg = getTaggedString(%player.client.name) SPC "took the" SPC getTaggedString(%game.getTeamName(%flag.team)) SPC "flag in the field. (Speed:" SPC %grabspeed @ "Kph)";  
+					%msg = getTaggedString(%player.client.name) SPC "took the" SPC getTaggedString(%game.getTeamName(%flag.team)) SPC "flag in the field. (Speed:" SPC %grabspeed @ "Kph)";
 			}
 		case "droppedFlag":
 			%game = %var1;
@@ -187,16 +187,16 @@ function discordBotProcess(%type, %var1, %var2, %var3, %var4, %var5, %var6)
 		case "lakMApoints":
 		    %sourceObject = %var1;
 			%points = %var2;
-			if(%points == 1)
+			if(%points !$=1)
 				%s = "s";
 			%hitType = %var3;
 			%weapon = %var4;
 			%distance = %var5;
 			%vel = %var6;
 			if(%points)
-				%msg = getTaggedString(%sourceObject.client.name) SPC "receives" SPC %points @ %s SPC "points! [" @ %hitType SPC %weapon @ "] [Distance:" SPC %distance @ "] [Speed:" SPC %vel @ "]";
+				%msg = getTaggedString(%sourceObject.client.name) SPC "receives" SPC %points SPC "point" @ %s @ "! [" @ %hitType SPC %weapon @ "] [Distance:" SPC %distance @ "] [Speed:" SPC %vel @ "]";
 	}
-	
+
 	if(%msg !$= "")
 	{
 		%msg = stripChars(%msg, "\cp\co\c0\c6\c7\c8\c9");
@@ -223,20 +223,20 @@ function sendToDiscordEmote(%msg,%channel)//emote filter will be applyed used in
       }
    }
 }
-function discordCon(){  
+function discordCon(){
    if(discord.lastState !$= "Connected"){
       if(isEventPending($discordBot::reconnectEvent))
          cancel($discordBot::reconnectEvent);
       if(isObject(discord))
          discord.delete();
-      new TCPObject(discord);  
+      new TCPObject(discord);
       discord.lastState = "Connecting";
-      discord.connect($discordBot::IP);  
+      discord.connect($discordBot::IP);
    }
 }
 function discordKill(){
  if(isEventPending($discordBot::reconnectEvent))
-      cancel($discordBot::reconnectEvent); 
+      cancel($discordBot::reconnectEvent);
    discord.delete();
 }
 
@@ -279,7 +279,7 @@ function discord::onLine(%this, %line){
    %cmd = getWord(%lineStrip,0);
    switch$(%cmd){
       //case "Discord":
-         //messageAll( 'MsgDiscord', '\c3Discord: \c4%1 %2',getWord(%lineStrip,1),getWords(%lineStrip,2,getWordCount(%lineStrip) -1)); 
+         //messageAll( 'MsgDiscord', '\c3Discord: \c4%1 %2',getWord(%lineStrip,1),getWords(%lineStrip,2,getWordCount(%lineStrip) -1));
       case "PING":
          discord.send("PONG" @ $discordBot::cmdSplit @ "\r\n");
       case "PINGAVG":
@@ -287,20 +287,20 @@ function discord::onLine(%this, %line){
       %max = -10000;
       %lowCount = %lowPing = 0;
          for(%i = 0; %i < ClientGroup.getCount(); %i++){
-            %cl = ClientGroup.getObject(%i);               
-            %ping = %cl.isAIControlled() ? 0 : %cl.getPing(); 
+            %cl = ClientGroup.getObject(%i);
+            %ping = %cl.isAIControlled() ? 0 : %cl.getPing();
                %min  =  (%ping < %min) ? %ping : %min;
                %max  =  (%ping > %max) ? %ping : %max;
                if(%ping < 250){
                   %lowCount++;
-                  %lowPing += %ping;   
+                  %lowPing += %ping;
                }
                %pc++;
-               %pingT += %ping;  
+               %pingT += %ping;
          }
          %lowCount = (%lowCount == 0) ? 1 : %lowCount;
          if(!%pc){
-            sendToDiscord("Ping AVG:" @ 0 SPC "Low Avg:" @ 0 SPC "Min:" @ 0 SPC "Max:" @ 0, $discordBot::monitorChannel);   
+            sendToDiscord("Ping AVG:" @ 0 SPC "Low Avg:" @ 0 SPC "Min:" @ 0 SPC "Max:" @ 0, $discordBot::monitorChannel);
          }
          else{
             %avg = mFloor(%pingT/%pc);
@@ -312,8 +312,8 @@ function discord::onLine(%this, %line){
             %channel = 1;
             if(ClientGroup.getCount() > 0){
                for(%i = 0; %i < ClientGroup.getCount(); %i++){
-                  %cl = ClientGroup.getObject(%i);               
-                  %ping = %cl.isAIControlled() ? 0 : %cl.getPing(); 
+                  %cl = ClientGroup.getObject(%i);
+                  %ping = %cl.isAIControlled() ? 0 : %cl.getPing();
                   %msg = %cl.namebase @ $discordBot::cmdSubSplit @ %ping @ $discordBot::cmdSubSplit @ %i;
                   discord.schedule(%i*32,"send","MSGSTACK" @ $discordBot::cmdSplit @ (%channel-1) @ $discordBot::cmdSplit @ %msg @ "\r\n");
                }

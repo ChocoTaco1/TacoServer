@@ -13,7 +13,7 @@ function chatMessageAll(%sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, 
         chatCmd(%sender,%a2,0);
         return;
     }
-	
+
 	parent::chatMessageAll(%sender, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8, %a9, %a10);
 }
 
@@ -28,8 +28,8 @@ if (!isActivePackage(dtChatCmd))
 function chatCmd(%client, %message) //%client is sender
 {
 	%command = strlwr(trim(getWord(%message, 0)));// strip command trim and make it lower case
-	
-	switch$(%command) 
+
+	switch$(%command)
 	{
       case "/help":
          if(%client.isSuperAdmin)
@@ -39,8 +39,8 @@ function chatCmd(%client, %message) //%client is sender
             messageClient(%client, 'msgChatCmd', '\c2/snowsky - changes the sky to a snow sky.');
 			messageClient(%client, 'msgChatCmd', '\c2/firesky - changes the sky to a fire sky.');
             messageClient(%client, 'msgChatCmd', '\c2/rainsky - changes the sky to a rain sky.');
-            messageClient(%client, 'msgChatCmd', '\c2/sandsky - changes the sky to a sand sky.');	
-            messageClient(%client, 'msgChatCmd', '\c2/nicesky - changes the sky to a variation of four nice skies.');				
+            messageClient(%client, 'msgChatCmd', '\c2/sandsky - changes the sky to a sand sky.');
+            messageClient(%client, 'msgChatCmd', '\c2/nicesky - changes the sky to a variation of four nice skies.');
             messageClient(%client, 'msgChatCmd', '\c2/normalsky - changes the sky to a fallback sky.');
 			messageClient(%client, 'msgChatCmd', '\c2/spookysky - changes the sky to a halloween sky.');
             messageClient(%client, 'msgChatCmd', '\c2/fireworks - look at some fireworks.');
@@ -49,20 +49,20 @@ function chatCmd(%client, %message) //%client is sender
          }
          else if(%client.isAdmin)
 		 {
-            messageClient(%client, 'msgChatCmd', '\c2/snowsky - changes the sky to a snow sky.');            
+            messageClient(%client, 'msgChatCmd', '\c2/snowsky - changes the sky to a snow sky.');
 			messageClient(%client, 'msgChatCmd', '\c2/firesky - changes the sky to a fire sky.');
             messageClient(%client, 'msgChatCmd', '\c2/rainsky - changes the sky to a rain sky.');
             messageClient(%client, 'msgChatCmd', '\c2/sandsky - changes the sky to a sand sky.');
-	        messageClient(%client, 'msgChatCmd', '\c2/nicesky - changes the sky to a variation of four nice skies.');				
+	        messageClient(%client, 'msgChatCmd', '\c2/nicesky - changes the sky to a variation of four nice skies.');
             messageClient(%client, 'msgChatCmd', '\c2/normalsky - changes the sky to a fallback sky.');
 			messageClient(%client, 'msgChatCmd', '\c2/spookysky - changes the sky to a halloween sky.');
             messageClient(%client, 'msgChatCmd', '\c2/fireworks - look at some fireworks.');
 			messageClient(%client, 'msgChatCmd', '\c2/AIQ 1 or 0 - to enable tor disable ai chat.');
-            messageClient(%client, 'msgChatCmd', '\c2/idInfo - get id resources.'); 
+            messageClient(%client, 'msgChatCmd', '\c2/idInfo - get id resources.');
          }
          messageClient(%client, 'msgChatCmd', '\c2/report "message" - report a problem for server owner.');
          messageClient(%client, 'msgChatCmd', '\c2/msg "message" - leave the server owner a message.');
-	   
+
 	   case "/summon":
          if(%client.isSuperAdmin)
 		 {
@@ -72,7 +72,7 @@ function chatCmd(%client, %message) //%client is sender
 			%obj.setTransform(%pos SPC getWords(%obj.getTransform(), 3, 6));
 			%obj.setVelocity("0 0 1");// stop them incase they are going over 9000
          }
-		 
+
 	   case "/warpto":
          if(%client.isSuperAdmin)
 		 {
@@ -81,42 +81,42 @@ function chatCmd(%client, %message) //%client is sender
 			%obj = %client.player;
 			%obj.setTransform(%pos SPC getWords(%obj.getTransform(), 3, 6));
          }
-		 
+
 	   case "/fireworks":
          if(%client.isAdmin || %client.isSuperAdmin )
 		 {
 			fireworksSky(1);// only one sky for right now
 			$CurrentSky = "fireworks";
          }
-		 
+
 	   case "/normalsky":
          if(%client.isAdmin || %client.isSuperAdmin )
 		 {
 			normalSky(1);// only one sky for right now
 			$CurrentSky = "normal";
          }
-		 
+
        case "/firesky":
          if(%client.isAdmin || %client.isSuperAdmin )
 		 {
             fireSky(1);// only one sky for right now
 			$CurrentSky = "fire";
          }
-		 
+
 	   case "/rainsky":
          if(%client.isAdmin || %client.isSuperAdmin )
 		 {
 			rainSky(1);// only one sky for right now
 			$CurrentSky = "rain";
          }
-		 
+
 	   case "/snowsky":
          if(%client.isAdmin || %client.isSuperAdmin )
 		 {
 			snowSky(1);// only one sky for right now
 			$CurrentSky = "snow";
-         }	
-		 
+         }
+
 	   case "/sandsky":
          if(%client.isAdmin || %client.isSuperAdmin )
 		 {
@@ -129,15 +129,15 @@ function chatCmd(%client, %message) //%client is sender
 			niceSky(1);// only one sky for right now
 			$CurrentSky = "nice";
 		 }
-		 
+
 	   case "/report":
 		   LogMessage(%client, %message, "report");
 		   messageClient(%client, 'msgChatCmd', 'Your report has been received.');
-		   
+
        case "/msg":
 		   LogMessage(%client, %message, "message");
 		   messageClient(%client, 'msgChatCmd', 'Your message has been received.');
-  
+
        case "/idInfo":
 			if(%client.isSuperAdmin || %client.isAdmin)
 			{
@@ -145,21 +145,21 @@ function chatCmd(%client, %message) //%client is sender
 				messageClient(%client, 'msgChatCmd', '\c2 Num of id left %1 / 2147483647 = %2%',%num, (%num / 2147483647) * 100);
 				%num.delete();
 			}
-	   
+
        case "/enableAI":
 			if(%client.isSuperAdmin)
 			{
 				AISystemEnabled(true);
 				messageAll('message', 'AI is now enabled.');
 			}
-		 
+
        case "/disableAI":
 			if(%client.isSuperAdmin)
 			{
 				AISystemEnabled(false);
 				messageAll('message', 'AI is now disabled.');
 			}
-		 
+
        case "/AIQ":
 			if(%client.isSuperAdmin || %client.isAdmin)
 			{
@@ -171,7 +171,7 @@ function chatCmd(%client, %message) //%client is sender
             }
             else
 			{
-				$AIDisableChat = 0; 
+				$AIDisableChat = 0;
 				messageClient(%client, 'msgChatCmd', '\c2AI Chat Enabled.');
             }
          }
@@ -182,7 +182,7 @@ function chatCmd(%client, %message) //%client is sender
 			spookySky(1);// only one sky for right now
 			$CurrentSky = "spookySky";
          }
-		 
+
 	    default:
 		   messageClient(%client, 'msgChatCmd', '\c2Oops, that command is not recognized. ');
 	}
@@ -191,7 +191,7 @@ function chatCmd(%client, %message) //%client is sender
 
 function clientNameAuto(%name)  //client name auto complate
 {
-	for (%i = 0; %i < ClientGroup.getCount(); %i++) 
+	for (%i = 0; %i < ClientGroup.getCount(); %i++)
 	{ // the client list
       %client = ClientGroup.getObject(%i);
 		%fullName = %client.nameBase;
@@ -199,10 +199,10 @@ function clientNameAuto(%name)  //client name auto complate
 		%partname = strlwr(%name);
 		for(%a=1; %a <= strlen(%partname); %a++){
 		   if(getSubStr(%fullName,0,%a) $= getSubStr(%partname,0,%a)){
-            //echo(getSubStr(%fullName,0,%a) SPC  getSubStr(%partname,0,%a)); 
+            //echo(getSubStr(%fullName,0,%a) SPC  getSubStr(%partname,0,%a));
             if(%c[%i] > %x){
                 %x =%c[%i];
-			      %f = %i; 
+			      %f = %i;
             }
             %c[%i]++;
 		   }
@@ -215,8 +215,8 @@ function clientNameAuto(%name)  //client name auto complate
 function LogMessage(%client, %msg, %cat) //phantoms chatlogging
 {
 	%filename = "logs/" @ %cat @ "/" @ formattimestring("mm-dd-yy") @ ".txt";
-	
-	if (!IsFile(%filename)) 
+
+	if (!IsFile(%filename))
 	{
 		new fileobject(Clog);
 		Clog.openforwrite(%filename);
@@ -224,7 +224,7 @@ function LogMessage(%client, %msg, %cat) //phantoms chatlogging
 		Clog.close();
 		Clog.delete();
 	}
-	else 
+	else
 	{
 		new fileobject(Clog);
 		Clog.openforappend(%filename);
@@ -240,7 +240,7 @@ function removeSky(%sky)
 		Sky.delete();
 	if(isObject(Precipitation))
 	{
-		alxStopAll(); 
+		alxStopAll();
 		Precipitation.delete();
 	}
 	if(isObject(Lightning))
@@ -257,12 +257,12 @@ function normalSky(%sky)
 {
 	if($CurrentSky $= "normal")
 		return;
-		
+
 	MessageAll('Msg', "\c2Looks like the weather is clearing up.");
-		
+
 	removeSky(%sky);
 
-	new Sky(Sky) 
+	new Sky(Sky)
 	{
 		position = "0 0 0";
 		rotation = "1 0 0 0";
@@ -300,10 +300,10 @@ function fireSky(%sky)
 		return;
 
 	MessageAll('Msg', "\c2Is it getting hot outside?");
-		
-	removeSky(%sky);		
-		
-	new Sky(Sky) 
+
+	removeSky(%sky);
+
+	new Sky(Sky)
 	{
 		position = "-1216 -1336 0";
 		rotation = "1 0 0 0";
@@ -334,12 +334,12 @@ function fireSky(%sky)
 		high_fogVolume1 = "-1 3.22439e-42 1.04486e-40";
 		high_fogVolume2 = "-1 1.04845e-40 3.26643e-42";
 		high_fogVolume3 = "-1 3.28324e-42 1.05581e-40";
-		
+
 		cloudSpeed0 = "0.000000 0.000000";
 	};
-			 
+
 	MissionCleanup.add(Sky);
-	
+
 	%fireball = new FireballAtmosphere(FireballAtmosphere)
 	{
 		position = "0 0 0";
@@ -356,7 +356,7 @@ function fireSky(%sky)
 		dropHeight = "2000";
 		dropDir = "0.212 0.212 -0.953998";
 	};
-	%embers = new Precipitation(Precipitation) 
+	%embers = new Precipitation(Precipitation)
 	{
 		position = "116.059 -26.7731 156.557";
 		rotation = "1 0 0 0";
@@ -374,7 +374,7 @@ function fireSky(%sky)
 		maxNumDrops = "500";
 		maxRadius = "125";
 	};
-	%firewind =	new AudioEmitter(PlanetSoundEmitter) 
+	%firewind =	new AudioEmitter(PlanetSoundEmitter)
 	{
 		position = "289.762 209.214 173.677";
 		rotation = "1 0 0 0";
@@ -395,7 +395,7 @@ function fireSky(%sky)
 		minLoopGap = "0";
 		maxLoopGap = "0";
 		type = "EffectAudioType";
-	};		
+	};
 
 	MissionCleanup.add(%fireball);
 	MissionCleanup.add(%embers2);
@@ -404,17 +404,17 @@ function fireSky(%sky)
 }
 
 
- 
+
 function rainSky(%sky)
 {
 	if($CurrentSky $= "rain")
 		return;
-	
-	MessageAll('Msg', "\c2Looks like a storm is brewing.");
-	
-	removeSky(%sky);		
 
-	new Sky(Sky) 
+	MessageAll('Msg', "\c2Looks like a storm is brewing.");
+
+	removeSky(%sky);
+
+	new Sky(Sky)
 	{
 		position = "0 0 0";
 		rotation = "1 0 0 0";
@@ -445,14 +445,14 @@ function rainSky(%sky)
 		high_fogVolume1 = "-1 107 1.07457e-38";
 		high_fogVolume2 = "-1 9.69184e-34 8.26766e-44";
 		high_fogVolume3 = "-1 0 3.2509e-38";
-		
+
 		cloudSpeed0 = "0.000000 0.000400";
 	};
-		 
+
 	MissionCleanup.add(Sky);
-	
+
 	//Requires RainNoSound Datablock in weather.cs
-	%rain = new Precipitation(Precipitation) 
+	%rain = new Precipitation(Precipitation)
 	{
 		position = "-336.859 -631.623 191.648";
 		rotation = "1 0 0 0";
@@ -470,7 +470,7 @@ function rainSky(%sky)
 		maxNumDrops = "1000";
 		maxRadius = "80";
 	};
-	%lightning = new Lightning(Lightning) 
+	%lightning = new Lightning(Lightning)
 	{
 		position = "-274.935 -143.111 353.049";
 		rotation = "1 0 0 0";
@@ -487,7 +487,7 @@ function rainSky(%sky)
 		fadeColor = "0.100000 0.100000 1.000000 1.000000";
 		useFog = "0";
 	};
-	%rainthunder =	new AudioEmitter(PlanetSoundEmitter) 
+	%rainthunder =	new AudioEmitter(PlanetSoundEmitter)
 	{
 		position = "289.762 209.214 173.677";
 		rotation = "1 0 0 0";
@@ -509,7 +509,7 @@ function rainSky(%sky)
 		maxLoopGap = "0";
 		type = "EffectAudioType";
 	};
-	%rainsound =	new AudioEmitter(PlanetSoundEmitter) 
+	%rainsound =	new AudioEmitter(PlanetSoundEmitter)
 	{
 		position = "-361.683 451 83.9062";
 		rotation = "1 0 0 0";
@@ -545,13 +545,13 @@ function snowSky(%sky)
 {
 	if($CurrentSky $= "snow")
 		return;
-		
-	MessageAll('Msg', "\c2The temperature seems to be dropping.");
-	
-	removeSky(%sky);
-	removeSky(%sky);		
 
-	new Sky(Sky) 
+	MessageAll('Msg', "\c2The temperature seems to be dropping.");
+
+	removeSky(%sky);
+	removeSky(%sky);
+
+	new Sky(Sky)
 	{
 		position = "0 0 0";
 		rotation = "1 0 0 0";
@@ -576,13 +576,13 @@ function snowSky(%sky)
 		fogVolumeColor1 = "128.000000 128.000000 128.000000 -0.000000";
 		fogVolumeColor2 = "128.000000 128.000000 128.000000 0.000000";
 		fogVolumeColor3 = "128.000000 128.000000 128.000000 0.000000";
-		
+
 		cloudSpeed0 = "0.000000 0.000400";
 	};
-		 
+
 	MissionCleanup.add(Sky);
-	
-	%snow = new Precipitation(Precipitation) 
+
+	%snow = new Precipitation(Precipitation)
 	{
 		position = "0 0 0";
 		rotation = "1 0 0 0";
@@ -598,7 +598,7 @@ function snowSky(%sky)
 		maxNumDrops = "2000";
 		maxRadius = "125";
 	};
-	%snowwind =	new AudioEmitter(PlanetSoundEmitter) 
+	%snowwind =	new AudioEmitter(PlanetSoundEmitter)
 	{
 		position = "289.762 209.214 173.677";
 		rotation = "1 0 0 0";
@@ -620,7 +620,7 @@ function snowSky(%sky)
 		maxLoopGap = "0";
 		type = "EffectAudioType";
 	};
-	
+
 	MissionCleanup.add(%snow);
 	MissionCleanup.add(%snowwind);
 }
@@ -630,13 +630,13 @@ function sandSky(%sky)
 {
 	if($CurrentSky $= "sand")
 		return;
-		
-	MessageAll('Msg', "\c2Visibility looks like its getting low.");
-	
-	removeSky(%sky);
-	removeSky(%sky);		
 
-	new Sky(Sky) 
+	MessageAll('Msg', "\c2Visibility looks like its getting low.");
+
+	removeSky(%sky);
+	removeSky(%sky);
+
+	new Sky(Sky)
 	{
 		position = "-1216 -848 0";
 		rotation = "1 0 0 0";
@@ -670,10 +670,10 @@ function sandSky(%sky)
 
 		cloudSpeed0 = "0.000000 0.000000";
 	};
-		 
+
 	MissionCleanup.add(Sky);
-	
-	%sandwind =	new AudioEmitter(PlanetSoundEmitter) 
+
+	%sandwind =	new AudioEmitter(PlanetSoundEmitter)
 	{
 		position = "289.762 209.214 173.677";
 		rotation = "1 0 0 0";
@@ -695,7 +695,7 @@ function sandSky(%sky)
 		maxLoopGap = "0";
 		type = "EffectAudioType";
 	};
-	
+
 	MissionCleanup.add(%sandwind);
 }
 
@@ -703,11 +703,11 @@ function sandSky(%sky)
 function niceSky(%sky)
 {
 	removeSky(%sky);
-	removeSky(%sky);	
-	
+	removeSky(%sky);
+
 	if($niceSkyNumber $= "" || $niceSkyNumber $= 4)
 	{
-		new Sky(Sky) 
+		new Sky(Sky)
 		{
 			position = "-1216 -848 0";
 			rotation = "1 0 0 0";
@@ -741,13 +741,13 @@ function niceSky(%sky)
 
 			cloudSpeed0 = "0.000000 0.000000";
 		};
-			 
+
 		MissionCleanup.add(Sky);
 		$niceSkyNumber = 1;
 	}
 	else if($niceSkyNumber $= 1)
-	{				
-		new Sky(Sky) 
+	{
+		new Sky(Sky)
 		{
 			position = "-1024 -1024 0";
 			rotation = "1 0 0 0";
@@ -781,13 +781,13 @@ function niceSky(%sky)
 
 			cloudSpeed0 = "0.900000 0.900000";
 		};
-			 
+
 		MissionCleanup.add(Sky);
 		$niceSkyNumber = 2;
 	}
 	else if($niceSkyNumber $= 2)
-	{					
-		new Sky(Sky) 
+	{
+		new Sky(Sky)
 		{
 			position = "0 0 0";
 			rotation = "1 0 0 0";
@@ -821,13 +821,13 @@ function niceSky(%sky)
 
 			cloudSpeed0 = "0.0000003 0.0000003";
 		};
-			 
+
 		MissionCleanup.add(Sky);
 		$niceSkyNumber = 3;
 	}
 	else if($niceSkyNumber $= 3)
-	{					
-		new Sky(Sky) 
+	{
+		new Sky(Sky)
 		{
 			position = "-1216 -848 0";
 			rotation = "1 0 0 0";
@@ -861,23 +861,23 @@ function niceSky(%sky)
 
 			cloudSpeed0 = "0.000000 0.000000";
 		};
-		
+
 		MissionCleanup.add(Sky);
 		$niceSkyNumber = 4;
 	}
 }
 
 function fireworksSky(%sky)
-{	
+{
 	if($CurrentSky $= "fireworks")
 	{
 		schedule(1500, 0, "dtCommandsReset");
 		return;
 	}
-	
+
 	removeSky(%sky);
-		
-	new Sky(Sky) 
+
+	new Sky(Sky)
 	{
 		position = "0 0 0";
 		rotation = "1 0 0 0";
@@ -908,20 +908,20 @@ function fireworksSky(%sky)
 		high_fogVolume1 = "-1 -2.58511e+36 2.28656e-38";
 		high_fogVolume2 = "-1 -1991.03 nan";
 		high_fogVolume3 = "-1 7945.87 7.22445e-09";
-	
+
 		cloudSpeed0 = "0.0000003 0.0000003";
 	};
-		
+
 	MissionCleanup.add(Sky);
-	
+
 	schedule(1500, 0, "fireworkLoop");
 }
 
 function fireworkLoop()
 {
-	if($CurrentSky !$= "fireworks")
+	if($CurrentSky !$= "fireworks" || !ClientGroup.getCount())
 		return;
-	
+
 	// find a random client.
 	%client = ClientGroup.getObject(getRandom(ClientGroup.getCount() - 1));
 
@@ -972,15 +972,15 @@ datablock AudioProfile(dtFireworksSound)
 };
 
 function spookySky(%sky)
-{	
+{
 	if($CurrentSky $= "spookySky")
 	{
 		schedule(1500, 0, "dtCommandsReset");
 		return;
 	}
-	
+
 	removeSky(%sky);
-		
+
 	new Sky(Sky) {
 		position = "0 0 0";
 		rotation = "1 0 0 0";
@@ -1015,17 +1015,17 @@ function spookySky(%sky)
 		locked = "true";
 		cloudSpeed0 = "0.000000 0.000000";
 	};
-		
+
 	MissionCleanup.add(Sky);
-	
+
 	schedule(1500, 0, "spookyFireworkLoop");
 }
 
 function spookyFireworkLoop()
 {
-	if($CurrentSky !$= "spookySky")
+	if($CurrentSky !$= "spookySky" || !ClientGroup.getCount())
 		return;
-	
+
 	// find a random client.
 	%client = ClientGroup.getObject(getRandom(ClientGroup.getCount() - 1));
 
@@ -1505,7 +1505,7 @@ package dtCommandsReset
 function DefaultGame::gameOver(%game)
 {
 	Parent::gameOver(%game);
-	
+
 	//Reset CurrentSky
 	dtCommandsReset();
 }
@@ -1514,7 +1514,7 @@ function DefaultGame::gameOver(%game)
 function DestroyServer()
 {
 	Parent::DestroyServer();
-	
+
 	//Reset CurrentSky
 	dtCommandsReset();
 }

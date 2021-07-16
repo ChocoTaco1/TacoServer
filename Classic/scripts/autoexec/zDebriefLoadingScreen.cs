@@ -33,11 +33,11 @@
 // $Host::LoadScreenLine1 = "Join Discord:";
 // $Host::LoadScreenLine1_Msg = "https://discord.me/tribes2";
 // $Host::LoadScreenLine2 = "Game Modes:";
-// $Host::LoadScreenLine2_Msg = "LakRabbit, Capture the Flag, DeathMatch, (Light Only) Capture the Flag";	
+// $Host::LoadScreenLine2_Msg = "LakRabbit, Capture the Flag, DeathMatch, (Light Only) Capture the Flag";
 // $Host::LoadScreenLine3 = "Required Mappacks:";
 // $Host::LoadScreenLine3_Msg = "S5, S8, TWL, TWL2";
 // $Host::LoadScreenLine4 = "Server Provided by:";
-// $Host::LoadScreenLine4_Msg = "Ravin";	
+// $Host::LoadScreenLine4_Msg = "Ravin";
 // $Host::LoadScreenLine5 = "Server Hosted by:";
 // $Host::LoadScreenLine5_Msg = "Branzone";
 // $Host::LoadScreenLine6 = "Server Github:";
@@ -51,7 +51,7 @@
 
 // First Screen loading time (Map Screen)
 // If this is set too low the second screen wont show at all
-$dtLoadingScreen::FirstScreen = 6000;
+$dtLoadingScreen::FirstScreen = 5500;
 // Second Screen Delay
 $dtLoadingScreen::Delay = 0;
 
@@ -75,7 +75,7 @@ if( $Host::LoadScreenColor3 $= " " ) $Host::LoadScreenColor3 = "33CCCC";
 // So ServerDefaults wont replace a "" value when meant to be blank
 function DLSBlank()
 {
-	for(%x = 1; %x <= 4; %x++) 
+	for(%x = 1; %x <= 4; %x++)
 	{
 		if( $Host::LoadScreenMOTD[%x] $= "")
 		{
@@ -88,7 +88,7 @@ DLSBlank();
 // Keep it in a package to be neat and organized!
 package LoadScreenPackage
 {
-	function sendLoadInfoToClient( %client ) 
+	function sendLoadInfoToClient( %client )
 	{
 		//error( "** SENDING LOAD INFO TO CLIENT " @ %client @ "! **" );
 		%singlePlayer = $CurrentMissionType $= "SinglePlayer";
@@ -149,7 +149,7 @@ if (!isActivePackage(LoadScreenPackage) && $Host::LoadingScreenUseDebrief)
 // Dont even try to override sendModInfoToClient since evo has it
 // Just make our own
 function ALTsendModInfoToClient(%client)
-{  
+{
 	// Wont allow Debrief on consecutive map loads
 	if(%client.loaded)
 	{
@@ -160,7 +160,7 @@ function ALTsendModInfoToClient(%client)
 	// Sound
 	// As the background hum will stop on the debrief page
 	// Breaks the abrupt stop
-	// LoadingScreen sounds are limited to 5 secs or you'll receive an error 
+	// LoadingScreen sounds are limited to 5 secs or you'll receive an error
 	%snd = '~wgui/inventory_hum.wav';
 	messageClient(%client, 'MsgLoadQuoteLine', %snd, "");
 
@@ -169,10 +169,10 @@ function ALTsendModInfoToClient(%client)
 	%line3 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine3 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine3_Msg;
 	%line4 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine4 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine4_Msg;
 	%line5 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine5 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine5_Msg;
-	%line6 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine6 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine6_Msg;	
+	%line6 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine6 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine6_Msg;
 
 	if($Host::TimeLimit $= "999" || $Host::TimeLimit $= "unlimited") %timeloadingvar = "Unlimited"; else %timeloadingvar = $Host::TimeLimit;
-	
+
 	if($Host::KickObserverTimeout $= 0) %obskickvar = "Off"; else %obskickvar = ($Host::KickObserverTimeout / 60)  @ " Minutes";
 
 	%time = "<color:" @ $Host::LoadScreenColor1 @ ">Time limit: <color:" @ $Host::LoadScreenColor2 @ ">" @ %timeloadingvar;
@@ -201,13 +201,13 @@ function ALTsendModInfoToClient(%client)
 
 
 	$dmlP = 0;
-	
+
 	$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 
 	// Images
 	// Desired pics much exist in the texticons folder on the client in some capacity
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	if($dtLoadingScreen::ShowImages)
 	{
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
@@ -218,13 +218,13 @@ function ALTsendModInfoToClient(%client)
 				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:twb/twb_lakedebris_01><Just:RIGHT><bitmap:twb/twb_waterdemise_03><Just:LEFT><bitmap:twb/twb_action_05>";
 			case 2:
 				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:twb/twb_blowngen_01><Just:RIGHT><bitmap:twb/twb_action_03><Just:LEFT><bitmap:twb/twb_starwolf_shrike>";
-			case 3:				
+			case 3:
 				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:twb/twb_TRIBES2><Just:RIGHT><bitmap:twb/twb_Harbingers><Just:LEFT><bitmap:twb/twb_action_10>";
-			case 4:				
+			case 4:
 				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:twb/twb_inferno_02><Just:RIGHT><bitmap:twb/twb_action_04><Just:LEFT><bitmap:twb/twb_action_06>";
 		}
 		//$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:Cred_logo5.png><bitmap:twb/twb_action_04><bitmap:twb/twb_action_06><Just:LEFT>";
-		
+
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
@@ -240,7 +240,7 @@ function ALTsendModInfoToClient(%client)
 		if(%client.dmpVersion $=$DMP::Version)
 		{
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<bitmap:" @ $dtLoadingScreen::LogoName @ ">";
-			
+
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
@@ -322,7 +322,7 @@ function ALTsendModInfoToClient(%client)
 	//$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Font:Arial:15>*" @ $Host::GameName;
 	//$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Font:Arial:15>" @ $Host::Info;
 
-	//$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Font:univers:18><lmargin:12><color:" @ $Host::LoadScreenColor2 @ "><Font:Univers Condensed Bold:28>Map Info:<lmargin:24><Font:univers:18>";    
+	//$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Font:univers:18><lmargin:12><color:" @ $Host::LoadScreenColor2 @ "><Font:Univers Condensed Bold:28>Map Info:<lmargin:24><Font:univers:18>";
 	//$dtLoadingScreen::LoadScreenMessage[$dmlP++] = %currentmis;
 
 	schedule($dtLoadingScreen::Delay, 0, "sendLoadscreen", %client);
@@ -351,17 +351,17 @@ function sendLoadscreen(%client)
 	{
 		%msgTag = $dtLoadingScreen::LoadScreenMessage[%a];
 		messageClient(%client, 'MsgDebriefAddLine', "", %msgTag);
-	} 
+	}
 
 	%MOTDHeader = "<lmargin:12><Font:Univers Condensed Bold:28><color:" @ $Host::LoadScreenColor2 @ ">Events:";
 	%MOTDMsg1 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD1;
 	%MOTDMsg2 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD2;
 	%MOTDMsg3 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD3;
 	%MOTDMsg4 = "<lmargin:24><Font:univers:18><bitmap:bullet_2><color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenMOTD4;
-	
+
 	//MOTD Loop
 	//Leave line " " in ServerPrefs to not show a line
-	for(%x = 1; %x <= 4; %x++) 
+	for(%x = 1; %x <= 4; %x++)
 	{
 		if($Host::LoadScreenMOTD[%x] !$= " " && $Host::LoadScreenMOTD[%x] !$= "")
 		{
@@ -375,7 +375,7 @@ function sendLoadscreen(%client)
 				messageClient(%client, 'MsgDebriefAddLine', "", %MOTDMsg[%x]);
 		}
 	}
-	
+
     // Normal Screen Always in the Background
 	// If client hits continue during debrief screen
 	sendLoadInfoToClient(%client);
@@ -383,7 +383,7 @@ function sendLoadscreen(%client)
 
 // Show normal second screen during following map loads
 function NORMALsendModInfoToClient(%client)
-{   
+{
 	%line1 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine1 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine1_Msg;
 	%line2 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine2 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine2_Msg;
 	%line3 = "<color:" @ $Host::LoadScreenColor1 @ ">" @ $Host::LoadScreenLine3 @ " <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::LoadScreenLine3_Msg;
@@ -397,7 +397,7 @@ function NORMALsendModInfoToClient(%client)
 	%max =  "<color:" @ $Host::LoadScreenColor1 @ ">Max players: <color:" @ $Host::LoadScreenColor2 @ ">" @ $Host::MaxPlayers;
 	%net = "<color:" @ $Host::LoadScreenColor1 @ ">Packets Rate / Size: <color:" @ $Host::LoadScreenColor2 @ ">" @ $pref::Net::PacketRateToClient @ " / " @ $pref::Net::PacketSize;
 	%smurf = "<color:" @ $Host::LoadScreenColor1 @ ">Refuse smurfs: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::NoSmurfs ? "On" : "Off");
-   
+
 	//%random = "<color:" @ $Host::LoadScreenColor1 @ ">Random teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($RandomTeams ? "On" : "Off");
 	//%fair = 	"<color:" @ $Host::LoadScreenColor1 @ ">Fair teams: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::ClassicFairTeams ? "On" : "Off");
 	//%rape = 	"<color:" @ $Host::LoadScreenColor1 @ ">No Base Rape: <color:" @ $Host::LoadScreenColor2 @ ">" @ ($Host::EvoNoBaseRapeEnabled ? "On" : "Off");

@@ -171,7 +171,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
 				else
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');
-					
+
 				if($LockedTeams)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Disable Locked Teams', 'Disable Locked Teams');
 				else
@@ -568,7 +568,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				   adminLog(%client, " has enabled Net Tourney Client checking.");
 				}
 			}
-			return;	
+			return;
 		case "ForceVote":
 			if (%client.isAdmin && $Host::AllowAdminVotes)
 			{
@@ -746,7 +746,7 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
       {
 		 kick(%client, %admin, %game.kickGuid);
          %cause = "(vote)";
-		  
+
 		 %key = "Passed";
       }
       else
@@ -783,7 +783,7 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
 function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typeDisplayName, %missionId, %missionTypeId)
 {
    %typeName = "VoteChangeMission";
-   
+
    %mission = $HostMissionFile[%missionId];
    if ( %mission $= "" )
    {
@@ -839,7 +839,7 @@ function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typ
 function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %typeDisplayName, %missionId, %missionTypeId )
 {
    %typeName = "VoteTournamentMode";
-   
+
    %mission = $HostMissionFile[%missionId];
    if ( %mission $= "" )
    {
@@ -864,16 +864,16 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
    {
       %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
       // Added people who dont vote into the equation, now if you do not vote, it doesn't count as a no. - z0dd - ZOD
-      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100)) 
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          messageAll('MsgVotePassed', '\c2Server switched to Tournament mode by vote (%1): %2 percent.', %missionDisplayName, mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
-		 
+
 		 //Log Vote % - Must be before Game Over
 		 %key = "Passed";
 		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
 		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
-		 
+
          setModeTournament( %mission, %missionType );
       }
       else
@@ -883,7 +883,7 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
 		 votePercentLog(%missionDisplayName, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
 		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
-		 
+
 		 messageAll('MsgVoteFailed', '\c2Tournament mode vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
 	  }
    }
@@ -896,7 +896,7 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
 function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
 {
    %typeName = "VoteChangeTimeLimit";
-   
+
    if( %newLimit == 999 )
       %display = "unlimited";
    else
@@ -936,7 +936,7 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
 	     votePercentLog(%newLimit, %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
 		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
-		 
+
 		 // VoteOvertime
 		 ResetVOall(%game);
 	  }
@@ -984,7 +984,7 @@ function DefaultGame::voteFFAMode( %game, %admin, %client )
 function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 {
    %typeName = "VoteSkipMission";
-   
+
    if(isObject(%admin))
    {
       messageAll('MsgAdminForce', '\c2The Admin %1 has skipped to the next mission.',%admin.name );
@@ -999,13 +999,13 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
       if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone)) > ($Host::VotePasspercent / 100))
       {
          messageAll('MsgVotePassed', '\c2The mission was skipped to next by vote.');
-		 
+
 		 //Log Vote % - Must be before Game Over
 		 %key = "Passed";
 		 votePercentLog("N/A", %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
 		 //Show Vote %
 		 messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Abstain: %7 Total: %3 [%4%5]', %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, mfloor((%game.totalVotesFor/(ClientGroup.getCount() - %game.totalVotesNone)) * 100), "%", %key, %game.totalVotesNone);
-		 
+
          echo("mission skipped (vote)");
          %game.gameOver();
          //loadMission( findNextCycleMission(), $CurrentMissionType, false );
@@ -1014,7 +1014,7 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
       else
 	  {
          messageAll('MsgVoteFailed', '\c2Skip mission vote did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount - %game.totalVotesNone) * 100));
-		 
+
 		 //Log Vote %
 		 %key = "Failed";
 		 votePercentLog("N/A", %typeName, %key, %game.totalVotesFor, %game.totalVotesAgainst, %totalVotes, %game.totalVotesNone);
@@ -1441,6 +1441,53 @@ function resetViewSchedule(%client)
   %client.cantView = false;
   %client.schedViewRules = "";
 }
+
+// Locked Teams code (Tournament Mode Only)
+// Doesnt allow players Joining the server late to join teams when enable, disables when server if switched back to free for all mode
+
+// Reset in MissionTypeOptions.cs
+//
+// if(isActivePackage(LockedTeams) && !$LockedTeams)
+// 	deactivatePackage(LockedTeams);
+
+package LockedTeams
+{
+
+function serverCmdClientJoinGame(%client)
+{
+	if($LockedTeams)
+	{
+		messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
+		return;
+	}
+	Parent::serverCmdClientJoinGame(%client);
+}
+
+function serverCmdClientPickedTeam(%client, %option)
+{
+	Parent::serverCmdClientPickedTeam(%client, %option); //Put first
+	if($LockedTeams) //Added
+	{
+		if($Host::TournamentMode && %client.team !$= 0) //Added
+		{
+			messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
+			serverCmdClientMakeObserver( %client );
+		}
+		return;
+	}
+}
+
+function serverCmdClientTeamChange(%client, %option)
+{
+	if($LockedTeams)
+	{
+		messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
+		return;
+	}
+	Parent::serverCmdClientTeamChange(%client, %option);
+}
+
+};
 
 // Prevent package from being activated if it is already
 if (!isActivePackage(ExtraVoteMenu))

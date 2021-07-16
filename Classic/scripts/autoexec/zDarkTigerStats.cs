@@ -14,7 +14,7 @@
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 8.8;
+$dtStats::version = 9.3;
 //disable stats system
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -28,6 +28,7 @@ $dtStats::MaxNumOfGames = 100;
 $dtStats::avgCount = 10;
 // number of players to start tracking totals
 
+//number of games for leaderboard averages
 $dtStats::minTotal = 6;
 //how high the player has to be off the ground before it will count
 $dtStats::midAirHeight = 10;
@@ -40,7 +41,6 @@ $dtStats::sortSpeed = 128;
 
 //Load/saving rates to prevent any server hitching
 $dtStats::slowSaveTime = 100;
-$dtStats::loadSlowTime = 0;// dont use yet
 //This will load player stats after their first game, to reduce any impact on the server.
 $dtStats::loadAfter = 0;//keep 0 not finished
 
@@ -288,6 +288,12 @@ $dtStats::FV[$dtStats::FC["CTFGame","Max"]++,"CTFGame","Max"] = "interceptSpeed"
 $dtStats::FV[$dtStats::FC["CTFGame","Max"]++,"CTFGame","Max"] = "interceptFlagSpeed";
 $dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "friendlyFire";
 
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "timeOnTeamZero";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "timeOnTeamOne";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "timeOnTeamTwo";
+$dtStats::FV[$dtStats::FC["CTFGame","TG"]++,"CTFGame","TG"] = "matchRunTime";
+$dtStats::FV[$dtStats::FC["CTFGame","Game"]++,"CTFGame","Game"] = "teamOneCapTimes";
+$dtStats::FV[$dtStats::FC["CTFGame","Game"]++,"CTFGame","Game"] = "teamTwoCapTimes";
 /////////////////////////////////////////////////////////////////////////////
 //Unused vars needed for stats back up
 $dtStats::uGFV[$dtStats::uGFC["CTFGame"]++,"CTFGame"] = "returnPts";
@@ -414,6 +420,12 @@ $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "depInvRepairs";
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "depTurretRepairs";
 $dtStats::uGFV[$dtStats::uGFC["SCtFGame"]++,"SCtFGame"] = "returnPts";
 
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "timeOnTeamZero";
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "timeOnTeamOne";
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "timeOnTeamTwo";
+$dtStats::FV[$dtStats::FC["SCtFGame","TG"]++,"SCtFGame","TG"] = "matchRunTime";
+$dtStats::FV[$dtStats::FC["SCtFGame","Game"]++,"SCtFGame","Game"] = "teamOneCapTimes";
+$dtStats::FV[$dtStats::FC["SCtFGame","Game"]++,"SCtFGame","Game"] = "teamTwoCapTimes";
 ///////////////////////////////////////////////////////////////////////////////
 //                            	 DuelGame
 ///////////////////////////////////////////////////////////////////////////////
@@ -440,6 +452,10 @@ $dtStats::FVG[$dtStats::FCG["ArenaGame","TG"]++,"ArenaGame","TG"] = "roundKills"
 $dtStats::FVG[$dtStats::FCG["ArenaGame","TG"]++,"ArenaGame","TG"] = "hatTricks";
 $dtStats::FV[$dtStats::FC["ArenaGame","Game"]++,"ArenaGame","Game"] = "dtTeam";
 $dtStats::FV[$dtStats::FC["ArenaGame","Game"]++,"ArenaGame","Game"] = "teamScore";
+$dtStats::FV[$dtStats::FC["ArenaGame","TG"]++,"ArenaGame","TG"] = "timeOnTeamZero";
+$dtStats::FV[$dtStats::FC["ArenaGame","TG"]++,"ArenaGame","TG"] = "timeOnTeamOne";
+$dtStats::FV[$dtStats::FC["ArenaGame","TG"]++,"ArenaGame","TG"] = "timeOnTeamTwo";
+$dtStats::FV[$dtStats::FC["ArenaGame","TG"]++,"ArenaGame","TG"] = "matchRunTime";
 ///////////////////////////////////////////////////////////////////////////////
 //                            	 SiegeGame
 ///////////////////////////////////////////////////////////////////////////////
@@ -625,7 +641,10 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "lightningMAEVKills";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVHitWep";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVMAHit";
 
-
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "startPCT";
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "endPCT";
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "mapSkip";
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "clientQuit";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "totalWepDmg";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "timeTL";
 $dtStats::FV[$dtStats::FC["Avg"]++,"Avg"] = "timeTL";
@@ -1710,6 +1729,7 @@ package dtStats{
    ///////////////////////////////////////////////////////////////////////////////
    function DefaultGame::missionLoadDone(%game){
       parent::missionLoadDone(%game);
+      //$dtStats::loadPlayerCount = $HostGamePlayerCount;
       if($dtStats::Enable){
          dtSaveServerVars();
          dtScanForRepair();
@@ -1724,6 +1744,8 @@ package dtStats{
          if(%reason $= "spawnTimeout"){
             %client.dtStats.spawnobstimeoutCount++;
          }
+         updateTeamTime(%client.dtStats,%client.dtStats.team);
+         %client.dtStats.team = 0;
          %client.gt = %client.at = 0;//air time ground time reset
       }
    }
@@ -1782,11 +1804,40 @@ package dtStats{
 	   if($dtStats::Enable)
 	       %player.client.dtStats.leavemissionareaCount++;
    }
-   function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned){ // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
-      parent::clientChangeTeam(%game, %client, %team, %fromObs, %respawned);
-	   if($dtStats::Enable && isGameRun())
-	       %client.dtStats.switchteamCount++;
+   function DefaultGame::clientJoinTeam( %game, %client, %team, %respawn ){
+      parent::clientJoinTeam( %game, %client, %team, %respawn );
+      if($dtStats::Enable){
+         updateTeamTime(%client.dtStats, 0);
+         %client.dtStats.team = %team;
+         //error("jointeam" SPC %team);
+     }
    }
+   function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned){ // z0dd - ZOD, 6/06/02. Don't send a message if player used respawn feature. Added %respawned
+	   if($dtStats::Enable && isGameRun()){
+         %client.dtStats.team = %team;
+         %client.dtStats.switchteamCount++;
+         //error("clientChagneTeam" SPC %fromObs SPC %team);
+         if(%fromObs)
+            updateTeamTime(%client.dtStats, 0);
+         else
+            updateTeamTime(%client.dtStats,%client.team);
+	   }
+      parent::clientChangeTeam(%game, %client, %team, %fromObs, %respawned);
+   }
+   function DefaultGame::assignClientTeam(%game, %client, %respawn ){
+      parent::assignClientTeam(%game, %client, %respawn );
+      if($dtStats::Enable){
+         updateTeamTime(%client.dtStats, 0);
+         %client.dtStats.team = %client.team;
+      }
+      //error("assignClientTeam" SPC %client.team SPC %respawn);
+   }
+   //function DefaultGame::startMatch(%game){
+      //parent::startMatch(%game);
+      //if($dtStats::Enable){
+         //
+      //}
+   //}
    function RepairPack::onThrow(%data,%obj,%shape){
       parent::onThrow(%data,%obj,%shape);
       if($dtStats::Enable){
@@ -2416,15 +2467,33 @@ package dtStatsGame{
    function CTFGame::flagCap(%game, %player){
       if($dtStats::Enable){
          %flag = %player.holdingFlag;
+         %clTeam = %player.client.team;
+         %dtStats = %player.client.dtStats;
+         %time = ((getSimTime() - $missionStartTime)/1000)/60;
+         if(%clTeam == 1){
+            $dtStats::teamOneCapCount++;
+            if($dtStats::teamOneCapCount == 1)
+               $dtStats::teamOneCapTimes = 0 @ "," @ cropFloat(%time,1);
+            else
+               $dtStats::teamOneCapTimes = $dtStats::teamOneCapTimes  @ "," @ cropFloat(%time,1);
+         }
+         else{
+            $dtStats::teamTwoCapCount++;
+            if($dtStats::teamTwoCapCount == 1)
+               $dtStats::teamTwoCapTimes = 0 @ "," @ cropFloat(%time,1);
+            else
+               $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
+         }
+         //error($dtStats::teamOneCapTimes SPC $dtStats::teamTwoCapTimes);
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
-            if(%heldTime < %player.client.dtStats.heldTimeSec || !%player.client.dtStats.heldTimeSec){
+            if(%heldTime < %dtStats.heldTimeSec || !%dtStats.heldTimeSec){
                if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
-                  %player.client.dtStats.heldTimeSec  = %heldTime;
-                  %player.client.dtStats.heldTimeSecLow  = %heldTime;
+                  %dtStats.heldTimeSec  = %heldTime;
+                  %dtStats.heldTimeSecLow  = %heldTime;
                }
                else
-                  %player.client.dtStats.heldTimeSecLow  = %heldTime;
+                  %dtStats.heldTimeSecLow  = %heldTime;
             }
          }
       }
@@ -2516,15 +2585,31 @@ package dtStatsGame{
    function SCtFGame::flagCap(%game, %player){
       if($dtStats::Enable){
          %flag = %player.holdingFlag;
+         %dtStats = %player.client.dtStats;
+         %time = ((getSimTime() - $missionStartTime)/1000)/60;
+          if(%clTeam == 1){
+            $dtStats::teamOneCapCount++;
+            if($dtStats::teamOneCapCount == 1)
+               $dtStats::teamOneCapTimes = 0 @ "," @ cropFloat(%time,1);
+            else
+               $dtStats::teamOneCapTimes = $dtStats::teamOneCapTimes  @ "," @ cropFloat(%time,1);
+         }
+         else{
+            $dtStats::teamTwoCapCount++;
+            if($dtStats::teamTwoCapCount == 1)
+               $dtStats::teamTwoCapTimes = 0 @ "," @ cropFloat(%time,1);
+            else
+               $dtStats::teamTwoCapTimes  = $dtStats::teamTwoCapTimes  @ "," @ cropFloat(%time,1);
+         }
          if(%game.dtTotalFlagTime[%flag]){
             %heldTime = (getSimTime() - %game.dtTotalFlagTime[%flag])/1000;
-            if(%heldTime < %player.client.dtStats.heldTimeSec || !%player.client.dtStats.heldTimeSec){
+            if(%heldTime < %dtStats.heldTimeSec || !%dtStats.heldTimeSec){
                if($TeamRank[2,"count"] > 5 && $TeamRank[1,"count"] > 5){
-                  %player.client.dtStats.heldTimeSec  = %heldTime;
-                  %player.client.dtStats.heldTimeSecLow  = %heldTime;
+                  %dtStats.heldTimeSec  = %heldTime;
+                  %dtStats.heldTimeSecLow  = %heldTime;
                }
                else
-                  %player.client.dtStats.heldTimeSecLow  = %heldTime;
+                  %dtStats.heldTimeSecLow  = %heldTime;
             }
          }
       }
@@ -2593,7 +2678,7 @@ if($dtStats::Enable){
 //							 Game Type Commons								  //
 ////////////////////////////////////////////////////////////////////////////////
 function dtGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4, %arg5){
-   if($dtStats::debugEchos){error(%game SPC %client SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4 SPC %arg5);}
+   if($dtStats::debugEchos){error("dtGameLink"  SPC %game SPC %client SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4 SPC %arg5);}
    if(%arg1 $= "S"){
       %client.viewClient = getCNameToCID(%arg3);
       if( %client.viewClient != 0){
@@ -3866,7 +3951,6 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    %client.lgame = %game.class;
    %foundOld = 0;
    %mrx = setGUIDName(%client);// make sure we  have a guid if not make one
-
    %authInfo = %client.getAuthInfo();
    %realName = getField( %authInfo, 0 );
    if(%realName !$= "")
@@ -3909,7 +3993,9 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    else
      %dtStats = %client.dtStats;
 
-   %dtStats.joinPCT = %game.getGamePct();
+   %dtStats.joinPCT = (isGameRun() == 1) ? %game.getGamePct() : 0;
+   updateTeamTime(%dtStats, -1);
+   %dtStats.team = %client.team;// should be 0
    if(isObject(%dtStats) && %dtStats.gameData[%game.class] != 1){ // game type change
       %dtStats.gameStats["totalGames","g",%game.class] = 0;
       %dtStats.gameStats["statsOverWrite","g",%game.class] = -1;
@@ -3922,102 +4008,117 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    }
 }
 function dtStatsClientLeaveGame(%client){
+   $dtServerVars::lastPlayerCount =  $HostGamePlayerCount - $HostGameBotCount;
+   
    if(isGameRun()){// if they dc during game over dont count it
       $dtServer::mapDisconnects[cleanMapName($CurrentMission),Game.class]++;
       if(%client.score != 0)
          $dtServer::mapDisconnectsScore[cleanMapName($CurrentMission),Game.class]++;
    }
-   //if($HostGamePlayerCount - $HostGameBotCount == 0)
+   
    if(isObject(%client.dtStats)){
       %client.dtStats.clientLeft = 1;
       %client.dtStats.leftTime = getSimTime();
       %client.dtStats.leftID = $dtStats::leftID;
+      %client.dtStats.leftPCT = Game.getGamePct();
       if(isObject(Game) && isGameRun() && %client.score != 0)
          bakGameStats(%client,Game.class);//back up there current game in case they lost connection
    }
 }
 function dtStatsGameOver( %game ){
+   if($dtStats::debugEchos){error("dtStatsGameOver");}
    $dtStats::serverHang = $dtStats::hostHang = 0;
    $dtStats::LastMissionDN = $MissionDisplayName;
    $dtStats::LastMissionCM = $CurrentMission;
    $dtStats::LastGameType = %game.class;
-   $dtStats::statsSave = 1;
-   if(%game.getGamePct() > 50){
+   if(%game.getGamePct() > 90){
       $dtServer::playCount[cleanMapName($CurrentMission),%game.class]++;
       $dtServer::lastPlay[cleanMapName($CurrentMission),%game.class] = getDayNum() TAB getYear() TAB formattimestring("mm/dd/yy hh:nn:a");
    }
    else
       $dtServer::skipCount[cleanMapName($CurrentMission),%game.class]++;
-
-   statsGroup.firstKill = 0;
-   if($dtStats::debugEchos){error("dtStatsGameOver");}
-   if(%game.class $= "CTFGame" || %game.class $= "SCtFGame" || %game.class $= "ArenaGame"){
-      statsGroup.team[1] = $teamScore[1];
-      statsGroup.team[2] = $teamScore[2];
-   }
-   %timeNext =0;
-   %time = 2000;
-   for (%i = 0; %i < statsGroup.getCount(); %i++){// see if we have any old clients data
-      %dtStats = statsGroup.getObject(%i);
-      if(%dtStats.clientLeft || !isObject(%dtStats.client)){ // find any that left during the match and
-         %dtStats.markForDelete = 1;
-         %game.postGameStats(%dtStats);
-         %time += $dtStats::slowSaveTime; // this will chain them
-         schedule(%time ,0,"incGameStats",%dtStats,%game.class);
-         if($dtStats::mapStats){
-            %time += $dtStats::slowSaveTime; // this will chain them
-            schedule(%time ,0,"saveMapStats",%dtStats,%game.class);
+   if(!$dtStats::statsSave){//in case of admin skip map and it has not finished saving the old map
+      $dtStats::statsSave = 1;
+      statsGroup.firstKill = 0;
+      if($dtStats::debugEchos){error("dtStatsGameOver2");}
+      if(%game.class $= "CTFGame" || %game.class $= "SCtFGame" || %game.class $= "ArenaGame"){
+         statsGroup.team[1] = $teamScore[1];
+         statsGroup.team[2] = $teamScore[2];
+      }
+      %timeNext =0;
+      %time = 2000;
+      for (%i = 0; %i < statsGroup.getCount(); %i++){// see if we have any old clients data
+         %dtStats = statsGroup.getObject(%i);
+         if(%dtStats.clientLeft || !isObject(%dtStats.client)){ // find any that left during the match and
+            %dtStats.markForDelete = 1;
+            %game.postGameStats(%dtStats);// note bakGame was called when they left
+            %time += $dtStats::slowSaveTime;
+            schedule(%time ,0,"incGameStats",%dtStats,%game.class);
+            if($dtStats::mapStats){
+               %time += $dtStats::slowSaveTime;
+               schedule(%time ,0,"saveMapStats",%dtStats,%game.class);
+            }
+            %time += $dtStats::slowSaveTime;
+            schedule(%time ,0,"saveGameTotalStats",%dtStats,%game.class);
          }
-         %time += $dtStats::slowSaveTime; // this will chain them
-         schedule(%time ,0,"saveGameTotalStats",%dtStats,%game.class);
-      }
-      else if(isObject(%dtStats.client)){// make sure client is still a thing
-         %client = %dtStats.client;
-         %client.viewMenu = %client.viewClient = %client.viewStats = 0;//reset hud
-         %client.lastPage   = 1; %client.lgame = %game;
-         bakGameStats(%client,%game.class);// copy over game type values before they reset
-         %game.postGameStats(%dtStats);
-         %time += $dtStats::slowSaveTime; // this will chain them
-         schedule(%time ,0,"incGameStats",%dtStats,%game.class); //resetDtStats after incGame
-         if($dtStats::mapStats){
+         else if(isObject(%dtStats.client)){// make sure client is still a thing
+            %client = %dtStats.client;
+            %client.viewMenu = %client.viewClient = %client.viewStats = 0;//reset hud
+            %client.lastPage   = 1; %client.lgame = %game;
+            bakGameStats(%client,%game.class);// copy over game type values before they reset
+            %game.postGameStats(%dtStats);
             %time += $dtStats::slowSaveTime; // this will chain them
-            schedule(%time ,0,"saveMapStats",%dtStats,%game.class);
+            schedule(%time ,0,"incGameStats",%dtStats,%game.class); //resetDtStats after incGame
+            if($dtStats::mapStats){
+               %time += $dtStats::slowSaveTime; // this will chain them
+               schedule(%time ,0,"saveMapStats",%dtStats,%game.class);
+            }
+            %time += $dtStats::slowSaveTime;
+            schedule(%time,0,"saveGameTotalStats",%dtStats,%game.class); //
          }
-         %time += $dtStats::slowSaveTime;
-         schedule(%time,0,"saveGameTotalStats",%dtStats,%game.class); //
+         else{
+            error("Logic issue in dtStatsGameOver" SPC %dtStats SPC %client SPC %game.class);
+            %dtStats.delete();
+         }
       }
-      else{
-         error("Logic issue in dtStatsGameOver" SPC %dtStats SPC %client SPC %game.class);
-         %dtStats.delete();
-      }
+      %time += $dtStats::slowSaveTime;
+      schedule(%time,0,"dtSaveDone");
    }
-   %time += $dtStats::slowSaveTime;
-   schedule(%time,0,"dtSaveDone");
 }
 function dtSaveDone(){
-  $dtStats::statsSave = 0;
-  $dtStats::leftID++;
+   $dtStats::statsSave = 0;
+   $dtStats::leftID++;
+   $dtStats::teamOneCapTimes = 0;
+   $dtStats::teamTwoCapTimes = 0;
+   $dtStats::teamOneCapCount = 0;
+   $dtStats::teamTwoCapCount = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 //							Supporting Functions							  //
 ////////////////////////////////////////////////////////////////////////////////
 function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the end of the match
+   if($dtStats::debugEchos){error("postGameStats GUID = "  SPC %dtStats.guid);}
    if(!isObject(%dtStats))
       return;
-   armorTimer(%dtStats, 0, 1);
+
    %dtStats.null = getRandom(1,100);
+
    %dtStats.kdr = %dtStats.deaths ? (%dtStats.kills/%dtStats.deaths) : %dtStats.kills;
-   if(statsGroup.lastKill == %dtStats)
-      %dtStats.lastKill = 1;
 
-   %dtStats.dtTeam = %dtStats.team;// this may need to be lastteam
-   if(%dtStats.clientLeft)
-      %dtStats.totalTime = ((%dtStats.leftTime - %dtStats.joinTime)/1000)/60;
-   else
-      %dtStats.totalTime = ((getSimTime() - %dtStats.joinTime)/1000)/60;//convert it to min
+   %dtStats.lastKill = (statsGroup.lastKill == %dtStats);
 
-   %dtStats.gamePCT = mFloor(%game.getGamePct() - %dtStats.joinPCT);
+   %dtStats.totalTime = (%dtStats.clientLeft == 1) ?  ((%dtStats.leftTime - %dtStats.joinTime)/1000)/60 : ((getSimTime() - %dtStats.joinTime)/1000)/60;
+
+   %dtStats.clientQuit = %dtStats.clientLeft == 1;
+
+   %dtStats.matchRunTime =((getSimTime() - $missionStartTime)/1000)/60;
+
+   %dtStats.startPCT = %dtStats.joinPCT;
+   %dtStats.endPCT =  (%dtStats.clientLeft == 1) ? %dtStats.leftPCT : %game.getGamePct();
+   %dtStats.gamePCT = mFloor(%dtStats.endPCT -  %dtStats.startPCT);
+   %dtStats.mapSkip = (%game.getGamePct() < 99);
+   //error(%dtStats.endPCT SPC %dtStats.startPCT SPC %dtStats.gamePCT SPC %dtStats.mapSkip);
 
    %dtStats.totalMA = %dtStats.discMA +
                      %dtStats.grenadeMA +
@@ -4030,7 +4131,7 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
                      %dtStats.mineMA;
 
 
-   %dtStats.EVKills =    %dtStats.explosionKills +
+   %dtStats.EVKills =   %dtStats.explosionKills +
                         %dtStats.groundKills +
                         %dtStats.outOfBoundKills +
                         %dtStats.lavaKills +
@@ -4039,7 +4140,7 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
                         %dtStats.forceFieldPowerUpKills +
                         %dtStats.nexusCampingKills;
 
-   %dtStats.EVDeaths =   %dtStats.explosionDeaths +
+   %dtStats.EVDeaths =  %dtStats.explosionDeaths +
                         %dtStats.groundDeaths +
                         %dtStats.outOfBoundDeaths +
                         %dtStats.lavaDeaths +
@@ -4049,18 +4150,18 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
                         %dtStats.nexusCampingDeaths;
 
    %dtStats.totalWepDmg = %dtStats.cgDmg +
-                         %dtStats.laserDmg +
-                         %dtStats.blasterDmg +
-                         %dtStats.elfDmg +
-                         %dtStats.discDmg +
-                         %dtStats.grenadeDmg +
-                         %dtStats.hGrenadeDmg +
-                         %dtStats.mortarDmg +
-                         %dtStats.missileDmg +
-                         %dtStats.plasmaDmg +
-                         %dtStats.shockDmg +
-                         %dtStats.mineDmg +
-                         %dtStats.SatchelDmg;
+                          %dtStats.laserDmg +
+                          %dtStats.blasterDmg +
+                          %dtStats.elfDmg +
+                          %dtStats.discDmg +
+                          %dtStats.grenadeDmg +
+                          %dtStats.hGrenadeDmg +
+                          %dtStats.mortarDmg +
+                          %dtStats.missileDmg +
+                          %dtStats.plasmaDmg +
+                          %dtStats.shockDmg +
+                          %dtStats.mineDmg +
+                          %dtStats.SatchelDmg;
 
 
    if(%dtStats.cgShotsFired < 100)
@@ -4106,9 +4207,11 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
 
 
    if(%game.class $= "CTFGame" || %game.class $= "SCtFGame"){
-     %dtStats.teamScore =  $TeamScore[%dtStats.team];
+      %dtStats.teamOneCapTimes  = $dtStats::teamOneCapTimes;
+      %dtStats.teamTwoCapTimes  = $dtStats::teamTwoCapTimes;
+      %dtStats.teamScore =  $TeamScore[%dtStats.dtTeam];
 
-     %dtStats.destruction =   %dtStats.genDestroys +
+      %dtStats.destruction =  %dtStats.genDestroys +
                               %dtStats.solarDestroys +
                               %dtStats.sensorDestroys +
                               %dtStats.turretDestroys +
@@ -4121,7 +4224,7 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
                               %dtStats.depStationDestroys +
                               %dtStats.mpbtstationDestroys;
 
-   %dtStats.repairs =  %dtStats.genRepairs +
+      %dtStats.repairs =   %dtStats.genRepairs +
                            %dtStats.SensorRepairs +
                            %dtStats.TurretRepairs +
                            %dtStats.StationRepairs +
@@ -4133,20 +4236,17 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
                            %dtStats.depInvRepairs +
                            %dtStats.depTurretRepairs;
 
-      if(%dtStats.flagGrabs > 0)
-         %dtStats.capEfficiency = %dtStats.flagCaps / %dtStats.flagGrabs;
-      else
-         %dtStats.capEfficiency = 0;
+      %dtStats.capEfficiency = (%dtStats.flagGrabs > 0)  ? (%dtStats.flagCaps / %dtStats.flagGrabs) : 0;
 
       if(statsGroup.team[1] == statsGroup.team[2]){
          %dtStats.winCount = 0;
          %dtStats.lossCount = 0;
       }
-      else if(statsGroup.team[1] > statsGroup.team[2] && %dtStats.team == 1)
+      else if(statsGroup.team[1] > statsGroup.team[2] && %dtStats.dtTeam == 1)
          %dtStats.winCount = 1;
-      else if(statsGroup.team[2] > statsGroup.team[1]  && %dtStats.team == 2)
+      else if(statsGroup.team[2] > statsGroup.team[1]  && %dtStats.dtTeam == 2)
          %dtStats.winCount = 1;
-      else if(%dtStats.team > 0)
+      else if(%dtStats.dtTeam > 0)
          %dtStats.lossCount = 1;
 
       %winCount = getField(%dtStats.gameStats["winCountTG","t",%game.class],5) + %dtStats.winCount;
@@ -4158,7 +4258,7 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
    else if(%game.class $= "LakRabbitGame")
       %dtStats.flagTimeMin = (%dtStats.flagTimeMS / 1000)/60;
    else if(%game.class $= "ArenaGame")
-      %dtStats.teamScore =  $TeamScore[%dtStats.team];
+      %dtStats.teamScore =  $TeamScore[%dtStats.dtTeam];
 }
 
 function isGameRun(){//
@@ -4166,120 +4266,109 @@ function isGameRun(){//
 }
 
 function DefaultGame::getGamePct(%game){
-   if(isGameRun()){
-      %curTimeLeftMS =  mAbs((($missionStartTime - getSimTime())/60)/1000);
-      %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
-      return %timePct;
-   }
-   return 0;
+   %curTimeLeftMS =  ((getSimTime() - $missionStartTime)/1000)/60;
+   %timePct = (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+   %timePct = (%timePct > 100) ?  100 : %timePct;
+   return %timePct;
 }
 
 function ArenaGame::getGamePct(%game){
-   if(isGameRun()){
-      // Verify that there is a roundlimit and that the team has met it
-      if(%game.roundLimit != 0){
-         if( $TeamScore[1] >= $TeamScore[2]){
-            return ($TeamScore[1] / %game.roundLimit) * 100;
-         }
-        else if( $TeamScore[1] <= $TeamScore[2]){
-           return ($TeamScore[2] / %game.roundLimit) * 100;
-        }
+   if(%game.roundLimit != 0){
+      if( $TeamScore[1] >= $TeamScore[2]){
+         %pct = ($TeamScore[1] / %game.roundLimit) * 100;
+         %pct =  (%pct > 100) ? 100 : %pct;
+         return %pct;
       }
+     else if( $TeamScore[1] <= $TeamScore[2]){
+         %pct = ($TeamScore[2] / %game.roundLimit) * 100;
+         %pct =  (%pct > 100) ? 100 : %pct;
+         return %pct;
+     }
    }
    return 0;
 }
 function CTFGame::getGamePct(%game){
-   if(isGameRun()){
-      %curTimeLeftMS =  mAbs((($missionStartTime - getSimTime())/60)/1000);
+      %curTimeLeftMS =  ((getSimTime() - $missionStartTime)/1000)/60;
       %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+      %timePct = (%timePct > 100) ?  100 : %timePct;
 
       %scoreLimit = MissionGroup.CTF_scoreLimit * %game.SCORE_PER_TEAM_FLAG_CAP;
       if(%scoreLimit $= "")
          %scoreLimit = 5 * %game.SCORE_PER_TEAM_FLAG_CAP;
 
       if($TeamScore[1] > $TeamScore[2])
-         %scorePct =  ($TeamScore[1] / %scoreLimit) * 100;
+         %pct = ($TeamScore[1] / %scoreLimit) * 100;
       else
-         %scorePct =  ($TeamScore[2] / %scoreLimit) * 100;
+         %pct =  ($TeamScore[2] / %scoreLimit) * 100;
 
+      %scorePct =  (%pct > 100) ? 100 : %pct;
       if(%scorePct > %timePct)
          return %scorePct;
       else
          return %timePct;
-   }
-   return 0;
 }
 
 function LakRabbitGame::getGamePct(%game){
-   if(isGameRun()){
-      %curTimeLeftMS =  mAbs((($missionStartTime - getSimTime())/60)/1000);
-      %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
-
-      %scoreLimit = MissionGroup.Rabbit_scoreLimit;
-      if(%scoreLimit $= "")
-         %scoreLimit = 2000;
-
-      for (%i = 0; %i < ClientGroup.getCount(); %i++){
-         %client = ClientGroup.getObject(%i);
-         if(%lScore < %client.score){
-            %lScore = %client.score;
-         }
+   %curTimeLeftMS =  ((getSimTime() - $missionStartTime)/1000)/60;
+   %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+   %timePct = (%timePct > 100) ?  100 : %timePct;
+   %scoreLimit = MissionGroup.Rabbit_scoreLimit;
+   if(%scoreLimit $= "")
+      %scoreLimit = 2000;
+   %lScore = 0;
+   for (%i = 0; %i < ClientGroup.getCount(); %i++){
+      %client = ClientGroup.getObject(%i);
+      if(%lScore < %client.score){
+         %lScore = %client.score;
       }
-      %scorePct =  (%lScore / %scoreLimit) * 100;
-
-      if(%scorePct > %timePct)
-         return %scorePct;
-      else
-         return %timePct;
    }
-   return 0;
-
+   %pct =  (%lScore / %scoreLimit) * 100;
+   %scorePct =  (%pct > 100) ? 100 : %pct;
+   if(%scorePct > %timePct)
+      return %scorePct;
+   else
+      return %timePct;
 }
 function DMGame::getGamePct(%game){
-   if(isGameRun()){
-      %curTimeLeftMS =  mAbs((($missionStartTime - getSimTime())/60)/1000);
-      %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+   %curTimeLeftMS =  ((getSimTime() - $missionStartTime)/1000)/60;
+   %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+   %timePct = (%timePct > 100) ?  100 : %timePct;
+   %scoreLimit =  MissionGroup.DM_scoreLimit;
+   if(%scoreLimit $= "")
+      %scoreLimit = 25;
 
-      %scoreLimit =  MissionGroup.DM_scoreLimit;
-      if(%scoreLimit $= "")
-         %scoreLimit = 25;
-
-      for (%i = 0; %i < ClientGroup.getCount(); %i++){
-         %client = ClientGroup.getObject(%i);
-         if(%lScore < %client.score){
-            %lScore = %client.score;
-         }
+   for (%i = 0; %i < ClientGroup.getCount(); %i++){
+      %client = ClientGroup.getObject(%i);
+      if(%lScore < %client.score){
+         %lScore = %client.score;
       }
-      %scorePct =  (%lScore / %scoreLimit) * 100;
-
-
-      if(%scorePct > %timePct)
-         return %scorePct;
-      else
-         return %timePct;
    }
-   return 0;
+   %pct =  (%lScore / %scoreLimit) * 100;
+   %scorePct =  (%pct > 100) ? 100 : %pct;
+
+   if(%scorePct > %timePct)
+      return %scorePct;
+   else
+      return %timePct;
 }
 function SCtFGame::getGamePct(%game){
-   if(isGameRun()){
-      %curTimeLeftMS =  mAbs((($missionStartTime - getSimTime())/60)/1000);
-      %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+   %curTimeLeftMS =  ((getSimTime() - $missionStartTime)/1000)/60;
+   %timePct =    (%curTimeLeftMS /  $Host::TimeLimit) * 100;
+   %timePct = (%timePct > 100) ?  100 : %timePct;
+   %scoreLimit = MissionGroup.CTF_scoreLimit * %game.SCORE_PER_TEAM_FLAG_CAP;
+   if(%scoreLimit $= "")
+      %scoreLimit = 5 * %game.SCORE_PER_TEAM_FLAG_CAP;
 
-      %scoreLimit = MissionGroup.CTF_scoreLimit * %game.SCORE_PER_TEAM_FLAG_CAP;
-      if(%scoreLimit $= "")
-         %scoreLimit = 5 * %game.SCORE_PER_TEAM_FLAG_CAP;
+   if($TeamScore[1] > $TeamScore[2])
+      %pct = ($TeamScore[1] / %scoreLimit) * 100;
+   else
+      %pct =  ($TeamScore[2] / %scoreLimit) * 100;
 
-      if($TeamScore[1] > $TeamScore[2])
-         %scorePct =  ($TeamScore[1] / %scoreLimit) * 100;
-      else
-         %scorePct =  ($TeamScore[2] / %scoreLimit) * 100;
-
-
-      if(%scorePct > %timePct)
-         return %scorePct;
-      else
-         return %timePct;
-   }
+   %scorePct =  (%pct > 100) ? 100 : %pct;
+   if(%scorePct > %timePct)
+      return %scorePct;
+   else
+      return %timePct;
 }
 function msToMinSec(%time)
 {
@@ -4499,46 +4588,6 @@ function monthString(%num){
 //							Load Save Management							  //
 ////////////////////////////////////////////////////////////////////////////////
 
-function loadSlowStats(%file,%dtStats,%game,%total){
-  if(!%file.isEOF()){
-      %line = strreplace(%file.readline(),"%t","\t");
-      %var = getField(%line,0);
-      %dtStats.gameStats[%var,"g",%game] =  getFields(%line,1,getFieldCount(%line)-1);
-      schedule($dtStats::loadSlowTime,0,"loadSlowStats",%file,%dtStats,%game,%total);
-   }
-   else{
-      %dtStats.gameData[%game]= 1;
-      %file.close();
-      %file.delete();
-   }
-}
-function loadTotalSlowStats(%file,%dtStats,%game){
-  if(!%file.isEOF()){
-      %line = strreplace(%file.readline(),"%t","\t");
-      %var = getField(%line,0);
-      if(%var !$= "playerName"){
-         %d0 = getField(%line,1);%d1 = getField(%line,2);
-         %w0 = getField(%line,3);%w1 = getField(%line,4);
-         %m0 = getField(%line,5);%m1 = getField(%line,6);
-         %q0 = getField(%line,7);%q1 = getField(%line,8);
-         %y0 = getField(%line,9);%y1 = getField(%line,10);
-
-         if(%day){ %d0 = %d1; %d1 = 0;} //if there was a change flip new with old and reset new
-         if(%week){%w0 = %w1;%w1 = 0;}
-         if(%month){%m0 = %m1;%m1 = 0;}
-         if(%quarter){%q0 = %q1;%q1 = 0;}
-         if(%year){ %y0 = %y1;%y1 = 0;}
-
-         %dtStats.gameStats[%var,"t",%game] = %d0 TAB %d1 TAB %w0 TAB %w1 TAB %m0 TAB %m1 TAB %q0 TAB %q1 TAB %y0 TAB %y1;
-      }
-      schedule($dtStats::loadSlowTime,0,"loadTotalSlowStats",%file,%dtStats,%game,%total);
-   }
-   else{
-      %file.close();
-      %file.delete();
-   }
-}
-
 function loadGameStats(%dtStats,%game){// called when client joins server.cs onConnect
    if($dtStats::debugEchos){error("loadGameStats GUID = "  SPC %dtStats.guid);}
    if(%dtStats.guid !$= ""){
@@ -4548,18 +4597,14 @@ function loadGameStats(%dtStats,%game){// called when client joins server.cs onC
          %file = new FileObject();
          RootGroup.add(%file);
          %file.OpenForRead(%filename);
-         if($dtStats::loadSlowTime > 0 && !$dtStats::loadAfter)// if load after is enabled dont load slow
-            loadSlowStats(%file,%dtStats,%game);
-         else{
-            while( !%file.isEOF() ){
-               %line = strreplace(%file.readline(),"%t","\t");
-               %var = getField(%line,0);
-               %dtStats.gameStats[%var,"g",%game] =  getFields(%line,1,getFieldCount(%line)-1);
-            }
-            %dtStats.gameData[%game]= 1;
-            %file.close();
-            %file.delete();
+         while( !%file.isEOF() ){
+            %line = strreplace(%file.readline(),"%t","\t");
+            %var = getField(%line,0);
+            %dtStats.gameStats[%var,"g",%game] =  getFields(%line,1,getFieldCount(%line)-1);
          }
+         %dtStats.gameData[%game]= 1;
+         %file.close();
+         %file.delete();
       }
       else
        %dtStats.gameData[%game]= 1;
@@ -4597,32 +4642,27 @@ function loadGameTotalStats(%dtStats,%game){
          if(%year){ %y0 = %y1; %y1 = %y;}
          %dtStats.gameStats["dwmqy","t",%game] =  %d0 TAB %d1 TAB %w0 TAB %w1 TAB %m0 TAB %m1 TAB %q0 TAB %q1 TAB %y0 TAB %y1; // update line
       }
-      if($dtStats::loadSlowTime > 0 && !$dtStats::loadAfter)// if load after is enabled dont load slow
-         loadTotalSlowStats(%file,%dtStats,%game);
-      else{
-         while( !%file.isEOF() ){
-            %line = strreplace(%file.readline(),"%t","\t");
-            %var = getField(%line,0);
-            if(%var !$= "playerName" && %var !$= "versionNum"){
-               %d0 = getField(%line,1);%d1 = getField(%line,2);
-               %w0 = getField(%line,3);%w1 = getField(%line,4);
-               %m0 = getField(%line,5);%m1 = getField(%line,6);
-               %q0 = getField(%line,7);%q1 = getField(%line,8);
-               %y0 = getField(%line,9);%y1 = getField(%line,10);
+      while( !%file.isEOF() ){
+         %line = strreplace(%file.readline(),"%t","\t");
+         %var = getField(%line,0);
+         if(%var !$= "playerName" && %var !$= "versionNum"){
+            %d0 = getField(%line,1);%d1 = getField(%line,2);
+            %w0 = getField(%line,3);%w1 = getField(%line,4);
+            %m0 = getField(%line,5);%m1 = getField(%line,6);
+            %q0 = getField(%line,7);%q1 = getField(%line,8);
+            %y0 = getField(%line,9);%y1 = getField(%line,10);
 
-               if(%day){ %d0 = %d1; %d1 = 0;} //if there was a change flip new with old and reset new
-               if(%week){%w0 = %w1;%w1 = 0;}
-               if(%month){%m0 = %m1;%m1 = 0;}
-               if(%quarter){%q0 = %q1;%q1 = 0;}
-               if(%year){ %y0 = %y1;%y1 = 0;}
+            if(%day){ %d0 = %d1; %d1 = 0;} //if there was a change flip new with old and reset new
+            if(%week){%w0 = %w1;%w1 = 0;}
+            if(%month){%m0 = %m1;%m1 = 0;}
+            if(%quarter){%q0 = %q1;%q1 = 0;}
+            if(%year){ %y0 = %y1;%y1 = 0;}
 
-               %dtStats.gameStats[%var,"t",%game] = %d0 TAB %d1 TAB %w0 TAB %w1 TAB %m0 TAB %m1 TAB %q0 TAB %q1 TAB %y0 TAB %y1;
-
-            }
+            %dtStats.gameStats[%var,"t",%game] = %d0 TAB %d1 TAB %w0 TAB %w1 TAB %m0 TAB %m1 TAB %q0 TAB %q1 TAB %y0 TAB %y1;
          }
-         %file.close();
-         %file.delete();
       }
+      %file.close();
+      %file.delete();
    }
    else// must be new person so be sure to set the dates
       %dtStats.gameStats["dwmqy","t",%game] =  %d TAB %d TAB %w TAB %w TAB %m TAB %m TAB %q TAB %q TAB %y TAB %y;
@@ -4859,12 +4899,8 @@ function incGameStats(%dtStats,%game) {// record that games stats and inc by one
                    %mapVal = getField(%dtStats.mapStats[getMapIDName(%game),%game],%varID);
                else
                   %mapVal = 0;
-               if(%val < %mapVal && %val != 0 || !%mapVal){
-				   setValueField(%dtStats,getMapIDName(%game),"m",%game,%varID,%val);
-			   }
-               else{
-				   setValueField(%dtStats,getMapIDName(%game),"m",%game,%varID,%mapVal);
-			   }
+               if(%val < %mapVal && %val != 0 || !%mapVal){  setValueField(%dtStats,getMapIDName(%game),"m",%game,%varID,%val);}
+               else{                                         setValueField(%dtStats,getMapIDName(%game),"m",%game,%varID,%mapVal);}
                setValueField(%dtStats,"varName","m",%game,%varID,%varNameType);
             }
             for(%x = 1; %x <= 9; %x+=2){
@@ -5136,8 +5172,9 @@ function hasValue(%val){//make sure we have at least something in the field spot
 function bakGameStats(%client,%game) {//back up clients current stats in case they come back
    if($dtStats::debugEchos){error("bakGameStats GUID = "  SPC %client.guid);}
    %dtStats = %client.dtStats;
-   %dtStats.team = (%client.team > 0) ? %client.team : %client.lastTeam;
-
+   %dtStats.dtTeam = %client.team;
+   updateTeamTime(%client.dtStats, %dtStats.team);
+   armorTimer(%dtStats, 0, 1);
    for(%v = 0; %v < $dtStats::varTypeCount; %v++){
       %varType = $dtStats::varType[%v];
       for(%i = 1; %i <= $dtStats::FCG[%game,%varType]; %i++){
@@ -5285,6 +5322,27 @@ function armorTimer(%dtStats, %size, %death){
       %dtStats.lastArmor = %size;
    }
    //error(%dtStats.lArmorTime SPC %dtStats.mArmorTime SPC %dtStats.hArmorTime);
+}
+function updateTeamTime(%dtStats,%team){
+   if(Game.numTeams > 1){
+      %time = getSimTime() - %dtStats.teamTime;
+      if(%team == 1){
+         %dtStats.timeOnTeamOne += (%time/1000)/60;
+         %dtStats.teamTime = getSimTime();
+      }
+      else if(%team == 2){
+         %dtStats.timeOnTeamTwo += (%time/1000)/60;
+         %dtStats.teamTime = getSimTime();
+      }
+      else if(%team == 0){
+         %dtStats.timeOnTeamZero += (%time/1000)/60;
+         %dtStats.teamTime = getSimTime();
+      }
+      else{
+         %dtStats.teamTime = getSimTime();
+      }
+   }
+   //error(%team SPC  %dtStats.timeOnTeamZero SPC %dtStats.timeOnTeamOne SPC %dtStats.timeOnTeamTwo);
 }
 function deadDist(%pos,%pl){
    if(isObject(%pl)){
@@ -5781,12 +5839,7 @@ function rayTestDis(%targetObject){
    else
       return 0;
 }
-function vectorRayCast(%startPos,%vec,%dis){
-   %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::PlayerObjectType;
-   %endPos = VectorAdd(%startPos, VectorScale(VectorNormalize(%vec), %dis));
-   %result = containerRayCast(%startPos, %endPos, %mask, %proj);
-   return %result;
-}
+
 function testHit(%client){
    if(isObject(%client)){
       %field = %client.lastExp;
@@ -5794,9 +5847,9 @@ function testHit(%client){
       if(%data.hasDamageRadius){
          %mask = $TypeMasks::PlayerObjectType;
          %vec = vectorNormalize(vectorSub(%ePos,%sPos));// some how this vector works
-         %ray = containerRayCast(%ePos, VectorAdd(%ePos, VectorScale(VectorNormalize(%vec), 5)), %mask, -1);
+         %ray = containerRayCast(%ePos, VectorAdd(%ePos, VectorScale(VectorNormalize(%vec), 5)), %mask, %client.player);
          if(%ray){
-            %dmgType = %data.radiusDamageType;
+            //%dmgType = %data.radiusDamageType;
             //error(%dmgType);
             return 1;
          }
@@ -5818,7 +5871,7 @@ function clientDmgStats(%data, %position, %sourceObject, %targetObject, %damageT
          if(rayTest(%targetObject, $dtStats::midAirHeight) && %damageType == $DamageType::Lightning)
             %sourceClient.dtStats.lightningMAEVHits++;
          else
-            %sourceDT.EVMAHit++;
+            %sourceClient.dtStats.EVMAHit++;
       }
       return;
    }
@@ -11683,7 +11736,9 @@ function  sortLStats(%c,%game,%lType){
             %maxCount = %i;
             for (%j = %i+1; %j < %statsCount; %j++){
                if(%cat $= "AvgI"){
-                  if (getField(strreplace(serverStats.getObject(%j).LStats[%var,%game],"%a","\t"),0) < getField(strreplace(serverStats.getObject(%maxCount).LStats[%var,%game],"%a","\t"),0))
+                  %aVal = getField(strreplace(serverStats.getObject(%j).LStats[%var,%game],"%a","\t"),2) >= $dtStats::minTotal ? getField(strreplace(serverStats.getObject(%j).LStats[%var,%game],"%a","\t"),0) : 0;
+                  %bVal = getField(strreplace(serverStats.getObject(%maxCount).LStats[%var,%game],"%a","\t"),2) >= $dtStats::minTotal ? getField(strreplace(serverStats.getObject(%maxCount).LStats[%var,%game],"%a","\t"),0) : 0;
+                  if (%aVal < %bVal)
                      %maxCount = %j;
                }
                else{
@@ -11694,7 +11749,7 @@ function  sortLStats(%c,%game,%lType){
             %obj = serverStats.getObject(%maxCount);
             serverStats.bringToFront(%obj);// push the ones we have sorted to the front so we dont pass over them again
             if(%cat $= "AvgI")
-               %num = getField(strreplace(%obj.LStats[%var,%game],"%a","\t"),0);
+               %num = getField(strreplace(%obj.LStats[%var,%game],"%a","\t"),2) >= $dtStats::minTotal ? getField(strreplace(%obj.LStats[%var,%game],"%a","\t"),0) : 0;
             else
                %num = %obj.LStats[%var,%game];
             if(%num != 0){
@@ -11719,7 +11774,9 @@ function  sortLStats(%c,%game,%lType){
             %maxCount = %i;
             for (%j = %i+1; %j < %statsCount; %j++){
                if(%cat $= "Avg"){
-                  if (getField(strreplace(serverStats.getObject(%j).LStats[%var,%game],"%a","\t"),0) > getField(strreplace(serverStats.getObject(%maxCount).LStats[%var,%game],"%a","\t"),0))
+                  %aVal = getField(strreplace(serverStats.getObject(%j).LStats[%var,%game],"%a","\t"),2) >= $dtStats::minTotal ? getField(strreplace(serverStats.getObject(%j).LStats[%var,%game],"%a","\t"),0) : 0;
+                  %bVal = getField(strreplace(serverStats.getObject(%maxCount).LStats[%var,%game],"%a","\t"),2) >= $dtStats::minTotal ? getField(strreplace(serverStats.getObject(%maxCount).LStats[%var,%game],"%a","\t"),0) : 0;
+                  if (%aVal > %bVal)
                      %maxCount = %j;
                }
                else{
@@ -11730,7 +11787,7 @@ function  sortLStats(%c,%game,%lType){
             %obj = serverStats.getObject(%maxCount);
             serverStats.bringToFront(%obj);// push the ones we have sorted to the front so we dont pass over them again
             if(%cat $= "Avg")
-               %num = getField(strreplace(%obj.LStats[%var,%game],"%a","\t"),0);
+               %num = getField(strreplace(%obj.LStats[%var,%game],"%a","\t"),2) >= $dtStats::minTotal ? getField(strreplace(%obj.LStats[%var,%game],"%a","\t"),0) : 0;
             else
                %num = %obj.LStats[%var,%game];
 
@@ -11817,7 +11874,7 @@ function loadMapLeaderBoards(%reset){
       else{
          if($dtStats::lsmMap){
             if($dtStats::debugEchos){error("Deleting old file" SPC %filepath);}
-            schedule((%i+1)  * 500,0,"deleteFile",%filepath);
+            schedule((%i+1)  * 256,0,"deleteFile",%filepath);
          }
       }
    }
@@ -11880,7 +11937,7 @@ function loadLeaderboards(%reset){ // loads up leaderboards
       else{// not valid any more delete;
          if($dtStats::lsm){
             if($dtStats::debugEchos){error("Deleting old file" SPC %filepath);}
-            schedule((%i+1)  * 1000,0,"deleteFile",%filepath);
+            schedule((%i+1)  * 256,0,"deleteFile",%filepath);
          }
          else{
              %oldFileCount++;
@@ -11954,17 +12011,17 @@ function dtCleanUp(%force){
             if($dtStats::sm || %force){
                if($dtStats::debugEchos){error("Deleting old file" SPC %dayCount SPC %extraDays SPC %filepath);}
                if(isFile(%filepath)){
-                  schedule(%v++ * 500,0,"deleteFile",%filepath);
+                  schedule(%v++ * 256,0,"deleteFile",%filepath);
                   %oldFileCount++;
                }
                %mPath = strreplace(%filepath,"t.cs","m.cs");
                if(isFile(%mPath)){
-                  schedule(%v++ * 500,0,"deleteFile",%mPath);
+                  schedule(%v++ * 256,0,"deleteFile",%mPath);
                   %oldFileCount++;
                }
                %gPath = strreplace(%filepath,"t.cs","g.cs");
                if(isFile(%gPath)){
-                  schedule(%v++ * 500,0,"deleteFile",%gPath);
+                  schedule(%v++ * 256,0,"deleteFile",%gPath);
                   %oldFileCount++;
                }
             }
@@ -12331,6 +12388,8 @@ function  sortMapStats(%varIndex,%game,%lType,%mapIndex){
                %obj1 = serverMapStats.getObject(%j); %obj2 = serverMapStats.getObject(%maxCount);
                if(getField(%obj1.varList,%varIndex) $= getField(%obj2.varList,%varIndex)){//make sure the var matches up in case of change
                   if(%cat $= "AvgI"){
+                     //%avgCount = getField(strreplace(getField(%obj1.mapStats[%mapNameID],%varIndex),"%a","\t"),2);
+                     //%avgCountM = getField(strreplace(getField(%obj2.mapStats[%mapNameID],%varIndex),"%a","\t"),2);
                      if (getField(strreplace(getField(%obj1.mapStats[%mapNameID],%varIndex),"%a","\t"),0) < getField(strreplace(getField(%obj2.mapStats[%mapNameID],%varIndex),"%a","\t"),0))
                         %maxCount = %j;
                   }
@@ -12370,7 +12429,9 @@ function  sortMapStats(%varIndex,%game,%lType,%mapIndex){
                %obj1 = serverMapStats.getObject(%j); %obj2 = serverMapStats.getObject(%maxCount);
                if(getField(%obj1.varList,%varIndex) $= getField(%obj2.varList,%varIndex)){
                   if(%cat $= "Avg"){
-                     if (getField(strreplace(getField(%obj1.mapStats[%mapNameID],%varIndex),"%a","\t"),0) > getField(strreplace(getField(%obj2.mapStats[%mapNameID],%varIndex),"%a","\t"),0))
+                     //%avgCount = getField(strreplace(getField(%obj1.mapStats[%mapNameID],%varIndex),"%a","\t"),2);
+                     //%avgCountM = getField(strreplace(getField(%obj2.mapStats[%mapNameID],%varIndex),"%a","\t"),2);
+                     if(getField(strreplace(getField(%obj1.mapStats[%mapNameID],%varIndex),"%a","\t"),0) > getField(strreplace(getField(%obj2.mapStats[%mapNameID],%varIndex),"%a","\t"),0))
                         %maxCount = %j;
                   }
                   else{
@@ -12585,7 +12646,7 @@ function startMonitor(){
    }
 }
 
-function dtSaveServerVars(){
+function dtSaveServerVars(){ 
    $dtServerVars::lastSimTime = getSimTime();
    $dtServerVars::lastDate = formattimestring("mm/dd/yy hh:nn:a");
    $dtServerVars::lastMission = cleanMapName($CurrentMission);
@@ -12608,8 +12669,12 @@ function dtLoadServerVars(){// keep function at the bottom
    if($dtStats::Enable){
       if(!statsGroup.serverStart){
          statsGroup.serverStart = 1;
+         $dtStats::teamOneCapTimes = 0;
+         $dtStats::teamTwoCapTimes = 0;
+         $dtStats::teamOneCapCount = 0;
+         $dtStats::teamTwoCapCount = 0;
          $dtServerVars::upTimeCount = -1;
-         %crash = 0;
+
          if(isFile("serverStats/serverVars.cs")){
             exec("serverStats/serverVars.cs");
             %date = $dtServerVars::lastDate;
@@ -12617,11 +12682,10 @@ function dtLoadServerVars(){// keep function at the bottom
             %mis = $dtServerVars::lastMission;
             if($dtStats::debugEchos){schedule(6000,0,"error","last server uptime = " SPC %date @ "-" @ %upTime @ "-" @ %mis);}
             $dtServerVars::upTime[$dtServerVars::upTimeCount++] = %date @ "-" @ %upTime @ "-" @ %mis;
-            if($dtServerVars::lastPlayerCount > 1){
+            if($dtServerVars::lastPlayerCount > 3){
                $dtServerVars::serverCrash[%mis, $dtServerVars::lastGameType]++;
-               $dtServerVars::crashLog[$dtServerVars::crashLogCount++] =%date @ "-" @ %upTime @ "-" @ %mis @ "-" @  $dtServerVars::lastGameType @ "-" @ $dtServerVars::lastPlayerCount;
-               $dtServerVars::lastPlayerCount = 0;
-               %crash = 1;
+               $dtServerVars::crashLog[$dtServerVars::crashLogCount++] = %date @ "-" @ %upTime @ "-" @ %mis @ "-" @  $dtServerVars::lastGameType @ "-" @ $dtServerVars::lastPlayerCount;
+               schedule(15000,0,"dtEventLog","Server Crash" SPC %date SPC "Pl Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC %mis SPC "Up Time =" SPC %upTime, 0);
             }
          }
          if($dtServerVars::upTimeCount >= 30)
@@ -12629,6 +12693,7 @@ function dtLoadServerVars(){// keep function at the bottom
          if($dtServerVars::crashLogCount >= 15)
             $dtServerVars::crashLogCount = 0;
 
+         $dtServerVars::lastPlayerCount = 0;
          $dtServerVars::lastSimTime = getSimTime();
          $dtServerVars::lastDate =  formattimestring("mm/dd/yy hh:nn:a");
          export( "$dtServerVars::*", "serverStats/serverVars.cs", false );
@@ -12653,8 +12718,6 @@ function dtLoadServerVars(){// keep function at the bottom
          $dtServer::eventLogCount = -1;
          //if(isFile("serverStats/eventLog.cs"))
             //exec("serverStats/eventLog.cs");
-         if(%crash)
-            dtEventLog("Server Crash" SPC %date SPC "Plr Count =" SPC $dtServerVars::lastPlayerCount SPC "Map =" SPC $dtServerVars::lastMission, 0);
 
          dtEventLog("Server Start" SPC formattimestring("hh:nn:a mm-dd-yy"), 0);
 
@@ -12903,3 +12966,32 @@ function testVarsRandomAll(%max){
 //    Removed arbitrary weapon scores  replaced with total kills
 //    Added map name to server hang in case its a map issue we need to keep an eye on
 //    200+ server warning now only echos to console
+//
+//    8.9
+//    New stats to track time spent on teams and game length
+//    Sorter now looks at avg count and rejects low counts for better leaderboard avgs
+//    Misc Stat fixes
+//    Speed up file delete time
+//    Removed loadslow in favor for loadafter, less edge cases
+//
+//    9.0
+//    Misc Stat Fixes
+//    Reverted team changes and removed some of the inconsistencies with team tracking
+//    Added flag capture times
+//    Capped gamepct do to timeing/score it can go over 100
+//    Added startPCt and endPct for game progress info
+//    Added clientQuit to make filtering easier
+//    Some code cleanup
+//
+//    9.1
+//    Stat fixes
+//       - made cap timers global instead of client... oops
+//       - fixed endPCt/leftPCT
+//
+//    9.2
+//    Added a delay for server crash to be able to report it to the bot on server start
+//    Fix Cap timers a 3rd time
+//    Server crash messsage fix
+//
+//    9.3
+//    Stat format change for flag cap times, they now start at 0 

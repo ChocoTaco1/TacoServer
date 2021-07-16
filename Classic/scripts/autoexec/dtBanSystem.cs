@@ -10,6 +10,10 @@
 //$dtBanList::GUID3555379 = "DAY OF THE YEAR BANNED \t YEAR BANNED \t HOUR BANNED \t MINUTE BANNED \t TIME TO BE BANNED";
 //$dtBanList::GUID3555379 = "4\t2021\t18\t31\t518400";
 
+//TO UNBAN SOMEONE WITHOUT RESTARTING THE SERVER
+//unban(%guid,%ip); in console
+//Example: unban(555555,"22.222.222.222"); put ip in quotes
+
 package dtBan
 {
 
@@ -147,6 +151,7 @@ function unban(%guid,%ip){
      $dtBanList::GUID[%guid] = "";
      error("GUID" SPC %guid SPC "UNBANNED");
    }
+   %ip = strReplace(%ip, ".", "_");
    if($dtBanList::IP[%ip] !$= ""){
      $dtBanList::IP[%ip] =  "";
      error("IP" SPC %ip SPC "UNBANNED");

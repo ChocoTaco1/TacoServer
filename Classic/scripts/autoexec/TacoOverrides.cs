@@ -303,6 +303,3 @@ function ConcussionGrenadeThrown::onThrow(%this, %gren)
 // Prevent package from being activated if it is already
 if (!isActivePackage(TacoOverrides))
     activatePackage(TacoOverrides);
-
-//Ban WhiteOut Grenade
-$InvBanList[CTF, "FlashGrenade"] = 1;

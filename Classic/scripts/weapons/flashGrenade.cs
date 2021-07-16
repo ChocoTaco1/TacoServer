@@ -37,7 +37,7 @@ datablock ItemData(FlashGrenadeThrown)
    radiusDamageType = $DamageType::Grenade;
    kickBackStrength = 1000;
    computeCRC = true;
-   maxWhiteout = 0.9; // z0dd - ZOD, 9/8/02. Was 1.2
+   maxWhiteout = 0.78; // z0dd - ZOD, 9/8/02. Was 1.2 //Reduced. Was 0.9 Choco
 };
 
 datablock ItemData(FlashGrenade)
@@ -62,4 +62,3 @@ function FlashGrenadeThrown::onCollision( %data, %obj, %col )
 {
    // Do nothing...
 }
-

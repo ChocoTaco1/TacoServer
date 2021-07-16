@@ -9,6 +9,8 @@
 // if a player has switched teams or not. Or if a team changing event has occurred.
 // This is triggered via various event functions throughout the game.
 //
+// If it takes too long for specific canidates to die. After a time choose anyone.
+$Autobalance::Fallback = 120000; //60000 is 1 minute
 
 // Set reset string
 $GetCountsStatus = "UPDATE";
@@ -295,8 +297,6 @@ if (!isActivePackage(ResetTBNGameOver))
 //
 // exec("scripts/autoexec/Autobalance.cs");
 //
-// If it takes too long for specific canidates to die. After a time choose anyone.
-$Autobalance::Fallback = 120000; //60000 is 1 minute
 
 // Run from TeamBalanceNotify via NotifyUnbalanced
 function Autobalance( %game )

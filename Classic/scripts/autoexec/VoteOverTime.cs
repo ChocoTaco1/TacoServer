@@ -3,7 +3,7 @@
 // Dont allow the match to end if a time vote is pending
 // Or if the timelimit has changed
 //
-// Changes were also made in the Evo Admin.ovl and DefaultGame.ovl
+// Changes were also made in how time votes are handled in scripts/autoexec/VoteMenu.cs
 // DefaultGame::voteChangeMission, DefaultGame::voteChangeTimeLimit, serverCmdStartNewVote
 //
 // The VoteChangeTimeLimit functions in evo dictate VOStatus conditions
@@ -25,7 +25,7 @@ function DefaultGame::checkTimeLimit(%game, %forced)
       %game.timeCheck = %game.schedule(20000, "checkTimeLimit");
       return;
    }
-   
+
    %curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
 
    if (%curTimeLeftMS <= 0)
@@ -43,9 +43,9 @@ function DefaultGame::checkTimeLimit(%game, %forced)
 				}
 			case InProgress:
 				//Do Nothing
-			case TimeChanged:				
+			case TimeChanged:
 				//Do Nothing
-			case Normal:				
+			case Normal:
 				// time's up, put down your pencils
 				%game.timeLimitReached();
 		}
@@ -65,7 +65,7 @@ function DefaultGame::checkTimeLimit(%game, %forced)
 function DefaultGame::gameOver(%game)
 {
 	Parent::gameOver(%game);
-	
+
 	//Reset everything to do with Vote Overtime
 	ResetVOall(%game);
 }

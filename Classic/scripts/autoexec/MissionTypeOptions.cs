@@ -20,11 +20,11 @@ function loadMissionStage2()
 	switch$($Host::PUGpasswordAlwaysOn)
 	{
 		case 0:
-			if( $CurrentMissionType !$= "LakRabbit" )
+			if($CurrentMissionType !$= "LakRabbit")
 			{
-				if( $Host::TournamentMode && $Host::PUGautoPassword )
+				if($Host::TournamentMode && $Host::PUGautoPassword)
 					$Host::Password = $Host::PUGPassword;
-				else if( !$Host::TournamentMode )
+				else if(!$Host::TournamentMode)
 				{
 					if($Host::Password)
 						$Host::Password = "";
@@ -35,7 +35,7 @@ function loadMissionStage2()
 				//Set server mode to SPEED
 				$Host::HiVisibility = "0";
 			}
-			else if( $CurrentMissionType $= "LakRabbit" )
+			else if($CurrentMissionType $= "LakRabbit")
 			{
 				if($Host::Password)
 					$Host::Password = "";
@@ -53,7 +53,7 @@ function loadMissionStage2()
 	}
 
 	//Siege NoBaseRape Fix
-	if( $CurrentMissionType $= "Siege" )
+	if($CurrentMissionType $= "Siege")
 		$Host::NoBaseRapeEnabled = 0;
 	else
 		$Host::NoBaseRapeEnabled = 1;

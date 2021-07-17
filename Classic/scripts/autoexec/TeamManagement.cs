@@ -24,18 +24,9 @@ function CreateServer( %mission, %missionType )
 	//Call for a GetTeamCount update
 	GetTeamCounts(%game);
 
-	// Set when server starts
-	// Used to reset timelimit (if voted) when map changes
-	$DefaultTimeLimit = $Host::TimeLimit;
-
 	// Prevent package from being activated if it is already
 	if (!isActivePackage(TeamCountsTriggers))
 		activatePackage(TeamCountsTriggers);
-
-	// Auto Daily Hard Server Restart at a specific time
-	// getTimeDif from zDarkTigerStats.cs
-	if($dtStats::version)
-		schedule(getTimeDif("10\t00\tam"),0,"quit");
 }
 
 };

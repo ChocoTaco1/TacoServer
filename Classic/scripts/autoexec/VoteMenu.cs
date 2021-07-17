@@ -449,10 +449,13 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 
 		case "stopRunningVote":
-			if(%client.isSuperAdmin || (%client.isAdmin && $Host::AllowAdminStopVote))
+			if($VOStatus !$="InProgress") //Dont allow a stop vote after time has expired, then no new time is set - VoteOverTime
 			{
-				adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
-				adminLog(%client, " stopped the vote in progress.");
+				if(%client.isSuperAdmin || (%client.isAdmin && $Host::AllowAdminStopVote))
+				{
+					adminStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4);
+					adminLog(%client, " stopped the vote in progress.");
+				}
 			}
 
 		// LakRabbit Stuff

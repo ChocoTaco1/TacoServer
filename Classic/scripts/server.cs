@@ -234,6 +234,15 @@ function CreateServer(%mission, %missionType)
    // TraversalRoot Console spam fix
    if($Host::ClassicSuppressTraversalRootError)
       suppressTraversalRootPatch();
+
+   // Set when server starts
+   // Used to reset timelimit (if voted) when map changes
+   $DefaultTimeLimit = $Host::TimeLimit;
+
+   // Auto Daily Hard Server Restart at a specific time
+   // getTimeDif from zDarkTigerStats.cs
+   if($dtStats::version)
+      schedule(getTimeDif("10\t00\tam"),0,"quit"); //10AM server time
 }
 
 function initGameBots( %mission, %mType )
@@ -815,7 +824,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    //Changed to allow botskins
    %temp = detag( %skin );
    if(%temp $= "")
-   		%client.skin = addTaggedString( "base" );
+		%client.skin = addTaggedString( "base" );
    else
         %client.skin = addTaggedString( %skin );
 

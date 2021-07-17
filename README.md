@@ -21,16 +21,19 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
  - Late Time Voting
  - Vote chimes
  - Vote Restricting
- - Bug Fixes
+ - Various Bug Fixes and Exploit Fixes
  - Map Stats
  - Full Players Stats
  - In-Game Stats Viewable
+ - Discord Bot Connectivity
  - Improved Map Rotation
  - PUG password options
  - Ability to Lock Teams
  - Disable/Enable Tournament Net Client In-Game
  - LakRabbit improvements
  - Various tweaks for PUBs
+ - AFK Timeouts and Observer Kicking
+ - Improved Ban System
  - Added Deathmatch, LCTF
  - Support for Siege
  - Shocklance Only Deathmatch Mode

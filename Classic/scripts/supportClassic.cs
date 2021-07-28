@@ -46,7 +46,7 @@ function AIConnection::isMounted(%client)
 {
    %vehicle = %client.getControlObject();
    %className = %vehicle.getDataBlock().className;
-   if(%className $= WheeledVehicleData || %className $= FlyingVehicleData || %className $= HoverVehicleData) 
+   if(%className $= WheeledVehicleData || %className $= FlyingVehicleData || %className $= HoverVehicleData)
       return true;
    else
       return false;
@@ -66,19 +66,19 @@ function ForceFieldBareData::damageObject(%data, %targetObject, %position, %sour
 // Random Teams code by Founder (founder@mechina.com) 6/13/02 ///////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
-// Couple other files edited for Random Teams. 
+// Couple other files edited for Random Teams.
 // Hud.cs and DefaultGame.cs
 function AIConnection::startMission(%client)
 {
    // assign the team
    if (%client.team <= 0)
       Game.assignClientTeam(%client);
-	
+
    if(%client.lastTeam !$= "")
    {
       if(%client.team != %client.lastTeam)
          Game.AIChangeTeam( %client, %client.lastTeam );
-   }		
+   }
    // set the client's sensor group...
    setTargetSensorGroup( %client.target, %client.team );
    %client.setSensorGroup( %client.team );
@@ -179,7 +179,7 @@ datablock TriggerData(flagTrigger)
    tickPeriodMS = 10;
 };
 
-function flagTrigger::onEnterTrigger(%data, %obj, %colObj)  
+function flagTrigger::onEnterTrigger(%data, %obj, %colObj)
 {
    %flag = %obj.flag;
    if($flagStatus[%flag.team] $= "<At Base>")
@@ -313,4 +313,13 @@ function KickByCID(%client, %reason, %time)
     // Keep them out
    // if(%time != 0)
    //     BanList::add(%client.guid, %client.getAddress(), %time);
+}
+
+//More Spam
+function TSStatic::onTrigger(%this, %triggerId, %on){
+//anti console spam
+}
+
+function TSStatic::onTriggerTick(%this, %triggerId){
+//anti console spam
 }

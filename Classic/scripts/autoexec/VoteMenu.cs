@@ -10,6 +10,10 @@
 //$Host::AllowPlayerVoteTimeLimit = 1;
 //$Host::AllowPlayerVoteTournamentMode = 1;
 
+//Beginning match VoteDelay
+//Delay the ability to vote at the beginning of the match
+$VoteDelay::Time = 120000; //120000 is two minutes
+
 package ExtraVoteMenu
 {
 
@@ -67,15 +71,19 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 	//Mission Info Header - Mission Name, Type, Caps to Win
 	if(%client.canVote)
 	{
-		if($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF")
-			messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win",
-			$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win");
-		else
+		switch$($CurrentMissionType)
 		{
-			if($CurrentMissionType $= "LakRabbit") %cap = "2000 Points to Win";
-			else %cap = "25 Points to Win"; //DM
-			messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
-			$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
+			case CTF or SCtF:
+				messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win",
+				$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win");
+			case LakRabbit:
+				%cap = "2000 Points to Win";
+				messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
+				$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
+			case DM:
+				%cap = "25 Points to Win";
+				messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
+				$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
 		}
 	}
 
@@ -101,6 +109,14 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 			messageClient(%client, 'MsgVoteItem', "", %key, 'MakeObserver', "", 'Become an Observer');
 		}
 	}
+
+	//Beginning match Vote Delay
+	if(!%client.isAdmin)
+	{
+		if((getSimTime() - $VoteDelay) < $VoteDelay::Time)
+			return;
+	}
+
 	if(!%client.canVote && !%isAdmin)
 		return;
 
@@ -179,7 +195,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				else
 					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Enable Locked Teams', 'Enable Locked Teams');
 			}
-			
+
 			if(%multipleTeams)
 			{
 				if($teamDamage)
@@ -712,6 +728,9 @@ function DefaultGame::gameOver(%game)
 
 	//Reset ClassicMaxMapChangeVotes
 	deleteVariables("$CMHasVoted*"); // Eolk - let people who have voted vote again
+
+	//Beginning match Vote Delay
+	$VoteDelay = getSimTime();
 }
 
 function DefaultGame::cancelMatchStart(%game, %admin)

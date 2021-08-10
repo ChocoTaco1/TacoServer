@@ -9,10 +9,15 @@
 //$Host::AllowPlayerVoteSkipMission = 1;
 //$Host::AllowPlayerVoteTimeLimit = 1;
 //$Host::AllowPlayerVoteTournamentMode = 1;
+//$Host::AllowPlayerVoteTeamDamage = 0;
 
-//Beginning match VoteDelay
-//Delay the ability to vote at the beginning of the match
-$VoteDelay::Time = 120000; //120000 is two minutes
+//Vote Delay
+//Delay the ability to vote (For everyone) at the beginning of the match
+//$Host::VoteDelayTime = 120; //(120 is 2 mins)
+
+//Vote Cooldown
+//Time cooldown that dosnt allow a player to vote again after theyve initiated a vote
+//$Host::VoteCooldown = 120; //(120 is 2 mins)
 
 package ExtraVoteMenu
 {
@@ -113,7 +118,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 	//Beginning match Vote Delay
 	if(!%client.isAdmin)
 	{
-		if((getSimTime() - $VoteDelay) < $VoteDelay::Time)
+		if((getSimTime() - $VoteDelay) < ($Host::VoteDelayTime * 1000))
 			return;
 	}
 
@@ -133,7 +138,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				if($Host::AllowPlayerVoteTimeLimit)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 
-				if(%multipleTeams)
+				if(%multipleTeams && $Host::AllowPlayerVoteTeamDamage)
 				{
 					if($teamDamage)
 						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
@@ -333,7 +338,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 
 		case "VoteTeamDamage":
-			if(!%isAdmin)
+			if((!%isAdmin && $Host::AllowPlayerVoteTeamDamage) || (%isAdmin && %client.ForceVote)) // not admin
 			{
 				%msg = %client.nameBase @ " initiated a vote to " @ ($TeamDamage == 0 ? "enable" : "disable") @ " team damage.";
 			}

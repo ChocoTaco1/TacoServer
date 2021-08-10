@@ -187,13 +187,13 @@ $Host::AllowPlayerVoteChangeMission = 1;
 $Host::AllowPlayerVoteSkipMission = 1;
 $Host::AllowPlayerVoteTimeLimit = 1;
 $Host::AllowPlayerVoteTournamentMode = 0;
+$Host::AllowPlayerVoteTeamDamage = 0;
 $Host::NoBaseRapeEnabled = 1;														//Enable or Disable No Base Rape
 $Host::NoBaseRapePlayerCount = 14;													//Min number players the turn off No Base Rape
 $Host::AveragePings = 1;															//Show Average ping in F2 menu
 $Host::GuidCheck = 1;																//Dont allow players to join without a Guid or Name
 $Host::MinFlagRecordPlayerCount = 6;												//Min number players to allow flag record to be recorded
 $Host::ItemRespawnTime = 30;														//Time it takes for items to respawn (repairpacks)
-$Host::VoteCooldown = 120;															//Time cooldown to allow a player to vote again after a vote (120 is 2 mins)
 $Host::TKMax = 12;																	//Max tks before kick
 $Host::TKWarn1 = 4;																	//Max tks before 1st warning
 $Host::TKWarn2 = 8;																	//Max tks before 2nd warning
@@ -201,6 +201,8 @@ $Host::KickObserverStartOnJoin = 0;													//Start KickObserver Timer as so
 $Host::KickObserverTimeout = 1200;													//How long player can stay in observer before being booted (1200 is 20 mins)
 //$Host::ClassicBanlist = "prefs/banlist.cs";
 $Host::dtBanlist = "prefs/dtBanlist.cs";											//Alternate Ban System
+$Host::VoteCooldown = 120;															//Time cooldown that dosnt allow a player to vote again after theyve initiated a vote (120 is 2 mins)
+$Host::VoteDelayTime = 120;															//Delay the ability to vote (For everyone) at the beginning of the match (120 is 2 minutes)
 
 //LakRabbit
 $Host::LakRabbitUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled

@@ -2193,15 +2193,15 @@ function LakRabbitGame::leaveMissionArea(%game, %playerData, %player)
 // Do damage to a player for being outside the mission area
 function LakRabbitGame::MissionAreaDamage(%game, %player)
 {
-  if(%player.getState() !$= "Dead")
-  {
-    %player.setDamageFlash(0.1);
-    %prevHurt = %player.getDamageLevel();
-    %player.setDamageLevel(%prevHurt + 0.09);
-    %player.alertThread = %game.schedule(1000, "MissionAreaDamage", %player);
-  }
-  else
-    %game.onClientKilled(%player.client, 0, $DamageType::OutOfBounds);
+	if(%player.getState() !$= "Dead")
+	{
+		%player.setDamageFlash(0.1);
+		%prevHurt = %player.getDamageLevel();
+		%player.setDamageLevel(%prevHurt + 0.09);
+		%player.alertThread = %game.schedule(1000, "MissionAreaDamage", %player);
+	}
+	else
+		%game.onClientKilled(%player.client, 0, $DamageType::OutOfBounds);
 }
 
 // z0dd - ZOD, 10/02/02. Hack for flag collision bug.

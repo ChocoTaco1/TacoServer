@@ -39,7 +39,7 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
  - Shocklance Only Deathmatch Mode
  - Admin Logging
  - Teamkill Warnings
- - General Improvments
+ - General Improvements
 
 ---
 

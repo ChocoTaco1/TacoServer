@@ -9,6 +9,15 @@
 //$Host::AllowPlayerVoteSkipMission = 1;
 //$Host::AllowPlayerVoteTimeLimit = 1;
 //$Host::AllowPlayerVoteTournamentMode = 1;
+//$Host::AllowPlayerVoteTeamDamage = 0;
+
+//Vote Delay
+//Delay the ability to vote (For everyone) at the beginning of the match
+//$Host::VoteDelayTime = 120; //(120 is 2 mins)
+
+//Vote Cooldown
+//Time cooldown that dosnt allow a player to vote again after theyve initiated a vote
+//$Host::VoteCooldown = 120; //(120 is 2 mins)
 
 package ExtraVoteMenu
 {
@@ -48,13 +57,15 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 		{
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTournamentMode', 'change server to Tournament.', 'Vote Tournament Mode');
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
-			// if(%multipleTeams)
-			// {
-				// if($teamDamage)
-					// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-				// else
-					// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-			// }
+
+			if(%multipleTeams)
+			{
+				if($teamDamage)
+					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
+				else
+					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
+			}
+
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
 			messageClient(%client, 'MsgVoteItem',"",  %key, 'ForceVote', 'Cancel Force Vote', "Cancel 'Vote To...'");
@@ -65,15 +76,19 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 	//Mission Info Header - Mission Name, Type, Caps to Win
 	if(%client.canVote)
 	{
-		if($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF")
-			messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win",
-			$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win");
-		else
+		switch$($CurrentMissionType)
 		{
-			if($CurrentMissionType $= "LakRabbit") %cap = "2000 Points to Win";
-			else %cap = "25 Points to Win"; //DM
-			messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
-			$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
+			case CTF or SCtF:
+				messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win",
+				$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win");
+			case LakRabbit:
+				%cap = "2000 Points to Win";
+				messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
+				$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
+			case DM:
+				%cap = "25 Points to Win";
+				messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
+				$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap);
 		}
 	}
 
@@ -99,6 +114,14 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 			messageClient(%client, 'MsgVoteItem', "", %key, 'MakeObserver', "", 'Become an Observer');
 		}
 	}
+
+	//Beginning match Vote Delay
+	if(!%client.isAdmin)
+	{
+		if((getSimTime() - $VoteDelay) < ($Host::VoteDelayTime * 1000))
+			return;
+	}
+
 	if(!%client.canVote && !%isAdmin)
 		return;
 
@@ -115,13 +138,13 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				if($Host::AllowPlayerVoteTimeLimit)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 
-				// if(%multipleTeams)
-				// {
-					// if($teamDamage)
-						// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-					// else
-						// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-				// }
+				if(%multipleTeams && $Host::AllowPlayerVoteTeamDamage)
+				{
+					if($teamDamage)
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
+					else
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
+				}
 
 				if($Host::AllowPlayerVoteSkipMission)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
@@ -135,13 +158,13 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 
-				// if(%multipleTeams)
-				// {
-					// if($teamDamage)
-						// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-					// else
-						// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-				// }
+				if(%multipleTeams)
+				{
+					if($teamDamage)
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
+					else
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
+				}
 			}
 		}
 		else
@@ -177,13 +200,14 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				else
 					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Enable Locked Teams', 'Enable Locked Teams');
 			}
-			// if(%multipleTeams)
-			// {
-				// if($teamDamage)
-					// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
-				// else
-					// messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
-			// }
+
+			if(%multipleTeams)
+			{
+				if($teamDamage)
+				    messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
+				else
+					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
+			}
 
 			//Toggle Tournament Net Client
 			if(%client.isAdmin && $Host::EnableNetTourneyClient)
@@ -314,7 +338,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 
 		case "VoteTeamDamage":
-			if(!%isAdmin)
+			if((!%isAdmin && $Host::AllowPlayerVoteTeamDamage) || (%isAdmin && %client.ForceVote)) // not admin
 			{
 				%msg = %client.nameBase @ " initiated a vote to " @ ($TeamDamage == 0 ? "enable" : "disable") @ " team damage.";
 			}
@@ -709,6 +733,9 @@ function DefaultGame::gameOver(%game)
 
 	//Reset ClassicMaxMapChangeVotes
 	deleteVariables("$CMHasVoted*"); // Eolk - let people who have voted vote again
+
+	//Beginning match Vote Delay
+	$VoteDelay = getSimTime();
 }
 
 function DefaultGame::cancelMatchStart(%game, %admin)

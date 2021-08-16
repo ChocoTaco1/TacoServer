@@ -2081,7 +2081,6 @@ function LakRabbitGame::enterMissionArea(%game, %playerData, %player)
 	cancel(%player.alertThread);
 }
 
-
 // borlak -- TAKEN FROM TR2 -- thanks! :D
 function plzBounceOffGrid(%obj, %bounceForce, %count)
 {
@@ -2154,6 +2153,7 @@ function plzBounceOffGrid(%obj, %bounceForce, %count)
 		schedule(250, 0, plzBounceOffGrid, %obj, %bounceForce, %count + 1);
 	}
 }
+
 function isOutOfBounds(%position)
 {
 	%shapePos = %position;
@@ -2168,6 +2168,7 @@ function isOutOfBounds(%position)
 	return (%shapex < %boundsWest  || %shapex > %boundsEast ||
 		%shapey < %boundsNorth || %shapey > %boundsSouth);
 }
+
 function getHeight(%this)
 {
 	%z = getWord(%this.getPosition(), 2);
@@ -2190,7 +2191,6 @@ function LakRabbitGame::leaveMissionArea(%game, %playerData, %player)
 // From Arena
 // ------------------------------------------------------------------ //
 // Do damage to a player for being outside the mission area
-
 function LakRabbitGame::MissionAreaDamage(%game, %player)
 {
   if(%player.getState() !$= "Dead")

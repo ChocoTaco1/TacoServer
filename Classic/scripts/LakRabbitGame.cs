@@ -17,6 +17,9 @@
 // Thanks for helping me test!
 // maradona, pip, phantom jaguar, hilikus, the_ham, pip, wiggle, dragon, pancho villa, w/o, nectar and many others..
 //
+// v3.39 Aug 2021
+// Added Leave Mission Area Damage from Arena
+//
 // v3.38 Nov 2020
 // Added Observer GameOver (Mainly for switching to CTF)
 // Added Missile Lak Fix
@@ -2067,13 +2070,15 @@ function LakRabbitGame::resetScore(%game, %client)
 
 function LakRabbitGame::enterMissionArea(%game, %playerData, %player)
 {
-   if(%player.getState() $= "Dead")
-      return;
+	if(%player.getState() $= "Dead")
+		return;
 
-   %player.client.outOfBounds = false;
-   messageClient(%player.client, 'EnterMissionArea', '\c1You are back in the mission area.');
-   logEcho(%player.client.nameBase@" (pl "@%player@"/cl "@%player.client@") entered mission area");
-   cancel(%player.alertThread);
+	%player.client.outOfBounds = false;
+	messageClient(%player.client, 'EnterMissionArea', '\c1You are back in the mission area.');
+	logEcho(%player.client.nameBase@" (pl "@%player@"/cl "@%player.client@") entered mission area");
+
+	// Disable out of bounds kill
+	cancel(%player.alertThread);
 }
 
 
@@ -2171,7 +2176,32 @@ function getHeight(%this)
 
 function LakRabbitGame::leaveMissionArea(%game, %playerData, %player)
 {
+	if(%player.getState() $= "Dead")
+		return;
+
+	%player.client.outOfBounds = true;
+
+	// Schedule out of bounds kill
+	%player.alertThread = %game.schedule(3500, "MissionAreaDamage", %player);
+
 	plzBounceOffGrid(%player, 65);
+}
+
+// From Arena
+// ------------------------------------------------------------------ //
+// Do damage to a player for being outside the mission area
+
+function LakRabbitGame::MissionAreaDamage(%game, %player)
+{
+  if(%player.getState() !$= "Dead")
+  {
+    %player.setDamageFlash(0.1);
+    %prevHurt = %player.getDamageLevel();
+    %player.setDamageLevel(%prevHurt + 0.09);
+    %player.alertThread = %game.schedule(1000, "MissionAreaDamage", %player);
+  }
+  else
+    %game.onClientKilled(%player.client, 0, $DamageType::OutOfBounds);
 }
 
 // z0dd - ZOD, 10/02/02. Hack for flag collision bug.

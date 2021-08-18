@@ -48,3 +48,7 @@ function serverCmd(%client)
 
 	BanList::add(%client.guid, %client.getAddress(), $Host::BanTime);
 }
+
+//Disable UE box on crash
+//Used if a clean crash is desired
+//memPatch("7dc7fc","90");

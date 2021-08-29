@@ -1668,7 +1668,10 @@ function LakRabbitGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageTy
 
 function LakRabbitGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc)
 {
-// borlak - make sure victim isn't killer
+	//Make sure OOB damage is cancelled
+	cancel(%clVictim.player.alertThread);
+
+	// borlak - make sure victim isn't killer
 	if(%clKiller != %clVictim)
 	{
 		%clKiller.kills++;
@@ -1682,7 +1685,8 @@ function LakRabbitGame::onClientKilled(%game, %clVictim, %clKiller, %damageType,
 		if(Game.duelMode && %killer.player.holdingFlag && %damageType != $DamageType::Missile)
 			duelBonus(%killer);
 	}
-// borlak -- flag bug fix
+
+	// borlak -- flag bug fix
 	%clVictim.flagDeny = schedule(2500, 0, setFlagDeny, %clVictim, 0);
 
 	DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLoc);
@@ -1765,11 +1769,11 @@ function LakRabbitGame::playerDroppedFlag(%game, %player)
    %flag.searchSchedule = Game.schedule(10, "startFlagCollisionSearch", %flag);
    %game.updateFlagTransform(%flag); // z0dd - ZOD, 8/4/02, Call to KineticPoet's flag updater
 
-// borlak -- timer fix and re-catch fix
+	// borlak -- timer fix and re-catch fix
 	%player.client.flagDeny = schedule(2500, 0, setFlagDeny, %player.client, 0);
 	cancel(%player.client.duelTimer);
 
-// borlak -- give bonus for duel mode
+	// borlak -- give bonus for duel mode
 	if(%game.duelMode)
 	{
 		if(%player.lastDamageType == $DamageType::Suicide)
@@ -1861,7 +1865,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 
    if(%flag.carrier $= "")
    {
-// borlak cancel flag search and remove free diskjump
+	  // borlak cancel flag search and remove free diskjump
       cancel(%flag.searchSchedule);
 	  cancel(%game.updateFlagThread[%flag]); // z0dd - ZOD, 8/4/02. Cancel this flag's thread to KineticPoet's flag updater
       %player.freeDJ = 0;
@@ -1885,7 +1889,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
       %flag.isHome = false;
       $flagStatus = %client.name;
 
-// borlak -- points for MA flag grabs
+	  // borlak -- points for MA flag grabs
       %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
       %rayStart = %player.getWorldBoxCenter();
       %rayEnd = getWord(%rayStart, 0) SPC getWord(%rayStart, 1) SPC getWord(%rayStart, 2) - 5;
@@ -2081,7 +2085,6 @@ function LakRabbitGame::enterMissionArea(%game, %playerData, %player)
 	cancel(%player.alertThread);
 }
 
-
 // borlak -- TAKEN FROM TR2 -- thanks! :D
 function plzBounceOffGrid(%obj, %bounceForce, %count)
 {
@@ -2154,6 +2157,7 @@ function plzBounceOffGrid(%obj, %bounceForce, %count)
 		schedule(250, 0, plzBounceOffGrid, %obj, %bounceForce, %count + 1);
 	}
 }
+
 function isOutOfBounds(%position)
 {
 	%shapePos = %position;
@@ -2168,6 +2172,7 @@ function isOutOfBounds(%position)
 	return (%shapex < %boundsWest  || %shapex > %boundsEast ||
 		%shapey < %boundsNorth || %shapey > %boundsSouth);
 }
+
 function getHeight(%this)
 {
 	%z = getWord(%this.getPosition(), 2);
@@ -2190,18 +2195,17 @@ function LakRabbitGame::leaveMissionArea(%game, %playerData, %player)
 // From Arena
 // ------------------------------------------------------------------ //
 // Do damage to a player for being outside the mission area
-
 function LakRabbitGame::MissionAreaDamage(%game, %player)
 {
-  if(%player.getState() !$= "Dead")
-  {
-    %player.setDamageFlash(0.1);
-    %prevHurt = %player.getDamageLevel();
-    %player.setDamageLevel(%prevHurt + 0.09);
-    %player.alertThread = %game.schedule(1000, "MissionAreaDamage", %player);
-  }
-  else
-    %game.onClientKilled(%player.client, 0, $DamageType::OutOfBounds);
+	if(%player.getState() !$= "Dead")
+	{
+		%player.setDamageFlash(0.1);
+		%prevHurt = %player.getDamageLevel();
+		%player.setDamageLevel(%prevHurt + 0.09);
+		%player.alertThread = %game.schedule(1000, "MissionAreaDamage", %player);
+	}
+	else
+		%game.onClientKilled(%player.client, 0, $DamageType::OutOfBounds);
 }
 
 // z0dd - ZOD, 10/02/02. Hack for flag collision bug.

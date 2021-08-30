@@ -2602,7 +2602,7 @@ function serverCmdWarnPlayer(%client, %target)
       messageAllExcept(%target, -1, 'MsgAdminForce', '%1 has been warned for inappropriate conduct by %2.', %target.name, %client.name);
       messageClient(%target, 'MsgAdminForce', 'You are recieving this warning for inappropriate conduct by %1. Behave or you will be kicked..~wfx/misc/lightning_impact.wav', %client.name);
       centerprint(%target, "You are recieving this warning for inappropriate conduct.\nBehave or you will be kicked.", 10, 2);
-      logEcho(%client.nameBase @ " sent warning to " @ %target.nameBase);
+      adminLog(%client, " sent warning to " @ %target.nameBase);
    }
    else
       messageClient(%client, 'MsgError', '\c2Only Admins can use this command.');

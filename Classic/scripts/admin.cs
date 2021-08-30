@@ -485,7 +485,7 @@ function serverCmdTogglePlayerGag(%client, %who)
          messageClient(%client, 'MsgAdmin', 'You have Gagged %1.', %who.name);
          messageAllExcept(%who, -1, 'MsgAdminForce', '%1 has been Gagged by %2 for talking too much crap.', %who.name, %client.name);
          messageClient(%who, 'MsgAdminAction', 'You have Been Gagged by %1, quit talking trash and play.', %client.name);
-         logEcho(%client.nameBase @ " gagged " @ %target.nameBase, 1);
+         adminLog(%client, " gagged " @ %who.nameBase);
       }
       else if (%who.isGagged)
       {
@@ -493,7 +493,7 @@ function serverCmdTogglePlayerGag(%client, %who)
          messageClient(%client, 'MsgAdmin', 'You have UnGagged %1.', %who.name);
          messageAllExcept(%who, -1, 'MsgAdminAction', '%1 has been UnGagged by %2.', %who.name, %client.name);
          messageClient(%who, 'MsgAdminAction', 'You have Been UnGagged by %1, quit talking trash and play.', %client.name);
-         logEcho(%client.nameBase @ " ungagged " @ %who.nameBase, 1);
+         adminLog(%client, " ungagged " @ %who.nameBase);
       }
    }
    // else
@@ -523,7 +523,7 @@ function serverCmdTogglePlayerFreeze(%client, %who)
          messageClient(%client, 'MsgAdmin', 'You have Frozen %1.', %who.name);
          messageAllExcept(%who, -1, 'MsgAdminForce', '%1 has been Frozen by %2 for being a Llama.', %who.name, %client.name);
          messageClient(%who, 'MsgAdminAction', 'You have Been Frozen by %1, Think about what you have been doing.', %client.name);
-         logEcho(%client.nameBase @ " froze " @ %who.nameBase, 1);
+         adminLog(%client, " froze " @ %who.nameBase);
       }
       else if (%who.isFroze)
       {
@@ -533,7 +533,7 @@ function serverCmdTogglePlayerFreeze(%client, %who)
          messageClient(%client, 'MsgAdmin', 'You have de-iced %1.', %who.name);
          messageAllExcept(%who, -1, 'MsgAdminForce', '%1 has been Un Frozen by %2.', %who.name, %client.name);
          messageClient(%who, 'MsgAdminAction', 'You have Been de-Iced by %1, now behave.', %client.name);
-         logEcho(%client.nameBase @ " unfroze " @ %who.nameBase, 1);
+         adminLog(%client, " unfroze " @ %who.nameBase);
       }
    }
    else
@@ -557,7 +557,7 @@ function serverCmdBootToTheRear(%client, %who)
          %obj.applyImpulse(%obj.position, VectorScale(%vec, %obj.getDataBlock().mass*20));
          messageAllExcept(%who, -1, 'MsgAdminForce', '%1 has been given a boot to the rear by %2.', %who.name, %client.name);
          messageClient(%who, 'MsgAdminAction', 'You have Been given a boot to the ass by %1, now behave.', %client.name);
-         logEcho(%client.nameBase @ " gave " @ %who.nameBase @ " a boot to the rear", 1);
+         adminLog(%client, " gave " @ %who.nameBase @ " a boot to the rear");
       }
       else
       {
@@ -583,7 +583,7 @@ function serverCmdExplodePlayer(%client, %who)
          %who.player.scriptKill(0);
          messageAllExcept(%who, -1, 'MsgAdminForce', '%1 found some explosives in his pants planted by %2.', %who.name, %client.name);
          messageClient(%who, 'MsgAdminAction', 'You have Been dissasembled for inspection by the Super Admin %1, now behave.', %client.name);
-         logEcho(%client.nameBase @ " exploded " @ %who.nameBase, 1);
+         adminLog(%client, " exploded " @ %who.nameBase);
       }
       else
       {

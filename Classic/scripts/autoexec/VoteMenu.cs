@@ -152,9 +152,10 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 			{
 				if(!$MatchStarted && !$CountdownStarted)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Vote to Start the Match');
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
+
+				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
+				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
+				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 
 				if(%multipleTeams)
 				{
@@ -1499,7 +1500,7 @@ function serverCmdClientJoinGame(%client)
 {
 	if($LockedTeams)
 	{
-		messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
+		messageClient( %client, '', "Teams are locked. Ask an admin to set your team." );
 		return;
 	}
 	Parent::serverCmdClientJoinGame(%client);
@@ -1512,7 +1513,7 @@ function serverCmdClientPickedTeam(%client, %option)
 	{
 		if($Host::TournamentMode && %client.team !$= 0) //Added
 		{
-			messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
+			messageClient( %client, '', "Teams are locked. Ask an admin to set your team." );
 			serverCmdClientMakeObserver( %client );
 		}
 		return;
@@ -1523,7 +1524,7 @@ function serverCmdClientTeamChange(%client, %option)
 {
 	if($LockedTeams)
 	{
-		messageClient( %client, '', "Teams are locked. Ask the admin to set your team." );
+		messageClient( %client, '', "Teams are locked. Ask an admin to set your team." );
 		return;
 	}
 	Parent::serverCmdClientTeamChange(%client, %option);

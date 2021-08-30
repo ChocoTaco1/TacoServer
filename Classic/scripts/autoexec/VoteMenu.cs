@@ -57,6 +57,8 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 		{
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTournamentMode', 'change server to Tournament.', 'Vote Tournament Mode');
 			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
+			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
+			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
 
 			if(%multipleTeams)
 			{
@@ -66,8 +68,6 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
 			}
 
-			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
-			messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
 			messageClient(%client, 'MsgVoteItem',"",  %key, 'ForceVote', 'Cancel Force Vote', "Cancel 'Vote To...'");
 			return; // Display no further vote options
 		}
@@ -137,6 +137,8 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTournamentMode', 'Change server to Tournament.', 'Vote Tournament Mode');
 				if($Host::AllowPlayerVoteTimeLimit)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
+				if($Host::AllowPlayerVoteSkipMission)
+					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
 
 				if(%multipleTeams && $Host::AllowPlayerVoteTeamDamage)
 				{
@@ -145,15 +147,11 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					else
 						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
 				}
-
-				if($Host::AllowPlayerVoteSkipMission)
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
 			}
 			else
 			{
 				if(!$MatchStarted && !$CountdownStarted)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Vote to Start the Match');
-
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
@@ -176,6 +174,14 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Skip the Mission' );
 				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Change the Time Limit');
 
+				if(%multipleTeams)
+				{
+					if($teamDamage)
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
+					else
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
+				}
+
 				if( $Host::AllowAdminVotes )
 					messageClient(%client, 'MsgVoteItem', "", %key, 'ForceVote', 'Vote to ...', 'Vote to ...');
 			}
@@ -186,9 +192,9 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				if(!$MatchStarted && $CountdownStarted)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'cancelMatchStart', 'Cancel Match Start', 'Cancel Match Start');
 
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Change the Mission');
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Free For All Mode');
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Change the Time Limit');
+				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Change the Mission');
+				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Free For All Mode');
+				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Change the Time Limit');
 
 				if($Host::Password !$= "")
 					messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
@@ -199,21 +205,24 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Disable Locked Teams', 'Disable Locked Teams');
 				else
 					messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Enable Locked Teams', 'Enable Locked Teams');
-			}
 
-			if(%multipleTeams)
-			{
-				if($teamDamage)
-				    messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
-				else
-					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
+				if(%multipleTeams)
+				{
+					if($teamDamage)
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
+					else
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
+				}
 			}
 
 			//Toggle Tournament Net Client
-			if(%client.isAdmin && $Host::EnableNetTourneyClient)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
-			else if(%client.isAdmin)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
+			if(%client.isSuperAdmin)
+			{
+				if($Host::EnableNetTourneyClient)
+					messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
+				else
+					messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
+			}
 
 		}
 
@@ -1223,15 +1232,15 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
 
             messageClient( %client, 'MsgPlayerPopupItem', "", %key, "SendMessage", "", 'Send Private Message', 15 );
 
+			if ( %targetClient.isGagged )
+				messageClient( %client, 'MsgPlayerPopupItem', "", %key, "UnGagPlayer", "", 'UnGag Player', 17);
+			else
+				messageClient( %client, 'MsgPlayerPopupItem', "", %key, "GagPlayer", "", 'Gag Player', 17);
+
             if( %client.isSuperAdmin )
             {
                messageClient( %client, 'MsgPlayerPopupItem', "", %key, "PrintClientInfo", "", 'Client Info', 16 ); // z0dd - ZOD - MeBad, 7/13/03. Send client information.
 			   messageClient( %client, 'MsgPlayerPopupItem', "", %key, "BanPlayer", "", 'Ban', 4 );
-
-               if ( %targetClient.isGagged )
-                  messageClient( %client, 'MsgPlayerPopupItem', "", %key, "UnGagPlayer", "", 'UnGag Player', 17);
-               else
-                  messageClient( %client, 'MsgPlayerPopupItem', "", %key, "GagPlayer", "", 'Gag Player', 17);
 
                if ( %targetClient.isFroze )
                   messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ThawPlayer", "", 'Thaw Player', 18);
@@ -1241,11 +1250,10 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
                messageClient( %client, 'MsgPlayerPopupItem', "", %key, "BootPlayer", "", 'Boot to the Rear', 19);
                messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ExplodePlayer", "", 'Explode Player', 20);
             }
-            if ( !%isTargetObserver )
-            {
-               messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ToObserver", "", 'Force observer', 5 );
-            }
          }
+
+         if ( !%isTargetObserver )
+             messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ToObserver", "", 'Force observer', 5 );
       }
       if ( %isTargetSelf || %outrankTarget )
       {
@@ -1256,24 +1264,28 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
          {
             if ( %isTargetObserver )
             {
-               %action = %isTargetSelf ? "Join " : "Change to ";
-               %str1 = %action @ getTaggedString( %game.getTeamName(1) );
-               %str2 = %action @ getTaggedString( %game.getTeamName(2) );
+				%action = %isTargetSelf ? "Join " : "Change to ";
+				%str1 = %action @ getTaggedString( %game.getTeamName(1) );
+				%str2 = %action @ getTaggedString( %game.getTeamName(2) );
 
-               messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str1, 6 );
-               messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str2, 7 );
+				messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str1, 6 );
+				messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str2, 7 );
             }
             else if( %isSuperAdmin || ($Host::AllowAdminSwitchTeams && %isAdmin) )
             {
-               %changeTo = %targetClient.team == 1 ? 2 : 1;
-               %str = "Switch to " @ getTaggedString( %game.getTeamName(%changeTo) );
-               %caseId = 5 + %changeTo;
+				%changeTo = %targetClient.team == 1 ? 2 : 1;
+				%str = "Switch to " @ getTaggedString( %game.getTeamName(%changeTo) );
+				%caseId = 5 + %changeTo;
 
-               messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str, %caseId );
-
-               // z0dd - ZOD, 7/11/03. Allow Super admins to force themselves to obs.
-               messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ToObserver", "", 'Force observer', 5 );
+				messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str, %caseId );
             }
+
+			// z0dd - ZOD, 7/11/03. Allow Super admins to force themselves to obs.
+			if( %isSuperAdmin )
+			{
+				if(%isTargetSelf && !%isTargetObserver)
+					messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ToObserver", "", 'Force observer', 5 );
+			}
          }
          else if ( %isTargetObserver )
          {

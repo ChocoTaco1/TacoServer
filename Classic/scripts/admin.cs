@@ -477,7 +477,7 @@ function serverCmdGetAntiTurtleTimeList( %client, %key )
 
 function serverCmdTogglePlayerGag(%client, %who)
 {
-   if(%client.isSuperAdmin)
+   if(%client.isAdmin || %client.isSuperAdmin)
    {
       if(!%who.isGagged && !%who.isSuperAdmin)
       {
@@ -496,8 +496,8 @@ function serverCmdTogglePlayerGag(%client, %who)
          logEcho(%client.nameBase @ " ungagged " @ %who.nameBase, 1);
       }
    }
-   else
-      messageClient(%client, 'MsgError', '\c2Only Super Admins can use this command.');
+   // else
+   //    messageClient(%client, 'MsgError', '\c2Only Super Admins can use this command.');
 }
 
 function serverCmdTogglePlayerFreeze(%client, %who)

@@ -2579,7 +2579,7 @@ function serverCmdStripAdmin(%client, %admin)
       %admin.isAdmin = 0;
       %admin.isSuperAdmin = 0;
       messageClient(%admin, 'MsgStripAdminPlayer', 'You have stripped yourself of admin privledges.');
-      logEcho(%client.nameBase @ " stripped admin from " @ %admin.nameBase, 1);
+      adminLog(%client, " stripped admin from " @ %admin.nameBase);
       return;
    }
    else if(%client.isSuperAdmin)
@@ -2588,7 +2588,7 @@ function serverCmdStripAdmin(%client, %admin)
       messageClient(%admin, 'MsgStripAdminPlayer', 'You are being stripped of your admin privledges by %1.', %client.name);
       %admin.isAdmin = 0;
       %admin.isSuperAdmin = 0;
-      logEcho(%client.nameBase @ " stripped admin from " @ %admin.nameBase, 1);
+      adminLog(%client, " stripped admin from " @ %admin.nameBase);
    }
    else
       messageClient(%client, 'MsgError', '\c2Only Super Admins can use this command.');

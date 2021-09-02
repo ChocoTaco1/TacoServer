@@ -45,7 +45,7 @@
 //Small Maps
 /////////////////////////////////////////////////////////////////////
 
-//addRotationMap("SmallCrossing",				"CTF",1,1,-1,16); //Using Small Crossing: DMP Version
+//addRotationMap("SmallCrossing",				"CTF",1,1,-1,16); //Using DMP Version
 addRotationMap("TWL2_CanyonCrusadeDeluxe",		"CTF",1,1,-1,18);
 addRotationMap("RoundTheMountain",				"CTF",1,1,-1,18);
 addRotationMap("oasisintensity",				"CTF",1,1,-1,12);
@@ -74,8 +74,8 @@ addRotationMap("FrozenHope",					"CTF",1,1,8,12);
 addRotationMap("ClusterUnFuct",					"CTF",1,1,8,12);
 addRotationMap("Raspian",						"CTF",1,0,8,12);
 addRotationMap("Zilch",							"CTF",1,1,8,12);
-addRotationMap("Cinerarium",					"CTF",1,0,-1,12);
-addRotationMap("StarFallCTF",					"CTF",1,0,6,12);
+//addRotationMap("Cinerarium",					"CTF",1,0,-1,12); //Using DMP Version
+//addRotationMap("StarFallCTF",					"CTF",1,0,6,12); //Using DMP Version
 
 //Medium Maps
 /////////////////////////////////////////////////////////////////////

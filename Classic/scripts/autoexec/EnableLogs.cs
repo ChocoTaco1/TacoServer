@@ -154,3 +154,21 @@ function ClassicChatLog(%client, %id, %team, %msg)
    %path = $Host::ClassicChatLogPath @ formatTimeString("/yy/mm-MM/dd.log");
    export("$ClassicChatLog", %path, true);
 }
+
+// Log Teamkills
+function teamkillLog(%victimID, %killerID)
+{
+   if(!$Host::ClassicTeamKillLog)
+      return;
+
+   //echo("TK Log");
+
+   //Note: %killerID.teamkills + 1 as this is added later
+   $teamkillLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %killerID.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %killerID.guid @ ") teamkilled" SPC %victimID.nameBase SPC "and has" SPC (%killerID.teamkills + 1) SPC "tks. CM[" @ $CurrentMission @ "]";
+   $teamkillLog = stripChars($teamkillLog, "\c0\c1\c2\c3\c4\c5\c6\c7\c8\c9\x10\x11\co\cp");
+
+	%logpath = $Host::ClassicTeamKillLogPath;
+   export("$teamkillLog", %logpath, true);
+	logEcho($teamkillLog);
+	echo($teamkillLog);
+}

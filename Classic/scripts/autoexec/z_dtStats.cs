@@ -84,7 +84,7 @@ $Host::ShowIngamePlayerScores  = 1;
 
 //debug stuff
 $dtStats::enableRefresh = 0;
-$dtStats::debugEchos = 1;// echos function calls
+$dtStats::debugEchos = 0;// echos function calls
 
 //$dtStats::returnToMenuTimer = (303*1000);
 //$pref::NoClearConsole = 1;

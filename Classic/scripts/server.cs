@@ -241,8 +241,8 @@ function CreateServer(%mission, %missionType)
 
    // Auto Daily Hard Server Restart at a specific time
    // getTimeDif from zDarkTigerStats.cs
-   if($dtStats::version)
-      schedule(getTimeDif("10\t00\tam"),0,"quit"); //10AM server time
+   if($dtStats::version && $Host::ClassicDailyHardRestart)
+      schedule(getTimeDif($Host::ClassicDailyHardRestartTime),0,"quit");
 }
 
 function initGameBots( %mission, %mType )

@@ -205,6 +205,8 @@ $Host::VoteCooldown = 120;															//Time cooldown that dosnt allow a play
 $Host::VoteDelayTime = 120;															//Delay the ability to vote (For everyone) at the beginning of the match (120 is 2 minutes)
 $Host::ClassicTeamKillLog = 1;                                                      //Enable/Disable Teamkill Logging
 $Host::ClassicTeamKillLogPath = "logs/TeamKills/teamkills.log";                     //TeamKill Log Path
+$Host::ClassicDailyHardRestart = 0;                                                 //Enable/Disable Daily Hard Restart
+$Host::ClassicDailyHardRestartTime = "10\t00\tam";                                  //Hard Restart Server Time Ex:10am
 
 //LakRabbit
 $Host::LakRabbitUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled

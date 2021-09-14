@@ -3,15 +3,22 @@
 package TKwarn
 {
 
-
 // From Evo
 function DefaultGame::testTeamKill(%game, %victimID, %killerID)
-{
+{ 
    %tk = Parent::testTeamKill(%game, %victimID, %killerID);
    if(!%tk)		
       return false; // is not a tk
+
+   // No Bots
+   if(%killerID.isAIcontrolled() || %victimID.isAIcontrolled())
+      return true;
+
+   // Log TeamKill
+   teamkillLog(%victimID, %killerID);
   
-   if($Host::TournamentMode || %killerID.isAdmin || %killerID.isAIcontrolled() || %victimID.isAIcontrolled())
+   // No Admins
+   if(%killerID.isAdmin)
       return true;
 
    // Ignore this map

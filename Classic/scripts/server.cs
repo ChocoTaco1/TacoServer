@@ -2579,7 +2579,7 @@ function serverCmdStripAdmin(%client, %admin)
       %admin.isAdmin = 0;
       %admin.isSuperAdmin = 0;
       messageClient(%admin, 'MsgStripAdminPlayer', 'You have stripped yourself of admin privledges.');
-      logEcho(%client.nameBase @ " stripped admin from " @ %admin.nameBase, 1);
+      adminLog(%client, " stripped admin from " @ %admin.nameBase);
       return;
    }
    else if(%client.isSuperAdmin)
@@ -2588,7 +2588,7 @@ function serverCmdStripAdmin(%client, %admin)
       messageClient(%admin, 'MsgStripAdminPlayer', 'You are being stripped of your admin privledges by %1.', %client.name);
       %admin.isAdmin = 0;
       %admin.isSuperAdmin = 0;
-      logEcho(%client.nameBase @ " stripped admin from " @ %admin.nameBase, 1);
+      adminLog(%client, " stripped admin from " @ %admin.nameBase);
    }
    else
       messageClient(%client, 'MsgError', '\c2Only Super Admins can use this command.');
@@ -2602,7 +2602,7 @@ function serverCmdWarnPlayer(%client, %target)
       messageAllExcept(%target, -1, 'MsgAdminForce', '%1 has been warned for inappropriate conduct by %2.', %target.name, %client.name);
       messageClient(%target, 'MsgAdminForce', 'You are recieving this warning for inappropriate conduct by %1. Behave or you will be kicked..~wfx/misc/lightning_impact.wav', %client.name);
       centerprint(%target, "You are recieving this warning for inappropriate conduct.\nBehave or you will be kicked.", 10, 2);
-      logEcho(%client.nameBase @ " sent warning to " @ %target.nameBase);
+      adminLog(%client, " sent warning to " @ %target.nameBase);
    }
    else
       messageClient(%client, 'MsgError', '\c2Only Admins can use this command.');

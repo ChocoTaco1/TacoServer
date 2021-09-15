@@ -160,21 +160,17 @@ function chatCmd(%client, %message) //%client is sender
 				messageAll('message', 'AI is now disabled.');
 			}
 
-       case "/AIQ":
-			if(%client.isSuperAdmin || %client.isAdmin)
-			{
-				%b = getWord(%message,1);
-            if(%b == 1)
-			{
+		case "/aichat":
+			if(%client.isSuperAdmin || %client.isAdmin){
+			if(!$AIDisableChat){
 				$AIDisableChat = 1;
-                messageClient(%client, 'msgChatCmd', '\c2AI Chat Disabled.');
-            }
-            else
-			{
+				messageAll('message', '\c2AI Chat Disable');
+			}
+			else{
 				$AIDisableChat = 0;
-				messageClient(%client, 'msgChatCmd', '\c2AI Chat Enabled.');
-            }
-         }
+				messageAll('message', '\c2AI Chat Enable');
+			}
+		}
 
 	   case "/spookysky":
          if(%client.isAdmin || %client.isSuperAdmin )

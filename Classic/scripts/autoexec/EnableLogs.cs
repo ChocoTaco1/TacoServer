@@ -161,10 +161,24 @@ function teamkillLog(%victimID, %killerID)
    if(!$Host::ClassicTeamKillLog)
       return;
 
-   //echo("TK Log");
-
+   //Killer tks / Victim tks
    //Note: %killerID.teamkills + 1 as this is added later
-   $teamkillLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %killerID.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %killerID.guid @ ") teamkilled" SPC %victimID.nameBase SPC "and has" SPC (%killerID.teamkills + 1) SPC "tks. CM[" @ $CurrentMission @ "]";
+   %ktk = %killerID.teamkills + 1;
+   %vtk = %victimID.teamkills;
+
+   //Stage in warnings
+   %s = "";
+   if(!%killerID.isAdmin) //Admins dont get warnings
+   {
+      if(%ktk >= $Host::TKWarn1 && %ktk < $Host::TKWarn2)
+         %s = "[Warned]";
+      else if(%ktk >= $Host::TKWarn2 && %ktk < $Host::TKMax) 
+         %s = "[Warned 2]";
+      else if(%ktk >= $Host::TKMax)
+         %s = "[Kicked]";
+   }
+   
+   $teamkillLog = %s @ formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %killerID.nameBase @ " (" @ %killerID.guid @ ")[" @ %ktk @ " tks] teamkilled" SPC %victimID.nameBase @ "[" @ %vtk @ " tks]. #P[" @ $HostGamePlayerCount @ "]" SPC "CM[" @ $CurrentMission @ "]";
    $teamkillLog = stripChars($teamkillLog, "\c0\c1\c2\c3\c4\c5\c6\c7\c8\c9\x10\x11\co\cp");
 
 	%logpath = $Host::ClassicTeamKillLogPath;

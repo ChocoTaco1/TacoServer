@@ -2891,17 +2891,15 @@ function Armor::applyConcussion( %this, %dist, %radius, %sourceObject, %targetOb
    }
    else
    {   
-      %flagChance = 0.7;
-      %itemChance = 0.7;   
+      %flagChance = 0.75;
+      %itemChance = 0.75;   
    }
    
    %probabilityFlag = %flagChance * %percentage;
    %probabilityItem = %itemChance * %percentage;   
    
    if( %random <= %probabilityFlag )
-   {   
-      Game.applyConcussion( %targetObject );
-   }    
+      Game.applyConcussion( %targetObject ); 
    
    if( %random <= %probabilityItem )
    {

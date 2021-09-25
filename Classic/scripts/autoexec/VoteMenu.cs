@@ -811,12 +811,12 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
       messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Total: %3 [%4%5]', %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, mfloor((%game.votesFor[%game.kickTeam] / %totalVotes) * 100), "%", %key);
    }
 
+   if(%cause $= "(admin)")
+	  adminLog(%admin, " kicked " @ %game.kickClientNameBase @ " (" @ %game.kickGuid @ ")");
+
    %game.kickTeam = "";
    %game.kickGuid = "";
    %game.kickClientName = "";
-
-   if(%cause !$= "")
-      logEcho($AdminCl.nameBase @ ": " @ %name @ " (cl " @ %game.kickClient @ ") kicked " @ %cause, 1);
 }
 
 //------------------------------------------------------------------------------

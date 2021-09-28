@@ -917,8 +917,10 @@ function Player::setKnockback(%this, %val)
 //    }
 //}
 
+};
+
 //Put everyone on NonRabbit Team
-function DefaultGame::missionLoadDone(%game)
+function LakRabbitGame::missionLoadDone(%game)
 {
 	for(%i = 0; %i < ClientGroup.getCount(); %i++)
 	{
@@ -935,8 +937,6 @@ function DefaultGame::missionLoadDone(%game)
 
 	parent::missionLoadDone(%game);
 }
-
-};
 
 // Added
 function LakRabbitGame::AIInit(%game)
@@ -1925,11 +1925,11 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
          %game.showRabbitWaypoint(%player.client);
       }
 
-// borlak - make rabbit invincible for 2 seconds ..
+ 	  // borlak - make rabbit invincible for 2 seconds ..
       %player.setInvincible(true);
       %player.schedule(2000, "setInvincible", false);
 
-// duel mode
+	  // duel mode
       if(%game.duelMode)
       {
          %player.client.duelTimer = schedule(1000, 0, checkDuelTimer, %player.client);
@@ -2032,11 +2032,11 @@ function LakRabbitGame::gameOver(%game)
          cancel(%client.waypointSchedule);
       cancel(%client.duelTimer);
 
-	  if(%client.team $=0)
-	  	%client.lakobs = 1;
-
 	  //Put everyone in observer
 	  //Mainly for switching to CTF
+	  if(%client.team $=0)
+	  	  %client.lakobs = 1;
+
 	  %client.team = 0;
 	  %client.lastTeam = 0;
    }
@@ -2045,9 +2045,9 @@ function LakRabbitGame::gameOver(%game)
    if($Host::LakRabbitShowFlagIcon == 0 && $Host::LakRabbitShowFlagTask)
       cancel(%game.waypointSchedule);
 
-// borlak -- delete variables
-   deleteVariables("$LakFired*");
-   deleteVariables("$LakDamaged*");
+	// borlak -- delete variables
+   	deleteVariables("$LakFired*");
+   	deleteVariables("$LakDamaged*");
 }
 
 function LakRabbitGame::resetScore(%game, %client)

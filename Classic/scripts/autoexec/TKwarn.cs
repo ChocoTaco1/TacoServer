@@ -121,7 +121,7 @@ function TKkick( %client, %admin, %guid )
 // Info: Auto start a new vote
 function TKvote(%typeName, %arg1, %arg2, %arg3, %arg4)
 {  
-   // works only for kicking players or skipping mission
+   // works only for kicking players
    if(%typeName !$= "VoteKickPlayer")
       return;
 

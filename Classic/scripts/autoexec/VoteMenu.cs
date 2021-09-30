@@ -844,6 +844,7 @@ function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typ
       messageAll('MsgAdminChangeMission', '\c2The Admin %3 has changed the mission to %1 (%2).', %missionDisplayName, %typeDisplayName, %admin.name );
       %game.gameOver();
       loadMission( %mission, %missionType, false );
+	  adminLog(%admin, " has changed the mission to " @ %missionDisplayName @ " (" @ %typeDisplayName @ ")");
    }
    else
    {
@@ -898,6 +899,7 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
    if (isObject(%admin))
    {
       messageAll( 'MsgAdminForce', '\c2The Admin %2 has switched the server to Tournament mode (%1).', %missionDisplayName, %admin.name );
+	  adminLog(%admin, " has switched the server to Tournament mode. " @ %missionDisplayName @ " (" @ %typeDisplayName @ ")");
       setModeTournament( %mission, %missionType );
    }
    else
@@ -947,6 +949,7 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
    {
       messageAll( 'MsgAdminForce', '\c2The Admin %2 changed the mission time limit to %1 minutes.', %display, %admin.name );
       $Host::TimeLimit = %newLimit;
+	  adminLog(%admin, " has changed the mission time limit to " @ %display @ " minutes.");
    }
    else
    {
@@ -1005,6 +1008,7 @@ function DefaultGame::voteFFAMode( %game, %admin, %client )
    if(isObject(%admin))
    {
       messageAll('MsgAdminForce', '\c2The Admin %1 has switched the server to Free For All mode.', %admin.name);
+	  adminLog(%admin, " has switched the server to Free For All mode.");
       setModeFFA($CurrentMission, $CurrentMissionType);
    }
    else
@@ -1028,6 +1032,7 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
    if(isObject(%admin))
    {
       messageAll('MsgAdminForce', '\c2The Admin %1 has skipped to the next mission.',%admin.name );
+	  adminLog(%admin, " has skipped to the next mission.");
       %game.gameOver();
       //loadMission( findNextCycleMission(), $CurrentMissionType, false );
       cycleMissions();
@@ -1117,12 +1122,14 @@ function DefaultGame::voteTeamDamage(%game, %admin)
          messageAll('MsgAdminForce', '\c2The Admin %1 has disabled team damage.', %admin.name);
          $Host::TeamDamageOn = $TeamDamage = 0;
          %setto = "disabled";
+		 adminLog(%admin, " has disabled team damage.");
       }
       else
       {
          messageAll('MsgAdminForce', '\c2The Admin %1 has enabled team damage.', %admin.name);
          $Host::TeamDamageOn = $TeamDamage = 1;
          %setto = "enabled";
+		 adminLog(%admin, " has enabled team damage.");
       }
    }
    else

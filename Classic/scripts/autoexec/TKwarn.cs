@@ -175,12 +175,4 @@ function TKvote(%typeName, %arg1, %arg2, %arg3, %arg4)
 
    // Log Vote
    voteLog(%client, %typeName, %arg1, %arg2, %arg3, "TeamkillAutovote");
-
-   if($Host::EnableVoteSoundReminders > 0)
-   {
-		%time = mFloor($Host::VoteTime / ($Host::EnableVoteSoundReminders + 1)) * 1000;
-		//echo(%time);
-		for(%i = 0; %i < $Host::EnableVoteSoundReminders; %i++)
-				Game.voteReminder[%i] = schedule((%time * (%i + 1)), 0, "VoteSound", %game, %typename, %arg1, %arg2);
-   }
 }

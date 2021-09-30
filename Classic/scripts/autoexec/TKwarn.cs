@@ -4,7 +4,7 @@ package TKwarn
 {
 
 // From Evo
-function DefaultGame::testTeamKill(%game, %victimID, %killerID)
+function DefaultGame::testTeamKill(%game, %victimID, %killerID, %damageType)
 { 
    if(!$countdownStarted && !$MatchStarted)
       return;
@@ -18,7 +18,7 @@ function DefaultGame::testTeamKill(%game, %victimID, %killerID)
      return true;
 
    // Log TeamKill
-   teamkillLog(%victimID, %killerID);
+   teamkillLog(%victimID, %killerID, %damageType);
   
    // No Admins
    if(%killerID.isAdmin)
@@ -92,7 +92,7 @@ function TKkick( %client, %admin, %guid )
                if ( isObject( %cl ) )
                {
                   %client.setDisconnectReason( "You have been kicked out of the game for teamkilling." ); // z0dd - ZOD, 7/13/03. Tell who kicked
-	              %cl.schedule(700, "delete");
+	               %cl.schedule(700, "delete");
                }
 			 // ban by IP as well
 	         BanList::add( %guid, %client.getAddress(), $Host::KickBanTime );

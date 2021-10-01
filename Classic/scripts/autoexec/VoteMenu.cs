@@ -782,16 +782,17 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
    {
       %team = %client.team;
       %totalVotes = %game.votesFor[%game.kickTeam] + %game.votesAgainst[%game.kickTeam];
+	  %cause = "(vote)";
       if(%totalVotes > 0 && (%game.votesFor[%game.kickTeam] / %totalVotes) > ($Host::VotePasspercent / 100))
       {
 		 kick(%client, %admin, %game.kickGuid);
-         %cause = "(vote)";
 
 		 %key = "Passed";
       }
       else
       {
-         for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
+         
+		 for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
          {
             %cl = ClientGroup.getObject( %idx );
 

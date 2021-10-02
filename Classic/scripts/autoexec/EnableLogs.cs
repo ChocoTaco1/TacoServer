@@ -76,7 +76,7 @@ function voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
 	  
 	  // show name for Votekick
 	  if(%typeName $= "VoteKickPlayer")
-		   %arg1 = %arg1.nameBase;
+		   %arg1 = %arg1.nameBase @ "[" @ %arg1.teamkills + 1 @ "tks]";
 
       // this is the info that will be logged
       $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4 SPC "CM[" @ $CurrentMission @ "]";

@@ -2585,6 +2585,7 @@ package dtStatsGame{
    function SCtFGame::flagCap(%game, %player){
       if($dtStats::Enable){
          %flag = %player.holdingFlag;
+         %clTeam = %player.client.team;
          %dtStats = %player.client.dtStats;
          %time = ((getSimTime() - $missionStartTime)/1000)/60;
           if(%clTeam == 1){

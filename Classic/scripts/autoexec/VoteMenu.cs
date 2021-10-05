@@ -330,7 +330,10 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 
 		case "BanPlayer":
 			if(%client.isSuperAdmin && !%arg1.isSuperAdmin) // we're a super admin, and our target isn't a super admin
+			{
 				ban(%arg1, %client); // ban 'em
+				adminLog(%client, " has banned" SPC %arg1.nameBase @ "(" @ %arg1.guid @ ").");
+			}
 			return; // stop the function in its tracks
 
 		case "VoteChangeMission":
@@ -821,7 +824,7 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
    }
 
    if(%cause $= "(admin)")
-	  adminLog(%admin, " kicked " @ %game.kickClientNameBase @ " (" @ %game.kickGuid @ ")");
+	  adminLog(%admin, " kicked " @ %game.kickClientNameBase @ " (" @ %game.kickGuid @ ").");
 
    %game.kickTeam = "";
    %game.kickGuid = "";

@@ -290,7 +290,15 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				}
 
 				%msg = %client.nameBase @ " initiated a vote to kick player " @ %arg1.nameBase @ ".";
-				messageAdmins("", "\c5[A]\c1"@ %msg @"~wgui/objective_notification.wav");
+
+				//Notify any admins on the other team
+				for(%i = 0; %i < ClientGroup.getCount(); %i++) 
+				{
+					%cl = ClientGroup.getObject(%i);
+					if(%cl.isAdmin == true && %cl.team !$= %arg1.team) //Not on admins team
+						messageClient(%cl, '', '\c5[A]\c0%1 initiated a vote to kick player %2 on the other team.~wgui/objective_notification.wav', %client.nameBase, %arg1.nameBase);
+				}
+
 				$CMHasVoted[%client.guid]++;
 			}
 
@@ -414,7 +422,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			if((!%isAdmin && $Host::AllowPlayerVoteTimeLimit) || (%isAdmin && %client.ForceVote))
 			{
 				if(%arg1 $= "999") %time = "unlimited"; else %time = %arg1;
-				%msg = %client.nameBase @ " initiated a vote to change the time limit to " @ %time @ ".";
+				%msg = %client.nameBase @ " initiated a vote to change the time limit to " @ %time SPC "minutes.";
 				// VoteOvertime
 				StartVOTimeVote(%game);
 				$CMHasVoted[%client.guid]++;
@@ -733,7 +741,7 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
 		%time = mFloor($Host::VoteTime / ($Host::EnableVoteSoundReminders + 1)) * 1000;
 		//echo(%time);
 		for(%i = 0; %i < $Host::EnableVoteSoundReminders; %i++)
-				Game.voteReminder[%i] = schedule((%time * (%i + 1)), 0, "VoteSound", %game, %typename, %arg1, %arg2);
+				Game.voteReminder[%i] = schedule((%time * (%i + 1)), 0, "VoteSound", %teamSpecific, %typename, %arg1, %arg2, %msg);
    }
 }
 
@@ -809,7 +817,7 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
 	  //Log Vote %
 	  votePercentLog(%client, %typeName, %key, %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, %game.totalVotesNone);
 	  //Show Vote %
-      messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Total: %3 [%4%5]', %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, mfloor((%game.votesFor[%game.kickTeam] / %totalVotes) * 100), "%", %key);
+      messageTeam(%game.kickTeam, "", '\c1Vote %6: \c0Yea: %1 Nay: %2 Total: %3 [%4%5]', %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, mfloor((%game.votesFor[%game.kickTeam] / %totalVotes) * 100), "%", %key);
    }
 
    if(%cause $= "(admin)")
@@ -1493,6 +1501,10 @@ function resetViewSchedule(%client)
   %client.schedViewRules = "";
 }
 
+// Prevent package from being activated if it is already
+if (!isActivePackage(ExtraVoteMenu))
+    activatePackage(ExtraVoteMenu);
+
 // Locked Teams code (Tournament Mode Only)
 // Doesnt allow players Joining the server late to join teams when enable, disables when server if switched back to free for all mode
 
@@ -1540,6 +1552,46 @@ function serverCmdClientTeamChange(%client, %option)
 
 };
 
-// Prevent package from being activated if it is already
-if (!isActivePackage(ExtraVoteMenu))
-    activatePackage(ExtraVoteMenu);
+// VoteSound Script
+//
+// Make a sound every so seconds to make sure everyone votes
+//
+// Enable or Disable VoteSound
+// $Host::EnableVoteSoundReminders = 3;
+// 3 for three reminder notifications
+
+function VoteSound(%teamSpecific, %typename, %arg1, %arg2, %msg)
+{	
+	if(Game.scheduleVote !$= "" && $Host::EnableVoteSoundReminders > 0) //Game.scheduleVote !$= "" is if vote is active
+	{
+		%vip = "Vote in Progress:";
+		//%yn = "Press Insert for Yes or Delete for No.";
+		
+		switch$(%typeName)
+		{
+			case "VoteKickPlayer":
+				if(%arg1.team != 0 && Game.numTeams > 1) //Not observer
+				{
+				   for(%i = 0; %i < ClientGroup.getCount(); %i++) 
+				   {
+					  	%cl = ClientGroup.getObject(%i);
+						if (%cl.isAdmin == true)
+						{ 
+							if(%cl.team !$= %arg1.team) //Not on admins team
+								messageClient(%cl, '', '\c5[A]\c1%1 \c0To kick %2 on the other team.~wgui/objective_notification.wav', %vip, %arg1.name);
+							else //Is on admins team
+								messageClient(%cl, '', '\c1%1 \c0%2 %3~wgui/objective_notification.wav', %vip, %msg, %yn);
+						}
+						else if(%cl.team $= %arg1.team)
+							messageClient(%cl, '', '\c1%1 \c0%2 %3~wgui/objective_notification.wav', %vip, %msg, %yn);
+					}
+				}
+				else //is observer
+					messageAll('', '\c1%1 \c0%2 %3~wgui/objective_notification.wav', %vip, %msg, %yn);
+				echo(%vip SPC %msg);
+			default:
+				messageAll('', '\c1%1 \c0%2 %3~wgui/objective_notification.wav', %vip, %msg, %yn);
+				echo(%vip SPC %msg);
+		}
+	}
+}

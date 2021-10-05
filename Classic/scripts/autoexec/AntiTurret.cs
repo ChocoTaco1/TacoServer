@@ -17,22 +17,14 @@ package AntiTurret
 
 function TurretData::selectTarget(%this, %turret)
 {
-	if( !$Host::TournamentMode && $TotalTeamPlayerCount < $Host::EnableTurretPlayerCount )
-	{
+	if(!$Host::TournamentMode && $TotalTeamPlayerCount < $Host::EnableTurretPlayerCount)
 		%turret.clearTarget();
-	}
 	else
 	{
-		//All turret types can fire
-		if( $Host::EnableMortarTurret )
-		{
+		if($Host::EnableMortarTurret) //All turret types can fire
 			parent::selectTarget(%this, %turret);
-		}
-		//Only non-MortarTurret types can fire
-		else if( %turret.initialBarrel !$= "MortarBarrelLarge" )
-		{
+		else if(%turret.initialBarrel !$= "MortarBarrelLarge") //Only non-MortarTurret types can fire
 			parent::selectTarget(%this, %turret);
-		}
     }
 }
 

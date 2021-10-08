@@ -581,9 +581,9 @@ function ELFProjectileData::targetDestroyedCancel(%data, %projectile, %target, %
 
 function ELFProjectile::checkELFStatus(%this, %data, %target, %targeter)
 {
-   %class = %targeter.getClassName();
    if(isObject(%target) && isObject(%targeter)) //Added %targeter for niche cases
    {
+      %class = %targeter.getClassName();
       if(%target.getDamageState() $= "Destroyed")
       {
          %data.targetDestroyedCancel(%this, %target, %targeter);

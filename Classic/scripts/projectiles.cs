@@ -393,7 +393,7 @@ function TargetingLaserImage::onFire(%data,%obj,%slot)
 
 function ShockLanceImage::onFire(%this, %obj, %slot)
 {
-	//Added Spawn Invinciblity check
+	// Added Spawn Invinciblity check
 	if(%obj.client > 0)
 	{
 		%obj.setInvincibleMode(0, 0.00);
@@ -582,7 +582,7 @@ function ELFProjectileData::targetDestroyedCancel(%data, %projectile, %target, %
 function ELFProjectile::checkELFStatus(%this, %data, %target, %targeter)
 {
    %class = %targeter.getClassName();
-   if(isObject(%target))
+   if(isObject(%target) && isObject(%targeter)) //Added %targeter for niche cases
    {
       if(%target.getDamageState() $= "Destroyed")
       {

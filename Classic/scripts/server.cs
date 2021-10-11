@@ -1000,40 +1000,36 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
 	   }
    }
 
-   // %stuff = getIPAddress(%client);
-   // if(strstr(%stuff, "70.240.") == 0)
-   // {
-		// %newPart = getSubStr(%stuff, 7, 255);
-		// %next = strstr(%newPart, ".");
-		// %thirdBlock = getSubStr(%stuff, 7, %next);
+   %stuff = getIPAddress(%client);
+   if(strstr(%stuff, "166.137.") == 0)
+   {
+		%newPart = getSubStr(%stuff, 7, 255);
+		%next = strstr(%newPart, ".");
+		%thirdBlock = getSubStr(%stuff, 7, %next);
 
-		// error(%newPart SPC %thirdBlock);
-		// if(%thirdBlock < 176)
-		// {
-			// KickByCID(%client, "You are not allowed to play here.");
-			// Banlist::Add(%client.guid, "0", $Host::BanTime);
+		error(%newPart SPC %thirdBlock);
+		if(%thirdBlock < 105)
+		{
+			KickByCID(%client, "You are not allowed to play here.");
+			Banlist::Add(%client.guid, "0", $Host::BanTime);
+			//ClassicAddBan(%client.namebase, %client.guid);
+			return;
+		}
+   }
+   else if(strstr(%stuff, "166.177.") == 0)
+   {
+		%newPart = getSubStr(%stuff, 7, 255);
+		%next = strstr(%newPart, ".");
+		%thirdBlock = getSubStr(%stuff, 7, %next);
 
-			// ClassicAddBan(%client.namebase, %client.guid);
-
-			// return;
-		// }
-   // }
-   // else if(strstr(%stuff, "69.151.") == 0)
-   // {
-		// %newPart = getSubStr(%stuff, 7, 255);
-		// %next = strstr(%newPart, ".");
-		// %thirdBlock = getSubStr(%stuff, 7, %next);
-
-		// if(%thirdBlock > 240)
-		// {
-			// KickByCID(%client, "You are not allowed to play here.");
-			// Banlist::Add(%client.guid, "0", $Host::BanTime);
-
-			// ClassicAddBan(%client.namebase, %client.guid);
-
-			// return;
-		// }
-   // }
+		if(%thirdBlock > 121)
+		{
+			KickByCID(%client, "You are not allowed to play here.");
+			Banlist::Add(%client.guid, "0", $Host::BanTime);
+			//ClassicAddBan(%client.namebase, %client.guid);
+			return;
+		}
+   }
 
    // Whitelist check is in here.
    %banned = ClassicIsBanned(%client);

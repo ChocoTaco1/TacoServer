@@ -634,6 +634,8 @@ function ELFProjectile::checkELFStatus(%this, %data, %target, %targeter)
    }
 }
 
+//Rework to prevent explosions from happening inside geometry
+$expMode = 1;
 function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse, %sourceObject, %damageType)
 {
    InitContainerRadiusSearch(%position, %radius, $TypeMasks::PlayerObjectType      |
@@ -672,32 +674,58 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
             }
          }
       }
-      %targets[%numTargets]     = %targetObject;
-      %targetDists[%numTargets] = %dist;
-      %numTargets++;
-   }
-
-   for (%i = 0; %i < %numTargets; %i++)
-   {
-      %targetObject = %targets[%i];
-      %dist = %targetDists[%i];
-      if(isObject(%targetObject)) // z0dd - ZOD, 5/18/03 Console spam fix.
+      if(isObject(%targetObject))
       {
-         %coverage = calcExplosionCoverage(%position, %targetObject,
-                                          ($TypeMasks::InteriorObjectType |
-                                           $TypeMasks::TerrainObjectType |
-                                           $TypeMasks::ForceFieldObjectType |
-                                           $TypeMasks::VehicleObjectType));
+         %covMode = $expMode;
+         // calcExplosionCoverage done inversely to remove edge cases of were explosions can clip into meshes
+         switch(%covMode){ //miscf stackable //0 1 0 161.574
+            case 1:
+               %coverage = 1; // test for any blocking objects
+               %ray = ContainerRayCast(%targetObject.getWorldBoxCenter(), %position, ($TypeMasks::InteriorObjectType |
+                                             $TypeMasks::StaticObjectType |
+                                              $TypeMasks::TerrainObjectType |
+                                              $TypeMasks::ForceFieldObjectType |
+                                              $TypeMasks::VehicleObjectType), %targetObject);
+               if(%ray){
+                  %hitObj = getWord(%ray,0);
+                  if(%hitObj.getType() & $TypeMasks::StaticObjectType){//miscf and stackable is offton used as walls and decore  best to block damage
+                     if(strPos(%hitObj.shapeName, "miscf") != -1 || strPos(%hitObj.shapeName, "stackable") != -1){
+                        %coverage = 0; 
+                     }
+                  }
+                  if(%coverage){//up and over test but ignore staticshapes as they not ment to block explosions
+                     %upray = ContainerRayCast(%position, vectorAdd(%position, "0 0 1"), ($TypeMasks::InteriorObjectType |
+                                             $TypeMasks::TerrainObjectType |
+                                             $TypeMasks::ForceFieldObjectType |
+                                             $TypeMasks::VehicleObjectType), %targetObject); 
+                     if(!%upray){
+                        %rayto = ContainerRayCast( %targetObject.getWorldBoxCenter(), vectorAdd(%position, "0 0 1"), ($TypeMasks::InteriorObjectType |
+                                             $TypeMasks::TerrainObjectType |
+                                             $TypeMasks::ForceFieldObjectType |
+                                             $TypeMasks::VehicleObjectType), %targetObject); 
+                        %coverage = !(%rayto);
+                     }
+                     else{
+                        %coverage = 0;  
+                     }
+                                             
+                  }  
+               }
+            // default function
+            default:
+               %coverage = calcExplosionCoverage(%position, %targetObject,
+                                             ($TypeMasks::InteriorObjectType |
+                                              $TypeMasks::TerrainObjectType |
+                                              $TypeMasks::ForceFieldObjectType |
+                                              $TypeMasks::VehicleObjectType));
+            
+         }
+
          if (%coverage == 0)
             continue;
 
-         //if ( $splashTest )
-            %amount = (1.0 - ((%dist / %radius) * 0.88)) * %coverage * %damage;
-         //else
-            //%amount = (1.0 - (%dist / %radius)) * %coverage * %damage;
+         %amount = (1.0 - ((%dist / %radius) * 0.88)) * %coverage * %damage;
 
-         //error( "damage: " @ %amount @ " at distance: " @ %dist @ " radius: " @ %radius @ " maxDamage: " @ %damage );
-      
          %data = %targetObject.getDataBlock();
          %className = %data.className;
 
@@ -718,7 +746,7 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
                }
                else if (%damageType == $DamageType::Mortar)
                {
-            	%impulse = 5750;
+            	   %impulse = 5750;
                }
             }
             //------------------------------------------------------------------------------
@@ -726,7 +754,7 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
             %impulseVec = VectorScale(%momVec, %impulse * (1.0 - (%dist / %radius)));
             %doImpulse = true;
          }
-         else if( %className $= FlyingVehicleData || %className $= HoverVehicleData ) // Removed WheeledVehicleData. z0dd - ZOD, 4/24/02. Do not allow impulse applied to MPB, conc MPB bug fix.
+         else if( %className $= "FlyingVehicleData" || %className $= "HoverVehicleData" ) // Removed WheeledVehicleData. z0dd - ZOD, 4/24/02. Do not allow impulse applied to MPB, conc MPB bug fix.
          {
             %p = %targetObject.getWorldBoxCenter();
             %momVec = VectorSub(%p, %position);
@@ -750,14 +778,13 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
          if(%amount > 0)
             %data.damageObject(%targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %explosionSource.theClient, %explosionSource);
          else if( %explosionSource.getDataBlock().getName() $= "ConcussionGrenadeThrown" && %data.getClassName() $= "PlayerData" )
-	   {
+	      {
             %data.applyConcussion( %dist, %radius, %sourceObject, %targetObject );
- 	  	
- 	  	if(!$teamDamage && %sourceObject != %targetObject && %sourceObject.client.team == %targetObject.client.team)
- 	  	{
-			messageClient(%targetObject.client, 'msgTeamConcussionGrenade', '\c1You were hit by %1\'s concussion grenade.', getTaggedString(%sourceObject.client.name));
-		}
-	   }
+            if(!$teamDamage && %sourceObject != %targetObject && %sourceObject.client.team == %targetObject.client.team)
+            {
+               messageClient(%targetObject.client, 'msgTeamConcussionGrenade', '\c1You were hit by %1\'s concussion grenade.', getTaggedString(%sourceObject.client.name));
+            }
+	      }
          //-------------------------------------------------------------------------------
          // z0dd - ZOD, 4/16/02. Tone done the how much bomber & HPC flip out when damaged
          if( %doImpulse )

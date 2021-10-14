@@ -265,14 +265,10 @@ function ClassicLoadBanlist()
 }
 
 // From Eolks
-// Minor improvement by Teratos
 function getIPAddress(%client)
 {
-    %port = nextToken(nextToken(%client.getAddress(), "ip", ":"), "addr", ":");
-    if(%client.isAIControlled()) {
-        %addr = "bot";
-    }
-    return (%addr $= "" ? "Local" : %addr);
+   %port = nextToken( nextToken(%client.getAddress(), "ip", ":"), "addr", ":");
+   return %addr;
 }
 
 // From Eolks

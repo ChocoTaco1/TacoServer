@@ -634,10 +634,10 @@ function ELFProjectile::checkELFStatus(%this, %data, %target, %targeter)
    }
 }
 
-//Rework to prevent explosions from happening inside geometry
-$expMode = 1;
+//Reworked to be a little faster
 function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse, %sourceObject, %damageType)
 {
+   
    InitContainerRadiusSearch(%position, %radius, $TypeMasks::PlayerObjectType      |
                                                  $TypeMasks::VehicleObjectType     |
                                                  $TypeMasks::StaticShapeObjectType |
@@ -648,13 +648,10 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
    while ((%targetObject = containerSearchNext()) != 0)
    {
       %dist = containerSearchCurrRadDamageDist();
-
       if (%dist > %radius)
          continue;
 
-      // z0dd - ZOD, 5/18/03. Changed to stop Force Field console spam
-      // if (%targetObject.isMounted())
-      if (!(%targetObject.getType() & $TypeMasks::ForceFieldObjectType) && %targetObject.isMounted())
+      if(%targetObject.isMounted())
       {
          %mount = %targetObject.getObjectMount();
          %found = -1;
@@ -676,51 +673,10 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
       }
       if(isObject(%targetObject))
       {
-         %covMode = $expMode;
-         // calcExplosionCoverage done inversely to remove edge cases of were explosions can clip into meshes
-         switch(%covMode){ //miscf stackable //0 1 0 161.574
-            case 1:
-               %coverage = 1; // test for any blocking objects
-               %ray = ContainerRayCast(%targetObject.getWorldBoxCenter(), %position, ($TypeMasks::InteriorObjectType |
-                                             $TypeMasks::StaticObjectType |
-                                              $TypeMasks::TerrainObjectType |
-                                              $TypeMasks::ForceFieldObjectType |
-                                              $TypeMasks::VehicleObjectType), %targetObject);
-               if(%ray){
-                  %hitObj = getWord(%ray,0);
-                  if(%hitObj.getType() & $TypeMasks::StaticObjectType){//miscf and stackable is offton used as walls and decore  best to block damage
-                     if(strPos(%hitObj.shapeName, "miscf") != -1 || strPos(%hitObj.shapeName, "stackable") != -1){
-                        %coverage = 0; 
-                     }
-                  }
-                  if(%coverage){//up and over test but ignore staticshapes as they not ment to block explosions
-                     %upray = ContainerRayCast(%position, vectorAdd(%position, "0 0 1"), ($TypeMasks::InteriorObjectType |
-                                             $TypeMasks::TerrainObjectType |
-                                             $TypeMasks::ForceFieldObjectType |
-                                             $TypeMasks::VehicleObjectType), %targetObject); 
-                     if(!%upray){
-                        %rayto = ContainerRayCast( %targetObject.getWorldBoxCenter(), vectorAdd(%position, "0 0 1"), ($TypeMasks::InteriorObjectType |
-                                             $TypeMasks::TerrainObjectType |
-                                             $TypeMasks::ForceFieldObjectType |
-                                             $TypeMasks::VehicleObjectType), %targetObject); 
-                        %coverage = !(%rayto);
-                     }
-                     else{
-                        %coverage = 0;  
-                     }
-                                             
-                  }  
-               }
-            // default function
-            default:
-               %coverage = calcExplosionCoverage(%position, %targetObject,
-                                             ($TypeMasks::InteriorObjectType |
-                                              $TypeMasks::TerrainObjectType |
-                                              $TypeMasks::ForceFieldObjectType |
-                                              $TypeMasks::VehicleObjectType));
-            
-         }
-
+         %coverage = calcExplosionCoverage(%position, %targetObject, ($TypeMasks::InteriorObjectType | 
+                                                                     $TypeMasks::TerrainObjectType |
+                                                                     $TypeMasks::ForceFieldObjectType | 
+                                                                     $TypeMasks::VehicleObjectType));
          if (%coverage == 0)
             continue;
 

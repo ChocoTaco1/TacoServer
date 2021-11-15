@@ -88,11 +88,15 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
       }
       else
       {
-         if( %obj.getEnergyLevel() > 20 )
-         {   
-            %obj.setCloaked( false );
-            %obj.reCloak = %obj.schedule( 500, "setCloaked", true );
-         }
+         // if( %obj.getEnergyLevel() > 20 )
+         // {   
+         //    %obj.setCloaked( false );
+         //    %obj.reCloak = %obj.schedule( 500, "setCloaked", true );
+         // }
+
+         //We check if the player is still cloaked now. So no need to limit to 20% energy for the cloak in/out animation
+         %obj.setCloaked( false );
+         %obj.reCloak = schedule( 500, 0, "checkCloakState", %obj);
       }   
    }
 
@@ -422,12 +426,16 @@ function ShockLanceImage::onFire(%this, %obj, %slot)
       }
       else
       {
-         if( %obj.getEnergyLevel() > 20 )
-         {   
-            %obj.setCloaked( false );
-            %obj.reCloak = %obj.schedule( 500, "setCloaked", true ); 
-         }
-      }   
+         // if( %obj.getEnergyLevel() > 20 )
+         // {   
+         //    %obj.setCloaked( false );
+         //    %obj.reCloak = %obj.schedule( 500, "setCloaked", true );
+         // }
+
+         //We check if the player is still cloaked now. So no need to limit to 20% energy for the cloak in/out animation
+         %obj.setCloaked( false );
+         %obj.reCloak = schedule( 500, 0, "checkCloakState", %obj);
+      }  
    }
 
    %muzzlePos = %obj.getMuzzlePoint(%slot);
@@ -772,4 +780,10 @@ function Flag::shouldApplyImpulse(%data, %obj)
       return false;
    else
       return true;
+}
+
+function checkCloakState(%obj)
+{
+   if(%obj.getImageState($BackpackSlot) $= "activate")
+      %obj.setCloaked(true);
 }

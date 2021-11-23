@@ -88,11 +88,15 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
       }
       else
       {
-         if( %obj.getEnergyLevel() > 20 )
-         {   
-            %obj.setCloaked( false );
-            %obj.reCloak = %obj.schedule( 500, "setCloaked", true );
-         }
+         // if( %obj.getEnergyLevel() > 20 )
+         // {   
+         //    %obj.setCloaked( false );
+         //    %obj.reCloak = %obj.schedule( 500, "setCloaked", true );
+         // }
+
+         //We check if the player is still cloaked now. So no need to limit to 20% energy for the cloak in/out animation
+         %obj.setCloaked( false );
+         %obj.reCloak = schedule( 500, 0, "checkCloakState", %obj);
       }   
    }
 
@@ -393,7 +397,7 @@ function TargetingLaserImage::onFire(%data,%obj,%slot)
 
 function ShockLanceImage::onFire(%this, %obj, %slot)
 {
-	//Added Spawn Invinciblity check
+	// Added Spawn Invinciblity check
 	if(%obj.client > 0)
 	{
 		%obj.setInvincibleMode(0, 0.00);
@@ -422,12 +426,16 @@ function ShockLanceImage::onFire(%this, %obj, %slot)
       }
       else
       {
-         if( %obj.getEnergyLevel() > 20 )
-         {   
-            %obj.setCloaked( false );
-            %obj.reCloak = %obj.schedule( 500, "setCloaked", true ); 
-         }
-      }   
+         // if( %obj.getEnergyLevel() > 20 )
+         // {   
+         //    %obj.setCloaked( false );
+         //    %obj.reCloak = %obj.schedule( 500, "setCloaked", true );
+         // }
+
+         //We check if the player is still cloaked now. So no need to limit to 20% energy for the cloak in/out animation
+         %obj.setCloaked( false );
+         %obj.reCloak = schedule( 500, 0, "checkCloakState", %obj);
+      }  
    }
 
    %muzzlePos = %obj.getMuzzlePoint(%slot);
@@ -581,9 +589,9 @@ function ELFProjectileData::targetDestroyedCancel(%data, %projectile, %target, %
 
 function ELFProjectile::checkELFStatus(%this, %data, %target, %targeter)
 {
-   %class = %targeter.getClassName();
-   if(isObject(%target))
+   if(isObject(%target) && isObject(%targeter)) //Added %targeter for niche cases
    {
+      %class = %targeter.getClassName();
       if(%target.getDamageState() $= "Destroyed")
       {
          %data.targetDestroyedCancel(%this, %target, %targeter);
@@ -789,4 +797,10 @@ function Flag::shouldApplyImpulse(%data, %obj)
       return false;
    else
       return true;
+}
+
+function checkCloakState(%obj)
+{
+   if(%obj.getImageState($BackpackSlot) $= "activate")
+      %obj.setCloaked(true);
 }

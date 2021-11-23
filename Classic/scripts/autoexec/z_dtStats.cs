@@ -2585,6 +2585,7 @@ package dtStatsGame{
    function SCtFGame::flagCap(%game, %player){
       if($dtStats::Enable){
          %flag = %player.holdingFlag;
+         %clTeam = %player.client.team;
          %dtStats = %player.client.dtStats;
          %time = ((getSimTime() - $missionStartTime)/1000)/60;
           if(%clTeam == 1){
@@ -12488,7 +12489,7 @@ $dtStats::prefTestTime = 512;// the lower the better tracking
 $dtStats::prefTestIdleTime = 10*1000;// if no one is playing just run slow
 $dtStats::prefTolerance = 128;//this number is to account for base line preformance and differences between engine simTime and realtime
 $dtStats::prefLog = 0; // enable logging of server hangs
-$dtStats::eventLockout = 5*1000;//every 5 sec
+$dtStats::eventLockout = 10*1000;//every 10 sec
 function prefTest(%time,%skip){
    %real  = getRealTime();
    %plCount = $HostGamePlayerCount - $HostGameBotCount;
@@ -12569,7 +12570,7 @@ function dtPingAvg(){
    if(%pc > 3){
       %lowAvg =  (%lowCount > 0) ? (%lowPing/%lowCount) : 0;
       $dtStats::pingAvg = %pingT / %pc;
-      if(%txStop / %pc  >= 0.5){
+      if(%txStop / %pc  > 0.5){
          if(getSimTime() - $dtStats:evTime[0] > $dtStats::eventLockout){
             %msg = "TX Loss" SPC dtFormatTime(getSimTime()) SPC "TX Loss Count =" SPC %txStop SPC "Player Count =" SPC %pc;
             if($dtStats::debugEchos){error(%msg);}

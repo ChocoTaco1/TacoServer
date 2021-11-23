@@ -1213,7 +1213,7 @@ function CTFGame::updateKillScores(%game, %clVictim, %clKiller, %damageType, %im
       }
       else
       {
-         if (%game.testTeamKill(%clVictim, %clKiller)) //otherwise test for a teamkill
+         if (%game.testTeamKill(%clVictim, %clKiller, %damageType)) //otherwise test for a teamkill
             %game.awardScoreTeamKill(%clVictim, %clKiller);
       }
    }        

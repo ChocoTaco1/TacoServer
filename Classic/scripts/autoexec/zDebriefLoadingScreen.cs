@@ -31,23 +31,23 @@
 
 // Lines
 // $Host::LoadScreenLine1 = "Join Discord:";
-// $Host::LoadScreenLine1_Msg = "https://discord.me/tribes2";
+// $Host::LoadScreenLine1_Msg = "<a:playt2.com/discord>playt2.com/discord</a>";
 // $Host::LoadScreenLine2 = "Game Modes:";
 // $Host::LoadScreenLine2_Msg = "LakRabbit, Capture the Flag, DeathMatch, (Light Only) Capture the Flag";
-// $Host::LoadScreenLine3 = "Required Mappacks:";
-// $Host::LoadScreenLine3_Msg = "S5, S8, TWL, TWL2";
-// $Host::LoadScreenLine4 = "Server Provided by:";
-// $Host::LoadScreenLine4_Msg = "Ravin";
-// $Host::LoadScreenLine5 = "Server Hosted by:";
-// $Host::LoadScreenLine5_Msg = "Branzone";
+// $Host::LoadScreenLine3 = "Get Mappacks:";
+// $Host::LoadScreenLine3_Msg = "<a:playt2.com/mappacks>playt2.com/mappacks</a>";
+// $Host::LoadScreenLine4 = "Server Location:";
+// $Host::LoadScreenLine4_Msg = "Iowa";
+// $Host::LoadScreenLine5 = "Server Hosted:";
+// $Host::LoadScreenLine5_Msg = "Google Compute Engine";
 // $Host::LoadScreenLine6 = "Server Github:";
-// $Host::LoadScreenLine6_Msg = "https://github.com/ChocoTaco1/TacoServer";
+// $Host::LoadScreenLine6_Msg = "<a:github.com/ChocoTaco1/TacoServer>github.com/ChocoTaco1/TacoServer</a>";
 
 // MOTD or EVENTS Messages
-// $Host::LoadScreenMOTD1 = "Blaster is here to stay!";
-// $Host::LoadScreenMOTD2 = "Come play Arena on Wednesday Nights!";
-// $Host::LoadScreenMOTD3 = "Lak crowd early evenings after work during the week.";
-// $Host::LoadScreenMOTD4 = "Big CTF games Fridays, Saturdays, and Sundays!";
+// $Host::LoadScreenMOTD1 = "Celebrating 20 Years of Tribes2!";
+// $Host::LoadScreenMOTD2 = "Lak crowd early evenings after work during the week.";
+// $Host::LoadScreenMOTD3 = "Big CTF games Fridays, Saturdays, and Sundays!";
+// $Host::LoadScreenMOTD4 = "Please make an effort to keep teams balanced!";
 
 // First Screen loading time (Map Screen)
 // If this is set too low the second screen wont show at all
@@ -60,10 +60,9 @@ $dtLoadingScreen::Delay = 0;
 $dtLoadingScreen::ShowFullScreen = 0;
 // Enable/Disable Images
 $dtLoadingScreen::ShowImages = 0;
-// Enable/Disable Server Logo
-$dtLoadingScreen::ShowLogo = 0;
-$dtLoadingScreen::LogoName = "dpub/DPUB_logo";
-
+// Enable/Disable Server Logo 
+$dtLoadingScreen::ShowLogo = $Host::LoadScreenShowLogo; //$dtLoadingScreen::ShowLogo = 0;
+$dtLoadingScreen::LogoName = $Host::LoadScreenShowLogoName; //$dtLoadingScreen::LogoName = "dpub/DPUB_logo";
 
 
 // Color safetynet

@@ -241,8 +241,8 @@ function CreateServer(%mission, %missionType)
 
    // Auto Daily Hard Server Restart at a specific time
    // getTimeDif from zDarkTigerStats.cs
-   if($dtStats::version)
-      schedule(getTimeDif("10\t00\tam"),0,"quit"); //10AM server time
+   if($dtStats::version && $Host::ClassicDailyHardRestart)
+      schedule(getTimeDif($Host::ClassicDailyHardRestartTime),0,"quit");
 }
 
 function initGameBots( %mission, %mType )
@@ -1001,38 +1001,22 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    }
 
    // %stuff = getIPAddress(%client);
-   // if(strstr(%stuff, "70.240.") == 0)
+   // %ipfield = strreplace(%stuff,".","\t");
+   // if(strstr(%stuff, "166.137.") == 0 && getField(%ipfield,2) < 105)
    // {
-		// %newPart = getSubStr(%stuff, 7, 255);
-		// %next = strstr(%newPart, ".");
-		// %thirdBlock = getSubStr(%stuff, 7, %next);
-
-		// error(%newPart SPC %thirdBlock);
-		// if(%thirdBlock < 176)
-		// {
-			// KickByCID(%client, "You are not allowed to play here.");
-			// Banlist::Add(%client.guid, "0", $Host::BanTime);
-
-			// ClassicAddBan(%client.namebase, %client.guid);
-
-			// return;
-		// }
+   //    error("IP not allowed:" SPC %stuff SPC "(" @ %client.nameBase @ "," SPC %client.guid @ ")");
+   //    KickByCID(%client, "You are not allowed to play here.");
+   //    Banlist::Add(%client.guid, "0", $Host::BanTime);
+   //    //ClassicAddBan(%client.namebase, %client.guid);
+   //    return;
    // }
-   // else if(strstr(%stuff, "69.151.") == 0)
+   // else if(strstr(%stuff, "166.177.") == 0 && getField(%ipfield,2) < 218)
    // {
-		// %newPart = getSubStr(%stuff, 7, 255);
-		// %next = strstr(%newPart, ".");
-		// %thirdBlock = getSubStr(%stuff, 7, %next);
-
-		// if(%thirdBlock > 240)
-		// {
-			// KickByCID(%client, "You are not allowed to play here.");
-			// Banlist::Add(%client.guid, "0", $Host::BanTime);
-
-			// ClassicAddBan(%client.namebase, %client.guid);
-
-			// return;
-		// }
+   //    error("IP not allowed:" SPC %stuff SPC "(" @ %client.nameBase @ "," SPC %client.guid @ ")");
+   //    KickByCID(%client, "You are not allowed to play here.");
+   //    Banlist::Add(%client.guid, "0", $Host::BanTime);
+   //    //ClassicAddBan(%client.namebase, %client.guid);
+   //    return;
    // }
 
    // Whitelist check is in here.

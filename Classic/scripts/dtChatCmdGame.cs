@@ -57,7 +57,7 @@ function chatCmd(%client, %message) //%client is sender
             messageClient(%client, 'msgChatCmd', '\c2/normalsky - changes the sky to a fallback sky.');
 			messageClient(%client, 'msgChatCmd', '\c2/spookysky - changes the sky to a halloween sky.');
             messageClient(%client, 'msgChatCmd', '\c2/fireworks - look at some fireworks.');
-			messageClient(%client, 'msgChatCmd', '\c2/AIQ 1 or 0 - to enable tor disable ai chat.');
+			messageClient(%client, 'msgChatCmd', '\c2/aichat - to enable tor disable ai chat.');
             messageClient(%client, 'msgChatCmd', '\c2/idInfo - get id resources.');
          }
          messageClient(%client, 'msgChatCmd', '\c2/report "message" - report a problem for server owner.');
@@ -160,19 +160,15 @@ function chatCmd(%client, %message) //%client is sender
 				messageAll('message', 'AI is now disabled.');
 			}
 
-       case "/AIQ":
-			if(%client.isSuperAdmin || %client.isAdmin)
-			{
-				%b = getWord(%message,1);
-            if(%b == 1)
-			{
-				$AIDisableChat = 1;
-                messageClient(%client, 'msgChatCmd', '\c2AI Chat Disabled.');
+      case "/aichat":
+         if(%client.isSuperAdmin || %client.isAdmin){
+            if(!$AIDisableChat){
+               $AIDisableChat = 1;
+               messageAll('message', '\c2AI Chat Disable');
             }
-            else
-			{
-				$AIDisableChat = 0;
-				messageClient(%client, 'msgChatCmd', '\c2AI Chat Enabled.');
+            else{
+               $AIDisableChat = 0;
+               messageAll('message', '\c2AI Chat Enable');
             }
          }
 

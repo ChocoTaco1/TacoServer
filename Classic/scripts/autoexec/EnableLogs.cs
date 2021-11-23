@@ -1,6 +1,8 @@
 //$Host::ClassicAdminLog = 1;
+//$Host::ClassicChatLog = 1;
 //$Host::ClassicConnectLog = 1;
 //$Host::ClassicVoteLog = 1;
+//$Host::ClassicTeamKillLog = 1;
 
 //exec("scripts/autoexec/EnableLogs.cs");
 
@@ -74,7 +76,7 @@ function voteLog(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
 	  
 	  // show name for Votekick
 	  if(%typeName $= "VoteKickPlayer")
-		   %arg1 = %arg1.nameBase;
+		   %arg1 = %arg1.nameBase @ "[" @ %arg1.teamkills + 1 @ "tks]";
 
       // this is the info that will be logged
       $VoteLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %client.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %client.guid @ ") Initiated a vote:" SPC %typeName SPC %arg1 SPC %arg2 SPC %arg3 SPC %arg4 SPC "CM[" @ $CurrentMission @ "]";
@@ -156,15 +158,36 @@ function ClassicChatLog(%client, %id, %team, %msg)
 }
 
 // Log Teamkills
-function teamkillLog(%victimID, %killerID)
+function teamkillLog(%victimID, %killerID, %damageType)
 {
    if(!$Host::ClassicTeamKillLog)
       return;
+   
+   if(!$CurrentMissionType $= "CTF" && !$CurrentMissionType $= "SCTF")
+      return;
 
-   //echo("TK Log");
+   //damageType
+   %type = getTaggedString($DamageTypeText[%damageType]);
 
+   //Killer tks / Victim tks
    //Note: %killerID.teamkills + 1 as this is added later
-   $teamkillLog = "#P[" @ $HostGamePlayerCount @ "]" SPC formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %killerID.nameBase @ " (" @ getField(%authInfo, 0) @ "," SPC %killerID.guid @ ") teamkilled" SPC %victimID.nameBase SPC "and has" SPC (%killerID.teamkills + 1) SPC "tks. CM[" @ $CurrentMission @ "]";
+   //Tks For this map only
+   %ktk = %killerID.teamkills + 1;
+   %vtk = %victimID.teamkills;
+
+   //Stage in warnings
+   %s = "";
+   if(!%killerID.isAdmin) //Admins dont get warnings
+   {
+      if(%ktk >= $Host::TKWarn1 && %ktk < $Host::TKWarn2)
+         %s = "[Warned] ";
+      else if(%ktk >= $Host::TKWarn2 && %ktk < $Host::TKMax) 
+         %s = "[Warned 2] ";
+      else if(%ktk >= $Host::TKMax)
+         %s = "[Kicked] ";
+   }
+   
+   $teamkillLog = formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC %s @ %killerID.nameBase @ "(" @ %killerID.guid @ ")[" @ %type @ "][" @ %ktk @ " tk] teamkilled" SPC %victimID.nameBase @ "[" @ %vtk @ " tk]. #P[" @ $HostGamePlayerCount @ "]" SPC "CM[" @ $CurrentMission @ "]";
    $teamkillLog = stripChars($teamkillLog, "\c0\c1\c2\c3\c4\c5\c6\c7\c8\c9\x10\x11\co\cp");
 
 	%logpath = $Host::ClassicTeamKillLogPath;

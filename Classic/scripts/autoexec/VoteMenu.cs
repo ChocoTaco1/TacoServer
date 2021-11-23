@@ -290,7 +290,15 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				}
 
 				%msg = %client.nameBase @ " initiated a vote to kick player " @ %arg1.nameBase @ ".";
-				messageAdmins("", "\c5[A]\c1"@ %msg @"~wgui/objective_notification.wav");
+
+				//Notify any admins on the other team
+				for(%i = 0; %i < ClientGroup.getCount(); %i++) 
+				{
+					%cl = ClientGroup.getObject(%i);
+					if(%cl.isAdmin == true && %cl.team !$= %arg1.team) //Not on admins team
+						messageClient(%cl, '', '\c5[A]\c0%1 initiated a vote to kick player %2 on the other team.~wgui/objective_notification.wav', %client.nameBase, %arg1.nameBase);
+				}
+
 				$CMHasVoted[%client.guid]++;
 			}
 
@@ -322,7 +330,10 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 
 		case "BanPlayer":
 			if(%client.isSuperAdmin && !%arg1.isSuperAdmin) // we're a super admin, and our target isn't a super admin
+			{
 				ban(%arg1, %client); // ban 'em
+				adminLog(%client, " has banned" SPC %arg1.nameBase @ "(" @ %arg1.guid @ ").");
+			}
 			return; // stop the function in its tracks
 
 		case "VoteChangeMission":
@@ -414,7 +425,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			if((!%isAdmin && $Host::AllowPlayerVoteTimeLimit) || (%isAdmin && %client.ForceVote))
 			{
 				if(%arg1 $= "999") %time = "unlimited"; else %time = %arg1;
-				%msg = %client.nameBase @ " initiated a vote to change the time limit to " @ %time @ ".";
+				%msg = %client.nameBase @ " initiated a vote to change the time limit to " @ %time SPC "minutes.";
 				// VoteOvertime
 				StartVOTimeVote(%game);
 				$CMHasVoted[%client.guid]++;
@@ -733,7 +744,7 @@ function playerStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %tea
 		%time = mFloor($Host::VoteTime / ($Host::EnableVoteSoundReminders + 1)) * 1000;
 		//echo(%time);
 		for(%i = 0; %i < $Host::EnableVoteSoundReminders; %i++)
-				Game.voteReminder[%i] = schedule((%time * (%i + 1)), 0, "VoteSound", %game, %typename, %arg1, %arg2);
+				Game.voteReminder[%i] = schedule((%time * (%i + 1)), 0, "VoteSound", %teamSpecific, %typename, %arg1, %arg2, %msg);
    }
 }
 
@@ -782,16 +793,17 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
    {
       %team = %client.team;
       %totalVotes = %game.votesFor[%game.kickTeam] + %game.votesAgainst[%game.kickTeam];
+	  %cause = "(vote)";
       if(%totalVotes > 0 && (%game.votesFor[%game.kickTeam] / %totalVotes) > ($Host::VotePasspercent / 100))
       {
 		 kick(%client, %admin, %game.kickGuid);
-         %cause = "(vote)";
 
 		 %key = "Passed";
       }
       else
       {
-         for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
+         
+		 for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
          {
             %cl = ClientGroup.getObject( %idx );
 
@@ -808,15 +820,15 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
 	  //Log Vote %
 	  votePercentLog(%client, %typeName, %key, %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, %game.totalVotesNone);
 	  //Show Vote %
-      messageAll('', '\c1Vote %6: \c0Yea: %1 Nay: %2 Total: %3 [%4%5]', %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, mfloor((%game.votesFor[%game.kickTeam] / %totalVotes) * 100), "%", %key);
+      messageTeam(%game.kickTeam, "", '\c1Vote %6: \c0Yea: %1 Nay: %2 Total: %3 [%4%5]', %game.votesFor[%game.kickTeam], %game.votesAgainst[%game.kickTeam], %totalVotes, mfloor((%game.votesFor[%game.kickTeam] / %totalVotes) * 100), "%", %key);
    }
+
+   if(%cause $= "(admin)")
+	  adminLog(%admin, " kicked " @ %game.kickClientNameBase @ " (" @ %game.kickGuid @ ").");
 
    %game.kickTeam = "";
    %game.kickGuid = "";
    %game.kickClientName = "";
-
-   if(%cause !$= "")
-      logEcho($AdminCl.nameBase @ ": " @ %name @ " (cl " @ %game.kickClient @ ") kicked " @ %cause, 1);
 }
 
 //------------------------------------------------------------------------------
@@ -844,6 +856,7 @@ function DefaultGame::voteChangeMission(%game, %admin, %missionDisplayName, %typ
       messageAll('MsgAdminChangeMission', '\c2The Admin %3 has changed the mission to %1 (%2).', %missionDisplayName, %typeDisplayName, %admin.name );
       %game.gameOver();
       loadMission( %mission, %missionType, false );
+	  adminLog(%admin, " has changed the mission to " @ %missionDisplayName @ " (" @ %typeDisplayName @ ")");
    }
    else
    {
@@ -898,6 +911,7 @@ function DefaultGame::voteTournamentMode( %game, %admin, %missionDisplayName, %t
    if (isObject(%admin))
    {
       messageAll( 'MsgAdminForce', '\c2The Admin %2 has switched the server to Tournament mode (%1).', %missionDisplayName, %admin.name );
+	  adminLog(%admin, " has switched the server to Tournament mode. " @ %missionDisplayName @ " (" @ %typeDisplayName @ ")");
       setModeTournament( %mission, %missionType );
    }
    else
@@ -947,6 +961,7 @@ function DefaultGame::voteChangeTimeLimit( %game, %admin, %newLimit )
    {
       messageAll( 'MsgAdminForce', '\c2The Admin %2 changed the mission time limit to %1 minutes.', %display, %admin.name );
       $Host::TimeLimit = %newLimit;
+	  adminLog(%admin, " has changed the mission time limit to " @ %display @ " minutes.");
    }
    else
    {
@@ -1005,6 +1020,7 @@ function DefaultGame::voteFFAMode( %game, %admin, %client )
    if(isObject(%admin))
    {
       messageAll('MsgAdminForce', '\c2The Admin %1 has switched the server to Free For All mode.', %admin.name);
+	  adminLog(%admin, " has switched the server to Free For All mode.");
       setModeFFA($CurrentMission, $CurrentMissionType);
    }
    else
@@ -1028,6 +1044,7 @@ function DefaultGame::voteSkipMission(%game, %admin, %arg1, %arg2, %arg3, %arg4)
    if(isObject(%admin))
    {
       messageAll('MsgAdminForce', '\c2The Admin %1 has skipped to the next mission.',%admin.name );
+	  adminLog(%admin, " has skipped to the next mission.");
       %game.gameOver();
       //loadMission( findNextCycleMission(), $CurrentMissionType, false );
       cycleMissions();
@@ -1117,12 +1134,14 @@ function DefaultGame::voteTeamDamage(%game, %admin)
          messageAll('MsgAdminForce', '\c2The Admin %1 has disabled team damage.', %admin.name);
          $Host::TeamDamageOn = $TeamDamage = 0;
          %setto = "disabled";
+		 adminLog(%admin, " has disabled team damage.");
       }
       else
       {
          messageAll('MsgAdminForce', '\c2The Admin %1 has enabled team damage.', %admin.name);
          $Host::TeamDamageOn = $TeamDamage = 1;
          %setto = "enabled";
+		 adminLog(%admin, " has enabled team damage.");
       }
    }
    else
@@ -1485,6 +1504,10 @@ function resetViewSchedule(%client)
   %client.schedViewRules = "";
 }
 
+// Prevent package from being activated if it is already
+if (!isActivePackage(ExtraVoteMenu))
+    activatePackage(ExtraVoteMenu);
+
 // Locked Teams code (Tournament Mode Only)
 // Doesnt allow players Joining the server late to join teams when enable, disables when server if switched back to free for all mode
 
@@ -1532,6 +1555,46 @@ function serverCmdClientTeamChange(%client, %option)
 
 };
 
-// Prevent package from being activated if it is already
-if (!isActivePackage(ExtraVoteMenu))
-    activatePackage(ExtraVoteMenu);
+// VoteSound Script
+//
+// Make a sound every so seconds to make sure everyone votes
+//
+// Enable or Disable VoteSound
+// $Host::EnableVoteSoundReminders = 3;
+// 3 for three reminder notifications
+
+function VoteSound(%teamSpecific, %typename, %arg1, %arg2, %msg)
+{	
+	if(Game.scheduleVote !$= "" && $Host::EnableVoteSoundReminders > 0) //Game.scheduleVote !$= "" is if vote is active
+	{
+		%vip = "Vote in Progress:";
+		//%yn = "Press Insert for Yes or Delete for No.";
+		
+		switch$(%typeName)
+		{
+			case "VoteKickPlayer":
+				if(%arg1.team != 0 && Game.numTeams > 1) //Not observer
+				{
+				   for(%i = 0; %i < ClientGroup.getCount(); %i++) 
+				   {
+					  	%cl = ClientGroup.getObject(%i);
+						if (%cl.isAdmin == true)
+						{ 
+							if(%cl.team !$= %arg1.team) //Not on admins team
+								messageClient(%cl, '', '\c5[A]\c1%1 \c0To kick %2 on the other team.~wgui/objective_notification.wav', %vip, %arg1.name);
+							else //Is on admins team
+								messageClient(%cl, '', '\c1%1 \c0%2 %3~wgui/objective_notification.wav', %vip, %msg, %yn);
+						}
+						else if(%cl.team $= %arg1.team)
+							messageClient(%cl, '', '\c1%1 \c0%2 %3~wgui/objective_notification.wav', %vip, %msg, %yn);
+					}
+				}
+				else //is observer
+					messageAll('', '\c1%1 \c0%2 %3~wgui/objective_notification.wav', %vip, %msg, %yn);
+				echo(%vip SPC %msg);
+			default:
+				messageAll('', '\c1%1 \c0%2 %3~wgui/objective_notification.wav', %vip, %msg, %yn);
+				echo(%vip SPC %msg);
+		}
+	}
+}

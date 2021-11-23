@@ -135,20 +135,13 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                   for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ ) 
                   {
                      %cl = ClientGroup.getObject( %idx );
-
-					if (%cl.isAdmin == true || (%cl.team == %client.team && !%cl.isAIControlled()))
-					{   
-						if(%cl.isAdmin == true && %cl.team !$= %client.team) {
-							messageClient(%cl, 'AdminOtherTeamKickVoteStarted', '\c2%1 has initiated a vote to kick %2 on the \c3Other Team.~wgui/objective_notification.wav', %client.name, %arg1.name);
-						}
-						else
-						messageClient( %cl, 'VoteStarted', '\c2%1 initiated a vote to %2 %3.', %client.name, %actionMsg, %arg1.name); 
-						%clientsVoting++;
-					}
+            
+                     if (%cl.team == %client.team && !%cl.isAIControlled())
+                     {   
+                        messageClient( %cl, 'VoteStarted', '\c2%1 initiated a vote to %2 %3.', %client.name, %actionMsg, %arg1.name); 
+                        %clientsVoting++;
+                     }
                   }
-				  %VoteSoundRandom = getRandom(1,100);
-				  $VoteSoundRandom = %VoteSoundRandom;
-				  $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
                }
                else
                {
@@ -161,9 +154,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                         %clientsVoting++;
                      }
                   }
-				  %VoteSoundRandom = getRandom(1,100);
-				  $VoteSoundRandom = %VoteSoundRandom;
-				  $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
                }
             }
             else
@@ -179,21 +169,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                }
             }   
          }
-		 else if ( %typeName $= "VoteSkipMission" )
-	     {
-			for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
-			{
-				%cl = ClientGroup.getObject( %idx );
-				if ( !%cl.isAIControlled() )
-				{
-					messageClient( %cl, 'VoteStarted', '\c2%1 initiated a vote to %2.', %client.name, %actionMsg, %arg1.name); 
-					%clientsVoting++;
-				}
-			}
-			%VoteSoundRandom = getRandom(1,100);
-			$VoteSoundRandom = %VoteSoundRandom;
-			$VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
-	     }
          else if ( %typeName $= "VoteChangeMission" )
          {
             for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
@@ -205,9 +180,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                   %clientsVoting++;
                }
             }
-			%VoteSoundRandom = getRandom(1,100);
-			$VoteSoundRandom = %VoteSoundRandom;
-			$VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
          }
          else if (%arg1 !$= 0)
          {
@@ -227,9 +199,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                            %clientsVoting++;
                         }
                      }
-				    %VoteSoundRandom = getRandom(1,100);
-				    $VoteSoundRandom = %VoteSoundRandom;
-				    $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
                   }
                   else
                   {   
@@ -252,10 +221,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
             }
             else
             {
-			   if( %arg1 == 999 )
-				 %arg1 = "unlimited";
-			   
-			   for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
+               for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
                {
                   %cl = ClientGroup.getObject( %idx );
                   if ( !%cl.isAIControlled() )
@@ -264,9 +230,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
                      %clientsVoting++;
                   }
                }
-			   %VoteSoundRandom = getRandom(1,100);
-			   $VoteSoundRandom = %VoteSoundRandom;
-			   $VoteSoundSchedule = schedule(10000, 0, "VoteSound", %game, %typename, %arg1, %arg2, %VoteSoundRandom);
             }
          }
          else

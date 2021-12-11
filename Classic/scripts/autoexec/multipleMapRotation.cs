@@ -1,3 +1,5 @@
+//$Host::ClassicRotationFile = "prefs/mapRotation1.cs";
+
 //Enable/Disable
 $EnableMultipleMapRotation = 0;
 
@@ -9,8 +11,14 @@ function multipleMapRotation()
 {
     if($EnableMultipleMapRotation)
     {
-        %random = getrandom(1, $mapRotationFilesCount);
-        %mapRot = "prefs/mapRotation" @ %random @ ".cs";
+        %var = stripChars($Host::ClassicRotationFile, "prefs/mapRotation.cs");
+        //echo("var: " @ %var);
+        if(%var $= $mapRotationFilesCount)
+            %var = 1;
+        else
+            %var = %var + 1;
+
+        %mapRot = "prefs/mapRotation" @ %var @ ".cs";
         $Host::ClassicRotationFile = %mapRot;
         
         //Echo at start

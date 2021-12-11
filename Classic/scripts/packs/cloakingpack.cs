@@ -18,10 +18,31 @@ datablock EffectProfile(CloakingPackActivateEffect)
    maxDistance = 2.5;
 };
 
+// datablock AudioProfile(CloakingPackActivateSound)
+// {
+//    filename = "fx/packs/cloak_on.wav";
+//    description = CloseLooping3d;
+//    preload = true;
+//    effect = CloakingPackActivateEffect;
+// };
+
+//Added (From CloseLooping3d)
+datablock AudioDescription(CloakLooping3d)
+{
+   volume   = 1.0;
+   isLooping= true;
+
+   is3D     = true;
+   minDistance= 15.0; //Was 10
+   MaxDistance= 55.0; //Was 50
+   type     = $EffectAudioType;
+   environmentLevel = 1.0;
+};
+
 datablock AudioProfile(CloakingPackActivateSound)
 {
    filename = "fx/packs/cloak_on.wav";
-   description = CloseLooping3d;
+   description = CloakLooping3d;
    preload = true;
    effect = CloakingPackActivateEffect;
 };

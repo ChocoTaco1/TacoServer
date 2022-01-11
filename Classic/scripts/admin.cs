@@ -564,23 +564,46 @@ function ServerCmdPrintClientInfo(%client, %targetClient)
    {
       if ((!%targetClient.isSuperAdmin) && (%client.isSuperAdmin))
       {
-         %wonid = getField( %targetClient.getAuthInfo(), 3);
          %ip = %targetClient.getAddress();
+         %guid = %targetClient.guid;
       }
       else
       {
-         %wonid = "PROTECTED";
-         %ip = "PROTECTED";
+         %ip = "N/A";
+         %guid = "N/A";
       }
-      MessageClient(%client, '', '---------------------------------------------------------------');
-      MessageClient(%client, 'ClientInfo', "\c3Client Info...\n" @ 
-                                           "ClientName: \c2" @ %targetClient.nameBase @ "\n" @
-                                           "\c3Wonid: \c2" @ %wonid @ "\n" @
-                                           "\c3IP: \c2" @ %ip @ "\n\n" @
-                                           "\c3TeamKills:\c2 " @ %targetClient.teamkills @ "\n" @
-                                           "\c3BK (BaseKills): \c2" @ %targetClient.tkDestroys @ "\n" @
-                                           "\c3Suicides:\c2 " @ %targetClient.suicides @ "\n");
-      MessageClient(%client, '', '---------------------------------------------------------------');
+
+      // get the client info
+      %authInfo = %targetClient.getAuthInfo();
+      %name = getField(%authInfo, 0);
+
+      if(%name $= "") //Bots
+         %name = "N/A";
+
+      if(%targetClient.isSmurf)
+		  %smurfname = stripChars( detag( getTaggedString( %targetClient.name ) ), "\cp\co\c6\c7\c8\c9" );
+	   else
+		  %smurfname = "N/A";
+
+      if(%targetClient.teamkills $= "")
+         %teamkills = "N/A";
+      else
+         %teamkills = %targetClient.teamkills;
+
+      if(%targetClient.tkDestroys $= "")
+         %tkDestroys = "N/A";
+      else
+         %tkDestroys = %targetClient.tkDestroys;
+      
+      MessageClient(%client, '', ' ');
+      MessageClient(%client, 'ClientInfo', "\c3Client Info:\n" @ 
+                                           "ClientName: \c2" @ %name @ "\n" @
+                                           "\c3SmurfName: \c2" @ %smurfname @ "\n" @
+                                           "\c3Guid: \c2" @ %guid @ "\n" @
+                                           "\c3IP: \c2" @ %ip @ "\n" @
+                                           "\c3TeamKills:\c2 " @ %teamkills @ "\n" @
+                                           "\c3BaseKills: \c2" @ %tkDestroys @ "\n");
+      MessageClient(%client, '', ' ');
    }
    else
       messageClient(%client, 'MsgError', '\c2Only Admins can use this command.');

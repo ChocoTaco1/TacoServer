@@ -1257,9 +1257,10 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
 			else
 				messageClient( %client, 'MsgPlayerPopupItem', "", %key, "GagPlayer", "", 'Gag Player', 17);
 
+			messageClient( %client, 'MsgPlayerPopupItem', "", %key, "PrintClientInfo", "", 'Client Info', 16 ); // z0dd - ZOD - MeBad, 7/13/03. Send client information.
+
             if( %client.isSuperAdmin )
             {
-               messageClient( %client, 'MsgPlayerPopupItem', "", %key, "PrintClientInfo", "", 'Client Info', 16 ); // z0dd - ZOD - MeBad, 7/13/03. Send client information.
 			   messageClient( %client, 'MsgPlayerPopupItem', "", %key, "BanPlayer", "", 'Ban', 4 );
 
                if ( %targetClient.isFroze )

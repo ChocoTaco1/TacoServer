@@ -14,18 +14,22 @@ function DefaultGame::testTeamKill(%game, %victimID, %killerID, %damageType)
       return false; // is not a tk
 
    // No Bots
-   if(%killerID.isAIcontrolled() || %victimID.isAIcontrolled())
-     return true;
+   //if(%killerID.isAIcontrolled() || %victimID.isAIcontrolled())
+   // return true;
 
    // Log TeamKill
    teamkillLog(%victimID, %killerID, %damageType);
+
+   //No warnings in tournament mode
+   if($Host::TournamentMode)
+      return true;
   
    // No Admins
    if(%killerID.isAdmin)
       return true;
 
    // Ignore this map
-   if($CurrentMission $= "Mac_FlagArena" || $CurrentMission $= "Machineeggs" || $CurrentMission $= "DMP_SimpleFlagArena")
+   if($CurrentMission $= "Mac_FlagArena" || $CurrentMission $= "Machineeggs")
 	  return true;
    
    // warn the player of the imminent kick vote

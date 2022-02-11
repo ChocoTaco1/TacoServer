@@ -7,12 +7,14 @@ $EnableMultipleMapRotation = 0;
 //Naming scheme mapRotation1.cs, mapRotation2.cs, mapRotation3.cs, etc
 $mapRotationFilesCount = 3;
 
-function multipleMapRotation() 
+function multipleMapRotation()
 {
-    if($EnableMultipleMapRotation)
+	//Look for a progressing number
+	%var = stripChars($Host::ClassicRotationFile, "prefs/mapRotation.cs");
+	//echo("var: " @ %var);
+
+	if(%var) //If number exists proceed
     {
-        %var = stripChars($Host::ClassicRotationFile, "prefs/mapRotation.cs");
-        //echo("var: " @ %var);
         if(%var $= $mapRotationFilesCount)
             %var = 1;
         else
@@ -20,17 +22,17 @@ function multipleMapRotation()
 
         %mapRot = "prefs/mapRotation" @ %var @ ".cs";
         $Host::ClassicRotationFile = %mapRot;
-        
-        //Echo at start
-        schedule(10000,0,"multipleMapRotationEcho",0);
     }
+
+	schedule(10000,0,"multipleMapRotationEcho",0); //Echo at start
 }
 
-//Echo at start
+//Echo
 function multipleMapRotationEcho()
 {
     echo("Current MapRotation: " @ $Host::ClassicRotationFile);
 }
 
 //Run
-multipleMapRotation();
+if($EnableMultipleMapRotation)
+	multipleMapRotation();

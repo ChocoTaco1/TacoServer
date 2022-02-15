@@ -52,20 +52,6 @@ function loadMissionStage2()
 			$Host::HiVisibility = "0"; //always SPEED
 	}
 
-	//Disable Antipack in tournament mode
-	if($Host::TournamentMode)
-	{
-		if($InvBanList[CTF, "CloakingPack"])
-			$InvBanList[CTF, "CloakingPack"] = 0;
-		if(isActivePackage(AntiPackCloak))
-			deactivatePackage(AntiPackCloak);
-			
-		if($InvBanList[CTF, "ShieldPack"])
-			$InvBanList[CTF, "ShieldPack"] = 0;
-		if(isActivePackage(AntiPackShield))
-			deactivatePackage(AntiPackShield);
-	}
-
 	//Siege NoBaseRape Fix
 	if($CurrentMissionType $= "Siege")
 		$Host::NoBaseRapeEnabled = 0;

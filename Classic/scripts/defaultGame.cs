@@ -772,7 +772,7 @@ function DefaultGame::sendDebriefing( %game, %client )
       }
    }
 
-   if($Host::ClassicEvoStats)
+   if($Host::ClassicEvoStats && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF"))
       sendEvoDebriefing(%client);
 }
 
@@ -1751,7 +1751,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
          //displayObserverHud( %client, 0 );
          // Eolk - flag stats stuff
          //updateObserverFlyHud(%client);
-         if($Host::ClassicEvoStats && $CurrentMissionType $= "CTF")
+         if($Host::ClassicEvoStats && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF"))
             schedule(10000, %client, updateObserverFlyHud, %client);
       }
 
@@ -1774,7 +1774,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
          }
       }
 
-      if( $Host::ClassicEvoStats && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF") )
+      if( $Host::ClassicEvoStats && ($CurrentMissionType $= "CTF" || $CurrentMissionType $= "SCtF"))
       {
          %nickTeam1 = ($flagstats::heldTeam1 ? $flagstats::nickTeam1 : "N/A");
          %realTeam1 = ($flagstats::heldTeam1 ? $flagstats::realTeam1 : "N/A");
@@ -1833,7 +1833,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
          if(isEventPending(%client.okschedule))
             cancel(%client.okschedule);
 
-		 %time = $Host::KickObserverTimeout;
+         %time = $Host::KickObserverTimeout;
          //%time = ($Host::KickObserverTimeout) + ($Host::KickObserverTimeout/2);
          //%minutes = %time / 60;
          //messageClient(%client, 'MsgNoObservers', '\c2You have %1 minutes to join the game or you will be kicked.', %minutes);

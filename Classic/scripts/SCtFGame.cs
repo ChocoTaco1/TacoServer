@@ -693,7 +693,7 @@ function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
       if (%startStalemate)
          %game.stalemateSchedule = %game.schedule(%game.stalemateTimeMS, beginStalemate);
 	 
-	  if($Host::ClassicEvoStats && !$Host::TournamentMode)
+	  if($Host::ClassicEvoStats)
       {
          $stats::grabs[%client]++;
          if($stats::grabs[%client] > $stats::grabs_counter)
@@ -707,7 +707,7 @@ function SCtFGame::playerTouchEnemyFlag(%game, %player, %flag)
          %game.totalFlagHeldTime[%flag] = getSimTime();
    }
    
-   if($Host::ClassicEvoStats && !%player.flagStatsWait && !$Host::TournamentMode)
+   if($Host::ClassicEvoStats && !%player.flagStatsWait)
    {
 	  // get the grab speed
 	  %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);

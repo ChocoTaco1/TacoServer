@@ -146,17 +146,20 @@ function DefaultGame::gameOver(%game)
 {
 	Parent::gameOver(%game);
 
-	if($InvBanList[CTF, "CloakingPack"])
-		$InvBanList[CTF, "CloakingPack"] = 0;
-	if(isActivePackage(AntiPackCloak))
-		deactivatePackage(AntiPackCloak);
+	if( $Host::AntiPackEnable )
+	{
+		if($InvBanList[CTF, "CloakingPack"])
+			$InvBanList[CTF, "CloakingPack"] = 0;
+		if(isActivePackage(AntiPackCloak))
+			deactivatePackage(AntiPackCloak);
 
-	if($InvBanList[CTF, "ShieldPack"])
-		$InvBanList[CTF, "ShieldPack"] = 0;
-	if(isActivePackage(AntiPackShield))
-		deactivatePackage(AntiPackShield);
-		
-	$AntiPackStatus = "OFF";
+		if($InvBanList[CTF, "ShieldPack"])
+			$InvBanList[CTF, "ShieldPack"] = 0;
+		if(isActivePackage(AntiPackShield))
+			deactivatePackage(AntiPackShield);
+
+		$AntiPackStatus = "OFF";
+	}
 }
 
 };

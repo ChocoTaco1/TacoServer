@@ -218,7 +218,7 @@ function sendToDiscordEmote(%msg,%channel)//emote filter will be applyed used in
    {
       if(discord.lastState $= "Connected")
 	   {
-         discord.send("MSG" @ $discordBot::cmdSplit @ (%channel-1) @ $discordBot::cmdSplit @ "emote" @ $discordBot::cmdSplit @ %msg @ "\r\n");
+         discord.send("MSG" @ $discordBot::cmdSplit @ (%channel) @ $discordBot::cmdSplit @ "emote" @ $discordBot::cmdSplit @ %msg @ "\r\n");
       }
    }
 }

@@ -79,14 +79,43 @@ package AntiPackCloak
 
 function CloakingPackImage::onActivate(%data, %obj, %slot)
 {
+   if(%obj.reCloak !$= "")
+   {   
+      Cancel(%obj.reCloak);
+      %obj.reCloak = "";
+   }
+   
    if(%obj.client.armor $= "Light") 
    {
+      // can the player currently cloak (function returns "true" or reason for failure)?
       if(%obj.canCloak() $= "true")
-         messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloakpack is disabled until %1 players.', $Host::AntiPackPlayerCount );
+		{
+			if(%obj.getImageState($BackpackSlot) $= "activate")
+			{
+			// cancel recloak thread
+			if(%obj.reCloak !$= "")
+			{   
+				Cancel(%obj.reCloak);
+				%obj.reCloak = "";
+			}
+
+			messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloakpack is disabled until %1 players.', $Host::AntiPackPlayerCount );
+			%obj.setCloaked(false);
+			%obj.setImageTrigger($BackpackSlot, false);
+		}
+      }
+      else
+      {
+         // notify player that they cannot cloak
+         messageClient(%obj.client, 'MsgCloakingPackFailed', '\c2Jamming field prevents cloaking.');
+         %obj.setImageTrigger(%slot, false);
+      }
    }
-   else
+   else 
    {
+      // hopefully avoid some loopholes
       messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloaking available for light armors only.');
+      %obj.setImageTrigger(%slot, false);
    }
 }
 
@@ -108,5 +137,35 @@ function ShieldPackImage::onDeactivate(%data, %obj, %slot)
 }
 
 };
+
+package AntiPack
+{
+
+//Reset Everything
+function DefaultGame::gameOver(%game)
+{
+	Parent::gameOver(%game);
+
+	if( $Host::AntiPackEnable )
+	{
+		if($InvBanList[CTF, "CloakingPack"])
+			$InvBanList[CTF, "CloakingPack"] = 0;
+		if(isActivePackage(AntiPackCloak))
+			deactivatePackage(AntiPackCloak);
+
+		if($InvBanList[CTF, "ShieldPack"])
+			$InvBanList[CTF, "ShieldPack"] = 0;
+		if(isActivePackage(AntiPackShield))
+			deactivatePackage(AntiPackShield);
+
+		$AntiPackStatus = "OFF";
+	}
+}
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(AntiPack))
+    activatePackage(AntiPack);
 
 

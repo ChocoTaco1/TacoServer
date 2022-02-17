@@ -37,7 +37,7 @@ function connectLog(%client, %isDisconnect)
    {
       // get the client info
       %authInfo = %client.getAuthInfo();
-	  %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
+      %ip = getField(strreplace(%client.getAddress(),":","\t"),1);
 	  
       // net tournament client present?
 	  if (!%client.t2csri_sentComCertDone)
@@ -177,7 +177,7 @@ function teamkillLog(%victimID, %killerID, %damageType)
 
    //Stage in warnings
    %s = "";
-   if(!%killerID.isAdmin) //Admins dont get warnings
+   if(!%killerID.isAdmin && !$Host::TournamentMode) //Admins dont get warnings. No warnings in Tournament Mode
    {
       if(%ktk >= $Host::TKWarn1 && %ktk < $Host::TKWarn2)
          %s = "[Warned] ";

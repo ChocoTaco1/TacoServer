@@ -4,17 +4,17 @@
 
 //exec("scripts/autoexec/zzDiscordBot.cs");
 
-//note first channel is for monitoring
-$discordBot::discordCHID = "";
+//ip of the bot
 $discordBot::IP = "";
 $discordBot::reconnectTimeout = 3 * 60000;
+//auto connect on start
 $discordBot::autoStart = 0;
 //used on the bot to help split thigns up
-$discordBot::cmdSplit = "%cmd%";
-$discordBot::cmdSubSplit = "%tab%";
-//These correspond with $discordBot::discordCHID
-$discordBot::monitorChannel = 1;
-$discordBot::serverFeed = 2;
+$discordBot::cmdSplit = "%c%";
+$discordBot::cmdSubSplit = "%t%";
+//These are set via the bot 
+$discordBot::monitorChannel = 0;
+$discordBot::serverFeed = 1;
 package discordPackage
 {
 
@@ -33,8 +33,7 @@ function messageAll(%msgType, %msgString, %a1, %a2, %a3, %a4, %a5, %a6, %a7, %a8
 	switch$(%type)
 	{
 		case "msgExplosionKill" or "msgSuicide" or "msgVehicleSpawnKill" or "msgVehicleCrash" or "msgVehicleKill" or "msgTurretSelfKill" or "msgTurretSelfKill" or "msgCTurretKill" or "msgTurretKill" or
-			 "msgSelfKill" or "msgOOBKill" or "msgCampKill" or "msgTeamKill" or "msgLavaKill" or "msgLightningKill" or "MsgRogueMineKill" or "MsgHeadshotKill" or "MsgRearshotKill" or "MsgLegitKill" or
-			 "MsgClientJoin" or "MsgClientDrop":
+			 "msgSelfKill" or "msgOOBKill" or "msgCampKill" or "msgTeamKill" or "msgLavaKill" or "msgLightningKill" or "MsgRogueMineKill" or "MsgHeadshotKill" or "MsgRearshotKill" or "MsgLegitKill":
 		%message = getTaggedString(%msgString);
 		%message =  strreplace(%message,"%1",getTaggedString(%a1));
 		%message =  strreplace(%message,"%2",getTaggedString(%a2));
@@ -209,7 +208,7 @@ function sendToDiscord(%msg,%channel)
    {
       if(discord.lastState $= "Connected")
 	   {
-         discord.send("MSG"  @ $discordBot::cmdSplit @  (%channel-1) @ $discordBot::cmdSplit @ %msg @ "\r\n");
+         discord.send("MSG" @ $discordBot::cmdSplit @ (%channel) @ $discordBot::cmdSplit @ "0" @ $discordBot::cmdSplit @ %msg @ "\r\n");
       }
    }
 }
@@ -219,7 +218,7 @@ function sendToDiscordEmote(%msg,%channel)//emote filter will be applyed used in
    {
       if(discord.lastState $= "Connected")
 	   {
-         discord.send("MSGE" @ $discordBot::cmdSplit @ (%channel-1) @ $discordBot::cmdSplit @ %msg @ "\r\n");
+         discord.send("MSG" @ $discordBot::cmdSplit @ (%channel) @ $discordBot::cmdSplit @ "emote" @ $discordBot::cmdSplit @ %msg @ "\r\n");
       }
    }
 }
@@ -262,7 +261,7 @@ function discord::onDNSResolved(%this){
 function discord::onConnected(%this){
    %this.lastState = "Connected";
    error(%this.lastState);
-   discord.send("AUTH" @ $discordBot::cmdSplit @ $discordBot::discordCHID @ $discordBot::cmdSplit @ $Host::GameName @ "\r\n");
+   discord.send("AUTH" @ $discordBot::cmdSplit @ $discordBot::cmdSplit @ $Host::GameName @ "\r\n");
 }
 
 function discord::onDisconnect(%this){

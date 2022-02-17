@@ -30,7 +30,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 {
    Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
    // call the function
-   if(!$Host::TournamentMode && $Host::ClassicEvoStats)
+   if($Host::ClassicEvoStats)
       handleDamageStat(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
 }
 
@@ -38,7 +38,7 @@ function DefaultGame::onClientKilled(%game, %clVictim, %clKiller, %damageType, %
 {
    Parent::onClientKilled(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
    // call the function
-   if(!$Host::TournamentMode && $Host::ClassicEvoStats)
+   if($Host::ClassicEvoStats)
       handleKillStat(%game, %clVictim, %clKiller, %damageType, %implement, %damageLocation);
 }
 
@@ -47,7 +47,7 @@ function ProjectileData::onCollision(%data, %projectile, %targetObject, %modifie
    if(isObject(%targetObject)) // Console spam fix.
    {
       // call the function
-      if(!$Host::TournamentMode && $Host::ClassicEvoStats)
+      if($Host::ClassicEvoStats)
          handleMAStat(%data, %projectile, %targetObject, %modifier, %position, %normal);
    }
    Parent::onCollision( %data, %projectile, %targetObject, %modifier, %position, %normal );

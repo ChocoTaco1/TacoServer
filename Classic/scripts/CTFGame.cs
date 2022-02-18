@@ -636,51 +636,51 @@ function CTFGame::flagCap(%game, %player)
          %realtime = %game.formatTime(%held2, true);
          %tm = %client.team;
 
-      if(%tm == 1 || %tm == 2)
-      {
-         if((%held2 < $flagstats::heldTeam[%tm]) || $flagstats::heldTeam[%tm] == 0)
+         if(%tm == 1 || %tm == 2)
+         {
+            if((%held2 < $flagstats::heldTeam[%tm]) || $flagstats::heldTeam[%tm] == 0)
+            {
+               if(%mincheck)
+               {
+                  %prevheld2 = $flagstats::heldTeam[%tm];
+                  $flagstats::heldTeam[%tm] = %held2;
+                  $flagstats::realTeam[%tm] = %realTime;
+                  $flagstats::nickTeam[%tm] = %client.nameBase;
+               }
+               %record = true;
+            }
+         }
+
+         if(%record == true)
          {
             if(%mincheck)
             {
-               %prevheld2 = $flagstats::heldTeam[%tm];
-               $flagstats::heldTeam[%tm] = %held2;
-               $flagstats::realTeam[%tm] = %realTime;
-               $flagstats::nickTeam[%tm] = %client.nameBase;
+               %fileOut = "stats/maps/classic/" @ $CurrentMissionType @ "/" @ $CurrentMission @ ".txt";
+               export("$flagstats::*", %fileOut, false);
+               if(%prevheld2)
+                  %saved = "\c2Saved: \c3-" @ %game.formatTime(%prevheld2 - %held2, true) @ "\c2";
+               schedule(4000, 0, "messageAll", 'MsgCTFNewRecord', "\c2It's a new record! Time: \c3"@%realtime@"\c2 " @ %saved @ "~wfx/misc/hunters_horde.wav");	
             }
-            %record = true;
+            else
+               schedule(4000, 0, "messageClient", %client, '', "\c2New flag records are disabled until" SPC $Host::MinFlagRecordPlayerCount SPC "players.");
          }
-      }
-
-      if(%record == true)
-      {
-         if(%mincheck)
-         {
-            %fileOut = "stats/maps/classic/" @ $CurrentMissionType @ "/" @ $CurrentMission @ ".txt";
-            export("$flagstats::*", %fileOut, false);
-            if(%prevheld2)
-               %saved = "\c2Saved: \c3-" @ %game.formatTime(%prevheld2 - %held2, true) @ "\c2";
-            schedule(4000, 0, "messageAll", 'MsgCTFNewRecord', "\c2It's a new record! Time: \c3"@%realtime@"\c2 " @ %saved @ "~wfx/misc/hunters_horde.wav");	
-         }
-         else
-            schedule(4000, 0, "messageClient", %client, '', "\c2New flag records are disabled until" SPC $Host::MinFlagRecordPlayerCount SPC "players.");
-      }
 		     
-		 bottomprint(%client, "You captured the flag in" SPC %realTime SPC "seconds.", 10, 1);
+		   bottomprint(%client, "You captured the flag in" SPC %realTime SPC "seconds.", 10, 1);
 		
-		 $stats::caps[%client]++;
-		 if($stats::caps[%client] > $stats::caps_counter)
-		 {
-			$stats::caps_counter = $stats::caps[%client];
-			$stats::caps_client = getTaggedString(%client.name);
-		 }
-			
-		 if(%held2 < $stats::fastestCap || !$stats::fastestCap)
-		 {
-			$stats::fastestCap = %held2;
-			$stats::fastcap_time = %realTime;
-			$stats::fastcap_client = getTaggedString(%client.name);
-		 }
-	  }
+         $stats::caps[%client]++;
+         if($stats::caps[%client] > $stats::caps_counter)
+         {
+            $stats::caps_counter = $stats::caps[%client];
+            $stats::caps_client = getTaggedString(%client.name);
+         }
+            
+         if(%held2 < $stats::fastestCap || !$stats::fastestCap)
+         {
+            $stats::fastestCap = %held2;
+            $stats::fastcap_time = %realTime;
+            $stats::fastcap_client = getTaggedString(%client.name);
+         }
+	   }
    }
 
    //award points to player and team

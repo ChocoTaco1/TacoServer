@@ -851,12 +851,12 @@ function SCtFGame::flagCap(%game, %player)
 
    if($Host::ClassicEvoStats)
    {
-	  %record = false;
-     %mincheck = false;
-	  if($TotalTeamPlayerCount >= $Host::MinFlagRecordPlayerCount)
-		  %mincheck = true;
-	  if(%game.totalFlagHeldTime[%flag])
-	  {
+      %record = false;
+      %mincheck = false;
+      if($TotalTeamPlayerCount >= $Host::MinFlagRecordPlayerCount)
+         %mincheck = true;
+      if(%game.totalFlagHeldTime[%flag])
+      {
          %held2 = getSimTime() - %game.totalFlagHeldTime[%flag];
          %realtime = %game.formatTime(%held2, true);
          %tm = %client.team;

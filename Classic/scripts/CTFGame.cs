@@ -503,10 +503,10 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
    
    if(%grabspeed)
    {
-	  messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
-	  messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1! (speed: %5Kph)~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase, %grabspeed);
-	  messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
-	  messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag. (Speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1! (Speed: %5Kph)~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag. (Speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag. (Speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
 
       if(%grabspeed > 300)
 		messageAll('', "~wfx/Bonuses/high-level4-blazing.wav");
@@ -620,60 +620,49 @@ function CTFGame::flagCap(%game, %player)
 	   }
    }
 
-   %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
+   %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], true); // z0dd - ZOD, 8/15/02. How long did player hold flag?
    
    %game.playerLostFlagTarget(%player);
 
    if($Host::ClassicEvoStats)
    {
 	  %record = false;
+     %mincheck = false;
 	  if($TotalTeamPlayerCount >= $Host::MinFlagRecordPlayerCount)
-		  %recordit = true;
+		  %mincheck = true;
 	  if(%game.totalFlagHeldTime[%flag])
 	  {
-		 %held2 = getSimTime() - %game.totalFlagHeldTime[%flag];
-		 %realtime = %game.formatTime(%held2, true);
-		 if(%client.team == 1)
-		 {
-			if((%held2 < $flagstats::heldTeam1) || $flagstats::heldTeam1 == 0)
-			{
-			   if(%recordit)
-			   {
-				   $flagstats::heldTeam1 = %held2;
-				   $flagstats::realTeam1 = %realTime;
-				   $flagstats::nickTeam1 = %client.nameBase;
-			   }
-			   %record = true;
-			}
-		 }
-		 else if(%client.team == 2)
-		 {
-			if((%held2 < $flagstats::heldTeam2) || $flagstats::heldTeam2 == 0)
-			{
-			   if(%recordit)
-			   {
-				   $flagstats::heldTeam2 = %held2;
-				   $flagstats::realTeam2 = %realTime;
-				   $flagstats::nickTeam2 = %client.nameBase;
-			   }
-			   %record = true;
-			}
-		 }
+         %held2 = getSimTime() - %game.totalFlagHeldTime[%flag];
+         %realtime = %game.formatTime(%held2, true);
+         %tm = %client.team;
 
-		 if(%record == true)
-		 {
-			if(%recordit)
-			{
-				%fileOut = "stats/maps/classic/" @ $CurrentMissionType @ "/" @ $CurrentMission @ ".txt";
-				export("$flagstats::*", %fileOut, false);
-				schedule(4000, 0, "messageAll", 'MsgCTFNewRecord', "\c2It's a new record! Time: \c3"@%realtime@"\c2.~wfx/misc/hunters_horde.wav");	
-			}
-			else
-				schedule(4000, 0, "messageClient", %client, '', "\c2New flag records are disabled until" SPC $Host::MinFlagRecordPlayerCount SPC "players.");
-		 }
-		 
-		 if(!$Host::TournamentMode)
-			bottomprint(%client, "You captured the flag in " @ %realTime @ " seconds", 3);
+      if((%held2 < $flagstats::heldTeam[%tm]) || $flagstats::heldTeam[%tm] == 0)
+      {
+         if(%mincheck)
+         {
+            %prevheld2 = $flagstats::heldTeam[%tm];
+            $flagstats::heldTeam[%tm] = %held2;
+            $flagstats::realTeam[%tm] = %realTime;
+            $flagstats::nickTeam[%tm] = %client.nameBase;
+         }
+         %record = true;
+      }
+
+      if(%record == true)
+      {
+         if(%mincheck)
+         {
+            %fileOut = "stats/maps/classic/" @ $CurrentMissionType @ "/" @ $CurrentMission @ ".txt";
+            export("$flagstats::*", %fileOut, false);
+            if(%prevheld2)
+               %saved = "\c2Saved: \c3-" @ %game.formatTime(%prevheld2 - %held2, true) @ "\c2";
+            schedule(4000, 0, "messageAll", 'MsgCTFNewRecord', "\c2It's a new record! Time: \c3"@%realtime@"\c2 " @ %saved @ "~wfx/misc/hunters_horde.wav");	
+         }
+         else
+            schedule(4000, 0, "messageClient", %client, '', "\c2New flag records are disabled until" SPC $Host::MinFlagRecordPlayerCount SPC "players.");
+      }
+		     
+		 bottomprint(%client, "You captured the flag in" SPC %realTime SPC "seconds.", 10, 1);
 		
 		 $stats::caps[%client]++;
 		 if($stats::caps[%client] > $stats::caps_counter)

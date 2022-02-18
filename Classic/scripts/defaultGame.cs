@@ -1782,7 +1782,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
          %nickTeam2 = ($flagstats::heldTeam2 ? $flagstats::nickTeam2 : "N/A");
          %realTeam2 = ($flagstats::heldTeam2 ? $flagstats::realTeam2 : "N/A");
 
-         BottomPrint(%client, "Best caps on " @ $CurrentMission @ ":\n" @ getTaggedString(%game.getTeamName(1)) @ ":" SPC %nickTeam1 @ " in " @ %realTeam1 @ " seconds\n" @ getTaggedString(%game.getTeamName(2)) @ ":" SPC %nickTeam2 @ " in " @ %realTeam2 @ " seconds", 10, 3);
+         BottomPrint(%client, "Best caps on " @ $CurrentMission @ ":\n" @ getTaggedString(%game.getTeamName(1)) @ ":" SPC %nickTeam1 @ " in " @ %realTeam1 @ " seconds\n" @ getTaggedString(%game.getTeamName(2)) @ ":" SPC %nickTeam2 @ " in " @ %realTeam2 @ " seconds", 20, 3);
       }
    }
    else

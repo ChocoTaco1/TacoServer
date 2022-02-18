@@ -636,16 +636,19 @@ function CTFGame::flagCap(%game, %player)
          %realtime = %game.formatTime(%held2, true);
          %tm = %client.team;
 
-      if((%held2 < $flagstats::heldTeam[%tm]) || $flagstats::heldTeam[%tm] == 0)
+      if(%tm == 1 || %tm == 2)
       {
-         if(%mincheck)
+         if((%held2 < $flagstats::heldTeam[%tm]) || $flagstats::heldTeam[%tm] == 0)
          {
-            %prevheld2 = $flagstats::heldTeam[%tm];
-            $flagstats::heldTeam[%tm] = %held2;
-            $flagstats::realTeam[%tm] = %realTime;
-            $flagstats::nickTeam[%tm] = %client.nameBase;
+            if(%mincheck)
+            {
+               %prevheld2 = $flagstats::heldTeam[%tm];
+               $flagstats::heldTeam[%tm] = %held2;
+               $flagstats::realTeam[%tm] = %realTime;
+               $flagstats::nickTeam[%tm] = %client.nameBase;
+            }
+            %record = true;
          }
-         %record = true;
       }
 
       if(%record == true)

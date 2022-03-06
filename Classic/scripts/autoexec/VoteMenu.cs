@@ -157,13 +157,13 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
 				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 
-				if(%multipleTeams)
-				{
-					if($teamDamage)
-						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-					else
-						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-				}
+				//if(%multipleTeams)
+				//{
+				//	if($teamDamage)
+				//		messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
+				//	else
+				//		messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
+				//}
 			}
 		}
 		else
@@ -258,6 +258,12 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 	switch$(%typeName)
 	{
 		case "VoteKickPlayer":
+			if($Host::TournamentMode) // Dont allow Votekicks in Tournament Mode
+			{
+				messageClient(%client, "", "\c2No votekicks in Tournament Mode.");
+				return;
+			}
+			
 			if(%client == %arg1) // client is trying to votekick himself
 				return; // Use the leave button instead, pal.
 
@@ -428,6 +434,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				%msg = %client.nameBase @ " initiated a vote to change the time limit to " @ %time SPC "minutes.";
 				// VoteOvertime
 				StartVOTimeVote(%game);
+
 				$CMHasVoted[%client.guid]++;
 			}
 
@@ -494,7 +501,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 
 		case "stopRunningVote":
-			if($VOStatus !$="InProgress") //Dont allow a stop vote after time has expired, then no new time is set - VoteOverTime
+			if($VOStatus !$="InProgress" || $Host::TournamentMode) //Dont allow a stop vote after time has expired, then no new time is set - VoteOverTime
 			{
 				if(%client.isSuperAdmin || (%client.isAdmin && $Host::AllowAdminStopVote))
 				{
@@ -1538,6 +1545,7 @@ function serverCmdClientPickedTeam(%client, %option)
 		if($Host::TournamentMode && %client.team !$= 0) //Added
 		{
 			messageClient( %client, '', "Teams are locked. Ask an admin to set your team." );
+			schedule(1000, 0, "ClearCenterPrint", %client); //So Press FIRE when ready is cleared, later down the pipe
 			serverCmdClientMakeObserver( %client );
 		}
 		return;

@@ -258,7 +258,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 	switch$(%typeName)
 	{
 		case "VoteKickPlayer":
-			if($Host::TournamentMode && $Host::AllowPlayerTournamentModeVotekick) // Dont allow Votekicks in Tournament Mode
+			if($Host::TournamentMode && !$Host::AllowPlayerTournamentModeVotekick) // Dont allow Votekicks in Tournament Mode
 			{
 				messageClient(%client, "", "\c2No votekicks in Tournament Mode.");
 				return;

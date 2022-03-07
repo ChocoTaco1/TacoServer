@@ -11,6 +11,10 @@
 // $Host::PUGPassword = "pickup";
 // PUG Password is always on no matter what
 // $Host::$PUGpasswordAlwaysOn = 1;
+// Enable a center print between map changes
+// $Host::MapChangeMSG = 0;
+// Message Content
+// $Host::MapChangeMSGContent = "<color:3cb4b4><font:Sui Generis:22>Pickup Night\n<color:3cb4b4><font:Univers:18>Saturday, March 5th\n<color:3cb4b4><font:Univers:16>Join discord for details";
 
 package MissionTypeOptions
 {
@@ -62,6 +66,9 @@ function loadMissionStage2()
 		deactivatePackage(LockedTeams);
 
     parent::loadMissionStage2();
+
+	if($Host::MapChangeMSG)
+		centerPrintAll($Host::MapChangeMSGContent, 12, 3);
 }
 
 };

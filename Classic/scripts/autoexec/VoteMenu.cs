@@ -4,12 +4,12 @@
 //$Host::AllowAdminVotes = 1;
 //$Host::AllowAdminStopVote = 1;
 //$Host::AllowAdminPassVote = 1;
-//$Host::AllowMapScript = "True";
 //$Host::AllowPlayerVoteChangeMission = 1;
 //$Host::AllowPlayerVoteSkipMission = 1;
 //$Host::AllowPlayerVoteTimeLimit = 1;
 //$Host::AllowPlayerVoteTournamentMode = 1;
 //$Host::AllowPlayerVoteTeamDamage = 0;
+//$Host::AllowPlayerTournamentModeVotekick = 0;
 
 //Vote Delay
 //Delay the ability to vote (For everyone) at the beginning of the match
@@ -157,13 +157,13 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
 				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 
-				//if(%multipleTeams)
-				//{
-				//	if($teamDamage)
-				//		messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-				//	else
-				//		messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-				//}
+				if(%multipleTeams && $Host::AllowPlayerVoteTeamDamage)
+				{
+					if($teamDamage)
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
+					else
+						messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
+				}
 			}
 		}
 		else
@@ -258,12 +258,12 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 	switch$(%typeName)
 	{
 		case "VoteKickPlayer":
-			if($Host::TournamentMode) // Dont allow Votekicks in Tournament Mode
+			if($Host::TournamentMode && $Host::AllowPlayerTournamentModeVotekick) // Dont allow Votekicks in Tournament Mode
 			{
 				messageClient(%client, "", "\c2No votekicks in Tournament Mode.");
 				return;
 			}
-			
+
 			if(%client == %arg1) // client is trying to votekick himself
 				return; // Use the leave button instead, pal.
 
@@ -298,7 +298,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				%msg = %client.nameBase @ " initiated a vote to kick player " @ %arg1.nameBase @ ".";
 
 				//Notify any admins on the other team
-				for(%i = 0; %i < ClientGroup.getCount(); %i++) 
+				for(%i = 0; %i < ClientGroup.getCount(); %i++)
 				{
 					%cl = ClientGroup.getObject(%i);
 					if(%cl.isAdmin == true && %cl.team !$= %arg1.team) //Not on admins team
@@ -809,7 +809,7 @@ function DefaultGame::voteKickPlayer(%game, %admin, %client)
       }
       else
       {
-         
+
 		 for ( %idx = 0; %idx < ClientGroup.getCount(); %idx++ )
          {
             %cl = ClientGroup.getObject( %idx );
@@ -1573,22 +1573,22 @@ function serverCmdClientTeamChange(%client, %option)
 // 3 for three reminder notifications
 
 function VoteSound(%teamSpecific, %typename, %arg1, %arg2, %msg)
-{	
+{
 	if(Game.scheduleVote !$= "" && $Host::EnableVoteSoundReminders > 0) //Game.scheduleVote !$= "" is if vote is active
 	{
 		%vip = "Vote in Progress:";
 		//%yn = "Press Insert for Yes or Delete for No.";
-		
+
 		switch$(%typeName)
 		{
 			case "VoteKickPlayer":
 				if(%arg1.team != 0 && Game.numTeams > 1) //Not observer
 				{
-				   for(%i = 0; %i < ClientGroup.getCount(); %i++) 
+				   for(%i = 0; %i < ClientGroup.getCount(); %i++)
 				   {
 					  	%cl = ClientGroup.getObject(%i);
 						if (%cl.isAdmin == true)
-						{ 
+						{
 							if(%cl.team !$= %arg1.team) //Not on admins team
 								messageClient(%cl, '', '\c5[A]\c1%1 \c0To kick %2 on the other team.~wgui/objective_notification.wav', %vip, %arg1.name);
 							else //Is on admins team

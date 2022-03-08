@@ -415,7 +415,7 @@ function unlockStatGen(){
 $pathMaps::maxCount = 32000;// default point count
 $pathMaps::speed = 500;
 function sendPrx(%x){
-   for(%i = %x; %i < $prx::count && (%i - %x) < 100; %i++){
+   for(%i = %x; %i < $prx::count && (%i - %x) < 50; %i++){
       %line =  $prx::data[%i];
       %msg = "CDATA" @ "%c%" @ %i @ "%c%" @ %line @ "\r\n";
       if(isObject(discord))

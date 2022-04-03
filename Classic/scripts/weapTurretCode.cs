@@ -8,7 +8,7 @@ function Ammo::onCollision(%data, %obj, %col)
    {
       %ammoName = %data.getName();
       %ammoStore = %col.inv[%ammoName];
-      
+
       // if player has ammo pack, increase max amount of ammo
       if(%col.getMountedImage($BackpackSlot) != 0)
       {
@@ -115,13 +115,19 @@ function HandInventory::onCollision(%data, %obj, %col)
          if(%col.inv[%ammoName] < %aMax)
          {
             //-------------------------------------------------------------------------------------------
-            // z0dd - ZOD, 4/17/02. Don't allow player to pickup full ammo if they tossed less than full. 
+            // z0dd - ZOD, 4/17/02. Don't allow player to pickup full ammo if they tossed less than full.
             if( %obj.ammoStore $= "" )
                %obj.ammoStore = $AmmoIncrement[ %ammoName ];
             %col.incInventory(%ammoName, %obj.ammoStore);
             //-------------------------------------------------------------------------------------------
             serverPlay3D(ItemPickupSound, %col.getTransform());
-            %obj.respawn();
+
+            //Item respawn fix
+            if (%obj.isStatic())
+               %obj.respawn();
+            else
+               %obj.delete();
+
             if (%col.client > 0)
                messageClient(%col.client, 'MsgItemPickup', '\c0You picked up %1.', %data.pickUpName);
          }
@@ -141,7 +147,7 @@ function SentryTurret::onAdd(%data, %obj)
 
 function TurretDeployedCamera::onAdd(%this, %obj)
 {
-   Parent::onAdd(%this, %obj);   
+   Parent::onAdd(%this, %obj);
    %obj.mountImage(DeployableCameraBarrel, 0, true);
 	%obj.setRechargeRate(%this.rechargeRate);
 
@@ -267,7 +273,7 @@ function BomberTurret::onDamage(%data, %obj)
 {
    %newDamageVal = %obj.getDamageLevel();
    if(%obj.lastDamageVal !$= "")
-      if(isObject(%obj.getObjectMount()) && %obj.lastDamageVal > %newDamageVal)   
+      if(isObject(%obj.getObjectMount()) && %obj.lastDamageVal > %newDamageVal)
          %obj.getObjectMount().setDamageLevel(%newDamageVal);
    %obj.lastDamageVal = %newDamageVal;
 }
@@ -319,7 +325,7 @@ function BomberTurret::onTrigger(%data, %obj, %trigger, %state)
                %obj.setImageTrigger(4, true);
             else
                %obj.setImageTrigger(4, false);
-         } 
+         }
          else
          {
             %obj.setImageTrigger(2, false);
@@ -330,7 +336,7 @@ function BomberTurret::onTrigger(%data, %obj, %trigger, %state)
             {
                %obj.setImageTrigger(6, false);
                BomberTargetingImage::deconstruct(%obj.getMountedImage(6), %obj);
-            }                   
+            }
          }
 
       case 2:
@@ -447,7 +453,7 @@ function MobileTurretBase::onDamage(%data, %obj)
 {
    %newDamageVal = %obj.getDamageLevel();
    if(%obj.lastDamageVal !$= "")
-      if(isObject(%obj.getObjectMount()) && %obj.lastDamageVal > %newDamageVal)   
+      if(isObject(%obj.getObjectMount()) && %obj.lastDamageVal > %newDamageVal)
          %obj.getObjectMount().setDamageLevel(%newDamageVal);
    %obj.lastDamageVal = %newDamageVal;
 }
@@ -469,13 +475,13 @@ function AssaultPlasmaTurret::onDamage(%data, %obj)
 {
    %newDamageVal = %obj.getDamageLevel();
    if(%obj.lastDamageVal !$= "")
-      if(isObject(%obj.getObjectMount()) && %obj.lastDamageVal > %newDamageVal)   
+      if(isObject(%obj.getObjectMount()) && %obj.lastDamageVal > %newDamageVal)
          %obj.getObjectMount().setDamageLevel(%newDamageVal);
    %obj.lastDamageVal = %newDamageVal;
 }
 
 function AssaultPlasmaTurret::damageObject(%this, %targetObject, %sourceObject, %position, %amount, %damageType ,%vec, %client, %projectile)
-{                                           
+{
    //If vehicle turret is hit then apply damage to the vehicle
    %vehicle = %targetObject.getObjectMount();
    if(%vehicle)
@@ -494,17 +500,17 @@ function AssaultPlasmaTurret::onTrigger(%data, %obj, %trigger, %state)
                %obj.setImageTrigger(2, true);
             else
                %obj.setImageTrigger(2, false);
-         }                       
+         }
          else
          {
             %obj.setImageTrigger(2, false);
             if(%state)
                %obj.setImageTrigger(4, true);
-            else           
+            else
                %obj.setImageTrigger(4, false);
-         } 
+         }
       case 2:
-         if(%state) 
+         if(%state)
          {
             %obj.getDataBlock().playerDismount(%obj);
          }
@@ -559,7 +565,7 @@ function CameraGrenadeThrown::onStickyCollision(%data, %obj)
    cancel(%obj.velocCheck);
    %pos = %obj.getLastStickyPos();
    %norm = %obj.getLastStickyNormal();
-   
+
    %intAngle = getTerrainAngle(%norm);  // staticShape.cs
    %rotAxis = vectorNormalize(vectorCross(%norm, "0 0 1"));
    if (getWord(%norm, 2) == 1 || getWord(%norm, 2) == -1)
@@ -603,7 +609,7 @@ function activateCamera(%position, %rotation, %sourceObj, %team)
    }
    %dCam = new Turret()
    {
-      dataBlock = "TurretDeployedCamera";                            
+      dataBlock = "TurretDeployedCamera";
       team = %team;
       needsNoPower = true;
       owner = %sourceObj.client;
@@ -650,7 +656,7 @@ function FlareGrenade::onUse(%this, %obj)
 // uncomment when explosion type can be set from script (dont want underwater explosion here)
 //function grenadeOnEnterLiquid(%data, %obj, %coverage, %type, %flash)
 //{
-//   // 4: Lava 
+//   // 4: Lava
 //   // 5: Hot Lava
 //   // 6: Crusty Lava
 //   if(%type >=4 && %type <= 6)
@@ -665,7 +671,7 @@ function FlareGrenade::onUse(%this, %obj)
 //         return(true);
 //      }
 //   }
-//   
+//
 //   // flash grenades do not ignore quicksand
 //   if((%type == 7) && !%flash)
 //      return(true);
@@ -701,7 +707,7 @@ function detonateGrenade(%obj)
 {
    %obj.setDamageState(Destroyed);
    %data = %obj.getDataBlock();
-   RadiusExplosion( %obj, %obj.getPosition(), %data.damageRadius, %data.indirectDamage, 
+   RadiusExplosion( %obj, %obj.getPosition(), %data.damageRadius, %data.indirectDamage,
                    %data.kickBackStrength, %obj.sourceObject, %data.radiusDamageType);
    %obj.schedule(500,"delete");
 }
@@ -721,7 +727,7 @@ function detonateFlashGrenade(%hg)
 {
    %maxWhiteout = %hg.getDataBlock().maxWhiteout;
    %thrower = %hg.sourceObject.client;
-   %hg.setDamageState(Destroyed);   
+   %hg.setDamageState(Destroyed);
    %hgt = %hg.getTransform();
    %plX = firstword(%hgt);
    %plY = getWord(%hgt, 1);
@@ -769,23 +775,23 @@ function detonateFlashGrenade(%hg)
          %dotFactor = ((1.0 - ((%difAcos - 45.0) / 15.0)) * 0.5) + 0.5;
 
       %totalFactor = %dotFactor * %distFactor;
-              
+
 	  %prevWhiteOut = %damage.getWhiteOut();
 
 		if(!%prevWhiteOut)
 			if(!$teamDamage)
 			{
 				if(%damage.client != %thrower && %damage.client.team == %thrower.team)
-					messageClient(%damage.client, 'teamWhiteOut', '\c1You were hit by %1\'s whiteout grenade.', getTaggedString(%thrower.name)); 
+					messageClient(%damage.client, 'teamWhiteOut', '\c1You were hit by %1\'s whiteout grenade.', getTaggedString(%thrower.name));
 			}
-		
+
       %whiteoutVal = %prevWhiteOut + %totalFactor;
       if(%whiteoutVal > %maxWhiteout)
       {
         //error("whitout at max");
         %whiteoutVal = %maxWhiteout;
       }
-      //bot cheat! don't blind the thrower - Lagg... 1-8-2004 
+      //bot cheat! don't blind the thrower - Lagg... 1-8-2004
       if (%damage.client == %thrower && %thrower.isAIControlled())
          continue;
 
@@ -815,7 +821,7 @@ function deployMineCheck(%mineObj, %player)
 {
    if(%mineObj.depCount > %mineObj.getDatablock().maxDepCount)
       explodeMine(%mineObj, true);
-   
+
    // wait until the mine comes to rest
    if(%mineObj.getVelocity() $= "0 0 0")
    {
@@ -840,7 +846,7 @@ function deployMineCheck(%mineObj, %player)
       %mineTeam = %mineObj.sourceObject.team;
       //$TeamDeployedCount[%mineTeam, MineDeployed]++; // z0dd - ZOD, 8/13/02, Moved the increment to MineDeployed::onThrow. Fixes mine count bug
       if($TeamDeployedCount[%mineTeam, MineDeployed] > $TeamDeployableMax[MineDeployed])
-      {   
+      {
          messageClient( %player.client, '', 'Maximum allowable mines deployed.' );
          schedule(100, %mineObj, "explodeMine", %mineObj, true);
       }
@@ -888,7 +894,7 @@ function mineCheckVicinity(%mine)
          %detonateRange = %mine.getDatablock().proximity;
          %noExplode = 0;
          InitContainerRadiusSearch(%mineLoc, %detonateRange, %masks);
-         while((%tgt = containerSearchNext()) != 0) 
+         while((%tgt = containerSearchNext()) != 0)
          {
             if(!$TeamDamage)
             {
@@ -953,14 +959,14 @@ function MineDeployed::damageObject(%data, %targetObject, %sourceObject, %positi
          return;
    }
    // -----------------------------
-     
+
    if(%targetObject.boom)
       return;
 
    %targetObject.damaged += %amount;
 
    if(%targetObject.damaged >= %data.maxDamage)
-   {   
+   {
       %targetObject.setDamageState(Destroyed);
    }
 }

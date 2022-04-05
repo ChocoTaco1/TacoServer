@@ -12,9 +12,10 @@ $discordBot::autoStart = 0;
 //used on the bot to help split thigns up
 $discordBot::cmdSplit = "%c%";
 $discordBot::cmdSubSplit = "%t%";
-//These are set via the bot 
+//These are set via the bot
 $discordBot::monitorChannel = 0;
 $discordBot::serverFeed = 1;
+
 package discordPackage
 {
 
@@ -202,6 +203,7 @@ function discordBotProcess(%type, %var1, %var2, %var3, %var4, %var5, %var6)
 		sendToDiscordEmote(%msg, $discordBot::serverFeed);
 	}
 }
+
 function sendToDiscord(%msg,%channel)
 {
    if(isObject(discord) && %msg !$= "")
@@ -223,14 +225,16 @@ function sendToDiscordEmote(%msg,%channel)//emote filter will be applyed used in
    }
 }
 function discordCon(){
-   if(discord.lastState !$= "Connected"){
+   if(discord.lastState !$= "Connected" && discord.lastState !$=  "Connecting"){
       if(isEventPending($discordBot::reconnectEvent))
          cancel($discordBot::reconnectEvent);
       if(isObject(discord))
          discord.delete();
       new TCPObject(discord);
       discord.lastState = "Connecting";
-      discord.connect($discordBot::IP);
+      //discord.connect($discordBot::IP);
+      discord.schedule(1000, "connect", $discordBot::IP);
+      //discord.schedule(5000, "send", "AUTH" @ $discordBot::cmdSplit @ $discordBot::cmdSplit @ $Host::GameName @ "\r\n");
    }
 }
 function discordKill(){
@@ -241,36 +245,39 @@ function discordKill(){
 
 function discord::onDNSFailed(%this){
    %this.lastState = "DNSFailed";
-   error(%this.lastState);
+   error("Discord" SPC %this.lastState);
 }
 
 function discord::onConnectFailed(%this){
-   %this.lastState = "ConnectFailed";
-   error(%this.lastState);
-   discord.delete();
    if(isEventPending($discordBot::reconnectEvent))
       cancel($discordBot::reconnectEvent);
    $discordBot::reconnectEvent = schedule($discordBot::reconnectTimeout,0,"discordCon");
+   %this.lastState = "ConnectFailed";
+   error("Discord" SPC %this.lastState);
+   discord.delete();
 }
 
 function discord::onDNSResolved(%this){
    %this.lastState = "DNSResolved";
-   error(%this.lastState);
+   error("Discord" SPC %this.lastState);
 }
 
 function discord::onConnected(%this){
+   discord.schedule(1000, "send", "AUTH" @ $discordBot::cmdSplit @ $discordBot::cmdSplit @ $Host::GameName @ "\r\n");
    %this.lastState = "Connected";
-   error(%this.lastState);
-   discord.send("AUTH" @ $discordBot::cmdSplit @ $discordBot::cmdSplit @ $Host::GameName @ "\r\n");
+   error("Discord" SPC %this.lastState);
 }
 
 function discord::onDisconnect(%this){
-   %this.lastState = "Disconnected";
-   error(%this.lastState);
-   discord.delete();
+   if(%this.lastState $= "Connecting" && $discordBot::failCon++ < 20){
+      schedule(5000,0,"discordCon");
+   }
    if(isEventPending($discordBot::reconnectEvent))
       cancel($discordBot::reconnectEvent);
    $discordBot::reconnectEvent = schedule($discordBot::reconnectTimeout,0,"discordCon");
+   %this.lastState = "Disconnected";
+   error("Discord" SPC %this.lastState);
+   discord.delete();
 }
 
 function discord::onLine(%this, %line){
@@ -279,6 +286,34 @@ function discord::onLine(%this, %line){
    switch$(%cmd){
       //case "Discord":
          //messageAll( 'MsgDiscord', '\c3Discord: \c4%1 %2',getWord(%lineStrip,1),getWords(%lineStrip,2,getWordCount(%lineStrip) -1));
+      case "PLOTSTOP":
+         $pathMaps::running = 0;
+      case "PLOTPLAYER":
+         startPlayerPlot(getWord(%lineStrip,1));
+      case "GETSTAT":
+            %var = getWord(%lineStrip,1);
+            %mon = getWord(%lineStrip,2);
+            %year = getWord(%lineStrip,3);
+            %game = getWord(%lineStrip,4);
+            %returnIndex = getWord(%lineStrip,5);
+            %nameList = $lData::name[%var,%game,"month",%mon,%year];
+            %dataList = $lData::data[%var,%game,"month",%mon,%year];
+            %nameList = strreplace(%nameList,"\t","%t");
+            %dataList = strreplace(%dataList,"\t","%t");
+            error("Discord" SPC "GETSTAT" SPC %var SPC %mon SPC %year SPC %game SPC %returnIndex);
+            discord.schedule(32,"send","SINSTAT" @ "%c%" @ %nameList @ "%c%" @ %dataList @ "%c%" @ %returnIndex @ "%c%" @ %var @ "\r\n");
+      case "GENSTATS":
+         if(!$genStatsLockout){
+            $genStatsLockout = 1;
+            %month = getWord(%lineStrip,1);
+            %year = getWord(%lineStrip,2);
+            if(%month > 0 && %year > 0){
+               schedule(1000, 0, "sendLDATA", %month, %year, "CTFGame");
+            }
+         }
+         else{
+            sendToDiscord("Already Building Please Wait", $discordBot::monitorChannel);
+         }
       case "PING":
          discord.send("PONG" @ $discordBot::cmdSplit @ "\r\n");
       case "PINGAVG":
@@ -308,20 +343,143 @@ function discord::onLine(%this, %line){
          }
       case "PINGLIST":
          if(isObject(discord) && discord.lastState $= "Connected"){
-            %channel = 1;
             if(ClientGroup.getCount() > 0){
                for(%i = 0; %i < ClientGroup.getCount(); %i++){
                   %cl = ClientGroup.getObject(%i);
                   %ping = %cl.isAIControlled() ? 0 : %cl.getPing();
                   %msg = %cl.namebase @ $discordBot::cmdSubSplit @ %ping @ $discordBot::cmdSubSplit @ %i;
-                  discord.schedule(%i*32,"send","MSGSTACK" @ $discordBot::cmdSplit @ (%channel-1) @ $discordBot::cmdSplit @ %msg @ "\r\n");
+                  discord.schedule(%i*32,"send","MSGSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ %msg @ "\r\n");
                }
-               discord.schedule((%i+1)*32,"send","PROCSTACK" @ $discordBot::cmdSplit @ (%channel-1) @ $discordBot::cmdSplit @ "msgList" @ "\r\n");
+               discord.schedule((%i+1)*32,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "msgList" @ "\r\n");
             }
          }
       default:
-         error("Bad Command" SPC %line);
+         error("Discord Bad Command" SPC %line);
    }
 }
-if(!isObject(discord) && $discordBot::autoStart)
-    discordCon();
+if(!isObject(discord) && $discordBot::autoStart){
+   discordCon();
+}
+
+function sendLDATA(%month, %year, %type){
+    %file = new FileObject();
+   RootGroup.add(%file);
+   %folderPath = "serverStats/LData/*.cs";
+   %count = getFileCount(%folderPath);
+   %found = 0;
+   for (%i = 0; %i < %count; %i++){
+      %filepath = findNextfile(%folderPath);
+      %fieldPath =strreplace(%filePath,"-","\t");
+      %game = getField(%fieldPath,1);
+      %m = getField(%fieldPath,2); // 0 path / 1  game / 2 mon / 3 year / 4 type / 5 .cs
+      %y = getField(%fieldPath,3);
+      //%lType = getField(%fieldPath,4);
+      if(%month $= %m && %y $= %year && %game $= %type){
+         %found = 1;
+         break;
+      }
+   }
+   $dtSendDataMon = %month;
+   $dtSendDataYear = %year;
+   $dtSendDataType = %type;
+   if(isFile(%filepath) && %found){
+      sendToDiscord("Building Big Stats", $discordBot::monitorChannel);
+      %file.OpenForRead(%filepath);
+      %i = 0;
+      while(!%file.isEOF()){
+         %line =  %file.readLine();
+         if(strPos(%line,"%tguid") == -1){
+            discord.schedule((%i++)*32,"send","STATSDATA" @ "%c%" @ $dtSendDataMon @ "%c%" @ $dtSendDataType @ "%c%" @ %line @ "\r\n");
+         }
+      }
+      error("Sent LData To Discord" SPC %month SPC %year SPC %type SPC %i);
+      discord.schedule((%i++*32)+1000,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "buildStats" @ $discordBot::cmdSplit @ %month @ $discordBot::cmdSplit @ %year @ $discordBot::cmdSplit @ %type @ $discordBot::cmdSplit @ "\r\n");
+      schedule((%i++*32)+1000, 0, "unlockStatGen");
+
+   }
+   else{
+      sendToDiscord("Error no file found", $discordBot::monitorChannel);
+      $genStatsLockout = 0;
+   }
+   %file.close();
+   %file.delete();
+}
+function unlockStatGen(){
+   $genStatsLockout = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//Player Path Maps
+////////////////////////////////////////////////////////////////////////////////
+
+$pathMaps::maxCount = 32000;// default point count
+$pathMaps::speed = 500;
+function sendPrx(%x){
+   for(%i = %x; %i < $prx::count && (%i - %x) < 50; %i++){
+      %line =  $prx::data[%i];
+      %msg = "CDATA" @ "%c%" @ %i @ "%c%" @ %line @ "\r\n";
+      if(isObject(discord))
+         discord.send(%msg);
+      //discord.schedule(%i,"send",%msg);
+   }
+   if(%i < $prx::count)
+      schedule(128, 0, "sendPrx", %i);
+   else
+      discord.schedule(5000,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "buildprx" @ $discordBot::cmdSplit @ $prx::terFile @ $discordBot::cmdSplit @ $prx::misFile @ "\r\n");
+}
+
+function startPlayerPlot(%count){
+   if(!$pathMaps::running && (($MatchStarted + $missionRunning) == 2)){
+      if(%count > 1000){
+         $pathMaps::maxCount = %count;
+      }
+      $prx::terFile = Terrain.terrainFile;
+      $prx::misFile = $missionName;
+      $prx::count = 0;
+      $pathMaps::running = 1;
+      pathMapData();
+      sendToDiscord("Player Plot Started" SPC $pathMaps::maxCount, $discordBot::monitorChannel);
+      error("Player Plot Started");
+   }
+   else{
+      sendToDiscord("Game Has Not Started Yet", $discordBot::monitorChannel);
+   }
+}
+function floorVector(%vec){
+   return mFloor(getWord(%vec,0)) SPC mFloor(getWord(%vec,1)) SPC mFloor(getWord(%vec,2));
+}
+function pathDataPoint(%client){
+   %player = %client.player;
+   if(isObject(%player)){
+      %veh =  (isObject(%client.vehicleMounted)) ? %client.vehicleMounted.getDataBlock().getName() : 0;
+      $prx::data[$prx::Count] = %client.nameBase @ "%c" @ %pos @ "%c" @ %client.team @ "%c" @ isObject(%player.holdingFlag) @ "%c" @ %veh @ "%c" @ getSimTime();
+      $prx::count++;
+   }
+}
+function pathMapData(){ //loop to collect player position data
+   for(%x = 0; %x < ClientGroup.getCount(); %x++){
+      %client = ClientGroup.getObject(%x);
+      %player = %client.player;
+      if(isObject(%player)){
+         %pos = %player.getPosition();
+         %fpos = floorVector(%pos);
+         if(%player.lpm !$= %fpos){
+            %veh =  (isObject(%client.vehicleMounted)) ? %client.vehicleMounted.getDataBlock().getName() : 0;
+            $prx::data[$prx::Count] = %client.nameBase @ "%c" @ %pos @ "%c" @ %client.team @ "%c" @ isObject(%player.holdingFlag) @ "%c" @ %veh @ "%c" @ getSimTime();
+            $prx::count++;
+         }
+         %player.lpm = %fpos;
+      }
+   }
+   if(!($prx::eCount++ % 10)){error("pathMapData" SPC $prx::Count);}
+
+   if($pathMaps::running && (($MatchStarted + $missionRunning) == 2)  && $prx::Count < $pathMaps::maxCount){// note will stop at end of mission
+      schedule($pathMaps::speed, 0,"pathMapData");
+   }
+   else{
+      $pathMaps::running = 0;
+      sendToDiscord("Player Plot Processing", $discordBot::monitorChannel);
+      error("Player Plot Tracking Has Ended");
+      sendPrx(0);
+   }
+}

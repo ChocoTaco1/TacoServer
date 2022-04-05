@@ -2,7 +2,7 @@
 
 //--- GAME RULES BEGIN ---
 //Prevent enemy from capturing your flag
-//Score one point for grabbing the enemy's flag 
+//Score one point for grabbing the enemy's flag
 //To capture, your flag must be at its stand
 //Score 100 points each time enemy flag is captured
 //--- GAME RULES END ---
@@ -13,14 +13,14 @@ exec("scripts/aiCTF.cs");
 //-- tracking  ---
 function CTFGame::initGameVars(%game)
 {
-   // --------------------------------------------------- 
+   // ---------------------------------------------------
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
    %game.SCORE_PER_SUICIDE             = 0; // z0dd - ZOD, 8/19/02. No penalty for suicide! Was -10
    %game.SCORE_PER_TEAMKILL            = -10;
-   %game.SCORE_PER_DEATH               = 0;  
+   %game.SCORE_PER_DEATH               = 0;
    %game.SCORE_PER_TK_DESTROY          = -10; // z0dd - ZOD, 10/03/02. Penalty for TKing equiptment.
 
-   %game.SCORE_PER_KILL                = 10; 
+   %game.SCORE_PER_KILL                = 10;
    %game.SCORE_PER_PLYR_FLAG_CAP       = 30;
    %game.SCORE_PER_PLYR_FLAG_TOUCH     = 20;
    %game.SCORE_PER_TEAM_FLAG_CAP       = 100;
@@ -32,7 +32,7 @@ function CTFGame::initGameVars(%game)
 
    %game.SCORE_PER_TURRET_KILL         = 10; // controlled
    %game.SCORE_PER_TURRET_KILL_AUTO    = 5;  // uncontrolled, z0dd - ZOD, 5/27/03. More points, was 3
-   %game.SCORE_PER_FLAG_DEFEND         = 5; 
+   %game.SCORE_PER_FLAG_DEFEND         = 5;
    %game.SCORE_PER_CARRIER_KILL        = 5;
    %game.SCORE_PER_FLAG_RETURN         = 10;
    %game.SCORE_PER_STALEMATE_RETURN    = 15;
@@ -74,7 +74,7 @@ function CTFGame::initGameVars(%game)
 
    %game.TIME_CONSIDERED_FLAGCARRIER_THREAT = 3 * 1000;  //after damaging enemy flag carrier
    %game.RADIUS_GEN_DEFENSE = 20;  //meters
-   %game.RADIUS_FLAG_DEFENSE = 20;  //meters 
+   %game.RADIUS_FLAG_DEFENSE = 20;  //meters
 
    %game.TOUCH_DELAY_MS = 20000;  //20 secs
 
@@ -87,9 +87,9 @@ function CTFGame::initGameVars(%game)
    %game.stalemateTimeMS = 60000;
    %game.stalemateFreqMS = 15000;
    %game.stalemateDurationMS = 6000;
-   
-   
-   // --------------------------------------------------- 
+
+
+   // ---------------------------------------------------
 
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
 }
@@ -242,7 +242,7 @@ function Flag::onEnterLiquid(%data, %obj, %coverage, %type)
     if(%type > 3)  // 1-3 are water, 4+ is lava and quicksand(?)
     {
         //error("flag("@%obj@") is in liquid type" SPC %type);
-        // Changed slightly so this can be cancelled if it leaves the 
+        // Changed slightly so this can be cancelled if it leaves the
         // lava before its supposed to be returned - Ilys
         %obj.lavaEnterThread = Game.schedule(3000, "flagReturn", %obj);
     }
@@ -251,7 +251,7 @@ function Flag::onEnterLiquid(%data, %obj, %coverage, %type)
 function Flag::onLeaveLiquid(%data, %obj, %type)
 {
    // Added to stop the flag retrun if it slides out of the lava  - Ilys
-   if(isEventPending(%obj.lavaEnterThread)) 
+   if(isEventPending(%obj.lavaEnterThread))
       cancel(%obj.lavaEnterThread);
 }
 
@@ -298,35 +298,35 @@ function CTFGame::getTeamSkin(%game, %team)
                 else if(%team == 2)
                     %skin = 'dsword';
                 else %skin = 'base';
-            
+
             case "badlands":
                 if(%team == 1)
                     %skin = 'swolf';
                 else if(%team == 2)
                     %skin = 'dsword';
                 else %skin = 'base';
-            
+
             case "ice":
                 if(%team == 1)
                     %skin = 'swolf';
                 else if(%team == 2)
                     %skin = 'beagle';
                 else %skin = 'base';
-            
+
             case "desert":
                 if(%team == 1)
                     %skin = 'cotp';
                 else if(%team == 2)
                     %skin = 'beagle';
                 else %skin = 'base';
-            
+
             case "Volcanic":
                 if(%team == 1)
                     %skin = 'dsword';
                 else if(%team == 2)
                     %skin = 'cotp';
                 else %skin = 'base';
-            
+
             default:
                 if(%team == 2)
                     %skin = 'baseb';
@@ -334,7 +334,7 @@ function CTFGame::getTeamSkin(%game, %team)
         }
     }
     else %skin = $teamSkin[%team];
-    
+
     //error("%skin = " SPC getTaggedString(%skin));
     return %skin;
 }
@@ -358,7 +358,7 @@ function CTFGame::missionLoadDone(%game)
    for(%i = 1; %i < (%game.numTeams + 1); %i++)
       $teamScore[%i] = 0;
 
-   // remove 
+   // remove
    MissionGroup.clearFlagWaypoints();
 
    //reset some globals, just in case...
@@ -376,7 +376,7 @@ function CTFGame::playerTouchFlag(%game, %player, %flag)
    if ((%flag.carrier $= "") && (%player.getState() !$= "Dead"))
    {
       // z0dd - ZOD, 5/07/04. Cancel the lava return.
-      if(isEventPending(%obj.lavaEnterThread)) 
+      if(isEventPending(%obj.lavaEnterThread))
          cancel(%obj.lavaEnterThread);
 
       //flag isn't held and has been touched by a live player
@@ -390,7 +390,7 @@ function CTFGame::playerTouchFlag(%game, %player, %flag)
 }
 
 function CTFGame::playerTouchOwnFlag(%game, %player, %flag)
-{   
+{
    if(%flag.isHome)
    {
       if (%player.holdingFlag !$= "")
@@ -400,7 +400,7 @@ function CTFGame::playerTouchOwnFlag(%game, %player, %flag)
       %game.flagReturn(%flag, %player);
 
    //call the AI function
-   %game.AIplayerTouchOwnFlag(%player, %flag);            
+   %game.AIplayerTouchOwnFlag(%player, %flag);
 }
 
 function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
@@ -419,7 +419,7 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
    %client = %player.client;
    %player.holdingFlag = %flag;  //%player has this flag
    %flag.carrier = %player;  //this %flag is carried by %player
-   
+
    // attach the camera to the flag.carrier
    if($Observers)
    {
@@ -430,10 +430,10 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
 				observeFlag(%cl, %player.client, 2, %flag.team);
 	   }
    }
-   
+
    %player.mountImage(FlagImage, $FlagSlot, true, %game.getTeamSkin(%flag.team));
    %game.playerGotFlagTarget(%player);
-   
+
    //only cancel the return timer if the player is in bounds...
    if(!%client.outOfBounds)
    {
@@ -484,7 +484,7 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
    {
 	  // get the grab speed
 	  %grabspeed = mFloor(VectorLen(setWord(%player.getVelocity(), 2, 0)) * 3.6);
-	   	
+
       if(%grabspeed > $stats::MaxGrabSpeed || ($stats::MaxGrabSpeed $= ""))
       {
         $stats::MaxGrabSpeed = %grabspeed;
@@ -493,20 +493,20 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
    }
 
    %flag.hide(true);
-   %flag.startFade(0, 0, false);         
+   %flag.startFade(0, 0, false);
    %flag.isHome = false;
    if(%flag.stand)
       %flag.stand.getDataBlock().onFlagTaken(%flag.stand);//animate, if exterior stand
 
    $flagStatus[%flag.team] = %client.nameBase;
    %teamName = %game.getTeamName(%flag.team);
-   
+
    if(%grabspeed)
    {
-	  messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
-	  messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1! (speed: %5Kph)~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase, %grabspeed);
-	  messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
-	  messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag. (speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeamExcept(%client, 'MsgCTFFlagTaken', '\c2Teammate %1 took the %2 flag. (Speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeam(%flag.team, 'MsgCTFFlagTaken', '\c2Your flag has been taken by %1! (Speed: %5Kph)~wfx/misc/flag_taken.wav',%client.name, 0, %flag.team, %client.nameBase, %grabspeed);
+	  messageTeam(0, 'MsgCTFFlagTaken', '\c2%1 took the %2 flag. (Speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
+	  messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag. (Speed: %5Kph)~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase, %grabspeed);
 
       if(%grabspeed > 300)
 		messageAll('', "~wfx/Bonuses/high-level4-blazing.wav");
@@ -519,7 +519,7 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
       messageClient(%client, 'MsgCTFFlagTaken', '\c2You took the %2 flag.~wfx/misc/flag_snatch.wav', %client.name, %teamName, %flag.team, %client.nameBase);
    }
    logEcho(%client.nameBase@" (pl "@%player@"/cl "@%client@") took team "@%flag.team@" flag ("@%grabspeed@")"); // MP: 6/15/2011 added grabspeed.
-   
+
    //call the AI function
    %game.AIplayerTouchEnemyFlag(%player, %flag);
 
@@ -559,19 +559,19 @@ function CTFGame::playerDroppedFlag(%game, %player)
 {
    %client = %player.client;
    %flag = %player.holdingFlag;
-   
+
    %game.updateFlagTransform(%flag); // z0dd - ZOD, 8/4/02, Call to KineticPoet's flag updater
    %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
-     
+
    %game.playerLostFlagTarget(%player);
-   
+
    if($Host::ClassicEvoStats)
       %game.totalFlagHeldTime[%flag] = 0;
 
    %player.holdingFlag = ""; //player isn't holding a flag anymore
-   %flag.carrier = "";  //flag isn't held anymore 
+   %flag.carrier = "";  //flag isn't held anymore
    $flagStatus[%flag.team] = "<In the Field>";
-   
+
    // attach the camera to the flag
    if($Observers)
    {
@@ -582,9 +582,9 @@ function CTFGame::playerDroppedFlag(%game, %player)
 				observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
 	   }
    }
-   
-   %player.unMountImage($FlagSlot);   
-   %flag.hide(false); //Does the throwItem function handle this?     
+
+   %player.unMountImage($FlagSlot);
+   %flag.hide(false); //Does the throwItem function handle this?
 
    %teamName = %game.getTeamName(%flag.team);
    messageTeamExcept(%client, 'MsgCTFFlagDropped', '\c2Teammate %1 dropped the %2 flag. (Held: %4)~wfx/misc/flag_drop.wav', %client.name, %teamName, %flag.team, %held); // z0dd - ZOD, 8/15/02. How long flag was held
@@ -598,7 +598,7 @@ function CTFGame::playerDroppedFlag(%game, %player)
    //don't duplicate the schedule if there's already one in progress...
    if ($FlagReturnTimer[%flag] <= 0)
       $FlagReturnTimer[%flag] = %game.schedule(%game.FLAG_RETURN_DELAY - %game.fadeTimeMS, "flagReturnFade", %flag);
-     
+
    //call the AI function
    %game.AIplayerDroppedFlag(%player, %flag);
 }
@@ -608,7 +608,7 @@ function CTFGame::flagCap(%game, %player)
    %client = %player.client;
    %flag = %player.holdingFlag;
    %flag.carrier = "";
-   
+
    // when a player cap the flag, attach to flag again
    if($Observers)
    {
@@ -620,100 +620,92 @@ function CTFGame::flagCap(%game, %player)
 	   }
    }
 
-   %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
-   
+   %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], true); // z0dd - ZOD, 8/15/02. How long did player hold flag?
+
    %game.playerLostFlagTarget(%player);
 
    if($Host::ClassicEvoStats)
    {
-	  %record = false;
-	  if($TotalTeamPlayerCount >= $Host::MinFlagRecordPlayerCount)
-		  %recordit = true;
-	  if(%game.totalFlagHeldTime[%flag])
-	  {
-		 %held2 = getSimTime() - %game.totalFlagHeldTime[%flag];
-		 %realtime = %game.formatTime(%held2, true);
-		 if(%client.team == 1)
-		 {
-			if((%held2 < $flagstats::heldTeam1) || $flagstats::heldTeam1 == 0)
-			{
-			   if(%recordit)
-			   {
-				   $flagstats::heldTeam1 = %held2;
-				   $flagstats::realTeam1 = %realTime;
-				   $flagstats::nickTeam1 = %client.nameBase;
-			   }
-			   %record = true;
-			}
-		 }
-		 else if(%client.team == 2)
-		 {
-			if((%held2 < $flagstats::heldTeam2) || $flagstats::heldTeam2 == 0)
-			{
-			   if(%recordit)
-			   {
-				   $flagstats::heldTeam2 = %held2;
-				   $flagstats::realTeam2 = %realTime;
-				   $flagstats::nickTeam2 = %client.nameBase;
-			   }
-			   %record = true;
-			}
-		 }
+      %record = false;
+      %mincheck = false;
+      if($TotalTeamPlayerCount >= $Host::MinFlagRecordPlayerCount)
+         %mincheck = true;
+      if(%game.totalFlagHeldTime[%flag])
+      {
+         %held2 = getSimTime() - %game.totalFlagHeldTime[%flag];
+         %realtime = %game.formatTime(%held2, true);
+         %tm = %client.team;
 
-		 if(%record == true)
-		 {
-			if(%recordit)
-			{
-				%fileOut = "stats/maps/classic/" @ $CurrentMissionType @ "/" @ $CurrentMission @ ".txt";
-				export("$flagstats::*", %fileOut, false);
-				schedule(4000, 0, "messageAll", 'MsgCTFNewRecord', "\c2It's a new record! Time: \c3"@%realtime@"\c2.~wfx/misc/hunters_horde.wav");	
-			}
-			else
-				schedule(4000, 0, "messageClient", %client, '', "\c2New flag records are disabled until" SPC $Host::MinFlagRecordPlayerCount SPC "players.");
-		 }
-		 
-		 if(!$Host::TournamentMode)
-			bottomprint(%client, "You captured the flag in " @ %realTime @ " seconds", 3);
-		
-		 $stats::caps[%client]++;
-		 if($stats::caps[%client] > $stats::caps_counter)
-		 {
-			$stats::caps_counter = $stats::caps[%client];
-			$stats::caps_client = getTaggedString(%client.name);
-		 }
-			
-		 if(%held2 < $stats::fastestCap || !$stats::fastestCap)
-		 {
-			$stats::fastestCap = %held2;
-			$stats::fastcap_time = %realTime;
-			$stats::fastcap_client = getTaggedString(%client.name);
-		 }
-	  }
+         if(%tm == 1 || %tm == 2)
+         {
+            if((%held2 < $flagstats::heldTeam[%tm]) || $flagstats::heldTeam[%tm] == 0)
+            {
+               if(%mincheck)
+               {
+                  %prevheld2 = $flagstats::heldTeam[%tm];
+                  $flagstats::heldTeam[%tm] = %held2;
+                  $flagstats::realTeam[%tm] = %realTime;
+                  $flagstats::nickTeam[%tm] = %client.nameBase;
+               }
+               %record = true;
+            }
+         }
+
+         if(%record == true)
+         {
+            if(%mincheck)
+            {
+               %fileOut = "stats/maps/classic/" @ $CurrentMissionType @ "/" @ $CurrentMission @ ".txt";
+               export("$flagstats::*", %fileOut, false);
+               if(%prevheld2)
+                  %saved = "\c2Saved: \c3-" @ %game.formatTime(%prevheld2 - %held2, true) @ "\c2";
+               schedule(4000, 0, "messageAll", 'MsgCTFNewRecord', "\c2It's a new record! Time: \c3"@%realtime@"\c2 " @ %saved @ "~wfx/misc/hunters_horde.wav");
+            }
+            else
+               schedule(4000, 0, "messageClient", %client, '', "\c2New flag records are disabled until" SPC $Host::MinFlagRecordPlayerCount SPC "players.");
+         }
+
+		   bottomprint(%client, "You captured the flag in" SPC %realTime SPC "seconds.", 10, 1);
+
+         $stats::caps[%client]++;
+         if($stats::caps[%client] > $stats::caps_counter)
+         {
+            $stats::caps_counter = $stats::caps[%client];
+            $stats::caps_client = getTaggedString(%client.name);
+         }
+
+         if(%held2 < $stats::fastestCap || !$stats::fastestCap)
+         {
+            $stats::fastestCap = %held2;
+            $stats::fastcap_time = %realTime;
+            $stats::fastcap_client = getTaggedString(%client.name);
+         }
+	   }
    }
 
    //award points to player and team
    %teamName = %game.getTeamName(%flag.team);
    messageTeamExcept(%client, 'MsgCTFFlagCapped', '\c2%1 captured the %2 flag! (Held: %5)~wfx/misc/flag_capture.wav', %client.name, %teamName, %flag.team, %client.team, %held);
-   messageTeam(%flag.team, 'MsgCTFFlagCapped', '\c2Your flag was captured by %1. (Held: %5)~wfx/misc/flag_lost.wav', %client.name, 0, %flag.team, %client.team, %held); 
-   messageTeam(0, 'MsgCTFFlagCapped', '\c2%1 captured the %2 flag! (Held: %5)~wfx/misc/flag_capture.wav', %client.name, %teamName, %flag.team, %client.team, %held); 
+   messageTeam(%flag.team, 'MsgCTFFlagCapped', '\c2Your flag was captured by %1. (Held: %5)~wfx/misc/flag_lost.wav', %client.name, 0, %flag.team, %client.team, %held);
+   messageTeam(0, 'MsgCTFFlagCapped', '\c2%1 captured the %2 flag! (Held: %5)~wfx/misc/flag_capture.wav', %client.name, %teamName, %flag.team, %client.team, %held);
    messageClient(%client, 'MsgCTFFlagCapped', '\c2You captured the %2 flag! (Held: %5)~wfx/misc/flag_capture.wav', %client.name, %teamName, %flag.team, %client.team, %held); // Yogi, 8/18/02.  3rd param changed 0 -> %client.name
 
    logEcho(%client.nameBase@" (pl "@%player@"/cl "@%client@") capped team "@%client.team@" flag"@" (Held: "@%held@")"); // MP: 6/14/2011 The team is wrong, but the stats program auto-corrects it, so just leave as is
    %player.holdingFlag = ""; //no longer holding it.
    %player.unMountImage($FlagSlot);
-   %game.awardScoreFlagCap(%client, %flag);   
+   %game.awardScoreFlagCap(%client, %flag);
    %game.flagReset(%flag);
-     
+
    //call the AI function
    %game.AIflagCap(%player, %flag);
 
    //Determine score status
    %caplimit = MissionGroup.CTF_scoreLimit;
-   %otherteam = ( %client.team == 1 ) ? 2 : 1;   
+   %otherteam = ( %client.team == 1 ) ? 2 : 1;
    //Find out caps from score
    %clientteamcaps = mFloor($TeamScore[%client.team] / %game.SCORE_PER_TEAM_FLAG_CAP);
    %otherteamcaps = mFloor($TeamScore[%otherteam] / %game.SCORE_PER_TEAM_FLAG_CAP);
-   
+
    //Determine Gamepoint
    if(%clientteamcaps >= (%caplimit - 1))
    {
@@ -766,7 +758,7 @@ function CTFGame::flagReturn(%game, %flag, %player)
    else
       %otherTeam = 1;
    %teamName = %game.getTeamName(%flag.team);
-   
+
    // when the flag return, attach to flag again
    if($Observers)
    {
@@ -777,7 +769,7 @@ function CTFGame::flagReturn(%game, %flag, %player)
 				observeFlag(%cl, $TeamFlag[%flag.team], 1, %flag.team);
 	   }
    }
-   
+
    if (%player !$= "")
    {
       //a player returned it
@@ -787,7 +779,7 @@ function CTFGame::flagReturn(%game, %flag, %player)
       messageTeam(0, 'MsgCTFFlagReturned', '\c2%1 returned the %2 flag.~wfx/misc/flag_return.wav', %client.name, %teamName, %flag.team);
       messageClient(%client, 'MsgCTFFlagReturned', '\c2You returned your flag.~wfx/misc/flag_return.wav', %client.name, %teamName, %flag.team); // Yogi, 8/18/02. 3rd param changed 0 -> %client.name
       logEcho(%client.nameBase@" (pl "@%player@"/cl "@%client@") returned team "@%flag.team@" flag");
-      
+
       // find out what type of return it is
       // stalemate return?
 
@@ -803,14 +795,14 @@ function CTFGame::flagReturn(%game, %flag, %player)
       {
         %enemyFlagDist = vectorDist($flagPos[%flag.team], $flagPos[%otherTeam]);
         %dist = vectorDist(%flag.position, %flag.originalPosition);
-    
+
         %rawRatio = %dist/%enemyFlagDist;
         %ratio = %rawRatio < 1 ? %rawRatio : 1;
         %percentage = mFloor( (%ratio) * 10 ) * 10;
-        %game.awardScoreFlagReturn(%player.client, %percentage); 
+        %game.awardScoreFlagReturn(%player.client, %percentage);
       }
       // ---------------------------------------------------
-   }      
+   }
    else
    {
       //returned due to timer
@@ -896,10 +888,10 @@ function CTFGame::antiTurtle(%game)
 
    if(%game.stalemateSchedule > 0)
       %game.stalemateSchedule = 0;
-  
+
    for (%i = 1; %i <= Game.numTeams; %i++)
       Game.flagReturn($TeamFlag[%i]);
-   
+
    messageAll( "", "\c3Both flags returned to bases to break stalemate.~wfx/misc/flag_return.wav");
    error(formatTimeString("HH:nn:ss") SPC "Anti-Turtle thread ended");
 }
@@ -931,7 +923,7 @@ function CTFGame::flagReset(%game, %flag)
       %flag.stand.getDataBlock().onFlagReturn(%flag.stand);//animate, if exterior stand
 
    //fade the flag in...
-   %flag.startFade(%game.fadeTimeMS, 0, false);         
+   %flag.startFade(%game.fadeTimeMS, 0, false);
 
    // dont render base target
    setTargetRenderMask(%flag.waypoint.getTarget(), 0);
@@ -949,7 +941,7 @@ function CTFGame::flagReset(%game, %flag)
    {
       cancel(%flag.searchSchedule);
    }
-   // --------------------------------------------------------------------------   
+   // --------------------------------------------------------------------------
 }
 
 function CTFGame::timeLimitReached(%game)
@@ -1035,7 +1027,7 @@ function CTFGame::gameOver(%game)
    }
 
    messageAll('MsgClearObjHud', "");
-   for(%i = 0; %i < ClientGroup.getCount(); %i ++) 
+   for(%i = 0; %i < ClientGroup.getCount(); %i ++)
    {
       %client = ClientGroup.getObject(%i);
       %game.resetScore(%client);
@@ -1045,7 +1037,7 @@ function CTFGame::gameOver(%game)
 }
 
 function CTFGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc)
-{ 
+{
    if(%clVictim.headshot && %damageType == $DamageType::Laser && %clVictim.team != %clAttacker.team)
    {
         %clAttacker.scoreHeadshot++;
@@ -1073,16 +1065,16 @@ function CTFGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %i
 
    //the DefaultGame will set some vars
    DefaultGame::onClientDamaged(%game, %clVictim, %clAttacker, %damageType, %implement, %damageLoc);
-    
+
    //if victim is carrying a flag and is not on the attackers team, mark the attacker as a threat for x seconds(for scoring purposes)
    if ((%clVictim.holdingFlag !$= "") && (%clVictim.team != %clAttacker.team))
    {
       %clAttacker.dmgdFlagCarrier = true;
-      cancel(%clAttacker.threatTimer);  //restart timer    
+      cancel(%clAttacker.threatTimer);  //restart timer
       %clAttacker.threatTimer = schedule(%game.TIME_CONSIDERED_FLAGCARRIER_THREAT, %clAttacker.dmgdFlagCarrier = false);
    }
 }
-      
+
 ////////////////////////////////////////////////////////////////////////////////////////
 function CTFGame::clientMissionDropReady(%game, %client)
 {
@@ -1096,8 +1088,8 @@ function CTFGame::clientMissionDropReady(%game, %client)
    //%game.populateTeamRankArray(%client);
 
    //messageClient(%client, 'MsgYourRankIs', "", -1);
-      
-   messageClient(%client, 'MsgMissionDropInfo', '\c0You are in mission %1 (%2).', $MissionDisplayName, $MissionTypeDisplayName, $ServerName ); 
+
+   messageClient(%client, 'MsgMissionDropInfo', '\c0You are in mission %1 (%2).', $MissionDisplayName, $MissionTypeDisplayName, $ServerName );
 
    DefaultGame::clientMissionDropReady(%game, %client);
 }
@@ -1122,34 +1114,34 @@ function CTFGame::recalcScore(%game, %cl)
    // ---------------------------------------------------
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
    %cl.offenseScore = %killPoints +
-                      %cl.suicides            * %game.SCORE_PER_SUICIDE + 
+                      %cl.suicides            * %game.SCORE_PER_SUICIDE +
                       %cl.escortAssists       * %game.SCORE_PER_ESCORT_ASSIST +
-                      %cl.teamKills           * %game.SCORE_PER_TEAMKILL + 
+                      %cl.teamKills           * %game.SCORE_PER_TEAMKILL +
                       %cl.tkDestroys          * %game.SCORE_PER_TK_DESTROY + // z0dd - ZOD, 10/03/02. Penalty for tking equiptment.
-                      %cl.scoreHeadshot       * %game.SCORE_PER_HEADSHOT + 
+                      %cl.scoreHeadshot       * %game.SCORE_PER_HEADSHOT +
                       %cl.scoreRearshot       * %game.SCORE_PER_REARSHOT + // z0dd - ZOD, 8/25/02. Added Lance rear shot messages
-					  %cl.scoreMidAir         * %game.SCORE_PER_MIDAIR + 
-                      %cl.flagCaps            * %game.SCORE_PER_PLYR_FLAG_CAP + 
-                      %cl.flagGrabs           * %game.SCORE_PER_PLYR_FLAG_TOUCH + 
-                      %cl.genDestroys         * %game.SCORE_PER_DESTROY_GEN + 
-                      %cl.sensorDestroys      * %game.SCORE_PER_DESTROY_SENSOR + 
-                      %cl.turretDestroys      * %game.SCORE_PER_DESTROY_TURRET + 
-                      %cl.iStationDestroys    * %game.SCORE_PER_DESTROY_ISTATION + 
-                      %cl.vstationDestroys    * %game.SCORE_PER_DESTROY_VSTATION + 
+					  %cl.scoreMidAir         * %game.SCORE_PER_MIDAIR +
+                      %cl.flagCaps            * %game.SCORE_PER_PLYR_FLAG_CAP +
+                      %cl.flagGrabs           * %game.SCORE_PER_PLYR_FLAG_TOUCH +
+                      %cl.genDestroys         * %game.SCORE_PER_DESTROY_GEN +
+                      %cl.sensorDestroys      * %game.SCORE_PER_DESTROY_SENSOR +
+                      %cl.turretDestroys      * %game.SCORE_PER_DESTROY_TURRET +
+                      %cl.iStationDestroys    * %game.SCORE_PER_DESTROY_ISTATION +
+                      %cl.vstationDestroys    * %game.SCORE_PER_DESTROY_VSTATION +
                       %cl.mpbtstationDestroys * %game.SCORE_PER_DESTROY_MPBTSTATION + // z0dd - ZOD 3/30/02. MPB Teleporter
-                      %cl.solarDestroys       * %game.SCORE_PER_DESTROY_SOLAR + 
-                      %cl.sentryDestroys      * %game.SCORE_PER_DESTROY_SENTRY + 
-                      %cl.depSensorDestroys   * %game.SCORE_PER_DESTROY_DEP_SENSOR + 
-                      %cl.depTurretDestroys   * %game.SCORE_PER_DESTROY_DEP_TUR + 
+                      %cl.solarDestroys       * %game.SCORE_PER_DESTROY_SOLAR +
+                      %cl.sentryDestroys      * %game.SCORE_PER_DESTROY_SENTRY +
+                      %cl.depSensorDestroys   * %game.SCORE_PER_DESTROY_DEP_SENSOR +
+                      %cl.depTurretDestroys   * %game.SCORE_PER_DESTROY_DEP_TUR +
                       %cl.depStationDestroys  * %game.SCORE_PER_DESTROY_DEP_INV +
-                      %cl.vehicleScore + %cl.vehicleBonus; 
+                      %cl.vehicleScore + %cl.vehicleBonus;
 
-   %cl.defenseScore = %cl.genDefends    * %game.SCORE_PER_GEN_DEFEND +   
+   %cl.defenseScore = %cl.genDefends    * %game.SCORE_PER_GEN_DEFEND +
                       %cl.flagDefends        * %game.SCORE_PER_FLAG_DEFEND +
-                      %cl.carrierKills       * %game.SCORE_PER_CARRIER_KILL +  
-                      %cl.escortAssists      * %game.SCORE_PER_ESCORT_ASSIST + 
-                      %cl.turretKills        * %game.SCORE_PER_TURRET_KILL_AUTO +  
-                      %cl.mannedturretKills  * %game.SCORE_PER_TURRET_KILL +  
+                      %cl.carrierKills       * %game.SCORE_PER_CARRIER_KILL +
+                      %cl.escortAssists      * %game.SCORE_PER_ESCORT_ASSIST +
+                      %cl.turretKills        * %game.SCORE_PER_TURRET_KILL_AUTO +
+                      %cl.mannedturretKills  * %game.SCORE_PER_TURRET_KILL +
                       %cl.genRepairs         * %game.SCORE_PER_REPAIR_GEN +
                       %cl.SensorRepairs      * %game.SCORE_PER_REPAIR_SENSOR +
                       %cl.TurretRepairs      * %game.SCORE_PER_REPAIR_TURRET +
@@ -1161,7 +1153,7 @@ function CTFGame::recalcScore(%game, %cl)
                       %cl.sentryRepairs      * %game.SCORE_PER_REPAIR_SENTRY +
                       %cl.depInvRepairs      * %game.SCORE_PER_REPAIR_DEP_INV +
                       %cl.depTurretRepairs   * %game.SCORE_PER_REPAIR_DEP_TUR +
-                      %cl.returnPts; 
+                      %cl.returnPts;
    // ---------------------------------------------------
 
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
@@ -1174,14 +1166,14 @@ function CTFGame::recalcScore(%game, %cl)
 function CTFGame::updateKillScores(%game, %clVictim, %clKiller, %damageType, %implement)
 {
 // is this a vehicle kill rather than a player kill
-    
+
    // console error message suppression
    if( isObject( %implement ) )
    {
       if( %implement.getDataBlock().getName() $= "AssaultPlasmaTurret" ||  %implement.getDataBlock().getName() $= "BomberTurret" ) // gunner
            %clKiller = %implement.vehicleMounted.getMountNodeObject(1).client;
       else if(%implement.getDataBlock().catagory $= "Vehicles") // pilot
-           %clKiller = %implement.getMountNodeObject(0).client;             
+           %clKiller = %implement.getMountNodeObject(0).client;
    }
 
    if(%game.testTurretKill(%implement))   //check for turretkill before awarded a non client points for a kill
@@ -1195,7 +1187,7 @@ function CTFGame::updateKillScores(%game, %clVictim, %clKiller, %damageType, %im
       if (%game.testGenDefend(%clVictim, %clKiller))
          %game.awardScoreGenDefend(%clKiller);
 
-      if(%game.testCarrierKill(%clVictim, %clKiller))    
+      if(%game.testCarrierKill(%clVictim, %clKiller))
          %game.awardScoreCarrierKill(%clKiller);
       else
       {
@@ -1203,35 +1195,35 @@ function CTFGame::updateKillScores(%game, %clVictim, %clKiller, %damageType, %im
             %game.awardScoreFlagDefend(%clKiller);
       }
       if (%game.testEscortAssist(%clVictim, %clKiller))
-         %game.awardScoreEscortAssist(%clKiller);     
-   }       
+         %game.awardScoreEscortAssist(%clKiller);
+   }
    else
-   {        
+   {
       if (%game.testSuicide(%clVictim, %clKiller, %damageType))  //otherwise test for suicide
       {
-         %game.awardScoreSuicide(%clVictim);     
+         %game.awardScoreSuicide(%clVictim);
       }
       else
       {
          if (%game.testTeamKill(%clVictim, %clKiller, %damageType)) //otherwise test for a teamkill
             %game.awardScoreTeamKill(%clVictim, %clKiller);
       }
-   }        
+   }
 }
 
 function CTFGame::testFlagDefend(%game, %victimID, %killerID)
 {
    InitContainerRadiusSearch(%victimID.plyrPointOfDeath, %game.RADIUS_FLAG_DEFENSE, $TypeMasks::ItemObjectType);
-   %objID = containerSearchNext();   
-   while(%objID != 0) 
+   %objID = containerSearchNext();
+   while(%objID != 0)
    {
      %objType = %objID.getDataBlock().getName();
-     if ((%objType $= "Flag") && (%objID.team == %killerID.team)) 
+     if ((%objType $= "Flag") && (%objID.team == %killerID.team))
           return true;  //found the(a) killer's flag near the victim's point of death
      else
-        %objID = containerSearchNext();     
+        %objID = containerSearchNext();
    }
-   return false; //didn't find a qualifying flag within required radius of victims point of death  
+   return false; //didn't find a qualifying flag within required radius of victims point of death
 }
 
 function CTFGame::testGenDefend(%game, %victimID, %killerID)
@@ -1241,23 +1233,23 @@ function CTFGame::testGenDefend(%game, %victimID, %killerID)
    while(%objID != 0)
    {
       %objType = %objID.getDataBlock().ClassName;
-     if ((%objType $= "generator") && (%objID.team == %killerID.team)) 
+     if ((%objType $= "generator") && (%objID.team == %killerID.team))
         return true;  //found a killer's generator within required radius of victim's death
      else
         %objID = containerSearchNext();
    }
-   return false;  //didn't find a qualifying gen within required radius of victim's point of death 
+   return false;  //didn't find a qualifying gen within required radius of victim's point of death
 }
 
 function CTFGame::testCarrierKill(%game, %victimID, %killerID)
 {
    %flag = %victimID.plyrDiedHoldingFlag;
-   return ((%flag !$= "") && (%flag.team == %killerID.team));  
+   return ((%flag !$= "") && (%flag.team == %killerID.team));
 }
 
 function CTFGame::testEscortAssist(%game, %victimID, %killerID)
 {
-   return (%victimID.dmgdFlagCarrier); 
+   return (%victimID.dmgdFlagCarrier);
 }
 
 function CTFGame::awardScoreFlagCap(%game, %cl, %flag)
@@ -1344,14 +1336,14 @@ function CTFGame::checkScoreLimit(%game, %team)
    // default of 5 if scoreLimit not defined
    if(%scoreLimit $= "")
       %scoreLimit = 5 * %game.SCORE_PER_TEAM_FLAG_CAP;
-   if($TeamScore[%team] >= %scoreLimit) 
+   if($TeamScore[%team] >= %scoreLimit)
       %game.scoreLimitReached();
 }
 
 function CTFGame::awardScoreFlagReturn(%game, %cl, %perc)
 {
    %cl.flagReturns++; //give flagreturn stat
-   
+
    // ---------------------------------------------------
    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
    if (%game.SCORE_PER_FLAG_RETURN != 0)
@@ -1361,7 +1353,7 @@ function CTFGame::awardScoreFlagReturn(%game, %cl, %perc)
          messageClient(%cl, 'scoreFlaRetMsg', 'Flag return - exceeded capping distance - %1 point bonus.', %pts, %perc);
       else if(%perc  == 0)
          messageClient(%cl, 'scoreFlaRetMsg', 'You gently place the flag back on the stand.', %pts, %perc);
-      else 
+      else
          messageClient(%cl, 'scoreFlaRetMsg', '\c0Flag return from %2%% of capping distance - %1 point bonus.', %pts, %perc);
       %cl.returnPts += %pts;
    }
@@ -1403,7 +1395,7 @@ function CTFGame::awardScoreCarrierKill(%game, %killerID)
       messageTeamExcept(%killerID, 'msgCarKill', '\c2%1 stopped the enemy flag carrier.', %killerID.name); // z0dd - ZOD, 8/15/02. Tell team
       //messageTeamExcept(%killerID, 'msgCarKill', '\c0Teammate %1 received a %2 point bonus for stopping the enemy flag carrier!', %killerID.name, %game.SCORE_PER_CARRIER_KILL);
    }
-   %game.recalcScore(%killerID);   
+   %game.recalcScore(%killerID);
     return %game.SCORE_PER_CARRIER_KILL;
 }
 
@@ -1415,7 +1407,7 @@ function CTFGame::awardScoreFlagDefend(%game, %killerID)
       messageClient(%killerID, 'msgFlagDef', '\c0You received a %1 point bonus for defending your flag!', %game.SCORE_PER_FLAG_DEFEND);
       messageTeamExcept(%killerID, 'msgFlagDef', '\c2%1 defended our flag.', %killerID.name); // z0dd - ZOD, 8/15/02. Tell team
       //messageTeamExcept(%killerID, 'msgFlagDef', '\c0Teammate %1 received a %2 point bonus for defending your flag!', %killerID.name, %game.SCORE_PER_FLAG_DEFEND);
-   }      
+   }
    %game.recalcScore(%killerID);
     return %game.SCORE_PER_FLAG_DEFEND;
 }
@@ -1569,7 +1561,7 @@ function CTFGame::testValidRepair(%game, %obj)
       return false;
    else if(%obj.team != %obj.repairedBy.team)
       return false;
-   else 
+   else
    {
       if(%obj.soiledByEnemyRepair)
          %obj.soiledByEnemyRepair = false;
@@ -1722,8 +1714,8 @@ function CTFGame::resetScore(%game, %client)
    %client.depSensorDestroys = 0;
    %client.depTurretDestroys = 0;
    %client.depStationDestroys = 0;
-   %client.vehicleScore = 0; 
-   %client.vehicleBonus = 0; 
+   %client.vehicleScore = 0;
+   %client.vehicleBonus = 0;
 
    %client.flagDefends = 0;
    %client.defenseScore = 0;
@@ -1752,7 +1744,7 @@ function CTFGame::enterMissionArea(%game, %playerData, %player)
 {
     if(%player.getState() $= "Dead")
     return;
-    %player.client.outOfBounds = false; 
+    %player.client.outOfBounds = false;
    messageClient(%player.client, 'EnterMissionArea', '\c1You are back in the mission area.');
    logEcho(%player.client.nameBase@" (pl "@%player@"/cl "@%player.client@") entered mission area");
 
@@ -1799,7 +1791,7 @@ function CTFGame::boundaryLoseFlag(%game, %player)
    %flag.setCollisionTimeout(%player);
 
    %held = %game.formatTime(getSimTime() - %game.flagHeldTime[%flag], false); // z0dd - ZOD, 8/15/02. How long did player hold flag?
-   
+
    if($Host::ClassicEvoStats)
       %game.totalFlagHeldTime[%flag] = 0;
 
@@ -1860,28 +1852,28 @@ function CTFGame::vehicleDestroyed(%game, %vehicle, %destroyer)
     %vehicleType = getTaggedString(%data.targetTypeTag);
     if(%vehicleType !$= "MPB")
         %vehicleType = strlwr(%vehicleType);
-    
+
     %enemyTeam = ( %destroyer.team == 1 ) ? 2 : 1;
-    
+
     %scorer = 0;
     %multiplier = 1;
-    
+
     %passengers = 0;
     for(%i = 0; %i < %data.numMountPoints; %i++)
         if(%vehicle.getMountNodeObject(%i))
             %passengers++;
-    
+
     //what destroyed this vehicle
     if(%destroyer.client)
     {
         //it was a player, or his mine, satchel, whatever...
         %destroyer = %destroyer.client;
         %scorer = %destroyer;
-        
+
         // determine if the object used was a mine
         if(%vehicle.lastDamageType == $DamageType::Mine)
             %multiplier = 2;
-    }    
+    }
     else if(%destroyer.getClassName() $= "Turret")
     {
         if(%destroyer.getControllingClient())
@@ -1890,12 +1882,12 @@ function CTFGame::vehicleDestroyed(%game, %vehicle, %destroyer)
             %destroyer = %destroyer.getControllingClient();
             %scorer = %destroyer;
         }
-        else 
+        else
         {
             %destroyerName = "A turret";
             %multiplier = 0;
         }
-    }    
+    }
     else if(%destroyer.getDataBlock().catagory $= "Vehicles")
     {
         // Vehicle vs vehicle kill!
@@ -1903,7 +1895,7 @@ function CTFGame::vehicleDestroyed(%game, %vehicle, %destroyer)
             %gunnerNode = 1;
         else
             %gunnerNode = 0;
-        
+
         if(%destroyer.getMountNodeObject(%gunnerNode))
         {
             %destroyer = %destroyer.getMountNodeObject(%gunnerNode).client;
@@ -1914,23 +1906,23 @@ function CTFGame::vehicleDestroyed(%game, %vehicle, %destroyer)
     else  // Is there anything else we care about?
         return;
 
-    
+
     if(%destroyerName $= "")
         %destroyerName = %destroyer.name;
-        
+
     if(%vehicle.team == %destroyer.team) // team kill
     {
         %pref = (%vehicleType $= "Assault Tank") ? "an" : "a";
         messageAll( 'msgVehicleTeamDestroy', '\c0%1 TEAMKILLED %3 %2!', %destroyerName, %vehicleType, %pref);
     }
-        
+
     else // legit kill
     {
         //messageTeamExcept(%destroyer, 'msgVehicleDestroy', '\c0%1 destroyed an enemy %2.', %destroyerName, %vehicleType); // z0dd - ZOD, 8/20/02. not needed with new messenger on line below
         teamDestroyMessage(%destroyer, 'msgVehDestroyed', '\c5%1 destroyed an enemy %2!', %destroyerName, %vehicleType); // z0dd - ZOD, 8/20/02. Send teammates a destroy message
         messageTeam(%enemyTeam, 'msgVehicleDestroy', '\c0%1 destroyed your team\'s %2.', %destroyerName, %vehicleType);
         //messageClient(%destroyer, 'msgVehicleDestroy', '\c0You destroyed an enemy %1.', %vehicleType);
-    
+
         if(%scorer)
         {
             %value = %game.awardScoreVehicleDestroyed(%scorer, %vehicleType, %multiplier, %passengers);
@@ -1942,7 +1934,7 @@ function CTFGame::vehicleDestroyed(%game, %vehicle, %destroyer)
 function CTFGame::awardScoreVehicleDestroyed(%game, %client, %vehicleType, %mult, %passengers)
 {
     // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
-    
+
     if(%vehicleType $= "Grav Cycle")
         %base = %game.SCORE_PER_DESTROY_WILDCAT;
     else if(%vehicleType $= "Assault Tank")
@@ -1955,11 +1947,11 @@ function CTFGame::awardScoreVehicleDestroyed(%game, %client, %vehicleType, %mult
         %base = %game.SCORE_PER_DESTROY_BOMBER;
     else if(%vehicleType $= "Heavy Transport")
         %base = %game.SCORE_PER_DESTROY_TRANSPORT;
-    
-    %total = ( %base * %mult ) + ( %passengers * %game.SCORE_PER_PASSENGER ); 
+
+    %total = ( %base * %mult ) + ( %passengers * %game.SCORE_PER_PASSENGER );
 
     %client.vehicleScore += %total;
-    
+
     messageClient(%client, 'msgVehicleScore', '\c0You received a %1 point bonus for destroying an enemy %2.', %total, %vehicleType);
     %game.recalcScore(%client);
     return %total;
@@ -1967,9 +1959,9 @@ function CTFGame::awardScoreVehicleDestroyed(%game, %client, %vehicleType, %mult
 
 function CTFGame::shareScore(%game, %client, %amount)
 {
-    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here    
-    
-    //error("share score of"SPC %amount SPC "from client:" SPC %client); 
+    // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
+
+    //error("share score of"SPC %amount SPC "from client:" SPC %client);
     // all of the player in the bomber and tank share the points
     // gained from any of the others
     %vehicle = %client.vehicleMounted;
@@ -1991,9 +1983,9 @@ function CTFGame::shareScore(%game, %client, %amount)
                     %occCl.vehicleBonus += %amount;
                     %game.recalcScore(%occCl);
                 }
-            }        
+            }
         }
-    
+
     }
 }
 
@@ -2003,7 +1995,7 @@ function CTFGame::awardScoreTurretKill(%game, %victimID, %implement)
     {
         if (%killer == %victimID)
             %game.awardScoreSuicide(%victimID);
-        else if (%killer.team == %victimID.team) //player controlling a turret killed a teammate     
+        else if (%killer.team == %victimID.team) //player controlling a turret killed a teammate
         {
             %killer.teamKills++;
             %game.awardScoreTurretTeamKill(%victimID, %killer);
@@ -2014,22 +2006,22 @@ function CTFGame::awardScoreTurretKill(%game, %victimID, %implement)
             %killer.mannedturretKills++;
             %game.recalcScore(%killer);
             %game.awardScoreDeath(%victimID);
-        }     
-    }   
+        }
+    }
     else if ((%killer = %implement.owner) != 0) //if it isn't controlled, award score to whoever deployed it
     {
-        if (%killer.team == %victimID.team)       
+        if (%killer.team == %victimID.team)
         {
             %game.awardScoreDeath(%victimID);
         }
-        else       
+        else
         {
             %killer.turretKills++;
             %game.recalcScore(%killer);
             %game.awardScoreDeath(%victimID);
         }
-    }   
-    //default is, no one was controlling it, no one owned it.  No score given.   
+    }
+    //default is, no one was controlling it, no one owned it.  No score given.
 }
 
 function CTFGame::testKill(%game, %victimID, %killerID)
@@ -2039,8 +2031,8 @@ function CTFGame::testKill(%game, %victimID, %killerID)
 
 function CTFGame::awardScoreKill(%game, %killerID)
 {
-   %killerID.kills++;   
-   %game.recalcScore(%killerID);    
+   %killerID.kills++;
+   %game.recalcScore(%killerID);
     return %game.SCORE_PER_KILL;
 }
 
@@ -2050,7 +2042,7 @@ function checkVehicleCamping( %team )
    %position = $flagPos[%team];
    %radius = 15;
    InitContainerRadiusSearch(%position, %radius, $TypeMasks::VehicleObjectType );
-   
+
    while ((%vehicle = containerSearchNext()) != 0)
    {
       %dist = containerSearchCurrRadDamageDist();
@@ -2058,12 +2050,12 @@ function checkVehicleCamping( %team )
       if (%dist > %radius)
          continue;
       else
-      {   
+      {
          //if( %vehicle.team == %team )
             applyVehicleCampDamage( %vehicle );
       }
    }
-   
+
    if( %team == 1 )
       Game.campThread_1 = schedule( 1000, 0, "checkVehicleCamping", 1 );
    else
@@ -2079,9 +2071,9 @@ function applyVehicleCampDamage( %vehicle )
       return;
 
    %client = %vehicle.getMountNodeObject(0).client; // grab the pilot
-   
+
    messageClient( %client, 'serverMessage', "Can't park vehicles in flag zones!" );
-   %vehicle.getDataBlock().damageObject( %vehicle, 0, "0 0 0", 0.5, 0); 
+   %vehicle.getDataBlock().damageObject( %vehicle, 0, "0 0 0", 0.5, 0);
 }
 
 // z0dd - ZOD, 10/02/02. Hack for flag collision bug.
@@ -2152,14 +2144,14 @@ function CTFGame::voteAntiTurtleTime(%game, %admin, %newLimit)
    else
    {
       %totalVotes = %game.totalVotesFor + %game.totalVotesAgainst;
-      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100)) 
+      if(%totalVotes > 0 && (%game.totalVotesFor / (ClientGroup.getCount() - $HostGameBotCount)) > ($Host::VotePasspercent / 100))
       {
-         messageAll('MsgVotePassed', '\c2The anti-turtle time is set to %1.', %display);   
+         messageAll('MsgVotePassed', '\c2The anti-turtle time is set to %1.', %display);
          $Host::ClassicAntiTurtleTime = %newLimit;
          %cause = "(vote)";
       }
-      else 
-         messageAll('MsgVoteFailed', '\c2The vote to change the anti-turtle time did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));   
+      else
+         messageAll('MsgVoteFailed', '\c2The vote to change the anti-turtle time did not pass: %1 percent.', mFloor(%game.totalVotesFor/(ClientGroup.getCount() - $HostGameBotCount) * 100));
    }
    if(%cause !$= "")
       logEcho($AdminCl.name @ ": anti-turtle time set to "@%display SPC %cause, 1);

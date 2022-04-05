@@ -76,7 +76,8 @@ function DefaultGame::gameOver(%game)
 // Starting a TimeVote - Sets flags so the game wont end during this vote
 function StartVOTimeVote(%game)
 {
-	$VOStatus = "Starting";
+	if(!$Host::TournamentMode)
+		$VOStatus = "Starting";
 }
 
 // Tribes wont change the time after its reached zero and you cant change it again afterwards until a gameover/map change.

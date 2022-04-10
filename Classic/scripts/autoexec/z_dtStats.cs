@@ -1733,7 +1733,7 @@ package dtStats{
       if($dtStats::Enable){
          dtSaveServerVars();
          dtScanForRepair();
-         $mapID::gameID = addNum($mapID::gameID,1);
+         $mapID::gameID = formattimestring("mddyHHnnss");
          if($dtStats::debugEchos)
             error("GAME ID" SPC $mapID::gameID SPC "//////////////////////////////");
       }
@@ -4010,13 +4010,13 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
 }
 function dtStatsClientLeaveGame(%client){
    $dtServerVars::lastPlayerCount =  $HostGamePlayerCount - $HostGameBotCount;
-   
+
    if(isGameRun()){// if they dc during game over dont count it
       $dtServer::mapDisconnects[cleanMapName($CurrentMission),Game.class]++;
       if(%client.score != 0)
          $dtServer::mapDisconnectsScore[cleanMapName($CurrentMission),Game.class]++;
    }
-   
+
    if(isObject(%client.dtStats)){
       %client.dtStats.clientLeft = 1;
       %client.dtStats.leftTime = getSimTime();
@@ -12647,7 +12647,7 @@ function startMonitor(){
    }
 }
 
-function dtSaveServerVars(){ 
+function dtSaveServerVars(){
    $dtServerVars::lastSimTime = getSimTime();
    $dtServerVars::lastDate = formattimestring("mm/dd/yy hh:nn:a");
    $dtServerVars::lastMission = cleanMapName($CurrentMission);
@@ -12995,4 +12995,4 @@ function testVarsRandomAll(%max){
 //    Server crash messsage fix
 //
 //    9.3
-//    Stat format change for flag cap times, they now start at 0 
+//    Stat format change for flag cap times, they now start at 0

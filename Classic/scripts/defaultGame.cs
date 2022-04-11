@@ -1802,7 +1802,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
             %damMess = "DISABLED";
 
          if(%game.numTeams > 1)
-            BottomPrint(%client, "Server is Running in Tournament Mode.\nPick a Team\nTeam Damage is " @ %damMess, 0, 3 );
+            BottomPrint(%client, "Server is Running in Tournament Mode.\nGood luck and Have Fun!\nTeam Damage is " @ %damMess, 0, 3 );
       }
       else
       {

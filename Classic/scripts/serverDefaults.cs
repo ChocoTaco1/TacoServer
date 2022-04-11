@@ -212,6 +212,8 @@ $Host::LoadScreenShowLogo = 0;                                                  
 $Host::LoadScreenShowLogoName = "dpub/DPUB_logo";                                   //Logo location Filename
 $Host::MapChangeMSG = 0;															//Center Print between mapchanges
 $Host::MapChangeMSGContent = "<color:3cb4b4><font:Sui Generis:22>Pickup Night\n<color:3cb4b4><font:Univers:16>Saturday, March 5th\n<color:3cb4b4><font:Univers:16>Join discord for details";
+$Host::MultipleMapRotation = 0;														//Rotate thru multiple map rotation files 1,2,3, etc
+$Host::MultipleMapRotationCount = 3;												//How many multiple map rotation files (mapRotation1.cs, mapRotation2.cs, mapRotation3.cs, etc)
 
 //LakRabbit
 $Host::LakRabbitUnlimitedDJ = 1;				//Unlimited disc-jumps if enabled

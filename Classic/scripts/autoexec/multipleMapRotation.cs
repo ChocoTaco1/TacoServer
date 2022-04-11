@@ -1,11 +1,11 @@
 //$Host::ClassicRotationFile = "prefs/mapRotation1.cs";
 
 //Enable/Disable
-$EnableMultipleMapRotation = 0;
+//$Host::MultipleMapRotation = 0;
 
 //How any mapRotation Files
 //Naming scheme mapRotation1.cs, mapRotation2.cs, mapRotation3.cs, etc
-$mapRotationFilesCount = 3;
+//$Host::MultipleMapRotationCount = 3;
 
 function multipleMapRotation()
 {
@@ -15,7 +15,7 @@ function multipleMapRotation()
 
 	if(%var) //If number exists proceed
     {
-        if(%var $= $mapRotationFilesCount)
+        if(%var $= $Host::MultipleMapRotationCount)
             %var = 1;
         else
             %var = %var + 1;
@@ -34,5 +34,5 @@ function multipleMapRotationEcho()
 }
 
 //Run
-if($EnableMultipleMapRotation)
+if($Host::MultipleMapRotation)
 	multipleMapRotation();

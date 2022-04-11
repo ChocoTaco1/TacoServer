@@ -1562,6 +1562,12 @@ function serverCmdClientTeamChange(%client, %option)
 	Parent::serverCmdClientTeamChange(%client, %option);
 }
 
+//No Pick Team PopUp Box when LockedTeams is enabled
+function serverCmdPlayContentSet( %client )
+{
+	//nothing
+}
+
 };
 
 // VoteSound Script

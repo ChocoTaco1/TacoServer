@@ -5,7 +5,7 @@
 //exec("scripts/autoexec/zzDiscordBot.cs");
 
 //ip of the bot
-$discordBot::IP = "";
+$discordBot::IP = "127.0.0.1:28003";
 $discordBot::reconnectTimeout = 3 * 60000;
 //auto connect on start
 $discordBot::autoStart = 0;
@@ -203,7 +203,6 @@ function discordBotProcess(%type, %var1, %var2, %var3, %var4, %var5, %var6)
 		sendToDiscordEmote(%msg, $discordBot::serverFeed);
 	}
 }
-
 function sendToDiscord(%msg,%channel)
 {
    if(isObject(discord) && %msg !$= "")
@@ -353,6 +352,33 @@ function discord::onLine(%this, %line){
                discord.schedule((%i+1)*32,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "msgList" @ "\r\n");
             }
          }
+      case "BANLIST":
+         if($dtBanList::NameListCount){
+            for (%i = 0; %i <  $dtBanList::NameListCount; %i++){
+               %fieldList = $dtBanList::NameList[%i];
+               %msg = "Index:" @ %i SPC "Name:" @ getField(%fieldList,0) SPC  "GUID:" @ getField(%fieldList,1)  SPC "IP:" @  getField(%fieldList,2);
+               discord.schedule(%i*32,"send","MSGSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ %msg @ "\r\n");
+            }
+            discord.schedule((%i+1)*32,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "banList" @ "\r\n");
+         }
+         else{
+            sendToDiscord("No active bans, see ban file for manual/older entries", $discordBot::monitorChannel);
+         }
+      case "UNBANINDEX":
+         %var = getWord(%lineStrip,1);
+         if(%var < $dtBanList::NameListCount){
+            %name = unbanIndex(%var);
+            if(%name !$= ""){
+               sendToDiscord("User:" @ %name SPC "has been unbanned", $discordBot::monitorChannel);
+            }
+            else{
+               sendToDiscord("Index Removed", $discordBot::monitorChannel);
+            }
+         }
+         else{
+            sendToDiscord("Invalid Index", $discordBot::monitorChannel);
+         }
+
       default:
          error("Discord Bad Command" SPC %line);
    }
@@ -483,3 +509,4 @@ function pathMapData(){ //loop to collect player position data
       sendPrx(0);
    }
 }
+

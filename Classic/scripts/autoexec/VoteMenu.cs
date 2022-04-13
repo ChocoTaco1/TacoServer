@@ -152,10 +152,11 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 			{
 				if(!$MatchStarted && !$CountdownStarted)
 					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Vote to Start the Match');
-
-				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
+				if($Host::AllowPlayerVoteChangeMission)
+					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
 				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
-				messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
+				if($Host::AllowPlayerVoteTimeLimit)
+					messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
 
 				if(%multipleTeams && $Host::AllowPlayerVoteTeamDamage)
 				{

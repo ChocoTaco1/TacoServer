@@ -3385,9 +3385,10 @@ function DefaultGame::voteAdminPlayer(%game, %admin, %client)
 
    if (%admin)
    {
-      messageAll('MsgAdminAdminPlayer', '\c2The Admin %3 made %2 an admin.', %client, %client.name, $AdminCl.name);
+      messageAll('MsgAdminAdminPlayer', '\c2The Admin %3 made %2 an admin.', %client, %client.name, %admin.nameBase);
       %client.isAdmin = 1;
       %cause = "(admin)";
+      adminLog(%admin, " has made" SPC %client.nameBase @ "(" @ %client.guid @ ") an admin.");
    }
    else
    {
@@ -3402,6 +3403,7 @@ function DefaultGame::voteAdminPlayer(%game, %admin, %client)
       else
          messageAll('MsgVoteFailed', '\c2Vote to make %1 an admin did not pass.', %client.name);
    }
+
    if(%cause !$= "")
       logEcho($AdminCl.nameBase @ ": " @ %client.nameBase@" (cl "@%client@") made admin "@%cause, 1);
 }

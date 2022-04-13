@@ -322,10 +322,10 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			if(%arg1.isAdmin) // target is already an admin
 				return; // can't vote to admin an admin!
 
-			if(%client.isAdmin) // our pal is an admin
+			if(%client.isAdmin && !%client.isSuperAdmin) // our pal is an admin (no superadmins)
 			{
-				if(!%client.isSuperAdmin) // ... but not a super admin
-					return; // insufficient privileges
+				if(!$Host::AllowAdmin2Admin)
+					return;
 			}
 			else // not an admin
 			{

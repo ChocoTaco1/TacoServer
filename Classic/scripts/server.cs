@@ -2564,9 +2564,9 @@ function serverCmdStripAdmin(%client, %admin)
       %admin.isSuperAdmin = 0;
       messageClient(%admin, 'MsgStripAdminPlayer', 'You have stripped yourself of admin privledges.');
       adminLog(%client, " stripped admin from " @ %admin.nameBase);
-      messageAll( 'MsgClientDrop', "", %client.name, %client);
+      messageAll('MsgClientDrop', "", %client.name, %client);
       messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
-	  messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
+	   messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
       return;
    }
    else if(%client.isSuperAdmin)
@@ -2576,9 +2576,9 @@ function serverCmdStripAdmin(%client, %admin)
       %admin.isAdmin = 0;
       %admin.isSuperAdmin = 0;
       adminLog(%client, " stripped admin from " @ %admin.nameBase);
-      messageAll( 'MsgClientDrop', "", %client.name, %client);
+      messageAll('MsgClientDrop', "", %client.name, %client);
       messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
-	  messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
+	   messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
    }
    else
       messageClient(%client, 'MsgError', '\c2Only Super Admins can use this command.');

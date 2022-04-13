@@ -2018,11 +2018,7 @@ function LakRabbitGame::gameOver(%game)
    //call the default
    DefaultGame::gameOver(%game);
 
-   //send the message
-   messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
-
    cancel(%game.rabbitWaypointThread);
-   messageAll('MsgClearObjHud', "");
    for(%i = 0; %i < ClientGroup.getCount(); %i++)
    {
       %client = ClientGroup.getObject(%i);
@@ -2039,6 +2035,12 @@ function LakRabbitGame::gameOver(%game)
 
 	  %client.team = 0;
 	  %client.lastTeam = 0;
+
+   	  //send the message
+   	  messageClient(%client, 'MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
+      messageClient(%client, 'MsgClearObjHud', "");
+
+	  messageClient(%client, 'MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
    }
 
    // ilys -- cancel waypoint if not showing flag icon

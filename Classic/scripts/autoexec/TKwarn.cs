@@ -14,8 +14,8 @@ function DefaultGame::testTeamKill(%game, %victimID, %killerID, %damageType)
       return false; // is not a tk
 
    // No Bots
-   // if(%killerID.isAIcontrolled() || %victimID.isAIcontrolled())
-   // return true;
+   //if(%killerID.isAIcontrolled() || %victimID.isAIcontrolled())
+   //return true;
 
    // Log TeamKill
    teamkillLog(%victimID, %killerID, %damageType);
@@ -133,20 +133,40 @@ function TKvote(%typeName, %arg1, %arg2, %arg3, %arg4)
    if($Host::TournamentMode)
       return;
 
-   //Added for vote overtime
-   %curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
-   if(%curTimeLeftMS <= 90000)
-   {
-      //log it
-      $tkvoteLog = formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC "[Autovote Cancelled]" SPC %arg1.nameBase @ "(" @ %arg1.guid @ ")" SPC "Teamkill Autovote cancelled due insufficient time. #P[" @ $HostGamePlayerCount @ "]" SPC "CM[" @ $CurrentMission @ "]";
-      if($Host::ClassicTeamKillLog)
-      {
-         %logpath = $Host::ClassicTeamKillLogPath;
-         export("$tkvoteLog", %logpath, true);
-         logEcho($tkvoteLog);
-      }
-      echo($tkvoteLog);
+   // admins can't be kicked
+   if(%arg1.isAdmin)
       return;
+
+   //Stop current votes
+   if(Game.scheduleVote !$= "")
+   {
+      //Added for vote overtime
+      //Dont stop if under 90 secs left
+      %curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
+      if(%curTimeLeftMS <= 90000)
+      {
+         //log it
+         $tkvoteLog = formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC "[Autovote Cancelled]" SPC %arg1.nameBase @ "(" @ %arg1.guid @ ")" SPC "Teamkill Autovote cancelled due insufficient time. #P[" @ $HostGamePlayerCount @ "]" SPC "CM[" @ $CurrentMission @ "]";
+         if($Host::ClassicTeamKillLog)
+         {
+            %logpath = $Host::ClassicTeamKillLogPath;
+            export("$tkvoteLog", %logpath, true);
+            logEcho($tkvoteLog);
+         }
+         echo($tkvoteLog);
+         return;
+      }
+      else //Stop any current votes
+      {
+         //Notify clients the vote is being cancelled
+         for(%i = 0; %i < %count; %i++)
+         {
+            %cl = ClientGroup.getObject(%i);
+            if(%cl !$= %arg1) //dont notify the team killer
+               messageClient(%cl, 'VoteStarted', '\c2Vote has been cancelled due to teamkill autovote.');
+         }
+         stopCurrentVote();
+      }
    }
 
    //notify any admins on the other team
@@ -156,20 +176,12 @@ function TKvote(%typeName, %arg1, %arg2, %arg3, %arg4)
       if (%cl.isAdmin == true)
       {
          if(%cl.team !$= %arg1.team) //Not on admins team
-            messageClient(%cl, '', '\c5[A]\c1%1 \c0Teamkill Autovote started to kick %2.~wgui/objective_notification.wav', "Vote in Progress:", %arg1.nameBase);
+            messageClient(%cl, '', '\c5[A]\c1%1 \c0Teamkill Autovote started to kick %2 on the other team.~wgui/objective_notification.wav', "Vote in Progress:", %arg1.nameBase);
       }
    }
    echo(formatTimeString("M-d") SPC formatTimeString("[hh:nn:a]") SPC "Teamkill Autovote started for..." SPC %arg1.nameBase @ "(" @ %arg1.guid @ ")" SPC "#P[" @ $HostGamePlayerCount @ "]" SPC "CM[" @ $CurrentMission @ "]");
 
-   // a vote is already running, cancel it
-   if(Game.scheduleVote !$= "")
-      stopCurrentVote();
-
    %clientsVoting = 0;
-
-   // admins can't be kicked
-   if(%arg1.isAdmin)
-      return;
 
    Game.kickClient = %arg1;
    Game.kickClientName = %arg1.name;

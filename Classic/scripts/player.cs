@@ -187,7 +187,7 @@ datablock AudioProfile(CorpseLootingSound)
    preload = true;
    effect = CorpseLootingEffect;
 };
-          
+
 datablock AudioProfile(ArmorMoveBubblesSound)
 {
    filename    = "fx/armor/bubbletrail2.wav";
@@ -1085,8 +1085,8 @@ datablock ParticleData(LightPuff)
    textureName          = "particleTest";
    colors[0]     = "0.46 0.36 0.26 0.4";
    colors[1]     = "0.46 0.46 0.36 0.0";
-   sizes[0]      = 0.4;
-   sizes[1]      = 1.0;
+   sizes[0]      = 0.8; //was 0.4
+   sizes[1]      = 1.4; //was 1.0
 };
 
 datablock ParticleEmitterData(LightPuffEmitter)
@@ -1123,9 +1123,9 @@ datablock ParticleData(LiftoffDust)
    colors[0]     = "0.46 0.36 0.26 0.0";
    colors[1]     = "0.46 0.46 0.36 0.4";
    colors[2]     = "0.46 0.46 0.36 0.0";
-   sizes[0]      = 0.2;
-   sizes[1]      = 0.6;
-   sizes[2]      = 1.0;
+   sizes[0]      = 0.6; //was 0.2
+   sizes[1]      = 1.0; //was 0.6
+   sizes[2]      = 1.4; //was 1.0
    times[0]      = 0.0;
    times[1]      = 0.5;
    times[2]      = 1.0;
@@ -1193,11 +1193,11 @@ datablock DebrisData( PlayerDebris )
 
    velocity = 18.0;
    velocityVariance = 12.0;
-};             
+};
 
 // z0dd - ZOD, 4/21/02. Altered most of these properties
 datablock PlayerData(LightMaleHumanArmor) : LightPlayerDamageProfile
-{  
+{
    emap = true;
 
    className = Armor;
@@ -1316,8 +1316,8 @@ datablock PlayerData(LightMaleHumanArmor) : LightPlayerDamageProfile
    splashEmitter[0] = PlayerFoamDropletsEmitter;
    splashEmitter[1] = PlayerFoamEmitter;
    splashEmitter[2] = PlayerBubbleEmitter;
-   mediumSplashSoundVelocity = 10.0;   
-   hardSplashSoundVelocity = 20.0;   
+   mediumSplashSoundVelocity = 10.0;
+   hardSplashSoundVelocity = 20.0;
    exitSplashSoundVelocity = 5.0;
 
    // Controls over slope of runnable/jumpable surfaces
@@ -1436,7 +1436,7 @@ datablock PlayerData(LightMaleHumanArmor) : LightPlayerDamageProfile
 
    observeParameters = "0.5 4.5 4.5";
    shieldEffectScale = "0.7 0.7 1.0";
-   
+
    //Kills autopoints
    detectsUsingLOSEnemy[1] = true;
    detectsUsingLOSEnemy[2] = true;
@@ -1453,7 +1453,7 @@ datablock DecalData(MediumMaleFootprint)
 
 // z0dd - ZOD, 4/21/02. Altered most of these properties
 datablock PlayerData(MediumMaleHumanArmor) : MediumPlayerDamageProfile
-{   
+{
    emap = true;
 
    className = Armor;
@@ -1574,7 +1574,7 @@ datablock PlayerData(MediumMaleHumanArmor) : MediumPlayerDamageProfile
    boxHeadRightPercentage        = 1;
    boxHeadBackPercentage         = 0;
    boxHeadFrontPercentage        = 1;
-   
+
    //Foot Prints
    decalData   = MediumMaleFootprint;
    decalOffset = 0.35;
@@ -1594,8 +1594,8 @@ datablock PlayerData(MediumMaleHumanArmor) : MediumPlayerDamageProfile
    splashEmitter[0] = PlayerFoamDropletsEmitter;
    splashEmitter[1] = PlayerFoamEmitter;
    splashEmitter[2] = PlayerBubbleEmitter;
-   mediumSplashSoundVelocity = 10.0;   
-   hardSplashSoundVelocity = 20.0;   
+   mediumSplashSoundVelocity = 10.0;
+   hardSplashSoundVelocity = 20.0;
    exitSplashSoundVelocity = 5.0;
 
    footstepSplashHeight = 0.35;
@@ -1694,7 +1694,7 @@ datablock PlayerData(MediumMaleHumanArmor) : MediumPlayerDamageProfile
    observeParameters = "0.5 4.5 4.5";
 
    shieldEffectScale = "0.7 0.7 1.0";
-   
+
    //Kills autopoints
    detectsUsingLOSEnemy[1] = true;
    detectsUsingLOSEnemy[2] = true;
@@ -1761,7 +1761,7 @@ datablock PlayerData(HeavyMaleHumanArmor) : HeavyPlayerDamageProfile
    maxDamage = 1.32;
    maxEnergy =  110;
    repairRate = 0.0033;
-   
+
    //Value changed halfway between base and classic.
    //Classic is 54, Base is 75
    //Shield breaks right at two mine-disc
@@ -1853,8 +1853,8 @@ datablock PlayerData(HeavyMaleHumanArmor) : HeavyPlayerDamageProfile
    splashEmitter[0] = PlayerFoamDropletsEmitter;
    splashEmitter[1] = PlayerFoamEmitter;
    splashEmitter[2] = PlayerBubbleEmitter;
-   mediumSplashSoundVelocity = 10.0;   
-   hardSplashSoundVelocity = 20.0;   
+   mediumSplashSoundVelocity = 10.0;
+   hardSplashSoundVelocity = 20.0;
    exitSplashSoundVelocity = 5.0;
 
    footstepSplashHeight = 0.35;
@@ -1953,7 +1953,7 @@ datablock PlayerData(HeavyMaleHumanArmor) : HeavyPlayerDamageProfile
    observeParameters = "0.5 4.5 4.5";
 
    shieldEffectScale = "0.7 0.7 1.0";
-   
+
    //Kills autopoints
    detectsUsingLOSEnemy[1] = true;
    detectsUsingLOSEnemy[2] = true;
@@ -1998,7 +1998,7 @@ datablock PlayerData(LightMaleBiodermArmor) : LightMaleHumanArmor
 
 
    debrisShapeName = "bio_player_debris.dts";
-   
+
    //Foot Prints
    decalData   = LightBiodermFootprint;
    decalOffset = 0.3;
@@ -2023,7 +2023,7 @@ datablock PlayerData(MediumMaleBiodermArmor) : MediumMaleHumanArmor
    debrisShapeName = "bio_player_debris.dts";
 
    //Foot Prints
-   decalData   = MediumBiodermFootprint; 
+   decalData   = MediumBiodermFootprint;
    decalOffset = 0.35;
 
    waterBreathSound = WaterBreathBiodermSound;
@@ -2049,7 +2049,7 @@ datablock PlayerData(HeavyMaleBiodermArmor) : HeavyMaleHumanArmor
    //Foot Prints
    decalData    = HeavyBiodermFootprint;
    decalOffset  = 0.4;
-   
+
    waterBreathSound = WaterBreathBiodermSound;
 };
 
@@ -2122,17 +2122,17 @@ function Armor::onMount(%this,%obj,%vehicle,%node)
 
       if(!%obj.inStation)
          %obj.lastWeapon = (%obj.getMountedImage($WeaponSlot) == 0 ) ? "" : %obj.getMountedImage($WeaponSlot).item;
-         
+
        %obj.unmountImage($WeaponSlot);
-   
+
       if(!%obj.client.isAIControlled())
       {
          %obj.setControlObject(%vehicle);
          %obj.client.setObjectActiveImage(%vehicle, 2);
       }
-      
+
       //E3 respawn...
- 
+
       if(%obj == %obj.lastVehicle.lastPilot && %obj.lastVehicle != %vehicle)
       {
          schedule(15000, %obj.lastVehicle,"vehicleAbandonTimeOut", %obj.lastVehicle);
@@ -2140,14 +2140,14 @@ function Armor::onMount(%this,%obj,%vehicle,%node)
       }
       if(%vehicle.lastPilot !$= "" && %vehicle == %vehicle.lastPilot.lastVehicle)
             %vehicle.lastPilot.lastVehicle = "";
-            
+
       %vehicle.abandon = false;
       %vehicle.lastPilot = %obj;
       %obj.lastVehicle = %vehicle;
 
       // update the vehicle's team
       if((%vehicle.getTarget() != -1) && %vehicle.getDatablock().cantTeamSwitch $= "")
-      {   
+      {
          setTargetSensorGroup(%vehicle.getTarget(), %obj.client.getSensorGroup());
          if( %vehicle.turretObject > 0 )
             setTargetSensorGroup(%vehicle.turretObject.getTarget(), %obj.client.getSensorGroup());
@@ -2207,9 +2207,9 @@ function Armor::onUnmount( %this, %obj, %vehicle, %node )
          %obj.use(%obj.lastWeapon);
       else
       {
-         if(%obj.getMountedImage($WeaponSlot) == 0) 
+         if(%obj.getMountedImage($WeaponSlot) == 0)
             %obj.selectWeaponSlot( 0 );
-      }                      
+      }
       //Inform gunner position when pilot leaves...
       //if(%vehicle.getDataBlock().showPilotInfo !$= "")
       //   if((%gunner = %vehicle.getMountNodeObject(1)) != 0)
@@ -2271,7 +2271,7 @@ function Armor::onCollision(%this,%obj,%col,%forceVehicleNode)
       //to ensure they mount the turret before the passenger seat, regardless of where they collide...
       if (%obj.client.isAIControlled())
       {
-         %transform = %col.getTransform();   
+         %transform = %col.getTransform();
 
          //either the AI is *required* to pilot, or they'll pick the first available passenger seat
          if (%client.pilotVehicle)
@@ -2312,7 +2312,7 @@ function Armor::onCollision(%this,%obj,%col,%forceVehicleNode)
          }
          if(%col.noEnemyControl && %obj.team != %col.team)
             return;
-            
+
          commandToClient(%obj.client,'SetDefaultVehicleKeys', true);
          //If pilot or passenger then bind a few extra keys
          if(%node == 0)
@@ -2329,7 +2329,7 @@ function Armor::onCollision(%this,%obj,%col,%forceVehicleNode)
          if (%obj.client.isAIControlled() && %node == 1 && (%type $= "BomberFlyer" || %type $= "AssaultVehicle"))
          {
             //%client.player.setActionThread(%col.getDataBlock().mountPose[0], true, true);
-            %client.player.setActionThread(sitting, true, true);                       
+            %client.player.setActionThread(sitting, true, true);
          }
 
          %col.mountObject(%obj,%node);
@@ -2350,7 +2350,7 @@ function Armor::onCollision(%this,%obj,%col,%forceVehicleNode)
          %gotSomething = false;
          // it's corpse-looting time!
          // weapons -- don't pick up more than you are allowed to carry!
-         for(%i = 0; ( %obj.weaponCount < %obj.getDatablock().maxWeapons ) && $InvWeapon[%i] !$= ""; %i++) 
+         for(%i = 0; ( %obj.weaponCount < %obj.getDatablock().maxWeapons ) && $InvWeapon[%i] !$= ""; %i++)
          {
             %weap = $NameToInv[$InvWeapon[%i]];
             if ( %col.hasInventory( %weap ) )
@@ -2498,7 +2498,7 @@ function Player::resetFlagTossWait(%this)
 
 function Player::resetSitMessage(%obj)
 {
-   %obj.noSitMessage = false;   
+   %obj.noSitMessage = false;
 }
 
 function Player::setInvincible(%this, %val)
@@ -2508,9 +2508,9 @@ function Player::setInvincible(%this, %val)
 
 function Player::causedRecentDamage(%this, %val)
 {
-   %this.causedRecentDamage = %val; 
+   %this.causedRecentDamage = %val;
 }
-   
+
 function hasLargePack(%player)
 {
    %pack = %player.getMountedImage($BackpackSlot);
@@ -2609,7 +2609,7 @@ function Armor::doDismount(%this, %obj, %forced)
    %obj.unmount();
    if(%obj.mVehicle)
       %obj.mVehicle.getDataBlock().playerDismounted(%obj.mVehicle, %obj);
-   
+
    // bots don't change their control objects when in vehicles
    if(!%obj.client.isAIControlled())
    {
@@ -2652,7 +2652,7 @@ function resetObserveFollow( %client, %dismount )
          if ( %client.observers[%i].clientObserve != %client )
             continue;
 
-         %client.observers[%i].camera.setOrbitMode( %client.player, %client.player.getTransform(), 0.5, 4.5, 4.5); 
+         %client.observers[%i].camera.setOrbitMode( %client.player, %client.player.getTransform(), 0.5, 4.5, 4.5);
       }
    }
    else
@@ -2666,7 +2666,7 @@ function resetObserveFollow( %client, %dismount )
          %params = %client.player.getTransform();
       else
          %params = %mount.getDataBlock().observeParameters;
-      
+
       for( %i = 0; %i < %client.observeCount; %i++ )
       {
          // z0dd - ZOD, 5/21/03. Make sure this client actually obs this client
@@ -2675,7 +2675,7 @@ function resetObserveFollow( %client, %dismount )
 
          %client.observers[%i].camera.setOrbitMode(%mount, %mount.getTransform(), getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
       }
-   }   
+   }
 }
 
 
@@ -2683,7 +2683,7 @@ function resetObserveFollow( %client, %dismount )
 
 function Player::scriptKill(%player, %damageType)
 {
-   %player.scriptKilled = 1; 
+   %player.scriptKilled = 1;
    %player.setInvincible(false);
    %player.damage(0, %player.getPosition(), 10000, %damageType);
 }
@@ -2695,7 +2695,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
       return;
 
    //----------------------------------------------------------------
-   // z0dd - ZOD, 6/09/02. Check to see if this vehicle is destroyed, 
+   // z0dd - ZOD, 6/09/02. Check to see if this vehicle is destroyed,
    // if it is do no damage. Fixes vehicle ghosting bug. We do not
    // check for isObject here, destroyed objects fail it even though
    // they exist as objects, go figure.
@@ -2730,7 +2730,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
                }
                else
                {
-                  if(%damageType != $DamageType::Laser && %damageType != $DamageType::Bullet && %damageType != $DamageType::Blaster) 
+                  if(%damageType != $DamageType::Laser && %damageType != $DamageType::Bullet && %damageType != $DamageType::Blaster)
                      return;
                }
             }
@@ -2740,7 +2740,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 
    %targetClient = %targetObject.getOwnerClient();
    if(isObject(%mineSC))
-      %sourceClient = %mineSC;   
+      %sourceClient = %mineSC;
    else
       %sourceClient = isObject(%sourceObject) ? %sourceObject.getOwnerClient() : 0;
 
@@ -2754,7 +2754,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
    else if(%damageType == $DamageType::Suicide)
       %sourceTeam = 0;
    //--------------------------------------------------------------------------------------------------------------------
-   // z0dd - ZOD, 4/8/02. Check to see if this turret has a valid owner, if not clear the variable. 
+   // z0dd - ZOD, 4/8/02. Check to see if this turret has a valid owner, if not clear the variable.
    else if(isObject(%sourceObject) && %sourceObject.getClassName() $= "Turret")
    {
       %sourceTeam = getTargetSensorGroup(%sourceObject.getTarget());
@@ -2794,11 +2794,11 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
    %damageScale = %data.damageScale[%damageType];
    if(%damageScale !$= "")
       %amount *= %damageScale;
-   
+
    %flash = %targetObject.getDamageFlash() + (%amount * 2);
    if (%flash > 0.75)
       %flash = 0.75;
-   
+
    	// Teratos: Originally from Eolk? Mine+Disc tracking/death message support.
 	// No Schedules by DarkTiger Ver.2
 	%targetClient.mineDisc = false;
@@ -2807,17 +2807,17 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 	   case $DamageType::Disc:
 		  if((getSimTime() - %targetClient.mdcTime1) < 256)
 			%targetClient.mineDisc = true;
-			
-		  %targetClient.mdcTime2 = getSimTime(); 
+
+		  %targetClient.mdcTime2 = getSimTime();
 
 	   case $DamageType::Mine:
 		  if((getSimTime() - %targetClient.mdcTime2) < 256)
 			%targetClient.mineDisc = true;
-			
-		  %targetClient.mdcTime1 = getSimTime(); 
+
+		  %targetClient.mdcTime1 = getSimTime();
 	}
 	// -- End Mine+Disc insert.
-   
+
    %previousDamage = %targetObject.getDamagePercent();
    %targetObject.setDamageFlash(%flash);
    %targetObject.applyDamage(%amount);
@@ -2826,49 +2826,49 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
    %targetClient.lastDamagedBy = %damagingClient;
    %targetClient.lastDamaged = getSimTime();
 
-   //now call the "onKilled" function if the client was... you know...  
+   //now call the "onKilled" function if the client was... you know...
    if(%targetObject.getState() $= "Dead")
    {
       // where did this guy get it?
       %damLoc = %targetObject.getDamageLocation(%position);
-      
+
       // should this guy be blown apart?
-      if( %damageType == $DamageType::Explosion || 
+      if( %damageType == $DamageType::Explosion ||
           %damageType == $DamageType::TankMortar ||
           %damageType == $DamageType::Mortar ||
           %damageType == $DamageType::MortarTurret ||
           %damageType == $DamageType::BomberBombs ||
           %damageType == $DamageType::SatchelCharge ||
-          %damageType == $DamageType::Missile )     
+          %damageType == $DamageType::Missile )
       {
          if( %previousDamage >= 0.35 ) // only if <= 35 percent damage remaining
          {
             %targetObject.setMomentumVector(%momVec);
-            %targetObject.blowup(); 
+            %targetObject.blowup();
          }
       }
-   
+
       // this should be funny...
       if( %damageType == $DamageType::VehicleSpawn )
-      {   
+      {
          %targetObject.setMomentumVector("0 0 1");
          %targetObject.blowup();
       }
-      
+
       // If we were killed, max out the flash
       %targetObject.setDamageFlash(0.75);
-      
+
       %damLoc = %targetObject.getDamageLocation(%position);
       Game.onClientKilled(%targetClient, %sourceClient, %damageType, %sourceObject, %damLoc);
    }
    else if ( %amount > 0.1 )
-   {   
+   {
       if( %targetObject.station $= "" && %targetObject.isCloaked() )
       {
          %targetObject.setCloaked( false );
-         %targetObject.reCloak = %targetObject.schedule( 500, "setCloaked", true ); 
+         %targetObject.reCloak = %targetObject.schedule( 500, "setCloaked", true );
       }
-      
+
       playPain( %targetObject );
    }
 }
@@ -2883,101 +2883,101 @@ function Armor::applyConcussion( %this, %dist, %radius, %sourceObject, %targetOb
 {
    %percentage = 1 - ( %dist / %radius );
    %random = getRandom();
-   
+
    if( %sourceObject == %targetObject )
-   {   
+   {
       %flagChance = 1.0;
       %itemChance = 1.0;
    }
    else
-   {   
+   {
       %flagChance = 0.75;
-      %itemChance = 0.75;   
+      %itemChance = 0.75;
    }
-   
+
    %probabilityFlag = %flagChance * %percentage;
-   %probabilityItem = %itemChance * %percentage;   
-   
+   %probabilityItem = %itemChance * %percentage;
+
    if( %random <= %probabilityFlag )
-      Game.applyConcussion( %targetObject ); 
-   
+      Game.applyConcussion( %targetObject );
+
    if( %random <= %probabilityItem )
    {
       %player = %targetObject;
       %numWeapons = 0;
-      
+
       // blaster 0
       // plasma 1
       // chain 2
-      // disc 3   
+      // disc 3
       // grenade 4
       // snipe 5
       // elf 6
       // mortar 7
-      
+
       //get our inventory
-      if( %weaps[0] = %player.getInventory("Blaster") > 0 ) %numWeapons++; 
-      if( %weaps[1] = %player.getInventory("Plasma") > 0 ) %numWeapons++; 
-      if( %weaps[2] = %player.getInventory("Chaingun") > 0 ) %numWeapons++; 
-      if( %weaps[3] = %player.getInventory("Disc") > 0 ) %numWeapons++; 
-      if( %weaps[4] = %player.getInventory("GrenadeLauncher") > 0 ) %numWeapons++; 
+      if( %weaps[0] = %player.getInventory("Blaster") > 0 ) %numWeapons++;
+      if( %weaps[1] = %player.getInventory("Plasma") > 0 ) %numWeapons++;
+      if( %weaps[2] = %player.getInventory("Chaingun") > 0 ) %numWeapons++;
+      if( %weaps[3] = %player.getInventory("Disc") > 0 ) %numWeapons++;
+      if( %weaps[4] = %player.getInventory("GrenadeLauncher") > 0 ) %numWeapons++;
       if( %weaps[5] = %player.getInventory("SniperRifle") > 0 ) %numWeapons++;
       if( %weaps[6] = %player.getInventory("ELFGun") > 0 ) %numWeapons++;
       if( %weaps[7] = %player.getInventory("Mortar") > 0 ) %numWeapons++;
-      
+
       %foundWeapon = false;
       %attempts = 0;
-      
-      if( %numWeapons > 0 )   
-      {   
+
+      if( %numWeapons > 0 )
+      {
          while( !%foundWeapon )
          {
             %rand = mFloor( getRandom() * 8 );
             if( %weaps[ %rand ] )
             {
                %foundWeapon = true;
-               
+
                switch ( %rand )
                {
                   case 0:
-                     %player.use("Blaster");     
+                     %player.use("Blaster");
                   case 1:
-                     %player.use("Plasma");     
+                     %player.use("Plasma");
                   case 2:
-                     %player.use("Chaingun");     
+                     %player.use("Chaingun");
                   case 3:
-                     %player.use("Disc");     
+                     %player.use("Disc");
                   case 4:
-                     %player.use("GrenadeLauncher");     
-                  case 5: 
-                     %player.use("SniperRifle");     
+                     %player.use("GrenadeLauncher");
+                  case 5:
+                     %player.use("SniperRifle");
                   case 6:
-                     %player.use("ElfGun");     
+                     %player.use("ElfGun");
                   case 7:
-                     %player.use("Mortar");     
+                     %player.use("Mortar");
                }
-               
+
                %image = %player.getMountedImage( $WeaponSlot );
                %player.throw( %image.item );
                %player.client.setWeaponsHudItem( %image.item, 0, 0 );
                %player.throwPack();
             }
             else
-            {   
+            {
                %attempts++;
                if( %attempts > 10 )
                   %foundWeapon = true;
-            }    
+            }
          }
       }
       else
       {
          %targetObject.throwPack();
          %targetObject.throwWeapon();
-      }   
+      }
    }
-   
-}             
+
+}
 
 //----------------------------------------------------------------------------
 
@@ -3000,7 +3000,7 @@ function playPain( %obj )
    %client = %obj.client;
    %random = getRandom(1) + 1;
    %desc = AudioClosest3d;
-   
+
    playTargetAudio( %client.target, $PainCry[%random], %desc, false);
 }
 
@@ -3050,8 +3050,8 @@ function Player::pickup(%this,%obj,%amount)
          %this.getMountedImage($BackpackSlot) != 0)
       return 0;
 	// don't pick up a weapon (other than targeting laser) if player's at maxWeapons
-   else if(%data.className $= Weapon 
-     && %data.getName() !$= "TargetingLaser"  // Special case 
+   else if(%data.className $= Weapon
+     && %data.getName() !$= "TargetingLaser"  // Special case
      && %this.weaponCount >= %this.getDatablock().maxWeapons)
       return 0;
 	// don't allow players to throw large packs at pilots (thanks Wizard)
@@ -3067,7 +3067,7 @@ function Player::use( %this,%data )
       return false;
 
    // Convert the word "Backpack" to whatever is in the backpack slot.
-   if ( %data $= "Backpack" ) 
+   if ( %data $= "Backpack" )
    {
       if ( %this.inStation )
          return false;
@@ -3082,17 +3082,17 @@ function Player::use( %this,%data )
          messageClient( %this.client, 'MsgCantUsePack', '\c2You can\'t use your pack while in a weaponry position.~wfx/misc/misc.error.wav' );
          return( false );
       }
-      
+
       %image = %this.getMountedImage( $BackpackSlot );
       if ( %image )
          %data = %image.item;
    }
 
    // Can't use some items when piloting or your a weapon operator
-   if ( %this.isPilot() || %this.isWeaponOperator() ) 
+   if ( %this.isPilot() || %this.isWeaponOperator() )
       if ( %data.getName() !$= "RepairKit" )
          return false;
-   
+
    return ShapeBase::use( %this, %data );
 }
 
@@ -3125,13 +3125,13 @@ function Player::isWeaponOperator(%this)
    }
 
    return( false );
-}   
+}
 
 function Player::liquidDamage(%obj, %data, %damageAmount, %damageType)
 {
    if(%obj.getState() !$= "Dead")
    {
-      %data.damageObject(%obj, 0, "0 0 0", %damageAmount, %damageType); 
+      %data.damageObject(%obj, 0, "0 0 0", %damageAmount, %damageType);
       %obj.lDamageSchedule = %obj.schedule(50, "liquidDamage", %data, %damageAmount, %damageType);
    }
    else
@@ -3160,7 +3160,7 @@ function Armor::onEnterLiquid(%data, %obj, %coverage, %type)
       case 5:
          //Hot Lava
          %obj.liquidDamage(%data, $DamageHotLava, $DamageType::Lava);
-      case 6:    
+      case 6:
          //Crusty Lava
          %obj.liquidDamage(%data, $DamageCrustyLava, $DamageType::Lava);
       case 7:
@@ -3281,46 +3281,46 @@ function playDeathAnimation(%player, %damageLocation, %type)
 {
    %vertPos = firstWord(%damageLocation);
    %quadrant = getWord(%damageLocation, 1);
-   
+
    //echo("vert Pos: " @ %vertPos);
    //echo("quad: " @ %quadrant);
-   
-   if( %type == $DamageType::Explosion || %type == $DamageType::Mortar || %type == $DamageType::Grenade) 
+
+   if( %type == $DamageType::Explosion || %type == $DamageType::Mortar || %type == $DamageType::Grenade)
    {
-      if(%quadrant $= "front_left" || %quadrant $= "front_right") 
+      if(%quadrant $= "front_left" || %quadrant $= "front_right")
          %curDie = $PlayerDeathAnim::ExplosionBlowBack;
       else
          %curDie = $PlayerDeathAnim::TorsoBackFallForward;
    }
-   else if(%vertPos $= "head") 
+   else if(%vertPos $= "head")
    {
-      if(%quadrant $= "front_left" ||  %quadrant $= "front_right" ) 
+      if(%quadrant $= "front_left" ||  %quadrant $= "front_right" )
          %curDie = $PlayerDeathAnim::HeadFrontDirect;
-      else 
+      else
          %curDie = $PlayerDeathAnim::HeadBackFallForward;
    }
-   else if(%vertPos $= "torso") 
+   else if(%vertPos $= "torso")
    {
-      if(%quadrant $= "front_left" ) 
+      if(%quadrant $= "front_left" )
          %curDie = $PlayerDeathAnim::TorsoLeftSpinDeath;
-      else if(%quadrant $= "front_right") 
+      else if(%quadrant $= "front_right")
          %curDie = $PlayerDeathAnim::TorsoRightSpinDeath;
-      else if(%quadrant $= "back_left" ) 
+      else if(%quadrant $= "back_left" )
          %curDie = $PlayerDeathAnim::TorsoBackFallForward;
-      else if(%quadrant $= "back_right") 
+      else if(%quadrant $= "back_right")
          %curDie = $PlayerDeathAnim::TorsoBackFallForward;
    }
-   else if (%vertPos $= "legs") 
+   else if (%vertPos $= "legs")
    {
-      if(%quadrant $= "front_left" ||  %quadrant $= "back_left") 
+      if(%quadrant $= "front_left" ||  %quadrant $= "back_left")
          %curDie = $PlayerDeathAnim::LegsLeftGimp;
-      if(%quadrant $= "front_right" || %quadrant $= "back_right") 
+      if(%quadrant $= "front_right" || %quadrant $= "back_right")
          %curDie = $PlayerDeathAnim::LegsRightGimp;
    }
-   
+
    if(%curDie $= "" || %curDie < 1 || %curDie > 11)
       %curDie = 1;
-   
+
    %player.setActionThread("Death" @ %curDie);
 }
 

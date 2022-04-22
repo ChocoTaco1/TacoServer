@@ -55,12 +55,15 @@ function GetTeamCounts(%game)
 
 				if( !$Host::TournamentMode )
 				{
-					if( $CurrentMissionType $= "CTF" )
+					if($CurrentMissionType $= "CTF")
 					{
 						NBRStatusNotify(%game);
 						CheckAntiPack(%game);
 					}
-					TeamBalanceNotify(%game);
+					else if($CurrentMissionType $= "DM")
+						CheckAntiPack(%game);
+
+					TeamBalanceNotify(%game); //Has check for # teams
 				}
 
 				//Set so counter wont run when it doesnt need to.

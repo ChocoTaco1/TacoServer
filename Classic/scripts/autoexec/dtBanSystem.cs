@@ -13,7 +13,7 @@
 //TO UNBAN SOMEONE WITHOUT RESTARTING THE SERVER
 //banList();in console
 //unbanIndex(%index) %index is the number next to the players name from listBans();
-//Example: unban(555555,"22.222.222.222"); put ip in quotes
+//Example: unbanold(555555,"22.222.222.222"); put ip in quotes
 
 package dtBan
 {
@@ -42,22 +42,30 @@ function BanList::add(%guid, %ipAddress, %time){
       $dtBanList::IP[%bareIP] = dtBanMark() TAB %time TAB %name;
    }
    %found = 0;
-   for (%i = 0; %i <  $dtBanList::NameListCount; %i++){
-      if(getField($dtBanList::NameList[%i], 0) $= %name){
-         %found =1;
-         if(%guid > 0)
-            $dtBanList::NameList[%i] = setField($dtBanList::NameList[%i], 1, %guid);
-         if(getSubStr(%ipAddress, 0, 3) $= "IP:")
-            $dtBanList::NameList[%i] = setField($dtBanList::NameList[%i], 2, %bareIP);
-         break;
+   %eIndex = -1;
+   for (%i = 0; %i <  100; %i++){
+      if($dtBanList::NameList[%i] !$= ""){
+         if(getField($dtBanList::NameList[%i], 0) $= %name){
+            %found =1;
+            if(%guid > 0)
+               $dtBanList::NameList[%i] = setField($dtBanList::NameList[%i], 1, %guid);
+            if(getSubStr(%ipAddress, 0, 3) $= "IP:")
+               $dtBanList::NameList[%i] = setField($dtBanList::NameList[%i], 2, %bareIP);
+            break;
+         }
+      }
+      else if(%eIndex == -1){
+         %eIndex = %i;    
       }
    }
    if(!%found){
-      $dtBanList::NameListCount = ($dtBanList::NameListCount > 0) ? $dtBanList::NameListCount : 0;
-      $dtBanList::NameList[$dtBanList::NameListCount] = %name TAB %guid TAB %bareIP;
-      $dtBanList::NameListCount++;
+      if($dtBanList::NameList[%eIndex] $= ""){
+         $dtBanList::NameList[%eIndex] = %name TAB %guid TAB %bareIP;
+      }
+      else{
+         error("Ban Index is not empty");
+      }
    }
-   // write out the updated bans to the file
    saveBanList();
 }
 
@@ -75,10 +83,12 @@ function banList_checkIP(%client){
       if (%delta < getField(%time,4))
          return 1;
       else{
-         for (%i = 0; %i <  $dtBanList::NameListCount; %i++){
-            if(getField($dtBanList::NameList[%i], 2) $= %ip){
-               unbanIndex(%i);
-               break;
+         for (%i = 0; %i <  100; %i++){
+            if($dtBanList::NameList[%i] !$= ""){
+               if(getField($dtBanList::NameList[%i], 1) $= %guid){
+                  unbanIndex(%i);
+                  break;
+               }
             }
          }
          $dtBanList::IP[%ip] =  "";
@@ -97,10 +107,12 @@ function banList_checkGUID(%guid){
       if (%delta < getField(%time,4))
          return 1;
       else{
-         for (%i = 0; %i <  $dtBanList::NameListCount; %i++){
-            if(getField($dtBanList::NameList[%i], 1) $= %guid){
-               unbanIndex(%i);
-               break;
+         for (%i = 0; %i <  100; %i++){
+            if($dtBanList::NameList[%i] !$= ""){
+               if(getField($dtBanList::NameList[%i], 1) $= %guid){
+                  unbanIndex(%i);
+                  break;
+               }
             }
          }
          $dtBanList::GUID[%guid] = "";
@@ -203,30 +215,27 @@ function dtBanMark(){
 }
 
 function banList(){
-   $dtBanList::NameListCount = ($dtBanList::NameListCount > 0) ? $dtBanList::NameListCount : 0;
-   if(!$dtBanList::NameListCount){
-      error("No bans, see" SPC $Host::dtBanlist SPC "for older system entries");
-   }
-   else{
-      for (%i = 0; %i <  $dtBanList::NameListCount; %i++){
-         %fieldList = $dtBanList::NameList[%i];
+   %found = 0;
+   for (%i = 0; %i <  100; %i++){
+      %fieldList = $dtBanList::NameList[%i];
+      if($dtBanList::NameList[%i] !$= ""){
+         %found = 1;
          error("index:" @ %i SPC "Name:" @ getField(%fieldList,0) SPC  "GUID:" @ getField(%fieldList,1)  SPC "IP:" @  getField(%fieldList,2));
       }
-      if($dtBanList::NameListCount > 0){
-         error("Use unbanIndex(%index); to unban user from the list ");
-      }
+   }
+   if(%found){
+       error("Use unbanIndex(%index); to unban user from the list ");
+   }
+   else{
+      error("No bans, see" SPC $Host::dtBanlist SPC "for older entries");
    }
 }
 
 function unbanIndex(%index){
-   %fieldList = $dtBanList::NameList[%index];
-   %name = getField(%fieldList, 0);
-   if(getFieldCount(%fieldList) > 1){
-      for(%i = %index; %i < $dtBanList::NameListCount -1; %i++) {
-         $dtBanList::NameList[%i] =$dtBanList::NameList[%i+1];
-      }
-      $dtBanList::NameList[%i] = "";
-      $dtBanList::NameListCount--;
+   if( $dtBanList::NameList[%index] !$= ""){
+      %fieldList = $dtBanList::NameList[%index];
+      %name = getField(%fieldList, 0);
+      $dtBanList::NameList[%index] = "";
       error("Name" SPC getField(%fieldList,0) SPC "UNBANNED");
       %guid = getField(%fieldList,1);
       if($dtBanList::GUID[%guid] !$= ""){
@@ -238,64 +247,21 @@ function unbanIndex(%index){
         $dtBanList::IP[%ip] =  "";
         error("IP" SPC %ip SPC "UNBANNED");
       }
+      saveBanList();
+      return %name;
    }
-   else{
-      for(%i = %index; %i < $dtBanList::NameListCount -1; %i++) {
-         $dtBanList::NameList[%i] =$dtBanList::NameList[%i+1];
-      }
-      $dtBanList::NameList[%i] = "";
-      $dtBanList::NameListCount--;
-      error("Error removing invalid index");
-   }
-   saveBanList();
-   return %name;
-}
-
-
-function banListClean(){
-   %count = 0;
-   for(%i = 0; %i < $dtBanList::NameListCount; %i++) {
-      %ban = 1;
-      %banField = $dtBanList::NameList[%i];
-      %guid = getField(%banField,1);
-      %ip = getField(%banField,2);
-
-      %time = $dtBanList::IP[%ip];
-      if(%time !$= "BAN" && getFieldCount(%time) > 0){
-         %delta =  getBanCount(getField(%time,0), getField(%time,1),getField(%time,2),getField(%time,3));
-         if (%delta > getField(%time,4)){
-            $dtBanList::IP[%ip] = "";
-            %ban = 0;
-         }
-      }
-
-      %time = $dtBanList::GUID[%guid];
-      if(%time !$= "BAN" && getFieldCount(%time) > 0){
-         %delta =  getBanCount(getField(%time,0), getField(%time,1),getField(%time,2),getField(%time,3));
-         if (%delta > getField(%time,4)){
-            $dtBanList::GUID[%guid] = "";
-            %ban = 0;
-         }
-      }
-
-      if(%banField !$= "" && %ban){
-         %tempList[%count] = %banField;
-         %count++;
-      }
-   }
-   for(%i = 0; %i < %count; %i++) {
-      $dtBanList::NameList[%i] = %tempList[%i];
-   }
-   $dtBanList::NameListCount = %count;
+   return -1;
 }
 
 //old method
 function unbanold(%guid,%ip){
    %ip = strReplace(%ip, ".", "_");
-   for (%i = 0; %i <  $dtBanList::NameListCount; %i++){
-      if(getField($dtBanList::NameList[%i], 2) $= %ip || getField($dtBanList::NameList[%i], 1) $= %guid){
-         unbanIndex(%i);
-         return;
+   for (%i = 0; %i <  100; %i++){
+      if($dtBanList::NameList[%i] !$= ""){
+         if(getField($dtBanList::NameList[%i], 2) $= %ip || getField($dtBanList::NameList[%i], 1) $= %guid){
+            unbanIndex(%i);
+            return;
+         }
       }
    }
    if($dtBanList::GUID[%guid] !$= ""){

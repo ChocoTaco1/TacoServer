@@ -285,10 +285,6 @@ function discord::onLine(%this, %line){
    switch$(%cmd){
       //case "Discord":
          //messageAll( 'MsgDiscord', '\c3Discord: \c4%1 %2',getWord(%lineStrip,1),getWords(%lineStrip,2,getWordCount(%lineStrip) -1));
-      case "PLOTSTOP":
-         $pathMaps::running = 0;
-      case "PLOTPLAYER":
-         startPlayerPlot(getWord(%lineStrip,1));
       case "GETSTAT":
             %var = getWord(%lineStrip,1);
             %mon = getWord(%lineStrip,2);
@@ -353,27 +349,26 @@ function discord::onLine(%this, %line){
             }
          }
       case "BANLIST":
-         if($dtBanList::NameListCount){
-            for (%i = 0; %i <  $dtBanList::NameListCount; %i++){
+         %found = 0;
+         for (%i = 0; %i <  100; %i++){
+            if($dtBanList::NameList[%i] !$= ""){
                %fieldList = $dtBanList::NameList[%i];
-               %msg = "Index:" @ %i SPC "Name:" @ getField(%fieldList,0) SPC  "GUID:" @ getField(%fieldList,1)  SPC "IP:" @  getField(%fieldList,2);
-               discord.schedule(%i*32,"send","MSGSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ %msg @ "\r\n");
+               %msg = "Index:" @ %i SPC "Name:" @ getField(%fieldList,0) SPC  "GUID:" @ getField(%fieldList,1);
+               %found++;
+               discord.schedule(%found*32,"send","MSGSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ %msg @ "\r\n");
             }
-            discord.schedule((%i+1)*32,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "banList" @ "\r\n");
+         }
+         if(%found > 0){
+            discord.schedule((%found+1)*32,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "banList" @ "\r\n");
          }
          else{
             sendToDiscord("No active bans, see ban file for manual/older entries", $discordBot::monitorChannel);
          }
       case "UNBANINDEX":
          %var = getWord(%lineStrip,1);
-         if(%var < $dtBanList::NameListCount){
+         if($dtBanList::NameList[%var] !$= ""){
             %name = unbanIndex(%var);
-            if(%name !$= ""){
-               sendToDiscord("User:" @ %name SPC "has been unbanned", $discordBot::monitorChannel);
-            }
-            else{
-               sendToDiscord("Index Removed", $discordBot::monitorChannel);
-            }
+            sendToDiscord("User:" @ %name SPC "has been unbanned", $discordBot::monitorChannel);
          }
          else{
             sendToDiscord("Invalid Index", $discordBot::monitorChannel);
@@ -433,80 +428,3 @@ function sendLDATA(%month, %year, %type){
 function unlockStatGen(){
    $genStatsLockout = 0;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-//Player Path Maps
-////////////////////////////////////////////////////////////////////////////////
-
-$pathMaps::maxCount = 32000;// default point count
-$pathMaps::speed = 500;
-function sendPrx(%x){
-   for(%i = %x; %i < $prx::count && (%i - %x) < 50; %i++){
-      %line =  $prx::data[%i];
-      %msg = "CDATA" @ "%c%" @ %i @ "%c%" @ %line @ "\r\n";
-      if(isObject(discord))
-         discord.send(%msg);
-      //discord.schedule(%i,"send",%msg);
-   }
-   if(%i < $prx::count)
-      schedule(128, 0, "sendPrx", %i);
-   else
-      discord.schedule(5000,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "buildprx" @ $discordBot::cmdSplit @ $prx::terFile @ $discordBot::cmdSplit @ $prx::misFile @ "\r\n");
-}
-
-function startPlayerPlot(%count){
-   if(!$pathMaps::running && (($MatchStarted + $missionRunning) == 2)){
-      if(%count > 1000){
-         $pathMaps::maxCount = %count;
-      }
-      $prx::terFile = Terrain.terrainFile;
-      $prx::misFile = $missionName;
-      $prx::count = 0;
-      $pathMaps::running = 1;
-      pathMapData();
-      sendToDiscord("Player Plot Started" SPC $pathMaps::maxCount, $discordBot::monitorChannel);
-      error("Player Plot Started");
-   }
-   else{
-      sendToDiscord("Game Has Not Started Yet", $discordBot::monitorChannel);
-   }
-}
-function floorVector(%vec){
-   return mFloor(getWord(%vec,0)) SPC mFloor(getWord(%vec,1)) SPC mFloor(getWord(%vec,2));
-}
-function pathDataPoint(%client){
-   %player = %client.player;
-   if(isObject(%player)){
-      %veh =  (isObject(%client.vehicleMounted)) ? %client.vehicleMounted.getDataBlock().getName() : 0;
-      $prx::data[$prx::Count] = %client.nameBase @ "%c" @ %pos @ "%c" @ %client.team @ "%c" @ isObject(%player.holdingFlag) @ "%c" @ %veh @ "%c" @ getSimTime();
-      $prx::count++;
-   }
-}
-function pathMapData(){ //loop to collect player position data
-   for(%x = 0; %x < ClientGroup.getCount(); %x++){
-      %client = ClientGroup.getObject(%x);
-      %player = %client.player;
-      if(isObject(%player)){
-         %pos = %player.getPosition();
-         %fpos = floorVector(%pos);
-         if(%player.lpm !$= %fpos){
-            %veh =  (isObject(%client.vehicleMounted)) ? %client.vehicleMounted.getDataBlock().getName() : 0;
-            $prx::data[$prx::Count] = %client.nameBase @ "%c" @ %pos @ "%c" @ %client.team @ "%c" @ isObject(%player.holdingFlag) @ "%c" @ %veh @ "%c" @ getSimTime();
-            $prx::count++;
-         }
-         %player.lpm = %fpos;
-      }
-   }
-   if(!($prx::eCount++ % 10)){error("pathMapData" SPC $prx::Count);}
-
-   if($pathMaps::running && (($MatchStarted + $missionRunning) == 2)  && $prx::Count < $pathMaps::maxCount){// note will stop at end of mission
-      schedule($pathMaps::speed, 0,"pathMapData");
-   }
-   else{
-      $pathMaps::running = 0;
-      sendToDiscord("Player Plot Processing", $discordBot::monitorChannel);
-      error("Player Plot Tracking Has Ended");
-      sendPrx(0);
-   }
-}
-

@@ -155,7 +155,7 @@ function stationTrigger::onEnterTrigger(%data, %obj, %colObj)
 function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
 {
     //Takes 11 blaster shots to kill a heavy, 13 normal.
-	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
+	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster && !$Host::TournamentMode) //Free-for-all only
 		%amount *= 1.15;
 
 	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);

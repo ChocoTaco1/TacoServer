@@ -732,8 +732,8 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		}
 		else if(%points >= 100)
 		{
+			blastFireworks();
 			messageAll('', '~wfx/Misc/Flair.wav');
-			messageAll('', '~wfx/Bonuses/Nouns/coyote.wav');
 		}
 
 		Game.recalcScore(%sourceObject.client);
@@ -1052,6 +1052,58 @@ function missileEveryone(%attacker)
 	if(Game.duelMode && %attacker.holdingFlag)
 		%attacker.client.duelSeconds += 15;
 }
+
+function blastFireworks(%deezFireworks)
+{
+	if(!ClientGroup.getCount())
+		return;
+
+	// find a random client.
+	%client = ClientGroup.getObject(getRandom(ClientGroup.getCount() - 1));
+
+	if(isObject(%client.player) && isObject(Game))
+	{
+		%distance = Sky.visibleDistance;
+		if(!%distance || %distance > 250)
+			%distance = 250;
+
+		%position = %client.player.position;
+		// Vary by half of the visible distance.
+		%neg = getRandom(0, 1) - 1;
+		%x = getWord(%position, 0) + ((%distance - getRandom(%distance / 2)) * %neg);
+		%neg = getRandom(0, 1) - 1; // Randomize it again.
+		%y = getWord(%position, 1) + ((%distance - getRandom(%distance / 2)) * %neg);
+		%z = getWord(%position, 2) + (%distance - getRandom(%distance / 2));
+
+		%random = getRandom(1, $fireworkDatablockCount);
+		deezFireworksExplode(%x SPC %y SPC %z, %random);
+	}
+
+	if(%deezFireworks <= 10)
+	{
+		%deezFireworks = %deezFireworks + 1;
+		$deezFireworksSchedule = schedule(getRandom(700), 0, "blastFireworks", %deezFireworks);
+	}
+}
+
+function deezFireworksExplode(%position, %id)
+{
+	%emitter = new ParticleEmissionDummy()
+	{
+		position = %position;
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		datablock = "defaultEmissionDummy";
+		emitter = "FireworksEmitter" @ %id;
+		velocity = "1";
+	};
+
+	//echo(%emitter.position);
+	//serverPlay3d(dtFireworksSound, %emitter.position);
+	MissionCleanup.add(%emitter);
+	%emitter.schedule(1250, "delete");
+}
+
 function killEveryone(%ignore, %message)
 {
 	if(!%message)

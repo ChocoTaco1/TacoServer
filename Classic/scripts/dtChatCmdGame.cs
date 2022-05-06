@@ -955,7 +955,7 @@ function explodeFirework(%position, %id)
 	};
 
 	//echo(%emitter.position);
-	serverPlay3d(dtFireworksSound, %emitter.position);
+	//serverPlay3d(dtFireworksSound, %emitter.position);
 	MissionCleanup.add(%emitter);
 	%emitter.schedule(1250, "delete");
 }

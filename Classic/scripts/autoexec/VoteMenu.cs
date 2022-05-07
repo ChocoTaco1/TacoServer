@@ -564,13 +564,13 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				if($Host::Password !$= "")
 				{
 				   $Host::Password = "";
-				   messageAdmins('', "PUG password been disabled.~wfx/powered/vehicle_screen_on.wav" );
+				   messageAdmins('', %client.nameBase @ " has disabled pug password.~wfx/powered/vehicle_screen_on.wav");
 				   adminLog(%client, " has disabled pug password." );
 				}
 				else
 				{
 				   $Host::Password = $Host::PUGPassword;
-				   messageAdmins('', "PUG password been enabled.~wfx/powered/vehicle_screen_on.wav" );
+				   messageAdmins('', %client.nameBase @ " has enabled pug password.~wfx/powered/vehicle_screen_on.wav" );
 				   adminLog(%client, " has enabled pug password." );
 				}
 			}
@@ -583,7 +583,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					if(!isActivePackage(LockedTeams))
 						activatePackage(LockedTeams);
 					$LockedTeams = 1;
-					messageAdmins('', "Locked Teams has been enabled.~wfx/powered/vehicle_screen_on.wav" );
+					messageAdmins('', %client.nameBase @ " has enabled Locked Teams.~wfx/powered/vehicle_screen_on.wav" );
 					adminLog(%client, " has enabled Locked Teams.");
 				}
 				else
@@ -591,7 +591,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 					if(isActivePackage(LockedTeams))
 						deactivatePackage(LockedTeams);
 					$LockedTeams = 0;
-					messageAdmins('', "Locked Teams has been disabled.~wfx/powered/vehicle_screen_on.wav" );
+					messageAdmins('', %client.nameBase @ " has disabled Locked Teams.~wfx/powered/vehicle_screen_on.wav" );
 					adminLog(%client, " has disabled Locked Teams.");
 				}
 			}
@@ -606,7 +606,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				   if(isActivePackage(checkver))
 						deactivatePackage(checkver);
 
-				   messageAdmins('', "Tournament Net Client checking has been disabled.~wfx/powered/vehicle_screen_on.wav" );
+				   messageAdmins('', %client.nameBase @ " has disabled Net Tourney Client checking.~wfx/powered/vehicle_screen_on.wav" );
 				   adminLog(%client, " has disabled Net Tourney Client checking.");
 				}
 				else
@@ -619,7 +619,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				   //Boot Offenders into Obs
 				   CheckVerObserver(%client);
 
-				   messageAdmins('', "Tournament Net Client checking has been enabled.~wfx/powered/vehicle_screen_on.wav" );
+				   messageAdmins('', %client.nameBase @ " has enabled Net Tourney Client checking.~wfx/powered/vehicle_screen_on.wav" );
 				   ResetGetCountsStatus();
 				   adminLog(%client, " has enabled Net Tourney Client checking.");
 				}

@@ -259,12 +259,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 	switch$(%typeName)
 	{
 		case "VoteKickPlayer":
-			if($Host::TournamentMode && !$Host::AllowPlayerTournamentModeVotekick) // Dont allow Votekicks in Tournament Mode
-			{
-				messageClient(%client, "", "\c2No votekicks in Tournament Mode.");
-				return;
-			}
-
 			if(%client == %arg1) // client is trying to votekick himself
 				return; // Use the leave button instead, pal.
 
@@ -278,6 +272,12 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 			else // Player is voting to kick
 			{
+				if($Host::TournamentMode && !$Host::AllowPlayerTournamentModeVotekick) // Dont allow Votekicks in Tournament Mode
+				{
+					messageClient(%client, "", "\c2No votekicks in Tournament Mode.");
+					return;
+				}
+
 				if(%arg1.isAdmin) // target is an admin
 				{
 					messageClient(%client, "MsgClient", "\c2You cannot vote to kick "@%arg1.nameBase@", "@(%arg1.sex $= "Male" ? "he" : "she")@" is an admin!");

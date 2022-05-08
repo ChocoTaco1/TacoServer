@@ -1532,32 +1532,36 @@ function serverCmdClientJoinGame(%client)
 {
 	if($LockedTeams)
 	{
-		messageClient( %client, '', "Teams are locked. Ask an admin to set your team." );
+		messageClient( %client, '', "Teams are locked. Wait to be assigned a team." );
 		return;
 	}
 	Parent::serverCmdClientJoinGame(%client);
 }
 
+//exec("Scripts/autoexec/votemenu.cs");
 function serverCmdClientPickedTeam(%client, %option)
 {
-	Parent::serverCmdClientPickedTeam(%client, %option); //Put first
-	if($LockedTeams) //Added
-	{
-		if($Host::TournamentMode && %client.team !$= 0) //Added
-		{
-			messageClient( %client, '', "Teams are locked. Ask an admin to set your team." );
-			schedule(1000, 0, "ClearCenterPrint", %client); //So Press FIRE when ready is cleared, later down the pipe
-			serverCmdClientMakeObserver( %client );
-		}
-		return;
-	}
+   if(!$Host::TournamentMode)
+      return;
+
+   //All roads lead to observer
+   if( isObject(%client.player) )
+   {
+      %client.player.scriptKill(0);
+      ClearBottomPrint(%client);
+   }
+   Game.forceObserver( %client, "playerChoose" );
+   %client.observerMode = "observer";
+   %client.notReady = false;
+   messageClient( %client, '', "Teams are locked. Wait to be assigned a team." );
+   return;
 }
 
 function serverCmdClientTeamChange(%client, %option)
 {
 	if($LockedTeams)
 	{
-		messageClient( %client, '', "Teams are locked. Ask an admin to set your team." );
+		messageClient( %client, '', "Teams are locked. Wait to be assigned a team." );
 		return;
 	}
 	Parent::serverCmdClientTeamChange(%client, %option);

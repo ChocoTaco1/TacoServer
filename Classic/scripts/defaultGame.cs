@@ -2973,13 +2973,13 @@ function DefaultGame::sendGameTeamList( %game, %client, %key )
 //------------------------------------------------------------------------------
 function DefaultGame::sendTimeLimitList( %game, %client, %key )
 {
+   messageClient( %client, 'MsgVoteItem', "", %key, 30, "", '30 minutes' );
+   messageClient( %client, 'MsgVoteItem', "", %key, 45, "", '45 minutes' );
+   messageClient( %client, 'MsgVoteItem', "", %key, 60, "", '60 minutes' );
+   messageClient( %client, 'MsgVoteItem', "", %key, 75, "", '75 minutes' );
    messageClient( %client, 'MsgVoteItem', "", %key, 90, "", '90 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 120, "", '120 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 150, "", '150 minutes' );
    messageClient( %client, 'MsgVoteItem', "", %key, 180, "", '180 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 240, "", '240 minutes' );
    messageClient( %client, 'MsgVoteItem', "", %key, 360, "", '360 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 480, "", '480 minutes' );
    messageClient( %client, 'MsgVoteItem', "", %key, 999, "", 'No time limit' );
 }
 

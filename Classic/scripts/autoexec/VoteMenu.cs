@@ -79,8 +79,10 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 		switch$($CurrentMissionType)
 		{
 			case CTF or SCtF:
+				if($Host::TournamentMode)
+               		%showTL = " - Time Limit:" SPC $Host::TimeLimit;
 				messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win",
-				$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win");
+				$MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win" @ %showTL);
 			case LakRabbit:
 				%cap = "2000 Points to Win";
 				messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
@@ -418,12 +420,31 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			//If proposed time is lower than server set or higher than unlimited
 			if(%arg1 < $Host::TimeLimit || %arg1 > 999)
 			{
-				messageClient(%client, "", "\c2Invalid time selection.");
-				return;
+				if(!%isAdmin)
+				{
+					messageClient(%client, "", "\c2Invalid time selection.");
+					return;
+				}
+				else //is an admin
+				{
+					if($Host::TournamentMode) //Admins still have the option to set the time to 30 minutes in Tourney Mode
+					{
+						if(%arg1 !$= "30") //30 minutes only
+						{
+							messageClient(%client, "", "\c2Invalid time selection.");
+							return;
+						}
+					}
+					else
+					{
+						messageClient(%client, "", "\c2Invalid time selection.");
+						return;
+					}
+				}
 			}
 
 			//If proposed time is something other than what is selectable
-			if(%arg1 !$= "90" && %arg1 !$= "120" && %arg1 !$= "150" && %arg1 !$= "180" && %arg1 !$= "240" && %arg1 !$= "360" && %arg1 !$= "480" && %arg1 !$= "999")
+			if(%arg1 !$= "30" && %arg1 !$= "45" && %arg1 !$= "60" && %arg1 !$= "75" && %arg1 !$= "90" && %arg1 !$= "180" && %arg1 !$= "360" && %arg1 !$= "999")
 			{
 				messageClient(%client, "", "\c2Only selectable times allowed.");
 				return;

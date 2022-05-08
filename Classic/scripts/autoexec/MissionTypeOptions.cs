@@ -56,6 +56,10 @@ function loadMissionStage2()
 			$Host::HiVisibility = "0"; //always SPEED
 	}
 
+	//TimeLimit Always 30 minutes in Tourney Mode
+	if($Host::TournamentMode)
+		$Host::TimeLimit = "30";
+
 	//Siege NoBaseRape Fix
 	if($CurrentMissionType $= "Siege")
 		$Host::NoBaseRapeEnabled = 0;

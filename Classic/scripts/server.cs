@@ -2564,7 +2564,7 @@ function serverCmdStripAdmin(%client, %admin)
       %admin.isSuperAdmin = 0;
       messageClient(%admin, 'MsgStripAdminPlayer', 'You have stripped yourself of admin privledges.');
       adminLog(%client, " stripped admin from " @ %admin.nameBase);
-      messageAll('MsgClientDrop', "", %client.name, %client);
+      messageAll( 'MsgClientDrop', "", %client.name, %client);
       messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
 	   messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
       return;
@@ -2576,7 +2576,7 @@ function serverCmdStripAdmin(%client, %admin)
       %admin.isAdmin = 0;
       %admin.isSuperAdmin = 0;
       adminLog(%client, " stripped admin from " @ %admin.nameBase);
-      messageAll('MsgClientDrop', "", %client.name, %client);
+      messageAll( 'MsgClientDrop', "", %client.name, %client);
       messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
 	   messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
    }
@@ -2916,7 +2916,10 @@ function startTourneyCountdown()
    }
 
    // lets get it on!
-   Countdown( 30 * 1000 );
+   if($Host::warmupTime <= 30)
+      Countdown(30 * 1000);
+   else
+      Countdown($Host::warmupTime * 1000); //Follow warmupTime!
 }
 
 function checkTourneyMatchStart()
@@ -2990,7 +2993,11 @@ function checkTourneyMatchStart()
          Game.scheduleVote = "";
       }
 
-      Countdown(30 * 1000);
+         // lets get it on!
+         if($Host::warmupTime <= 30)
+            Countdown(30 * 1000);
+         else
+            Countdown($Host::warmupTime * 1000); //Follow warmupTime!
    }
 }
 

@@ -2206,7 +2206,7 @@ package dtStatsGame{
       }
       function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg){
 	      parent::serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %teamSpecific, %msg);
-	      if($dtStats::Enable){
+	      if($dtStats::Enable && (!%client.isAdmin || (%client.isAdmin && %client.ForceVote)){
 	         %client.dtStats.voteCount++;
 	         if(%typeName $= "VoteChangeMission"){
 	            %mission = $HostMissionFile[%arg3];

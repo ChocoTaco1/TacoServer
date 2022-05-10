@@ -495,7 +495,7 @@ function SCtFGame::equip(%game, %player)
 	  {
 		%player.clearInventory();
 		%player.setInventory(Disc,1);
-		%player.setInventory(Blaster,1);
+		%player.setInventory(Shocklance,1);
 		%player.setInventory(GrenadeLauncher,1);
 		%player.setInventory(DiscAmmo, %player.getDataBlock().max[DiscAmmo]);
 		%player.setInventory(GrenadeLauncherAmmo, %player.getDataBlock().max[GrenadeLauncherAmmo]);
@@ -2214,33 +2214,26 @@ function SCtFGame::sendGameVoteMenu(%game, %client, %key)
    if(!%client.canVote && !%isAdmin)
       return;
 
-   if ( %game.scheduleVote $= "" )
+   if(%game.scheduleVote $= "")
    {
-     if(!%client.isAdmin)
-	 {
-        //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Vote to change the Armor class' );
-        //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
-		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
-	 }
-	 else if (%client.ForceVote > 0)
-	 {
-		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
-	 }
-	 else
-	 {
-		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Enable Pro Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Disable Pro Mode' );
-	 }
-         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Change the Armor class' );
-         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
+      if(!%isAdmin || (%isAdmin && %client.ForceVote))
+      {
+         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Vote to change the Armor class' );
+         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
+         if(!$Host::SCtFProMode)
+            messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode (Disc, SL, GL Only)', 'Vote to enable Pro Mode (Disc, SL, GL Only)' );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode (Disc, SL, GL Only)', 'Vote to disable Pro Mode (Disc, SL, GL Only)' );
+      }
+      else
+      {
+         if(!$Host::SCtFProMode)
+            messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode (Disc, SL, GL Only)', 'Enable Pro Mode (Disc, SL, GL Only)' );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode (Disc, SL, GL Only)', 'Disable Pro Mode (Disc, SL, GL Only)' );
+      }
+      //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Change the Armor class' );
+      //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
    }
 }
 

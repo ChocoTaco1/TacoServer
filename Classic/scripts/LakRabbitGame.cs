@@ -1172,42 +1172,20 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 
 	if( %game.scheduleVote $= "" )
 	{
-		if(!%isAdmin)
+		if(!%isAdmin || (%isAdmin && %client.ForceVote))
 		{
 			if(!Game.duelMode)
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to enable Duel Mode' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Vote to disable Duel Mode' );
-
 			if(!Game.noSplashDamage)
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Vote to disable Splash Damage' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Vote to enable Splash Damage' );
-			// DeVast - PubPro votes
-			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
+			if(!Game.PubPro) // DeVast - PubPro votes
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode (Disc, Blaster, Plasma Only)', 'Vote to enable Pro Mode (Disc, Blaster, Plasma Only)' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
-		}
-		//Added so lak vote items are properly displayed in evo adminvotemenu
-		//A lot of changes were added to admin.ovl in evo
-		//see footnotes below
-		else if (%client.ForceVote > 0)
-		{
-			if(!Game.duelMode)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to enable Duel Mode' );
-			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Vote to disable Duel Mode' );
-
-			if(!Game.noSplashDamage)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Vote to disable Splash Damage' );
-			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Vote to enable Splash Damage' );
-			// DeVast - PubPro votes
-			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
-			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode (Disc, Blaster, Plasma Only)', 'Vote to disable Pro Mode (Disc, Blaster, Plasma Only)' );
 		}
 		else
 		{
@@ -1215,16 +1193,14 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Enable Duel Mode' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Disable Duel Mode' );
-
 			if(!Game.noSplashDamage)
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Disable Splash Damage' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Enable Splash Damage' );
-			// DeVast - PubPro votes
-			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Enable Pro Mode' );
+			if(!Game.PubPro) // DeVast - PubPro votes
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode (Disc, Blaster, Plasma Only)', 'Enable Pro Mode (Disc, Blaster, Plasma Only)' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Disable Pro Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode (Disc, Blaster, Plasma Only)', 'Disable Pro Mode (Disc, Blaster, Plasma Only)' );
 		}
 	}
 }

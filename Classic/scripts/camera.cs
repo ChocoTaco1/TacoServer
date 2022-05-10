@@ -326,27 +326,41 @@ function Observer::onTrigger(%data,%obj,%trigger,%state)
          if(!$Host::TournamentMode || $CountdownStarted)
             return;
 
-         if(%client.notReady)
+         %readySpamDif  = getSimTime() - %client.readySpam;
+         %readySpamDif1  = getSimTime() - %client.readySpamMsg;
+         if(%readySpamDif > 10000 || !%client.readySpam)
          {
-            %client.notReady = "";
-            MessageAll( 0, '\c1%1 is READY.', %client.name );
-            if(%client.notReadyCount < 3)
-               centerprint( %client, "\nWaiting for match start (FIRE if not ready)", 0, 3);
-            else
-               centerprint( %client, "\nWaiting for match start", 0, 3);
-         }
-         else
-         {
-            %client.notReadyCount++;
-            if(%client.notReadyCount < 4)
+            %client.readySpam = getSimTime();
+            if(%client.notReady)
             {
-               %client.notReady = true;
-               MessageAll( 0, '\c1%1 is not READY.', %client.name );
-               centerprint( %client, "\nPress FIRE when ready.", 0, 3 );
+               %client.notReady = "";
+               MessageAll( 0, '\c1%1 is READY.', %client.name );
+               if(%client.notReadyCount < 3)
+                  centerprint( %client, "\nWaiting for match start (FIRE if not ready)", 0, 3);
+               else
+                  centerprint( %client, "\nWaiting for match start", 0, 3);
             }
-            return;
+            else
+            {
+               %client.notReadyCount++;
+               if(%client.notReadyCount < 4)
+               {
+                  %client.notReady = true;
+                  MessageAll( 0, '\c1%1 is not READY.', %client.name );
+                  centerprint( %client, "\nPress FIRE when ready.", 0, 3 );
+               }
+               return;
+            }
+
+            CheckTourneyMatchStart();
          }
-         CheckTourneyMatchStart();
+         else if((%readySpamDif1 > 1000 || !%client.readySpamMsg) && %client.notReadyCount < 4)
+         {
+            %client.readySpamMsg = getSimTime();
+            %wait = mFloor((10000 - (getSimTime() - %client.readySpam)) / 1000);
+            messageClient(%client, 'MsgObserverCooldown', '\c3Ready Cooldown:\cr Please wait another %1 seconds.', %wait );
+         }
+
    }
 }
 

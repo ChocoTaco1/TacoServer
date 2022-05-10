@@ -1100,17 +1100,17 @@ function GameConnection::onDrop(%client, %reason)
    // reset the server if everyone has left the game
    if( $HostGamePlayerCount - $HostGameBotCount == 0 && $Host::EmptyServerReset && !$resettingServer && !$LoadingMission && $CurrentMissionType !$= $Host::MissionType )
    {
-	// Timed Server Reset: $Host::EmptyServerReset = 1; --- Time in Minutes $Host::EmptyServerResetTime = 120;
-	if(isEventPending($EmptyServerResetSchedule))
-	{
-		error(formatTimeString("HH:nn:ss") SPC "Previous Timed Server Reset schedule cancelled..." );
-		cancel($EmptyServerResetSchedule);
-	}
+      // Timed Server Reset: $Host::EmptyServerReset = 1; --- Time in Minutes $Host::EmptyServerResetTime = 120;
+      if(isEventPending($EmptyServerResetSchedule))
+      {
+         error(formatTimeString("HH:nn:ss") SPC "Previous Timed Server Reset schedule cancelled..." );
+         cancel($EmptyServerResetSchedule);
+      }
 
-	%resettime = $Host::EmptyServerResetTime * 60000;
-	if(%resettime <= 0) %resettime = 1;
-	$EmptyServerResetSchedule = schedule(%resettime, 0, "ResetServerTimed");
-	error(formatTimeString("HH:nn:ss") SPC "Timed Server Reset schedule started..." );
+      %resettime = $Host::EmptyServerResetTime * 60000;
+      if(%resettime <= 0) %resettime = 1;
+      $EmptyServerResetSchedule = schedule(%resettime, 0, "ResetServerTimed");
+      error(formatTimeString("HH:nn:ss") SPC "Timed Server Reset schedule started..." );
    }
 }
 
@@ -1764,8 +1764,13 @@ function serverCmdSAD(%client, %password)
             %client.isSuperAdmin = true;
             MessageAll( 'MsgSuperAdminPlayer', '\c2%2 has become a Super Admin by force.', %client, %name);
             %adminmsg = " has become a Super Admin by force.";
-	        adminLog(%client, %adminmsg);
-	        logEcho(%client.nameBase @ " has become a Super Admin by force.");
+	         adminLog(%client, %adminmsg);
+	         logEcho(%client.nameBase @ " has become a Super Admin by force.");
+
+            //Update everyones client and put an SA by your name
+            messageAll( 'MsgClientDrop', "", %client.name, %client);
+            messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+            messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
          }
 
       case $Host::AdminPassword:
@@ -1780,8 +1785,13 @@ function serverCmdSAD(%client, %password)
             %client.isSuperAdmin = false;
             MessageAll( 'MsgAdminForce', '\c2%2 has become a Admin by force.', %client, %name);
             %adminmsg = " has become an Admin by force.";
-	        adminLog(%client, %adminmsg);
-	        logEcho(%client.nameBase @ " has become an Admin by force.");
+	         adminLog(%client, %adminmsg);
+	         logEcho(%client.nameBase @ " has become an Admin by force.");
+
+            //Update everyones client and put an A by your name
+            messageAll( 'MsgClientDrop', "", %client.name, %client);
+            messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+            messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
          }
       default:
          messageClient(%client, 'MsgPasswordFailed', '\c2Illegal SAD PW.');

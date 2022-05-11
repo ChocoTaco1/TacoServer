@@ -97,7 +97,6 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
    {
       if(%client.isSuperAdmin || (%client.isAdmin && $Host::AllowAdminStopVote)) // allow admins to stop votes
          messageClient( %client, 'MsgVoteItem', "", %key, 'stopRunningVote', 'stop current vote', 'Stop the Vote');
-
       if(%client.isSuperAdmin || (%client.isAdmin && $Host::AllowAdminPassVote)) // allow admins to pass votes
          messageClient( %client, 'MsgVoteItem', "", %key, 'passRunningVote', 'pass current vote', 'Pass the Vote');
       return;
@@ -1510,7 +1509,7 @@ function GameConnection::onDrop(%client, %reason)
 	Parent::onDrop(%client, %reason);
 
 	//Reset SetNextMission
-   if($HostGamePlayerCount - $HostGameBotCount == 0 && $Host::AllowPlayerVoteNextMission && $voteNext)
+   if($HostGamePlayerCount - $HostGameBotCount == 0 && $voteNext)
    {
       echo("No clients on the server. Set next mission reset...");
       $voteNext = 0;

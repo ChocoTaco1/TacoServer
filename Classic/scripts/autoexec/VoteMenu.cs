@@ -23,29 +23,6 @@ $Host::AllowPlayerVoteNextMission = 1;
 package ExtraVoteMenu
 {
 
-function serverCmdGetVoteMenu( %client, %key )
-{
-   if (isObject( Game ) && !%client.lockVMenu)
-      Game.sendGameVoteMenu( %client, %key );
-   %client.lockVMenu = 0;
-}
-
-function CycleMissions()
-{
-   if($voteNext)
-   {
-      %nextMission = $HostMissionFile[$voteNextMap];
-      %type = $HostTypeName[$voteNextType];
-      messageAll( 'MsgClient', 'Loading %1 (%2)...', %nextMission, $HostTypeDisplayName[$voteNextType] );
-      loadMission( %nextMission, %type );
-      $voteNextType = 0;
-      $voteNextMap = 0;
-      $voteNext = 0;
-   }
-   else
-      parent::CycleMissions();
-}
-
 function DefaultGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4)
 {
    switch$ (%typeName)
@@ -554,18 +531,15 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 		case "stopRunningVote":
          if(%client.isSuperAdmin || (%client.isAdmin && $Host::AllowAdminStopVote))
          {
-            if($VOStatus !$="InProgress") //Dont allow a stop vote after time has expired, then no new time is set - VoteOverTime
-            {
-               stopCurrentVote(%client);
-               adminLog(%client, " stopped the vote in progress.");
-               return;
-            }
-            else
+            if($VOStatus $="InProgress") //Dont allow a stop vote after time has expired, then no new time is set - VoteOverTime
             {
                messageClient(%client, "", "\c2Can't stop time vote after time has expired.");
                return;
             }
 
+            stopCurrentVote(%client);
+            adminLog(%client, " stopped the vote in progress.");
+            return;
          }
 
 		case "TogglePUGpassword":
@@ -1501,6 +1475,29 @@ function adminStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
 		Game.votingArgs[arg4] = "";
 	}
 	Game.evalVote(%typeName, %client, %arg1, %arg2, %arg3, %arg4);
+}
+
+function serverCmdGetVoteMenu( %client, %key )
+{
+   if (isObject( Game ) && !%client.lockVMenu)
+      Game.sendGameVoteMenu( %client, %key );
+   %client.lockVMenu = 0;
+}
+
+function CycleMissions()
+{
+   if($voteNext)
+   {
+      %nextMission = $HostMissionFile[$voteNextMap];
+      %type = $HostTypeName[$voteNextType];
+      messageAll( 'MsgClient', 'Loading %1 (%2)...', %nextMission, $HostTypeDisplayName[$voteNextType] );
+      loadMission( %nextMission, %type );
+      $voteNextType = 0;
+      $voteNextMap = 0;
+      $voteNext = 0;
+   }
+   else
+      parent::CycleMissions();
 }
 
 //Reset Set next mission if everyone leaves

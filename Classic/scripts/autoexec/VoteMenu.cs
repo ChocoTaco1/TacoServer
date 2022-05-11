@@ -89,7 +89,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
             messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
       }
       messageClient(%client, 'MsgVoteItem',"",  %key, 'ForceVote', 'Cancel Force Vote', "Cancel 'Vote To...'");
-      return; // Display no further vote options
+      return;
    }
 
    //Pass Stop Menu
@@ -155,9 +155,10 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
    if(!%client.canVote && !%isAdmin)
       return;
 
+   //Standard Vote Options
    if(%game.scheduleVote $= "")
    {
-      if(!%client.isAdmin)
+      if(!%client.isAdmin) //Not an admin
       {
          if(!$Host::TournamentMode)
          {
@@ -201,7 +202,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
             }
          }
       }
-      else
+      else //Is an Admin
       {
          if(!$Host::TournamentMode)
          {
@@ -255,10 +256,9 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
             }
          }
 
-         //Toggle Tournament Net Client
-         if(%client.isSuperAdmin)
+         if(%client.isSuperAdmin) //Super Admin Only
          {
-            if($Host::EnableNetTourneyClient)
+            if($Host::EnableNetTourneyClient) //Toggle Tournament Net Client
                messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
             else
                messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
@@ -266,6 +266,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 
       }
 
+      //Everyone
       if ($Host::ServerRules[1] !$= "" )
          messageClient( %client, 'MsgVoteItem', "", %key, 'showServerRules', 'show server rules', "Show Server Rules" );
    }
@@ -288,80 +289,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 	%teamSpecific = 0;
 	switch$(%typeName)
 	{
-	   case "VoteNextMission":
-         %foundMap =0;
-         %client.lockVMenu = 1;
-         if(strpos(strlwr(%arg1),"next mission") != -1)
-         {
-            %key = %client.k++;
-            for ( %type = 0; %type < $HostTypeCount; %type++ )
-               messageClient( %client, 'MsgVoteItem', "", %key, 'VoteNextMission', $HostTypeDisplayName[%type], $HostTypeDisplayName[%type], true );
-            return;
-         }
-         %key = %client.k++;
-         for ( %type = 0; %type < $HostTypeCount; %type++ )
-         {
-            if($HostTypeDisplayName[%type] $= %arg1)
-            {
-               $HostNextTypeIndex = %type;
-
-
-               for ( %i = $HostMissionCount[%type] - 1; %i >= 0; %i-- )
-               {
-                  %idx = $HostMission[%type, %i];
-                  // If we have bots, don't change to a mission that doesn't support bots:
-                  if ( $HostGameBotCount > 0 )
-                  {
-                     if( !$BotEnabled[%idx] )
-                        continue;
-                  }
-                  messageClient( %client, 'MsgVoteItem', "", %key,'VoteNextMission',$HostMissionName[%idx],$HostMissionName[%idx], true );
-               }
-               return;
-            }
-         }
-         %type = $HostNextTypeIndex;
-         for ( %i = $HostMissionCount[%type] - 1; %i >= 0; %i-- )
-         {
-            %idx = $HostMission[%type, %i];
-            if ( $HostGameBotCount > 0 )
-            {
-               if( !$BotEnabled[%idx] )
-                  continue;
-            }
-            if(%arg1 $= $HostMissionName[%idx])
-            {
-             $hostNextMapIndex = %idx;
-             %foundMap = 1;
-             break;
-            }
-         }
-         //error("found map" SPC %foundMap SPC $HostNextTypeIndex  SPC $hostNextMapIndex);
-         if(%foundMap)
-         {
-            %arg3 = $hostNextMapIndex;
-            %arg4 = $HostNextTypeIndex;
-            // Vote-spoof prevention right here
-            %arg1 = $HostMissionFile[%arg3];
-            %arg2 = $HostTypeName[%arg4];
-            if(!checkMapExist(%arg1, %arg2))
-               return;
-
-            // We passed the spoof check, give it the fancy label
-            %arg1 = $HostMissionName[%arg3];
-            %arg2 = $HostTypeDisplayName[%arg4];
-             %client.lockVMenu = 0;
-            if((!%isAdmin && $Host::AllowPlayerVoteNextMission) || (%isAdmin && %client.ForceVote)) // not admin
-            {
-               if($CMHasVoted[%client.guid] >= $Host::ClassicMaxVotes && !%isAdmin) // they've voted too many times
-               {
-                  messageClient(%client, "", "\c2You have exhausted your voting rights for this mission.");
-                  return;
-               }
-               %msg = %client.nameBase @ " initiated a vote to set the next mission to " @ %arg1 @ " (" @ %arg2 @ ").";
-               $CMHasVoted[%client.guid]++;
-            }
-         }
 		case "VoteKickPlayer":
 			if(%client == %arg1) // client is trying to votekick himself
 				return; // Use the leave button instead, pal.
@@ -642,53 +569,6 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 
          }
 
-		// LakRabbit Stuff
-		case "VoteDuelMode":
-			if(!$CurrentMissionType $= "LakRabbit")
-				return;
-
-			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %client.nameBase @ " initiated a vote to " @ (Game.duelMode == 0 ? "enable" : "disable") @ " duel mode.";
-
-		case "VoteSplashDamage":
-			if(!$CurrentMissionType $= "LakRabbit")
-				return;
-
-			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %client.nameBase @ " initiated a vote to " @ (Game.noSplashDamage == 1 ? "enable" : "disable") @ " splash damage.";
-
-		case "VotePro":
-			if(!$CurrentMissionType $= "LakRabbit")
-				return;
-
-			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %client.nameBase @ " initiated a vote to " @ (Game.pubPro == 0 ? "enable" : "disable") @ " pro mode.";
-
-		case "DMSLOnlyMode":
-			if(!$CurrentMissionType $= "DM")
-				return;
-
-			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %client.nameBase @ " initiated a vote to " @ (Game.DMSLOnlyMode == 0 ? "enable" : "disable") @ " shocklance only mode.";
-
-		case "SCtFProMode":
-			if(!$CurrentMissionType $= "sctf")
-				return;
-
-			if(!%isAdmin || (%isAdmin && %client.ForceVote))
-				%msg = %client.nameBase @ " initiated a vote to " @ (Game.SCtFProMode == 0 ? "enable" : "disable") @ " pro mode.";
-
-		case "showServerRules":
-			if (($Host::ServerRules[1] !$= "") && (!%client.CantView))
-			{
-				for ( %i = 1; $Host::ServerRules[%i] !$= ""; %i++ )
-				{
-				   messageClient(%client, 'ServerRule', '\c2%1', $Host::ServerRules[%i] );
-				}
-				%client.cantView = true;
-				%client.schedViewRules = schedule( 10000, %client, "resetViewSchedule", %client );
-			}
-			return;
 		case "TogglePUGpassword":
 			if (%client.isAdmin)
 			{
@@ -706,6 +586,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				}
 			}
 			return;
+
 		case "ToggleLockedTeams":
 			if (%client.isAdmin)
 			{
@@ -727,6 +608,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				}
 			}
 			return;
+
 		case "ToggleTourneyNetClient":
 			if (%client.isAdmin)
 			{
@@ -756,6 +638,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				}
 			}
 			return;
+
 		case "ForceVote":
 			if (!%client.isAdmin)
             return;
@@ -775,6 +658,88 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
          }
 
 			return;
+
+	   case "VoteNextMission":
+         if(!%client.isAdmin && $TotalTeamPlayerCount < 6)
+         {
+            messageClient( %client, '', "Need at least 6 players on teams to set the next map." );
+            return;
+         }
+
+         %foundMap = 0;
+         %client.lockVMenu = 1;
+         if(strpos(strlwr(%arg1),"next mission") != -1)
+         {
+            %key = %client.k++;
+            for ( %type = 0; %type < $HostTypeCount; %type++ )
+               messageClient( %client, 'MsgVoteItem', "", %key, 'VoteNextMission', $HostTypeDisplayName[%type], $HostTypeDisplayName[%type], true );
+            return;
+         }
+         %key = %client.k++;
+         for ( %type = 0; %type < $HostTypeCount; %type++ )
+         {
+            if($HostTypeDisplayName[%type] $= %arg1)
+            {
+               $HostNextTypeIndex = %type;
+
+
+               for ( %i = $HostMissionCount[%type] - 1; %i >= 0; %i-- )
+               {
+                  %idx = $HostMission[%type, %i];
+                  // If we have bots, don't change to a mission that doesn't support bots:
+                  if ( $HostGameBotCount > 0 )
+                  {
+                     if( !$BotEnabled[%idx] )
+                        continue;
+                  }
+                  messageClient( %client, 'MsgVoteItem', "", %key,'VoteNextMission',$HostMissionName[%idx],$HostMissionName[%idx], true );
+               }
+               return;
+            }
+         }
+         %type = $HostNextTypeIndex;
+         for ( %i = $HostMissionCount[%type] - 1; %i >= 0; %i-- )
+         {
+            %idx = $HostMission[%type, %i];
+            if ( $HostGameBotCount > 0 )
+            {
+               if( !$BotEnabled[%idx] )
+                  continue;
+            }
+            if(%arg1 $= $HostMissionName[%idx])
+            {
+             $hostNextMapIndex = %idx;
+             %foundMap = 1;
+             break;
+            }
+         }
+         //error("found map" SPC %foundMap SPC $HostNextTypeIndex  SPC $hostNextMapIndex);
+         if(%foundMap)
+         {
+            %arg3 = $hostNextMapIndex;
+            %arg4 = $HostNextTypeIndex;
+            // Vote-spoof prevention right here
+            %arg1 = $HostMissionFile[%arg3];
+            %arg2 = $HostTypeName[%arg4];
+            if(!checkMapExist(%arg1, %arg2))
+               return;
+
+            // We passed the spoof check, give it the fancy label
+            %arg1 = $HostMissionName[%arg3];
+            %arg2 = $HostTypeDisplayName[%arg4];
+             %client.lockVMenu = 0;
+            if((!%isAdmin && $Host::AllowPlayerVoteNextMission) || (%isAdmin && %client.ForceVote)) // not admin
+            {
+               if($CMHasVoted[%client.guid] >= $Host::ClassicMaxVotes && !%isAdmin) // they've voted too many times
+               {
+                  messageClient(%client, "", "\c2You have exhausted your voting rights for this mission.");
+                  return;
+               }
+               %msg = %client.nameBase @ " initiated a vote to set the next mission to " @ %arg1 @ " (" @ %arg2 @ ").";
+               $CMHasVoted[%client.guid]++;
+            }
+         }
+
       case "ClearNextMap":
          if (%client.isAdmin && $voteNext)
 			{
@@ -783,6 +748,56 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
             $voteNext  = 0;
          }
          return;
+
+		// LakRabbit Stuff
+		case "VoteDuelMode":
+			if(!$CurrentMissionType $= "LakRabbit")
+				return;
+
+			if(!%isAdmin || (%isAdmin && %client.ForceVote))
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.duelMode == 0 ? "enable" : "disable") @ " duel mode.";
+
+		case "VoteSplashDamage":
+			if(!$CurrentMissionType $= "LakRabbit")
+				return;
+
+			if(!%isAdmin || (%isAdmin && %client.ForceVote))
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.noSplashDamage == 1 ? "enable" : "disable") @ " splash damage.";
+
+		case "VotePro":
+			if(!$CurrentMissionType $= "LakRabbit")
+				return;
+
+			if(!%isAdmin || (%isAdmin && %client.ForceVote))
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.pubPro == 0 ? "enable" : "disable") @ " pro mode.";
+
+      //Deathmatch Stuff
+		case "DMSLOnlyMode":
+			if(!$CurrentMissionType $= "DM")
+				return;
+
+			if(!%isAdmin || (%isAdmin && %client.ForceVote))
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.DMSLOnlyMode == 0 ? "enable" : "disable") @ " shocklance only mode.";
+
+      //LCTF Stuff
+		case "SCtFProMode":
+			if(!$CurrentMissionType $= "sctf")
+				return;
+
+			if(!%isAdmin || (%isAdmin && %client.ForceVote))
+				%msg = %client.nameBase @ " initiated a vote to " @ (Game.SCtFProMode == 0 ? "enable" : "disable") @ " pro mode.";
+
+		case "showServerRules":
+			if (($Host::ServerRules[1] !$= "") && (!%client.CantView))
+			{
+				for ( %i = 1; $Host::ServerRules[%i] !$= ""; %i++ )
+				{
+				   messageClient(%client, 'ServerRule', '\c2%1', $Host::ServerRules[%i] );
+				}
+				%client.cantView = true;
+				%client.schedViewRules = schedule( 10000, %client, "resetViewSchedule", %client );
+			}
+			return;
 
 		default:
 			return;
@@ -1487,6 +1502,19 @@ function adminStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4)
 		Game.votingArgs[arg4] = "";
 	}
 	Game.evalVote(%typeName, %client, %arg1, %arg2, %arg3, %arg4);
+}
+
+//Reset Set next mission if everyone leaves
+function GameConnection::onDrop(%client, %reason)
+{
+	Parent::onDrop(%client, %reason);
+
+	//Reset SetNextMission
+   if($HostGamePlayerCount - $HostGameBotCount == 0 && $Host::AllowPlayerVoteNextMission && $voteNext)
+   {
+      echo("No clients on the server. Set next mission reset...");
+      $voteNext = 0;
+   }
 }
 
 };

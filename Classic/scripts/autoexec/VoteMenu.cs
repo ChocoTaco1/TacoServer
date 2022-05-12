@@ -88,7 +88,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 				if($Host::TournamentMode)
                %showTL = " - Time Limit:" SPC $Host::TimeLimit SPC "Minutes";
             if($voteNext)
-               %showNM = " - Next Map:" SPC $HostMissionFile[$voteNextMap] SPC "(" @ $HostTypeName[$voteNextType] @ ")";
+               %showNM = " - Next Map:" SPC $HostMissionName[$voteNextMap] SPC "(" @ $HostTypeName[$voteNextType] @ ")";
             messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win",
             $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win" @ %showTL @ %showNM);
          case LakRabbit:

@@ -87,8 +87,10 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
 			case CTF or SCtF:
 				if($Host::TournamentMode)
                %showTL = " - Time Limit:" SPC $Host::TimeLimit SPC "Minutes";
+            if($voteNext)
+               %showNM = " - Next Map:" SPC $HostMissionFile[$voteNextMap] SPC "(" @ $HostTypeName[$voteNextType] @ ")";
             messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win",
-            $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win" @ %showTL);
+            $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC MissionGroup.CTF_scoreLimit SPC "Caps to Win" @ %showTL @ %showNM);
          case LakRabbit:
             %cap = "2000 Points to Win";
             messageClient(%client, 'MsgVoteItem', "", %key, '', $MissionDisplayName SPC "(" @ $MissionTypeDisplayName @ "):" SPC %cap,
@@ -717,8 +719,10 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
          if (%client.isAdmin && $voteNext)
 			{
             messageAll('MsgAdminForce', "\c2The Admin " @ %client.nameBase @ " has cleared the next set mission.");
-            adminLog(%client, " has cleared the next set mission.");
-            $voteNext  = 0;
+            adminLog(%client, " has cleared" SPC $HostMissionFile[$voteNextMap] SPC "(" @ $HostTypeName[$voteNextType] @ ") from the next set mission.");
+            $voteNextType = 0;
+            $voteNextMap = 0;
+            $voteNext = 0;
          }
          return;
 
@@ -1509,6 +1513,8 @@ function GameConnection::onDrop(%client, %reason)
    if($HostGamePlayerCount - $HostGameBotCount == 0 && $voteNext)
    {
       echo("No clients on the server. Set next mission reset...");
+      $voteNextType = 0;
+      $voteNextMap = 0;
       $voteNext = 0;
    }
 }

@@ -28,10 +28,6 @@ function DefaultGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %a
    {
       case "cancelMatchStart":
          %game.cancelMatchStart(%admin, %arg1, %arg2, %arg3, %arg4);
-      case "passRunningVote":
-         %game.passRunningVote(%admin, %arg1, %arg2, %arg3, %arg4);
-      case "stopRunningVote":
-         %game.stopRunningVote(%admin, %arg1, %arg2, %arg3, %arg4);
       case "VoteNextMission":
           %game.setNextMission(%admin, %arg1, %arg2, %arg3, %arg4);
       default:

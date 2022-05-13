@@ -9,8 +9,7 @@
 //$Host::AllowPlayerVoteTimeLimit = 1;
 //$Host::AllowPlayerVoteTournamentMode = 1;
 //$Host::AllowPlayerVoteTeamDamage = 0;
-//$Host::AllowPlayerTournamentModeVotekick = 0;
-$Host::AllowPlayerVoteNextMission = 1;
+//$Host::AllowPlayerVoteNextMission = 1;
 
 //Vote Delay
 //Delay the ability to vote (For everyone) at the beginning of the match
@@ -103,19 +102,16 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
    }
 
    // TEAM OPTIONS
-   if(!$Host::TournamentMode)
+   if(%client.team != 0) //he isn't an observer
    {
-      if(%client.team != 0) // he isn't an observer
+      if(!%client.isAdmin && !$Host::TournamentMode)
       {
          if(%multipleTeams)
             messageClient(%client, 'MsgVoteItem', "", %key, 'ChooseTeam', "", 'Change your Team');
          if($MatchStarted)
             messageClient(%client, 'MsgVoteItem', "", %key, 'MakeObserver', "", 'Become an Observer');
       }
-   }
-   else if(%client.isAdmin) // only admins can change team during tournament mode
-   {
-      if(%client.team != 0) // he isn't an observer
+      else if(%client.isAdmin) //only admins can change team during tournament mode
       {
          if(%multipleTeams)
             messageClient(%client, 'MsgVoteItem', "", %key, 'ChooseTeam', "", 'Change your Team');
@@ -124,11 +120,8 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
    }
 
    //Beginning match Vote Delay
-   if(!%client.isAdmin)
-   {
-      if((getSimTime() - $VoteDelay) < ($Host::VoteDelayTime * 1000))
+   if(!%client.isAdmin && (getSimTime() - $VoteDelay) < ($Host::VoteDelayTime * 1000))
          return;
-   }
 
    if(!%client.canVote && !%isAdmin)
       return;
@@ -136,114 +129,129 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
    //Standard Vote Options
    if(%game.scheduleVote $= "")
    {
-      if(!%client.isAdmin) //Not an admin
+      //Start Match
+      if(!$MatchStarted && !$CountdownStarted && $Host::TournamentMode)
       {
-         if(!$Host::TournamentMode)
+         if(!%client.isAdmin)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Vote to Start the Match');
+         else
+            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Start Match');
+      }
+      //Cancel Match Start
+      if(!$MatchStarted && $CountdownStarted && $Host::TournamentMode && %client.isAdmin)
+         messageClient(%client, 'MsgVoteItem', "", %key, 'cancelMatchStart', 'Cancel Match Start', 'Cancel Match Start');
+      //Vote Free For All Mode
+      if($Host::TournamentMode)
+      {
+         if(!%client.isAdmin)
+               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
+         else
+            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Change FFA Mode');
+      }
+      //Vote Tournament Mode
+      if(!$Host::TournamentMode)
+      {
+         if(!%client.isAdmin)
          {
-            //if($Host::AllowPlayerVoteChangeMission) //Tourny Only for now
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
-            if($Host::AllowPlayerVoteNextMission)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteNextMission', 'set next mission to', 'Vote to Set the Next Mission');
-            if($Host::AllowPlayerVoteTournamentMode)
+            if($Host::AllowPlayerVoteTournamentMode && !$RestrictedVoting)
                messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTournamentMode', 'Change server to Tournament.', 'Vote Tournament Mode');
-            if($Host::AllowPlayerVoteTimeLimit)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
-            if($Host::AllowPlayerVoteSkipMission)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
-
-            if(%multipleTeams && $Host::AllowPlayerVoteTeamDamage)
-            {
-               if($teamDamage)
-                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-               else
-                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-            }
          }
          else
-         {
-            if(!$MatchStarted && !$CountdownStarted)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Vote to Start the Match');
-            if($Host::AllowPlayerVoteChangeMission)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
-            if($Host::AllowPlayerVoteNextMission)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteNextMission', 'set next mission to', 'Vote to Set the Next Mission');
-            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Vote Free For All Mode');
-            if($Host::AllowPlayerVoteTimeLimit)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
-
-            if(%multipleTeams && $Host::AllowPlayerVoteTeamDamage)
-            {
-               if($teamDamage)
-                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
-               else
-                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
-            }
-         }
-      }
-      else //Is an Admin
-      {
-         if(!$Host::TournamentMode)
-         {
             messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTournamentMode', 'Change server to Tournament.', 'Tournament Mode');
-            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Change the Mission');
-            if(!$voteNext)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteNextMission', 'set next mission to', 'Set the Next Mission');
-            else
-               messageClient(%client, 'MsgVoteItem', "", %key, 'ClearNextMap', 'Clear Next Set Map', 'Clear Next Set Map');
-            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Skip the Mission' );
-            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Change the Time Limit');
-            if(%multipleTeams)
+      }
+      //Vote Change Mission
+      if(!%client.isAdmin)
+      {
+         if($Host::AllowPlayerVoteChangeMission && !$RestrictedVoting)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Vote to Change the Mission');
+      }
+      else
+         messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Change the Mission');
+      //Vote Change Next Mission
+      if(!%client.isAdmin)
+      {
+         if($Host::AllowPlayerVoteNextMission && !$RestrictedVoting)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteNextMission', 'set next mission to', 'Vote to Set the Next Mission');
+      }
+      else
+      {
+         if(!$voteNext)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteNextMission', 'set next mission to', 'Set the Next Mission');
+         else
+            messageClient(%client, 'MsgVoteItem', "", %key, 'ClearNextMap', 'Clear Next Set Map', 'Clear Next Set Map');
+      }
+      //Vote Change Time
+      if(!%client.isAdmin)
+      {
+         if($Host::AllowPlayerVoteTimeLimit && !$RestrictedVoting)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Vote to Change the Time Limit');
+      }
+      else
+         messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Change the Time Limit');
+      //Vote Skip Mission
+      if(!%client.isAdmin)
+      {
+         if($Host::AllowPlayerVoteSkipMission && !$RestrictedVoting)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Vote to Skip Mission' );
+      }
+      else
+         messageClient(%client, 'MsgVoteItem', "", %key, 'VoteSkipMission', 'skip the mission to', 'Skip the Mission' );
+      //Admin Vote Menu
+      if(%client.isAdmin && $Host::AllowAdminVotes)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'ForceVote', 'Vote to ...', 'Vote to ...');
+      //PUG Password
+      if(%client.isAdmin && $Host::TournamentMode)
+      {
+         if($Host::Password !$= "")
+            messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
+         else
+            messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');
+      }
+      //Locked Teams
+      if(%client.isAdmin && $Host::TournamentMode)
+      {
+         if($LockedTeams)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Disable Locked Teams', 'Disable Locked Teams');
+         else
+            messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Enable Locked Teams', 'Enable Locked Teams');
+      }
+      //Restricted Voting
+      if(%client.isAdmin && $Host::TournamentMode)
+      {
+         if($RestrictedVoting)
+            messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleRestrictedVoting', 'Disable Restricted Voting', 'Disable Restricted Voting');
+         else
+            messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleRestrictedVoting', 'Enable Restricted Voting', 'Enable Restricted Voting');
+      }
+      //Vote Team Damage
+      if(%multipleTeams)
+      {
+         if(!%client.isAdmin)
+         {
+            if($Host::AllowPlayerVoteTeamDamage && !$RestrictedVoting)
             {
                if($teamDamage)
-                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
+                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Vote to Disable Team Damage');
                else
-                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
+                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Vote to Enable Team Damage');
             }
-            if($Host::AllowAdminVotes)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'ForceVote', 'Vote to ...', 'Vote to ...');
          }
          else
          {
-            if(!$MatchStarted && !$CountdownStarted)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteMatchStart', 'Start Match', 'Start Match');
-            if(!$MatchStarted && $CountdownStarted)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'cancelMatchStart', 'Cancel Match Start', 'Cancel Match Start');
-            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteFFAMode', 'Change server to Free For All.', 'Free For All Mode');
-            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeMission', 'change the mission to', 'Change the Mission');
-            if(!$voteNext)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteNextMission', 'set next mission to', 'Set the Next Mission');
+            if($teamDamage)
+               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
             else
-               messageClient(%client, 'MsgVoteItem', "", %key, 'ClearNextMap', 'Clear Next Set Map', 'Clear Next Set Map');
-            messageClient(%client, 'MsgVoteItem', "", %key, 'VoteChangeTimeLimit', 'change the time limit', 'Change the Time Limit');
-            if($Host::AllowAdminVotes)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'ForceVote', 'Vote to ...', 'Vote to ...');
-            if($Host::Password !$= "")
-               messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
-            else
-               messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');
-            if($LockedTeams)
-               messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Disable Locked Teams', 'Disable Locked Teams');
-            else
-               messageClient(%client, 'MsgVoteItem', "", %key, 'ToggleLockedTeams', 'Enable Locked Teams', 'Enable Locked Teams');
-            if(%multipleTeams)
-            {
-               if($teamDamage)
-                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'disable team damage', 'Disable Team Damage');
-               else
-                  messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
-            }
+               messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
          }
-
-         if(%client.isSuperAdmin) //Super Admin Only
-         {
-            if($Host::EnableNetTourneyClient) //Toggle Tournament Net Client
-               messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
-            else
-               messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
-         }
-
       }
-
+      //Super Admin Only
+      if(%client.isSuperAdmin)
+      {
+         if($Host::EnableNetTourneyClient) //Toggle Tournament Net Client
+            messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
+      }
       //Everyone
       if ($Host::ServerRules[1] !$= "" )
          messageClient( %client, 'MsgVoteItem', "", %key, 'showServerRules', 'show server rules', "Show Server Rules" );
@@ -281,9 +289,9 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 			else // Player is voting to kick
 			{
-				if($Host::TournamentMode && !$Host::AllowPlayerTournamentModeVotekick) // Dont allow Votekicks in Tournament Mode
+				if($Host::TournamentMode && $RestrictedVoting) // Dont allow Votekicks in Tournament Mode
             {
-               messageClient(%client, "", "\c2No votekicks in Tournament Mode.");
+               messageClient(%client, "", "\c2No votekicks in Tournament Mode at this time.");
                return;
             }
 
@@ -545,25 +553,25 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
          }
 
 		case "TogglePUGpassword":
-			if (%client.isAdmin)
+			if (%client.isAdmin && $Host::TournamentMode)
 			{
 				if($Host::Password !$= "")
 				{
 				   $Host::Password = "";
-				   messageAdmins('', %client.nameBase @ " has disabled pug password.~wfx/powered/vehicle_screen_on.wav");
-				   adminLog(%client, " has disabled pug password." );
+				   messageAdmins('', %client.nameBase @ " has disabled the PUG password.~wfx/powered/vehicle_screen_on.wav");
+				   adminLog(%client, " has disabled PUG password." );
 				}
 				else
 				{
 				   $Host::Password = $Host::PUGPassword;
-				   messageAdmins('', %client.nameBase @ " has enabled pug password.~wfx/powered/vehicle_screen_on.wav" );
-				   adminLog(%client, " has enabled pug password." );
+				   messageAdmins('', %client.nameBase @ " has enabled the PUG password (\"" @ $Host::PUGPassword @ "\").~wfx/powered/vehicle_screen_on.wav");
+				   adminLog(%client, " has enabled PUG password." );
 				}
 			}
 			return;
 
 		case "ToggleLockedTeams":
-			if (%client.isAdmin)
+			if (%client.isAdmin && $Host::TournamentMode)
 			{
 				if(!$LockedTeams)
 				{
@@ -584,8 +592,26 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 			return;
 
+      case "ToggleRestrictedVoting":
+         if(%client.isAdmin && $Host::TournamentMode)
+			{
+				if(!$RestrictedVoting)
+				{
+				   $RestrictedVoting = 1;
+				   messageAdmins('', %client.nameBase @ " has enabled restricted voting (No Map, Time, Kick, or Team Damage Votes).~wfx/powered/vehicle_screen_on.wav");
+				   adminLog(%client, " has enabled restricted voting." );
+				}
+				else
+				{
+				   $RestrictedVoting = 0;
+				   messageAdmins('', %client.nameBase @ " has disabled restricted voting.~wfx/powered/vehicle_screen_on.wav" );
+				   adminLog(%client, " has disabled restricted voting." );
+				}
+			}
+			return;
+
 		case "ToggleTourneyNetClient":
-			if (%client.isAdmin)
+			if(%client.isAdmin && $Host::TournamentMode)
 			{
 				if($Host::EnableNetTourneyClient)
 				{
@@ -1447,12 +1473,12 @@ function DefaultGame::sendGamePlayerPopupMenu( %game, %client, %targetClient, %k
 				messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ChangeTeam", "", %str, %caseId );
             }
 
-			// z0dd - ZOD, 7/11/03. Allow Super admins to force themselves to obs.
-			if( %isSuperAdmin )
-			{
-				if(%isTargetSelf && !%isTargetObserver)
-					messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ToObserver", "", 'Force observer', 5 );
-			}
+            // z0dd - ZOD, 7/11/03. Allow Super admins to force themselves to obs.
+            if( %isSuperAdmin )
+            {
+               if(%isTargetSelf && !%isTargetObserver)
+                  messageClient( %client, 'MsgPlayerPopupItem', "", %key, "ToObserver", "", 'Force observer', 5 );
+            }
          }
          else if ( %isTargetObserver )
          {

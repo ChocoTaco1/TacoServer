@@ -28,37 +28,37 @@ function loadMissionStage2()
 			{
 				if($Host::TournamentMode && $Host::PUGautoPassword)
 					$Host::Password = $Host::PUGPassword;
-				else if(!$Host::TournamentMode)
-				{
-					if($Host::Password)
-						$Host::Password = "";
-					if($LockedTeams)
-						$LockedTeams = 0;
-				}
 
 				//Set server mode to SPEED
-				$Host::HiVisibility = "0";
+				$Host::HiVisibility = 0;
 			}
 			else if($CurrentMissionType $= "LakRabbit")
 			{
-				if($Host::Password)
-					$Host::Password = "";
-				if($LockedTeams)
-					$LockedTeams = 0;
 				if($Host::TournamentMode)
 					$Host::TournamentMode = 0;
 
 				//Set server mode to DISTANCE
-				$Host::HiVisibility = "1";
+				$Host::HiVisibility = 1;
 			}
 		case 1:
 			$Host::Password = $Host::PUGPassword;
-			$Host::HiVisibility = "0"; //always SPEED
+			$Host::HiVisibility = 0; //always SPEED
 	}
 
-	//TimeLimit Always 30 minutes in Tourney Mode
 	if($Host::TournamentMode)
-		$Host::TimeLimit = "30";
+		$Host::TimeLimit = 30; //TimeLimit Always 30 minutes in Tourney Mode
+	else
+	{
+		//Disable everything
+		if($Host::Password)
+			$Host::Password = "";
+		if($LockedTeams)
+			$LockedTeams = 0;
+		if($RestrictedVoting)
+			$RestrictedVoting = 0;
+	}
+	if(isActivePackage(LockedTeams) && !$LockedTeams)
+		deactivatePackage(LockedTeams);
 
 	//Siege NoBaseRape Fix
 	if($CurrentMissionType $= "Siege")
@@ -66,11 +66,9 @@ function loadMissionStage2()
 	else
 		$Host::NoBaseRapeEnabled = 1;
 
-	if(isActivePackage(LockedTeams) && !$LockedTeams)
-		deactivatePackage(LockedTeams);
-
     parent::loadMissionStage2();
 
+	//Map Change Center Print. Used to advertise upcoming events
 	if($Host::MapChangeMSG)
 		centerPrintAll($Host::MapChangeMSGContent, 12, 3);
 }

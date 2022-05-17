@@ -452,7 +452,7 @@ function SCtFGame::missionLoadDone(%game)
    %game.campThread_1 = schedule( 1000, 0, "checkVehicleCamping", 1 );
    %game.campThread_2 = schedule( 1000, 0, "checkVehicleCamping", 2 );
 
-   deleteNonSCtFObjectsFromMap();
+   deleteNonSCtFObjects();
 }
 
 function SCtFGame::clientMissionDropReady(%game, %client)
@@ -2450,97 +2450,28 @@ function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 //            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
 //         }
 
-
-//--------------------------------DeleteObjects Code-------------------------------
 //AutoRemove assets, sensors, and turrets from non-LT maps
-//
-function getGroupObjectByName(%group, %name)
+function deleteNonSCtFObjects()
 {
-	%numObjects = %group.getCount();
+   %c = 0;
+   InitContainerRadiusSearch("0 0 0", 9999, $TypeMasks::ItemObjectType |
+   $TypeMasks::TurretObjectType | $TypeMasks::ForceFieldObjectType |
+   $TypeMasks::VehicleObjectType | $TypeMasks::StaticShapeObjectType);
+   while ((%obj = containerSearchNext()) != 0)
+   {
+      if(%obj.Datablock !$= "flag" && %obj.Datablock !$= "RepairKit" && %obj.Datablock !$= "RepairPatch") //Dont delete these...
+      {
+         %deleteList[%c] = %obj;
+         %c++;
+      }
 
-	for(%i = 0; %i < %numObjects; %i++)
-	{
-		if (%group.getObject(%i).getClassName() $= %name)
-			return %group.getObject(%i);
-	}
+   }
+   for(%i = 0; %i  < %c; %i++)
+   {
+       %deleteList[%i].delete();
+   }
+
+   //Delete all ForceField PhysicalZones (PZones)
+   if(isObject(PZones))
+      PZones.schedule(1500,"delete");
 }
-
-function deleteObjectsFromMapByType(%type)
-{
-	%teamsGroup = getGroupObjectByName(MissionGroup, "Teams");
-	if (!isObject(%teamsGroup))
-	{
-		return;
-	}
-
-	%team1Group = getGroupObjectByName(%teamsGroup, "Team1");
-	if (!isObject(%team1Group))
-	{
-		return;
-	}
-
-	%team2Group = getGroupObjectByName(%teamsGroup, "Team2");
-	if (!isObject(%team2Group))
-	{
-		return;
-	}
-
-	%team1Base0Group = getGroupObjectByName(%team1Group, "Base0");
-	if (!isObject(%team1Base0Group))
-	{
-		return;
-	}
-
-	%team2Base0Group = getGroupObjectByName(%team2Group, "Base1");
-	if (!isObject(%team2Base0Group))
-	{
-		return;
-	}
-
-
-	deleteObjectsFromGroupByType(%team1Base0Group, %type);
-	deleteObjectsFromGroupByType(%team2Base0Group, %type);
-}
-
-function deleteObjectsFromGroupByType(%group, %type)
-{
-	%noObjectsLeft = 0;
-
-	while (%noObjectsLeft == 0)
-	{
-		%i = 0;
-		%noObjectsLeft = 1;
-		%loop = 1;
-     	%numObjects = %group.getCount();
-
-		while ((%loop == 1) && (%i < %numObjects))
-		{
-         %obj = %group.getObject(%i);
-
-         if (%obj.getClassName() $= "SimGroup")
-            deleteObjectsFromGroupByType(%obj, %type);
-
-         if (%obj.getClassName() $= %type)
-			{
-				%obj.delete();
-				%loop = 0;
-				%noObjectsLeft = 0;
-			}
-			else
-				%i++;
-		}
-	}
-}
-
-function deleteNonSCtFObjectsFromMap()
-{
-   deleteObjectsFromGroupByType(MissionGroup, "Turret");
-   deleteObjectsFromGroupByType(MissionGroup, "StaticShape");
-   deleteObjectsFromGroupByType(MissionGroup, "FlyingVehicle");
-   deleteObjectsFromGroupByType(MissionGroup, "WheeledVehicle");
-   deleteObjectsFromGroupByType(MissionGroup, "HoverVehicle");
-   deleteObjectsFromGroupByType(MissionGroup, "Waypoint");
-   //deleteObjectsFromGroupByType(MissionGroup, "ForceFieldBare");
-   //deleteObjectsFromGroupByType(MissionGroup, "Item");
-}
-

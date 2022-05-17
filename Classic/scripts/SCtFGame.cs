@@ -2455,8 +2455,7 @@ function deleteNonSCtFObjects()
 {
    %c = 0;
    InitContainerRadiusSearch("0 0 0", 9999, $TypeMasks::ItemObjectType |
-   $TypeMasks::TurretObjectType | $TypeMasks::ForceFieldObjectType |
-   $TypeMasks::VehicleObjectType | $TypeMasks::StaticShapeObjectType);
+   $TypeMasks::TurretObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::StaticShapeObjectType); //For FF: $TypeMasks::ForceFieldObjectType
    while ((%obj = containerSearchNext()) != 0)
    {
       if(%obj.Datablock !$= "flag" && %obj.Datablock !$= "RepairKit" && %obj.Datablock !$= "RepairPatch") //Dont delete these...
@@ -2472,6 +2471,6 @@ function deleteNonSCtFObjects()
    }
 
    //Delete all ForceField PhysicalZones (PZones)
-   if(isObject(PZones))
-      PZones.schedule(1500,"delete");
+   // if(isObject(PZones))
+   //    PZones.schedule(1500,"delete");
 }

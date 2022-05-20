@@ -40,7 +40,6 @@
 //
 // v3.34 Febuary 2019
 // Armor::damageObject rework
-// Added SetNextMission support
 // Indoor Spawning support
 //
 // v3.33 January 2019
@@ -2065,11 +2064,17 @@ function LakRabbitGame::gameOver(%game)
 	  %client.team = 0;
 	  %client.lastTeam = 0;
 
+	  if(!%client.isAIControlled())
+	  {
+		//This is not a great way to do this...but...everything will be correct in all clients menus if its a change to ctf...
+		messageAll('MsgClientDrop', "", %client.name, %client);
+		messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+		messageClient(%client, 'MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
+	  }
+
    	  //send the message
    	  messageClient(%client, 'MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
       messageClient(%client, 'MsgClearObjHud', "");
-
-	  messageClient(%client, 'MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
    }
 
    // ilys -- cancel waypoint if not showing flag icon

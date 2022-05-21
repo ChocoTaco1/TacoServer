@@ -861,7 +861,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
          messageClient(%client, 'MsgClientJoin', "",
                %recipient.name,
                %recipient,
-               %recipient.target,
+               "",
                %recipient.isAIControlled(),
                %recipient.isAdmin,
                %recipient.isSuperAdmin,
@@ -879,21 +879,21 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    if ( $CurrentMissionType !$= "SinglePlayer" )
    {
       // z0dd - ZOD, 5/08/04. Send message of any gameplay changes
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Sniper Mod: \c3%1.', ($Host::ClassicLoadSniperChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Missile Mod: \c3%1.', ($Host::ClassicLoadMissileChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Mortar Mod: \c3%1.', ($Host::ClassicLoadMortarChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Blaster Mod: \c3%1.', ($Host::ClassicLoadBlasterChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Plasma Turret Mod: \c3%1.', ($Host::ClassicLoadPlasmaTurretChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Player Mod: \c3%1.', ($Host::ClassicLoadPlayerChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Havoc Mod: \c3%1.', ($Host::ClassicLoadHavocChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Mine Mod: \c3%1.', ($Host::ClassicLoadMineChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2V-Ramming Mod: \c3%1.', ($Host::ClassicLoadVRamChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Sniper Mod: \c3%1.', ($Host::ClassicLoadSniperChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Missile Mod: \c3%1.', ($Host::ClassicLoadMissileChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Mortar Mod: \c3%1.', ($Host::ClassicLoadMortarChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Blaster Mod: \c3%1.', ($Host::ClassicLoadBlasterChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Plasma Turret Mod: \c3%1.', ($Host::ClassicLoadPlasmaTurretChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Player Mod: \c3%1.', ($Host::ClassicLoadPlayerChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Havoc Mod: \c3%1.', ($Host::ClassicLoadHavocChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Mine Mod: \c3%1.', ($Host::ClassicLoadMineChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2V-Ramming Mod: \c3%1.', ($Host::ClassicLoadVRamChanges ? 'Enabled' : 'Disabled') );
 
       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
       messageClient(%client, 'MsgClientJoin', 'Welcome to Tribes2 %1.',
                     %client.name,
                     %client,
-                    %client.target,
+                    "",
                     false,   // isBot
                     %client.isAdmin,
                     %client.isSuperAdmin,
@@ -904,7 +904,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
       messageAllExcept(%client, -1, 'MsgClientJoin', '\c1%1 joined the game.',
                        %client.name,
                        %client,
-                       %client.target,
+                       "",
                        false,   // isBot
                        %client.isAdmin,
                        %client.isSuperAdmin,
@@ -1769,7 +1769,7 @@ function serverCmdSAD(%client, %password)
 
             //Update everyones client and put an SA by your name
             messageAll( 'MsgClientDrop', "", %client.name, %client);
-            messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+            messageAll('MsgClientJoin', "",%client.name, %client, "",%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
             messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
          }
 
@@ -1790,7 +1790,7 @@ function serverCmdSAD(%client, %password)
 
             //Update everyones client and put an A by your name
             messageAll( 'MsgClientDrop', "", %client.name, %client);
-            messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+            messageAll('MsgClientJoin', "",%client.name, %client, "",%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
             messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
          }
       default:
@@ -2575,7 +2575,7 @@ function serverCmdStripAdmin(%client, %admin)
       messageClient(%admin, 'MsgStripAdminPlayer', 'You have stripped yourself of admin privledges.');
       adminLog(%client, " stripped admin from " @ %admin.nameBase);
       messageAll('MsgClientDrop', "", %client.name, %client);
-      messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+      messageAll('MsgClientJoin', "",%client.name, %client, "",%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
 	   messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
       return;
    }
@@ -2587,7 +2587,7 @@ function serverCmdStripAdmin(%client, %admin)
       %admin.isSuperAdmin = 0;
       adminLog(%client, " stripped admin from " @ %admin.nameBase);
       messageAll( 'MsgClientDrop', "", %client.name, %client);
-      messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+      messageAll('MsgClientJoin', "",%client.name, %client, "",%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
 	   messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
    }
    else

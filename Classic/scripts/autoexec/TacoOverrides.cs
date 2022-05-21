@@ -298,6 +298,22 @@ function ConcussionGrenadeThrown::onThrow(%this, %gren)
    %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren); // Was 2000
 }
 
+//Attack LOS Sky Fix
+function serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap)
+{
+	%obj = getTargetObject(%client.getTargetId());
+	if(isObject(%obj))
+	{
+		%vec = %client.player.getMuzzleVector(0);
+		%vec2 = vectorNormalize(vectorSub(%obj.getWorldBoxCenter(), %client.player.getMuzzlePoint(%slot)));
+		%dot = vectorDot(%vec, %vec2);
+		if(%dot < 0.9)
+			return;
+	}
+
+	parent::serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap);
+}
+
 };
 
 // Prevent package from being activated if it is already

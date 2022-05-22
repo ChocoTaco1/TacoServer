@@ -301,17 +301,26 @@ function ConcussionGrenadeThrown::onThrow(%this, %gren)
 //Attack LOS Sky Fix
 function serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap)
 {
-	%obj = getTargetObject(%client.getTargetId());
-	if(isObject(%obj))
-	{
-		%vec = %client.player.getMuzzleVector(0);
-		%vec2 = vectorNormalize(vectorSub(%obj.getWorldBoxCenter(), %client.player.getMuzzlePoint(%slot)));
-		%dot = vectorDot(%vec, %vec2);
-		if(%dot < 0.9)
-			return;
-	}
+   %obj = getTargetObject(%client.getTargetId());
+   if(isObject(%obj))
+   {
+      if(%obj.getClassName() $= "Player" && !%client.player.ccActive)
+      {
+         %vec = %client.player.getMuzzleVector(0);
+         %vec2 = vectorNormalize(vectorSub(%obj.getWorldBoxCenter(), %client.player.getMuzzlePoint(%slot)));
+         %dot = vectorDot(%vec, %vec2);
+         if(%dot < 0.9)
+            return;
+      }
+   }
 
-	parent::serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap);
+   parent::serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap);
+}
+
+function serverCmdScopeCommanderMap(%client, %scope)
+{
+   parent::serverCmdScopeCommanderMap(%client, %scope);
+   %client.player.ccActive = %scope;
 }
 
 };

@@ -899,8 +899,8 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
                     %client.isSuperAdmin,
                     %client.isSmurf,
                     %client.sendGuid );
-       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
 
+       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
       messageAllExcept(%client, -1, 'MsgClientJoin', '\c1%1 joined the game.',
                        %client.name,
                        %client,
@@ -3089,6 +3089,12 @@ function EndCountdown(%timeMS)
    else
       return;
 
+   if(%timeMS >= 900000 && $Host::TournamentMode)
+      Game.endfifteenminuteCount = schedule(%timeMS - 900000, Game, "notifyMatchEndMinutes", 900000);
+   if(%timeMS >= 600000 && $Host::TournamentMode)
+      Game.endtenminuteCount = schedule(%timeMS - 600000, Game, "notifyMatchEndMinutes", 600000);
+   if(%timeMS >= 300000 && $Host::TournamentMode)
+      Game.endfiveminuteCount = schedule(%timeMS - 300000, Game, "notifyMatchEndMinutes", 300000);
    if(%timeMS >= 180000)
       Game.endthreeminuteCount = schedule(%timeMS - 180000, Game, "notifyMatchEndMinutes", 180000);
    if(%timeMS >= 120000)

@@ -3849,10 +3849,9 @@ function notifyMatchEnd(%time)
 {
    %seconds = mFloor(%time / 1000);
 
-   if (%seconds > 1) {
+   if(%seconds > 1)
       MessageAll('MsgMissionEnd', '\c2Match ends in %1 seconds.~wfx/misc/hunters_%1.wav', %seconds);
-   }
-   else if (%seconds == 1)
+   else if(%seconds == 1)
       MessageAll('MsgMissionEnd', '\c2Match ends in 1 second.~wfx/misc/hunters_1.wav');
 
    UpdateClientTimes(%time);
@@ -3862,9 +3861,15 @@ function notifyMatchEndMinutes(%time)
 {
    %seconds = mFloor(%time / 1000);
 
-   if (%seconds == 180)
+   if(%seconds == 900 && $Host::TournamentMode)
+      MessageAll('MsgMissionEndMinutes', '\c2Match ends in 15 minutes.~wfx/misc/flagself.wav');
+   else if(%seconds == 600 && $Host::TournamentMode)
+      MessageAll('MsgMissionEndMinutes', '\c2Match ends in 10 minutes.~wfx/misc/flagself.wav');
+   else if(%seconds == 300 && $Host::TournamentMode)
+      MessageAll('MsgMissionEndMinutes', '\c2Match ends in 5 minutes.~wfx/misc/flagself.wav');
+   else if(%seconds == 180)
       MessageAll('MsgMissionEndMinutes', '\c2Match ends in 3 minutes.~wfx/misc/flagself.wav');
-   else if (%seconds == 120)
+   else if(%seconds == 120)
       MessageAll('MsgMissionEndMinutes', '\c2Match ends in 2 minutes.~wfx/misc/flagself.wav');
 
    UpdateClientTimes(%time);

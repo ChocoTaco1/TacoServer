@@ -893,7 +893,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
       messageClient(%client, 'MsgClientJoin', 'Welcome to Tribes2 %1.',
                     %client.name,
                     %client,
-                    "",
+                    %client.target,
                     false,   // isBot
                     %client.isAdmin,
                     %client.isSuperAdmin,

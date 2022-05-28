@@ -240,14 +240,14 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
                messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
          }
       }
-      //Super Admin Only
-      if(%client.isSuperAdmin)
-      {
-         if($Host::EnableNetTourneyClient) //Toggle Tournament Net Client
-            messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
-         else
-            messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
-      }
+      //Super Admin Only - Disabled for now
+      // if(%client.isSuperAdmin)
+      // {
+      //    if($Host::EnableNetTourneyClient) //Toggle Tournament Net Client
+      //       messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Disable Tournament Net Client', "Disable Tournament Net Client" );
+      //    else
+      //       messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
+      // }
       //Everyone
       if ($Host::ServerRules[1] !$= "" )
          messageClient( %client, 'MsgVoteItem', "", %key, 'showServerRules', 'show server rules', "Show Server Rules" );
@@ -607,7 +607,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			return;
 
 		case "ToggleTourneyNetClient":
-			if(%client.isAdmin && $Host::TournamentMode)
+			if(%client.isSuperAdmin)
 			{
 				if($Host::EnableNetTourneyClient)
 				{

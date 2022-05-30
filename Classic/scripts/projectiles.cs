@@ -11,7 +11,7 @@
 //   GrenadeProjectileData     : ProjectileData
 //   SeekerProjectileData      : ProjectileData
 //   SniperProjectileData      : ProjectileData
-// 
+//
 //--------------------------------------------------------------------------
 //-------------------------------------- Default functions
 //
@@ -33,12 +33,12 @@ function SniperProjectileData::onCollision(%data, %projectile, %targetObject, %m
       {
          %damLoc = firstWord(%targetObject.getDamageLocation(%position));
          if(%damLoc $= "head")
-         {   
+         {
             %targetObject.getOwnerClient().headShot = 1;
             %modifier = %data.rifleHeadMultiplier;
          }
          else
-         {   
+         {
             %modifier = 1;
             %targetObject.getOwnerClient().headShot = 0;
          }
@@ -72,10 +72,11 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
    {
       %obj.cantFire = 1;
       %preventTime = %data.stateTimeoutValue[4];
+      //%preventTime = (%data.stateTimeoutValue[4] + %data.stateTimeoutValue[3]) - 0.032;
       %obj.reloadSchedule = schedule(%preventTime * 1000, %obj, resetFire, %obj);
    }
    // ---------------------------------------------------------------------------
-   
+
    %data.lightStart = getSimTime();
 
    if( %obj.station $= "" && %obj.isCloaked() )
@@ -89,7 +90,7 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
       else
       {
          // if( %obj.getEnergyLevel() > 20 )
-         // {   
+         // {
          //    %obj.setCloaked( false );
          //    %obj.reCloak = %obj.schedule( 500, "setCloaked", true );
          // }
@@ -97,15 +98,15 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
          //We check if the player is still cloaked now. So no need to limit to 20% energy for the cloak in/out animation
          %obj.setCloaked( false );
          %obj.reCloak = schedule( 500, 0, "checkCloakState", %obj);
-      }   
+      }
    }
 
    if( %obj.client > 0 )
-   {   
+   {
       %obj.setInvincibleMode(0 ,0.00);
-      %obj.setInvincible( false ); // fire your weapon and your invincibility goes away.   
+      %obj.setInvincible( false ); // fire your weapon and your invincibility goes away.
    }
-   
+
    %vehicle = 0;
    if(%data.usesEnergy)
    {
@@ -119,11 +120,11 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
       }
       else
          %energy = %obj.getEnergyLevel();
-      
+
       if(%data.useCapacitor && %data.usesEnergy)
-      {   
+      {
          if( %useEnergyObj.turretObject.getCapacitorLevel() < %data.minEnergy )
-         {   
+         {
             return;
          }
       }
@@ -164,7 +165,7 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
    %obj.lastProjectile = %p;
    %obj.deleteLastProjectile = %data.deleteLastProjectile;
    MissionCleanup.add(%p);
-   
+
    // AI hook
    if(%obj.client)
       %obj.client.projectile = %p;
@@ -172,9 +173,9 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
    if(%data.usesEnergy)
    {
       if(%data.useMountEnergy)
-      {   
+      {
          if( %data.useCapacitor )
-         {   
+         {
             %vehicle.turretObject.setCapacitorLevel( %vehicle.turretObject.getCapacitorLevel() - %data.fireEnergy );
          }
          else
@@ -222,7 +223,7 @@ function MissileLauncherImage::onFire(%data,%obj,%slot)
    // z0dd - ZOD, 9/3/02. Anti rapid fire mortar/missile fix.
    if(!%p)
    {
-      return;	
+      return;
    }
    //--------------------------------------------------------
    MissileSet.add(%p);
@@ -253,7 +254,7 @@ function MissileLauncherImage::onWetFire(%data, %obj, %slot)
    // z0dd - ZOD, 9/3/02. Anti rapid fire mortar/missile fix.
    if(!%p)
    {
-      return;	
+      return;
    }
    //--------------------------------------------------------
    MissileSet.add(%p);
@@ -269,7 +270,7 @@ function MissileBarrelLarge::onFire(%data,%obj,%slot)
    // z0dd - ZOD, 9/3/02. Anti rapid fire mortar/missile fix.
    if(!%p)
    {
-      return;	
+      return;
    }
    //--------------------------------------------------------
    MissileSet.add(%p); // z0dd - ZOD, 8/10/03. Bots need this.
@@ -298,7 +299,7 @@ function MortarImage::onFire(%data,%obj,%slot)
    // z0dd - ZOD, 9/3/02. Anti rapid fire mortar/missile fix.
    if(!%p)
    {
-      return;	
+      return;
    }
    // z0dd - ZOD, 5/22/03, Spawn a mortar at the end of the projectiles lifetime.
    // Addresses long range mortar spam exploit.
@@ -358,7 +359,7 @@ function SniperRifleImage::onFire(%data,%obj,%slot)
    %obj.lastProjectile = %p;
    MissionCleanup.add(%p);
    serverPlay3D(SniperRifleFireSound, %obj.getTransform());
-   
+
    // AI hook
    if(%obj.client)
       %obj.client.projectile = %p;
@@ -375,7 +376,7 @@ function ElfGunImage::onFire(%data, %obj, %slot)
    // z0dd - ZOD, 9/3/02. Anti rapid fire mortar/missile fix.
    if(!%p)
    {
-      return;	
+      return;
    }
    //--------------------------------------------------------
    if(!%p.hasTarget())
@@ -389,7 +390,7 @@ function TargetingLaserImage::onFire(%data,%obj,%slot)
    // z0dd - ZOD, 9/3/02. Anti rapid fire mortar/missile fix.
    if(!%p)
    {
-      return;	
+      return;
    }
    //--------------------------------------------------------
    %p.setTarget(%obj.team);
@@ -403,13 +404,14 @@ function ShockLanceImage::onFire(%this, %obj, %slot)
 		%obj.setInvincibleMode(0, 0.00);
 		%obj.setInvincible( false );
 	}
-   
+
    // z0dd - ZOD, 4/10/04. ilys - Added rapidfire shocklance fix
    if(%obj.cantfire !$= "")
       return;
 
    %obj.cantfire = 1;
    %preventTime = %this.stateTimeoutValue[4];
+   //%preventTime = (%data.stateTimeoutValue[4] + %data.stateTimeoutValue[3]) - 0.032;
    %obj.reloadSchedule = schedule(%preventTime * 1000, %obj, resetFire, %obj);
 
    if( %obj.getEnergyLevel() < %this.minEnergy ) // z0dd - ZOD, 5/22/03. Check energy level first
@@ -427,7 +429,7 @@ function ShockLanceImage::onFire(%this, %obj, %slot)
       else
       {
          // if( %obj.getEnergyLevel() > 20 )
-         // {   
+         // {
          //    %obj.setCloaked( false );
          //    %obj.reCloak = %obj.schedule( 500, "setCloaked", true );
          // }
@@ -435,7 +437,7 @@ function ShockLanceImage::onFire(%this, %obj, %slot)
          //We check if the player is still cloaked now. So no need to limit to 20% energy for the cloak in/out animation
          %obj.setCloaked( false );
          %obj.reCloak = schedule( 500, 0, "checkCloakState", %obj);
-      }  
+      }
    }
 
    %muzzlePos = %obj.getMuzzlePoint(%slot);
@@ -482,7 +484,7 @@ function ShockLanceImage::onFire(%this, %obj, %slot)
          MissionCleanup.add(%p);
 
          %damageMultiplier = 1.0;
-         
+
          if(%hitObj.getDataBlock().getClassName() $= "PlayerData")
          {
             // Now we see if we hit from behind...
@@ -512,13 +514,13 @@ function ShockLanceImage::onFire(%this, %obj, %slot)
             }
             // --------------------------------------------------------------
          }
-         
+
          %totalDamage = %this.Projectile.DirectDamage * %damageMultiplier;
          %hitObj.getDataBlock().damageObject(%hitobj, %p.sourceObject, %hitpos, %totalDamage, $DamageType::ShockLance);
 
          %noDisplay = false;
       }
-   } 
+   }
 
    if( %noDisplay )
    {
@@ -554,7 +556,7 @@ function ELFProjectileData::zapTarget(%data, %projectile, %target, %targeter)
    if( %target.teamDamageStateOnZap || !%teammates )
       %target.setRechargeRate(%oldERate - %data.drainEnergy);
    else
-      %target.setRechargeRate(%oldERate);	
+      %target.setRechargeRate(%oldERate);
 
    %projectile.checkELFStatus(%data, %target, %targeter);
 }
@@ -705,7 +707,7 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
             //%amount = (1.0 - (%dist / %radius)) * %coverage * %damage;
 
          //error( "damage: " @ %amount @ " at distance: " @ %dist @ " radius: " @ %radius @ " maxDamage: " @ %damage );
-      
+
          %data = %targetObject.getDataBlock();
          %className = %data.className;
 
@@ -714,7 +716,7 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
             %p = %targetObject.getWorldBoxCenter();
             %momVec = VectorSub(%p, %position);
             %momVec = VectorNormalize(%momVec);
-         
+
             //------------------------------------------------------------------------------
             // z0dd - ZOD, 7/08/02. More kick when player damages self with disc or mortar.
             // Stronger DJs and mortar jumps without impacting others (mainly HoFs)
@@ -730,7 +732,7 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
                }
             }
             //------------------------------------------------------------------------------
-         
+
             %impulseVec = VectorScale(%momVec, %impulse * (1.0 - (%dist / %radius)));
             %doImpulse = true;
          }
@@ -740,27 +742,27 @@ function RadiusExplosion(%explosionSource, %position, %radius, %damage, %impulse
             %momVec = VectorSub(%p, %position);
             %momVec = VectorNormalize(%momVec);
             %impulseVec = VectorScale(%momVec, %impulse * (1.0 - (%dist / %radius)));
-         
+
             if( getWord( %momVec, 2 ) < -0.5 )
                %momVec = "0 0 1";
-            
+
             // Add obj's velocity into the momentum vector
             %velocity = %targetObject.getVelocity();
             //%momVec = VectorNormalize( vectorAdd( %momVec, %velocity) );
             %doImpulse = true;
          }
          else
-         {   
+         {
             %momVec = "0 0 1";
             %doImpulse = false;
          }
-      
+
          if(%amount > 0)
             %data.damageObject(%targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %explosionSource.theClient, %explosionSource);
          else if( %explosionSource.getDataBlock().getName() $= "ConcussionGrenadeThrown" && %data.getClassName() $= "PlayerData" )
 	   {
             %data.applyConcussion( %dist, %radius, %sourceObject, %targetObject );
- 	  	
+
  	  	if(!$teamDamage && %sourceObject != %targetObject && %sourceObject.client.team == %targetObject.client.team)
  	  	{
 			messageClient(%targetObject.client, 'msgTeamConcussionGrenade', '\c1You were hit by %1\'s concussion grenade.', getTaggedString(%sourceObject.client.name));

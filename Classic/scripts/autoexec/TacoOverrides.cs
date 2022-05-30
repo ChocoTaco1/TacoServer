@@ -323,6 +323,17 @@ function serverCmdScopeCommanderMap(%client, %scope)
    %client.player.ccActive = %scope;
 }
 
+//Mortar Throw Reload Fix
+function ShapeBase::throwWeapon(%this)
+{
+   if((%this.getMountedImage($WeaponSlot).getName() $= "MortarImage" || %this.getMountedImage($WeaponSlot).getName() $= "MissileLauncherImage" || %this.getMountedImage($WeaponSlot).getName() $= "ShockLanceImage") &&
+   (%this.getImageState($WeaponSlot) $= "Reload" || %this.getImageState($WeaponSlot) $= "Fire")){
+      return;
+   }
+
+   parent::throwWeapon(%this);
+}
+
 };
 
 // Prevent package from being activated if it is already

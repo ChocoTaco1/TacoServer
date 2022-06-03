@@ -240,7 +240,16 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
                messageClient(%client, 'MsgVoteItem', "", %key, 'VoteTeamDamage', 'enable team damage', 'Enable Team Damage');
          }
       }
-      //Super Admin Only - Disabled for now
+
+      //Super Admin Only
+      if(%client.isSuperAdmin)
+      {
+         if($Host::AllowAdmin2Admin) //Toggle Admin2Admin
+            messageClient( %client, 'MsgVoteItem', "", %key, 'Admins2Admin', 'Disable Admins to Admin', "Disable Admins to Admin" );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'Admins2Admin', 'Enable Admins to Admin', "Enable Admins to Admin" );
+      }
+      //Disabled for now
       // if(%client.isSuperAdmin)
       // {
       //    if($Host::EnableNetTourneyClient) //Toggle Tournament Net Client
@@ -248,6 +257,7 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
       //    else
       //       messageClient( %client, 'MsgVoteItem', "", %key, 'ToggleTourneyNetClient', 'Enable Tournament Net Client', "Enable Tournament Net Client" );
       // }
+
       //Everyone
       if ($Host::ServerRules[1] !$= "" )
          messageClient( %client, 'MsgVoteItem', "", %key, 'showServerRules', 'show server rules', "Show Server Rules" );
@@ -602,6 +612,26 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				   $RestrictedVoting = 0;
 				   messageAdmins('', %client.nameBase @ " has disabled restricted voting.~wfx/powered/vehicle_screen_on.wav" );
 				   adminLog(%client, " has disabled restricted voting." );
+				}
+			}
+			return;
+
+      case "Admins2Admin":
+			if(%client.isSuperAdmin)
+			{
+				if($Host::AllowAdmin2Admin)
+				{
+				   $Host::AllowAdmin2Admin = 0;
+
+				   messageAdmins('', %client.nameBase @ " has disabled Admins to Admin.~wfx/powered/vehicle_screen_on.wav" );
+				   adminLog(%client, " has disabled Admins to Admin.");
+				}
+				else
+				{
+				   $Host::AllowAdmin2Admin = 1;
+
+				   messageAdmins('', %client.nameBase @ " has enabled Admins to Admin.~wfx/powered/vehicle_screen_on.wav" );
+				   adminLog(%client, " has enabled Admins to Admin.");
 				}
 			}
 			return;

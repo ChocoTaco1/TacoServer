@@ -50,7 +50,7 @@ function loadMissionStage2()
 	else
 	{
 		//Disable everything
-		if($Host::Password)
+		if($Host::Password !$= "")
 			$Host::Password = "";
 		if($LockedTeams)
 			$LockedTeams = 0;

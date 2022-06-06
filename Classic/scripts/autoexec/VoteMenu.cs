@@ -345,18 +345,18 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			if(%arg1.isAdmin) // target is already an admin
 				return; // can't vote to admin an admin!
 
-			if(%client.isAdmin && !%client.isSuperAdmin) // our pal is an admin (no superadmins)
-			{
-				if(!$Host::AllowAdmin2Admin)
-					return;
-			}
-			else // not an admin
-			{
-				if(!$host::allowadminplayervotes) // admin player votes are NOT enabled
-					return; // can't do that pal
+         if(%isAdmin)
+         {
+            if(!%client.isSuperAdmin && !$Host::AllowAdmin2Admin)
+               return;
+         }
+         else
+         {
+            if(!$host::allowadminplayervotes) // admin player votes are NOT enabled
+				   return; // can't do that pal
 
 				%msg = %client.nameBase @ " initiated a vote to admin player " @ %arg1.nameBase @ ".";
-			}
+         }
 
 		case "BanPlayer":
 			if(%client.isSuperAdmin && !%arg1.isSuperAdmin) // we're a super admin, and our target isn't a super admin

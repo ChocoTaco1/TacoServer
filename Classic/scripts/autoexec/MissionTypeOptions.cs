@@ -58,7 +58,6 @@ function loadMissionStage2()
 			$RestrictedVoting = 0;
 		if($Host::AllowAdmin2Admin)
 			$Host::AllowAdmin2Admin = 0;
-
 	}
 	if(isActivePackage(LockedTeams) && !$LockedTeams)
 		deactivatePackage(LockedTeams);

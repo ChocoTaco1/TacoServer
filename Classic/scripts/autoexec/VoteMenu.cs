@@ -419,9 +419,16 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 				return;
 			}
 
-			if($CurrentMissionType $= "Siege") // Can't change time in this one
+         if($CurrentMissionType $= "Siege") // Can't change time in this one
 			{
 				messageClient(%client, "", "\c2Cannot change the time limit in this gametype.");
+				return;
+			}
+
+         // 30 minutes Only in Tournament mode
+			if($Host::TournamentMode && %arg1 !$= "30")
+			{
+				messageClient(%client, "", "\c2Only 30 minute time limit allowed in tournament mode.");
 				return;
 			}
 

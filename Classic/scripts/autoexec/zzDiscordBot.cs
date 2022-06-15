@@ -286,10 +286,13 @@ function discord::onLine(%this, %line){
       //case "Discord":
          //messageAll( 'MsgDiscord', '\c3Discord: \c4%1 %2',getWord(%lineStrip,1),getWords(%lineStrip,2,getWordCount(%lineStrip) -1));
       case "GETSTAT":
-            %var = getWord(%lineStrip,1);
-            %mon = getWord(%lineStrip,2);
-            %year = getWord(%lineStrip,3);
+            %mon = getWord(%lineStrip,1);
+            %year = getWord(%lineStrip,2);
+            %var = getWord(%lineStrip,3);
             %game = getWord(%lineStrip,4);
+            if(%game $= ""){// default if not valid
+             %game =  "CTFGame";
+            }
             %returnIndex = getWord(%lineStrip,5);
             %nameList = $lData::name[%var,%game,"month",%mon,%year];
             %dataList = $lData::data[%var,%game,"month",%mon,%year];
@@ -302,8 +305,12 @@ function discord::onLine(%this, %line){
             $genStatsLockout = 1;
             %month = getWord(%lineStrip,1);
             %year = getWord(%lineStrip,2);
+            %game = getWord(%lineStrip,3);
+            if(%game $= ""){// default if not valid
+             %game =  "CTFGame";
+            }
             if(%month > 0 && %year > 0){
-               schedule(1000, 0, "sendLDATA", %month, %year, "CTFGame");
+               schedule(1000, 0, "sendLDATA", %month, %year, %game);
             }
          }
          else{
@@ -312,9 +319,9 @@ function discord::onLine(%this, %line){
       case "PING":
          discord.send("PONG" @ $discordBot::cmdSplit @ "\r\n");
       case "PINGAVG":
-      %min = 10000;
-      %max = -10000;
-      %lowCount = %lowPing = 0;
+         %min = 10000;
+         %max = -10000;
+         %lowCount = %lowPing = 0;
          for(%i = 0; %i < ClientGroup.getCount(); %i++){
             %cl = ClientGroup.getObject(%i);
             %ping = %cl.isAIControlled() ? 0 : %cl.getPing();
@@ -382,7 +389,7 @@ if(!isObject(discord) && $discordBot::autoStart){
    discordCon();
 }
 
-function sendLDATA(%month, %year, %type){
+function sendLDATA(%month, %year, %game){
     %file = new FileObject();
    RootGroup.add(%file);
    %folderPath = "serverStats/LData/*.cs";
@@ -391,18 +398,16 @@ function sendLDATA(%month, %year, %type){
    for (%i = 0; %i < %count; %i++){
       %filepath = findNextfile(%folderPath);
       %fieldPath =strreplace(%filePath,"-","\t");
-      %game = getField(%fieldPath,1);
+      %g = getField(%fieldPath,1);
       %m = getField(%fieldPath,2); // 0 path / 1  game / 2 mon / 3 year / 4 type / 5 .cs
       %y = getField(%fieldPath,3);
       //%lType = getField(%fieldPath,4);
-      if(%month $= %m && %y $= %year && %game $= %type){
+      //error(%g SPC %game SPC %m SPC %month SPC %y SPC %year);
+      if(%month $= %m && %y $= %year && %g $= %game){
          %found = 1;
          break;
       }
    }
-   $dtSendDataMon = %month;
-   $dtSendDataYear = %year;
-   $dtSendDataType = %type;
    if(isFile(%filepath) && %found){
       sendToDiscord("Building Big Stats", $discordBot::monitorChannel);
       %file.OpenForRead(%filepath);
@@ -410,11 +415,11 @@ function sendLDATA(%month, %year, %type){
       while(!%file.isEOF()){
          %line =  %file.readLine();
          if(strPos(%line,"%tguid") == -1){
-            discord.schedule((%i++)*32,"send","STATSDATA" @ "%c%" @ $dtSendDataMon @ "%c%" @ $dtSendDataType @ "%c%" @ %line @ "\r\n");
+            discord.schedule((%i++)*32,"send","STATSDATA" @ "%c%" @ %month @ "%c%" @ %game @ "%c%" @ %line @ "\r\n");
          }
       }
-      error("Sent LData To Discord" SPC %month SPC %year SPC %type SPC %i);
-      discord.schedule((%i++*32)+1000,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "buildStats" @ $discordBot::cmdSplit @ %month @ $discordBot::cmdSplit @ %year @ $discordBot::cmdSplit @ %type @ $discordBot::cmdSplit @ "\r\n");
+      //error("Sent LData To Discord" SPC %month SPC %year SPC %game SPC %i);
+      discord.schedule((%i++*32)+1000,"send","PROCSTACK" @ $discordBot::cmdSplit @ ($discordBot::monitorChannel) @ $discordBot::cmdSplit @ "buildStats" @ $discordBot::cmdSplit @ %month @ $discordBot::cmdSplit @ %year @ $discordBot::cmdSplit @ %game @ $discordBot::cmdSplit @ "\r\n");
       schedule((%i++*32)+1000, 0, "unlockStatGen");
 
    }

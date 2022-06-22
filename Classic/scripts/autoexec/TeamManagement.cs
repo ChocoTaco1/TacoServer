@@ -24,7 +24,7 @@ function CreateServer( %mission, %missionType )
 	//Call for a GetTeamCount update
 	GetTeamCounts(%game);
 
-	// Prevent package from being activated if it is already
+	//Prevent package from being activated if it is already
 	if (!isActivePackage(TeamCountsTriggers))
 		activatePackage(TeamCountsTriggers);
 }

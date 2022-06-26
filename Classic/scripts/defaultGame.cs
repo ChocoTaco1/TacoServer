@@ -1802,7 +1802,7 @@ function DefaultGame::clientMissionDropReady(%game, %client)
             %damMess = "DISABLED";
 
          if(%game.numTeams > 1)
-            BottomPrint(%client, "Server is Running in Tournament Mode.\nPick a Team\nTeam Damage is " @ %damMess, 0, 3 );
+            BottomPrint(%client, "Server is Running in Tournament Mode.\nGood luck and Have Fun!\nTeam Damage is " @ %damMess, 0, 3 );
       }
       else
       {
@@ -2973,13 +2973,13 @@ function DefaultGame::sendGameTeamList( %game, %client, %key )
 //------------------------------------------------------------------------------
 function DefaultGame::sendTimeLimitList( %game, %client, %key )
 {
+   messageClient( %client, 'MsgVoteItem', "", %key, 30, "", '30 minutes' );
+   messageClient( %client, 'MsgVoteItem', "", %key, 45, "", '45 minutes' );
+   messageClient( %client, 'MsgVoteItem', "", %key, 60, "", '60 minutes' );
+   messageClient( %client, 'MsgVoteItem', "", %key, 75, "", '75 minutes' );
    messageClient( %client, 'MsgVoteItem', "", %key, 90, "", '90 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 120, "", '120 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 150, "", '150 minutes' );
    messageClient( %client, 'MsgVoteItem', "", %key, 180, "", '180 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 240, "", '240 minutes' );
    messageClient( %client, 'MsgVoteItem', "", %key, 360, "", '360 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 480, "", '480 minutes' );
    messageClient( %client, 'MsgVoteItem', "", %key, 999, "", 'No time limit' );
 }
 
@@ -3385,9 +3385,10 @@ function DefaultGame::voteAdminPlayer(%game, %admin, %client)
 
    if (%admin)
    {
-      messageAll('MsgAdminAdminPlayer', '\c2The Admin %3 made %2 an admin.', %client, %client.name, $AdminCl.name);
+      messageAll('MsgAdminAdminPlayer', '\c2The Admin %3 made %2 an admin.', %client, %client.name, %admin.nameBase);
       %client.isAdmin = 1;
       %cause = "(admin)";
+      adminLog(%admin, " has made" SPC %client.nameBase @ "(" @ %client.guid @ ") an admin.");
    }
    else
    {
@@ -3402,6 +3403,7 @@ function DefaultGame::voteAdminPlayer(%game, %admin, %client)
       else
          messageAll('MsgVoteFailed', '\c2Vote to make %1 an admin did not pass.', %client.name);
    }
+
    if(%cause !$= "")
       logEcho($AdminCl.nameBase @ ": " @ %client.nameBase@" (cl "@%client@") made admin "@%cause, 1);
 }
@@ -3847,10 +3849,9 @@ function notifyMatchEnd(%time)
 {
    %seconds = mFloor(%time / 1000);
 
-   if (%seconds > 1) {
+   if(%seconds > 1)
       MessageAll('MsgMissionEnd', '\c2Match ends in %1 seconds.~wfx/misc/hunters_%1.wav', %seconds);
-   }
-   else if (%seconds == 1)
+   else if(%seconds == 1)
       MessageAll('MsgMissionEnd', '\c2Match ends in 1 second.~wfx/misc/hunters_1.wav');
 
    UpdateClientTimes(%time);
@@ -3860,9 +3861,15 @@ function notifyMatchEndMinutes(%time)
 {
    %seconds = mFloor(%time / 1000);
 
-   if (%seconds == 180)
+   if(%seconds == 900 && $Host::TournamentMode)
+      MessageAll('MsgMissionEndMinutes', '\c2Match ends in 15 minutes.~wfx/misc/flagself.wav');
+   else if(%seconds == 600 && $Host::TournamentMode)
+      MessageAll('MsgMissionEndMinutes', '\c2Match ends in 10 minutes.~wfx/misc/flagself.wav');
+   else if(%seconds == 300 && $Host::TournamentMode)
+      MessageAll('MsgMissionEndMinutes', '\c2Match ends in 5 minutes.~wfx/misc/flagself.wav');
+   else if(%seconds == 180)
       MessageAll('MsgMissionEndMinutes', '\c2Match ends in 3 minutes.~wfx/misc/flagself.wav');
-   else if (%seconds == 120)
+   else if(%seconds == 120)
       MessageAll('MsgMissionEndMinutes', '\c2Match ends in 2 minutes.~wfx/misc/flagself.wav');
 
    UpdateClientTimes(%time);

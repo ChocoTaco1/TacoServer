@@ -861,7 +861,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
          messageClient(%client, 'MsgClientJoin', "",
                %recipient.name,
                %recipient,
-               %recipient.target,
+               "",
                %recipient.isAIControlled(),
                %recipient.isAdmin,
                %recipient.isSuperAdmin,
@@ -879,15 +879,15 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
    if ( $CurrentMissionType !$= "SinglePlayer" )
    {
       // z0dd - ZOD, 5/08/04. Send message of any gameplay changes
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Sniper Mod: \c3%1.', ($Host::ClassicLoadSniperChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Missile Mod: \c3%1.', ($Host::ClassicLoadMissileChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Mortar Mod: \c3%1.', ($Host::ClassicLoadMortarChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Blaster Mod: \c3%1.', ($Host::ClassicLoadBlasterChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Plasma Turret Mod: \c3%1.', ($Host::ClassicLoadPlasmaTurretChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Player Mod: \c3%1.', ($Host::ClassicLoadPlayerChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Havoc Mod: \c3%1.', ($Host::ClassicLoadHavocChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2Mine Mod: \c3%1.', ($Host::ClassicLoadMineChanges ? 'Enabled' : 'Disabled') );
-//      messageClient( %client, 'MsgClassic', 'Classic \c2V-Ramming Mod: \c3%1.', ($Host::ClassicLoadVRamChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Sniper Mod: \c3%1.', ($Host::ClassicLoadSniperChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Missile Mod: \c3%1.', ($Host::ClassicLoadMissileChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Mortar Mod: \c3%1.', ($Host::ClassicLoadMortarChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Blaster Mod: \c3%1.', ($Host::ClassicLoadBlasterChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Plasma Turret Mod: \c3%1.', ($Host::ClassicLoadPlasmaTurretChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Player Mod: \c3%1.', ($Host::ClassicLoadPlayerChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Havoc Mod: \c3%1.', ($Host::ClassicLoadHavocChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2Mine Mod: \c3%1.', ($Host::ClassicLoadMineChanges ? 'Enabled' : 'Disabled') );
+      //messageClient( %client, 'MsgClassic', 'Classic \c2V-Ramming Mod: \c3%1.', ($Host::ClassicLoadVRamChanges ? 'Enabled' : 'Disabled') );
 
       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
       messageClient(%client, 'MsgClientJoin', 'Welcome to Tribes2 %1.',
@@ -899,12 +899,12 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
                     %client.isSuperAdmin,
                     %client.isSmurf,
                     %client.sendGuid );
-       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
 
+       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
       messageAllExcept(%client, -1, 'MsgClientJoin', '\c1%1 joined the game.',
                        %client.name,
                        %client,
-                       %client.target,
+                       "",
                        false,   // isBot
                        %client.isAdmin,
                        %client.isSuperAdmin,
@@ -1100,17 +1100,17 @@ function GameConnection::onDrop(%client, %reason)
    // reset the server if everyone has left the game
    if( $HostGamePlayerCount - $HostGameBotCount == 0 && $Host::EmptyServerReset && !$resettingServer && !$LoadingMission && $CurrentMissionType !$= $Host::MissionType )
    {
-	// Timed Server Reset: $Host::EmptyServerReset = 1; --- Time in Minutes $Host::EmptyServerResetTime = 120;
-	if(isEventPending($EmptyServerResetSchedule))
-	{
-		error(formatTimeString("HH:nn:ss") SPC "Previous Timed Server Reset schedule cancelled..." );
-		cancel($EmptyServerResetSchedule);
-	}
+      // Timed Server Reset: $Host::EmptyServerReset = 1; --- Time in Minutes $Host::EmptyServerResetTime = 120;
+      if(isEventPending($EmptyServerResetSchedule))
+      {
+         error(formatTimeString("HH:nn:ss") SPC "Previous Timed Server Reset schedule cancelled..." );
+         cancel($EmptyServerResetSchedule);
+      }
 
-	%resettime = $Host::EmptyServerResetTime * 60000;
-	if(%resettime <= 0) %resettime = 1;
-	$EmptyServerResetSchedule = schedule(%resettime, 0, "ResetServerTimed");
-	error(formatTimeString("HH:nn:ss") SPC "Timed Server Reset schedule started..." );
+      %resettime = $Host::EmptyServerResetTime * 60000;
+      if(%resettime <= 0) %resettime = 1;
+      $EmptyServerResetSchedule = schedule(%resettime, 0, "ResetServerTimed");
+      error(formatTimeString("HH:nn:ss") SPC "Timed Server Reset schedule started..." );
    }
 }
 
@@ -1764,8 +1764,13 @@ function serverCmdSAD(%client, %password)
             %client.isSuperAdmin = true;
             MessageAll( 'MsgSuperAdminPlayer', '\c2%2 has become a Super Admin by force.', %client, %name);
             %adminmsg = " has become a Super Admin by force.";
-	        adminLog(%client, %adminmsg);
-	        logEcho(%client.nameBase @ " has become a Super Admin by force.");
+	         adminLog(%client, %adminmsg);
+	         logEcho(%client.nameBase @ " has become a Super Admin by force.");
+
+            //Update everyones client and put an SA by your name
+            messageAll( 'MsgClientDrop', "", %client.name, %client);
+            messageAll('MsgClientJoin', "",%client.name, %client, "",%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+            messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
          }
 
       case $Host::AdminPassword:
@@ -1780,8 +1785,13 @@ function serverCmdSAD(%client, %password)
             %client.isSuperAdmin = false;
             MessageAll( 'MsgAdminForce', '\c2%2 has become a Admin by force.', %client, %name);
             %adminmsg = " has become an Admin by force.";
-	        adminLog(%client, %adminmsg);
-	        logEcho(%client.nameBase @ " has become an Admin by force.");
+	         adminLog(%client, %adminmsg);
+	         logEcho(%client.nameBase @ " has become an Admin by force.");
+
+            //Update everyones client and put an A by your name
+            messageAll( 'MsgClientDrop', "", %client.name, %client);
+            messageAll('MsgClientJoin', "",%client.name, %client, "",%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+            messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
          }
       default:
          messageClient(%client, 'MsgPasswordFailed', '\c2Illegal SAD PW.');
@@ -2564,15 +2574,21 @@ function serverCmdStripAdmin(%client, %admin)
       %admin.isSuperAdmin = 0;
       messageClient(%admin, 'MsgStripAdminPlayer', 'You have stripped yourself of admin privledges.');
       adminLog(%client, " stripped admin from " @ %admin.nameBase);
+      messageAll('MsgClientDrop', "", %client.name, %client);
+      messageAll('MsgClientJoin', "",%client.name, %client, "",%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+	   messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
       return;
    }
    else if(%client.isSuperAdmin)
    {
-      messageAll( 'MsgStripAdminPlayer', '\c2%1 removed %2\'s admin privledges.', %client.name, %admin.name, %admin );
+      messageAll('MsgStripAdminPlayer', '\c2%1 removed %2\'s admin privledges.', %client.name, %admin.name, %admin );
       messageClient(%admin, 'MsgStripAdminPlayer', 'You are being stripped of your admin privledges by %1.', %client.name);
       %admin.isAdmin = 0;
       %admin.isSuperAdmin = 0;
       adminLog(%client, " stripped admin from " @ %admin.nameBase);
+      messageAll( 'MsgClientDrop', "", %client.name, %client);
+      messageAll('MsgClientJoin', "",%client.name, %client, "",%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+	   messageAll('MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
    }
    else
       messageClient(%client, 'MsgError', '\c2Only Super Admins can use this command.');
@@ -2910,7 +2926,10 @@ function startTourneyCountdown()
    }
 
    // lets get it on!
-   Countdown( 30 * 1000 );
+   if($Host::warmupTime <= 30)
+      Countdown(30 * 1000);
+   else
+      Countdown($Host::warmupTime * 1000); //Follow warmupTime!
 }
 
 function checkTourneyMatchStart()
@@ -2984,7 +3003,11 @@ function checkTourneyMatchStart()
          Game.scheduleVote = "";
       }
 
-      Countdown(30 * 1000);
+      // lets get it on!
+      if($Host::warmupTime <= 30)
+         Countdown(30 * 1000);
+      else
+         Countdown($Host::warmupTime * 1000); //Follow warmupTime!
    }
 }
 
@@ -3066,6 +3089,12 @@ function EndCountdown(%timeMS)
    else
       return;
 
+   if(%timeMS >= 900000 && $Host::TournamentMode)
+      Game.endfifteenminuteCount = schedule(%timeMS - 900000, Game, "notifyMatchEndMinutes", 900000);
+   if(%timeMS >= 600000 && $Host::TournamentMode)
+      Game.endtenminuteCount = schedule(%timeMS - 600000, Game, "notifyMatchEndMinutes", 600000);
+   if(%timeMS >= 300000 && $Host::TournamentMode)
+      Game.endfiveminuteCount = schedule(%timeMS - 300000, Game, "notifyMatchEndMinutes", 300000);
    if(%timeMS >= 180000)
       Game.endthreeminuteCount = schedule(%timeMS - 180000, Game, "notifyMatchEndMinutes", 180000);
    if(%timeMS >= 120000)

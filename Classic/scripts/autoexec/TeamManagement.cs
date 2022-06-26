@@ -24,7 +24,7 @@ function CreateServer( %mission, %missionType )
 	//Call for a GetTeamCount update
 	GetTeamCounts(%game);
 
-	// Prevent package from being activated if it is already
+	//Prevent package from being activated if it is already
 	if (!isActivePackage(TeamCountsTriggers))
 		activatePackage(TeamCountsTriggers);
 }
@@ -55,12 +55,15 @@ function GetTeamCounts(%game)
 
 				if( !$Host::TournamentMode )
 				{
-					if( $CurrentMissionType $= "CTF" )
+					if($CurrentMissionType $= "CTF")
 					{
 						NBRStatusNotify(%game);
 						CheckAntiPack(%game);
 					}
-					TeamBalanceNotify(%game);
+					else if($CurrentMissionType $= "DM")
+						CheckAntiPack(%game);
+
+					TeamBalanceNotify(%game); //Has check for # teams
 				}
 
 				//Set so counter wont run when it doesnt need to.
@@ -172,6 +175,9 @@ function GameConnection::onDrop(%client, %reason)
 // Called in GetTeamCounts
 function TeamBalanceNotify(%game)
 {
+	if(!$Host::EnableTeamBalanceNotify && !$Host::EnableAutobalance)
+		return;
+
 	if( Game.numTeams > 1 && $TotalTeamPlayerCount !$= 0 )
 	{
 		//Uneven
@@ -224,6 +230,9 @@ function NotifyUnbalanced( %game )
 {
 	if(isEventPending($NotifySchedule))
 		cancel($NotifySchedule);
+
+	if(!$Host::EnableTeamBalanceNotify && !$Host::EnableAutobalance)
+		return;
 
 	if( $TBNStatus !$= "NOTIFY" ) //If Status has changed to EVEN or anything else (GameOver reset).
 		return;
@@ -356,6 +365,9 @@ function Autobalance( %game )
 {
 	if(isEventPending($AutoBalanceSchedule))
 		cancel($AutoBalanceSchedule);
+
+	if(!$Host::EnableAutobalance)
+		return;
 
 	if($TBNStatus !$= "NOTIFY") //If Status has changed to EVEN or anything else (GameOver reset).
 		return;

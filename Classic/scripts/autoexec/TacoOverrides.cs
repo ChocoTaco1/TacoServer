@@ -155,7 +155,7 @@ function stationTrigger::onEnterTrigger(%data, %obj, %colObj)
 function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC)
 {
     //Takes 11 blaster shots to kill a heavy, 13 normal.
-	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster)
+	if(%targetObject.client.armor $= "Heavy" && %damageType $= $DamageType::Blaster && !$Host::TournamentMode) //Free-for-all only
 		%amount *= 1.15;
 
 	Parent::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %mineSC);
@@ -296,6 +296,42 @@ function ConcussionGrenadeThrown::onThrow(%this, %gren)
 {
    AIGrenadeThrown(%gren);
    %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren); // Was 2000
+}
+
+//Attack LOS Sky Fix
+function serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap)
+{
+   %obj = getTargetObject(%client.getTargetId());
+   if(isObject(%obj))
+   {
+      if(%obj.getClassName() $= "Player" && !%client.player.ccActive)
+      {
+         %vec = %client.player.getMuzzleVector(0);
+         %vec2 = vectorNormalize(vectorSub(%obj.getWorldBoxCenter(), %client.player.getMuzzlePoint(%slot)));
+         %dot = vectorDot(%vec, %vec2);
+         if(%dot < 0.9)
+            return;
+      }
+   }
+
+   parent::serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap);
+}
+
+function serverCmdScopeCommanderMap(%client, %scope)
+{
+   parent::serverCmdScopeCommanderMap(%client, %scope);
+   %client.player.ccActive = %scope;
+}
+
+//Mortar Throw Reload Fix
+function ShapeBase::throwWeapon(%this)
+{
+   if((%this.getMountedImage($WeaponSlot).getName() $= "MortarImage" || %this.getMountedImage($WeaponSlot).getName() $= "MissileLauncherImage" || %this.getMountedImage($WeaponSlot).getName() $= "ShockLanceImage") &&
+   (%this.getImageState($WeaponSlot) $= "Reload" || %this.getImageState($WeaponSlot) $= "Fire")){
+      return;
+   }
+
+   parent::throwWeapon(%this);
 }
 
 };

@@ -2093,39 +2093,39 @@ function CTFGame::startFlagCollisionSearch(%game, %flag)
 // VOTING ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
 
-function CTFGame::sendGameVoteMenu(%game, %client, %key)
-{
-   DefaultGame::sendGameVoteMenu(%game, %client, %key);
-   if ( %game.scheduleVote $= "" )
-   {
-      //if(%client.isAdmin)
-         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
-      //else
-      //   messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
-   }
-}
+// function CTFGame::sendGameVoteMenu(%game, %client, %key)
+// {
+//    DefaultGame::sendGameVoteMenu(%game, %client, %key);
+//    if ( %game.scheduleVote $= "" )
+//    {
+//       if(%client.isAdmin)
+//          messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
+//       else
+//         messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
+//    }
+// }
 
-function CTFGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4)
-{
-   DefaultGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4);
-   switch$ (%typeName)
-   {
-      case "voteAntiTurtleTime":
-         %game.voteAntiTurtleTime(%admin, %arg1, %arg2, %arg3, %arg4);
-   }
-}
+// function CTFGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4)
+// {
+//    DefaultGame::evalVote(%game, %typeName, %admin, %arg1, %arg2, %arg3, %arg4);
+//    switch$ (%typeName)
+//    {
+//       case "voteAntiTurtleTime":
+//          %game.voteAntiTurtleTime(%admin, %arg1, %arg2, %arg3, %arg4);
+//    }
+// }
 
-function CTFGame::sendAntiTurtleTimeList( %game, %client, %key )
-{
-   messageClient( %client, 'MsgVoteItem', "", %key, 6, "", '6 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 8, "", '8 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 10, "", '10 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 12, "", '12 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 14, "", '14 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 16, "", '16 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 18, "", '18 minutes' );
-   messageClient( %client, 'MsgVoteItem', "", %key, 200, "", 'Disable Anti Turtle' );
-}
+// function CTFGame::sendAntiTurtleTimeList( %game, %client, %key )
+// {
+//    messageClient( %client, 'MsgVoteItem', "", %key, 6, "", '6 minutes' );
+//    messageClient( %client, 'MsgVoteItem', "", %key, 8, "", '8 minutes' );
+//    messageClient( %client, 'MsgVoteItem', "", %key, 10, "", '10 minutes' );
+//    messageClient( %client, 'MsgVoteItem', "", %key, 12, "", '12 minutes' );
+//    messageClient( %client, 'MsgVoteItem', "", %key, 14, "", '14 minutes' );
+//    messageClient( %client, 'MsgVoteItem', "", %key, 16, "", '16 minutes' );
+//    messageClient( %client, 'MsgVoteItem', "", %key, 18, "", '18 minutes' );
+//    messageClient( %client, 'MsgVoteItem', "", %key, 200, "", 'Disable Anti Turtle' );
+// }
 
 function CTFGame::voteAntiTurtleTime(%game, %admin, %newLimit)
 {

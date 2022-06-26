@@ -452,7 +452,7 @@ function SCtFGame::missionLoadDone(%game)
    %game.campThread_1 = schedule( 1000, 0, "checkVehicleCamping", 1 );
    %game.campThread_2 = schedule( 1000, 0, "checkVehicleCamping", 2 );
 
-   deleteNonSCtFObjectsFromMap();
+   deleteNonSCtFObjects();
 }
 
 function SCtFGame::clientMissionDropReady(%game, %client)
@@ -495,7 +495,7 @@ function SCtFGame::equip(%game, %player)
 	  {
 		%player.clearInventory();
 		%player.setInventory(Disc,1);
-		%player.setInventory(Blaster,1);
+		%player.setInventory(Shocklance,1);
 		%player.setInventory(GrenadeLauncher,1);
 		%player.setInventory(DiscAmmo, %player.getDataBlock().max[DiscAmmo]);
 		%player.setInventory(GrenadeLauncherAmmo, %player.getDataBlock().max[GrenadeLauncherAmmo]);
@@ -2214,33 +2214,26 @@ function SCtFGame::sendGameVoteMenu(%game, %client, %key)
    if(!%client.canVote && !%isAdmin)
       return;
 
-   if ( %game.scheduleVote $= "" )
+   if(%game.scheduleVote $= "")
    {
-     if(!%client.isAdmin)
-	 {
-        //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Vote to change the Armor class' );
-        //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
-		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
-	 }
-	 else if (%client.ForceVote > 0)
-	 {
-		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
-	 }
-	 else
-	 {
-		if(!$Host::SCtFProMode)
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode', 'Enable Pro Mode' );
-		else
-		messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode', 'Disable Pro Mode' );
-	 }
-         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Change the Armor class' );
-         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
+      if(!%isAdmin || (%isAdmin && %client.ForceVote))
+      {
+         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Vote to change the Armor class' );
+         //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Vote Anti-Turtle time' );
+         if(!$Host::SCtFProMode)
+            messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode (Disc, SL, GL Only)', 'Vote to enable Pro Mode (Disc, SL, GL Only)' );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode (Disc, SL, GL Only)', 'Vote to disable Pro Mode (Disc, SL, GL Only)' );
+      }
+      else
+      {
+         if(!$Host::SCtFProMode)
+            messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Enable Pro Mode (Disc, SL, GL Only)', 'Enable Pro Mode (Disc, SL, GL Only)' );
+         else
+            messageClient( %client, 'MsgVoteItem', "", %key, 'SCtFProMode', 'Disable Pro Mode (Disc, SL, GL Only)', 'Disable Pro Mode (Disc, SL, GL Only)' );
+      }
+      //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteArmorClass', 'change the armor class to', 'Change the Armor class' );
+      //messageClient( %client, 'MsgVoteItem', "", %key, 'VoteAntiTurtleTime', 'change the anti turtle time to', 'Change Anti-Turtle time' );
    }
 }
 
@@ -2457,97 +2450,27 @@ function SCtFGame::SCtFProMode(%game, %admin, %arg1, %arg2, %arg3, %arg4)
 //            playerStartNewVote(%client, %typename, %arg1, %arg2, %arg3, %arg4, %clientsVoting);
 //         }
 
-
-//--------------------------------DeleteObjects Code-------------------------------
 //AutoRemove assets, sensors, and turrets from non-LT maps
-//
-function getGroupObjectByName(%group, %name)
+function deleteNonSCtFObjects()
 {
-	%numObjects = %group.getCount();
+   %c = 0;
+   InitContainerRadiusSearch("0 0 0", 9999, $TypeMasks::ItemObjectType |
+   $TypeMasks::TurretObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::StaticShapeObjectType); //For FF: $TypeMasks::ForceFieldObjectType
+   while ((%obj = containerSearchNext()) != 0)
+   {
+      if(%obj.Datablock !$= "flag" && %obj.Datablock !$= "RepairKit" && %obj.Datablock !$= "RepairPatch") //Dont delete these...
+      {
+         %deleteList[%c] = %obj;
+         %c++;
+      }
 
-	for(%i = 0; %i < %numObjects; %i++)
-	{
-		if (%group.getObject(%i).getClassName() $= %name)
-			return %group.getObject(%i);
-	}
+   }
+   for(%i = 0; %i  < %c; %i++)
+   {
+       %deleteList[%i].delete();
+   }
+
+   //Delete all ForceField PhysicalZones (PZones)
+   // if(isObject(PZones))
+   //    PZones.schedule(1500,"delete");
 }
-
-function deleteObjectsFromMapByType(%type)
-{
-	%teamsGroup = getGroupObjectByName(MissionGroup, "Teams");
-	if (!isObject(%teamsGroup))
-	{
-		return;
-	}
-
-	%team1Group = getGroupObjectByName(%teamsGroup, "Team1");
-	if (!isObject(%team1Group))
-	{
-		return;
-	}
-
-	%team2Group = getGroupObjectByName(%teamsGroup, "Team2");
-	if (!isObject(%team2Group))
-	{
-		return;
-	}
-
-	%team1Base0Group = getGroupObjectByName(%team1Group, "Base0");
-	if (!isObject(%team1Base0Group))
-	{
-		return;
-	}
-
-	%team2Base0Group = getGroupObjectByName(%team2Group, "Base1");
-	if (!isObject(%team2Base0Group))
-	{
-		return;
-	}
-
-
-	deleteObjectsFromGroupByType(%team1Base0Group, %type);
-	deleteObjectsFromGroupByType(%team2Base0Group, %type);
-}
-
-function deleteObjectsFromGroupByType(%group, %type)
-{
-	%noObjectsLeft = 0;
-
-	while (%noObjectsLeft == 0)
-	{
-		%i = 0;
-		%noObjectsLeft = 1;
-		%loop = 1;
-     	%numObjects = %group.getCount();
-
-		while ((%loop == 1) && (%i < %numObjects))
-		{
-         %obj = %group.getObject(%i);
-
-         if (%obj.getClassName() $= "SimGroup")
-            deleteObjectsFromGroupByType(%obj, %type);
-
-         if (%obj.getClassName() $= %type)
-			{
-				%obj.delete();
-				%loop = 0;
-				%noObjectsLeft = 0;
-			}
-			else
-				%i++;
-		}
-	}
-}
-
-function deleteNonSCtFObjectsFromMap()
-{
-   deleteObjectsFromGroupByType(MissionGroup, "Turret");
-   deleteObjectsFromGroupByType(MissionGroup, "StaticShape");
-   deleteObjectsFromGroupByType(MissionGroup, "FlyingVehicle");
-   deleteObjectsFromGroupByType(MissionGroup, "WheeledVehicle");
-   deleteObjectsFromGroupByType(MissionGroup, "HoverVehicle");
-   deleteObjectsFromGroupByType(MissionGroup, "Waypoint");
-   //deleteObjectsFromGroupByType(MissionGroup, "ForceFieldBare");
-   //deleteObjectsFromGroupByType(MissionGroup, "Item");
-}
-

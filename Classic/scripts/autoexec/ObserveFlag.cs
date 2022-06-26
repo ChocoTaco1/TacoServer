@@ -53,7 +53,7 @@ function Observer::onTrigger(%data, %obj, %trigger, %state)
             }
             else
                return;
-	      
+
             // the flag isn't carried
             if(%otherFlag.carrier $= "")
                observeFlag(%client, %otherFlag, 1, %otherFlagTeam);
@@ -121,7 +121,15 @@ function Observer::setMode(%data, %obj, %mode, %targetObj)
       default:
          Parent::setMode(%data, %obj, %mode, %targetObj);
    }
-   %obj.mode = %mode;   
+   %obj.mode = %mode;
+}
+
+function serverCmdObserveClient(%client, %target)
+{
+   %client.observeFlyClient = "";
+   %client.observingFlag = false;
+
+   parent::serverCmdObserveClient(%client, %target);
 }
 
 };
@@ -134,14 +142,14 @@ function serverCmdObserveFirstFlag(%client)
 {
   if(Game.class !$= CTFGame && Game.class !$= SCtFGame)
     return;
-  
+
   // client must be an observer
   if(%client.team > 0 || !$Observers) //$Observers added; Serverside var; Needs to have value to work correctly
     return;
-  
+
   // check if the flag is carried by someone
   %player = $TeamFlag[1].carrier;
-  
+
   if($TeamFlag[1].isHome || %player $= "")
     observeFlag(%client, $TeamFlag[1], 1, 1);
   else
@@ -152,14 +160,14 @@ function serverCmdObserveSecondFlag(%client)
 {
   if(Game.class !$= CTFGame && Game.class !$= SCtFGame)
     return;
-  
+
   // client must be an observer
   if(%client.team > 0 || !$Observers) //$Observers added; Serverside var; Needs to have value to work correctly
     return;
-  
+
   // check if the flag is carried by someone
   %player = $TeamFlag[2].carrier;
-  
+
   if($TeamFlag[2].isHome || %player $= "")
     observeFlag(%client, $TeamFlag[2], 1, 2);
   else
@@ -173,27 +181,27 @@ function observeFlag(%client, %target, %type, %flagTeam)
 {
    if(!isObject(%client) || !isObject(%target) || !isObject(%client.camera))
      return;
-  
+
    if(Game.class !$= CTFGame && Game.class !$= SCtFGame)
      return;
-  
+
    if(%client.team > 0)
      return;
-  
+
    // cancel any scheduled update
    if(isEventPending(%client.obsHudSchedule))
      cancel(%client.obsHudSchedule);
-  
+
    // must be an observer when observing other clients
    if(%client.getControlObject() != %client.camera)
      return;
-  
+
    //can't observer yourself
    if(%client == %target)
      return;
-  
+
    %count = ClientGroup.getCount();
-  
+
    //can't go into observer mode if you're the only client
    if(%count <= 1 && %type != 1)
      return;
@@ -202,18 +210,18 @@ function observeFlag(%client, %target, %type, %flagTeam)
    {
       if(isObject(%client.player))
 	   %client.player.scriptKill(0); // the player is still playing (this shouldn't be happen)
-      
+
       %client.camera.getDataBlock().setMode(%client.camera, "followFlag", $TeamFlag[%flagTeam]);
       %client.setControlObject(%client.camera);
       clearBottomPrint(%client);
-      
+
       // was the client observing a player before?
       if(%client.observeClient != -1)
-	{
-	  observerFollowUpdate(%client, -1, false);
-	  messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
-	  %client.observeClient = -1;
-	}
+      {
+      observerFollowUpdate(%client, -1, false);
+      messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+      %client.observeClient = -1;
+      }
    }
    else // Player
    {
@@ -232,22 +240,23 @@ function observeFlag(%client, %target, %type, %flagTeam)
 	  if(!%found)
 	    return;
 	}
-      
+
       if(isObject(%client.player))
 	   %client.player.scriptKill(0); // the player is still playing (this shouldn't be happen)
-      
+
       observerFollowUpdate(%client, %target, true);
       displayObserverHud(%client, %target);
       messageClient(%target, 'Observer', '\c1%1 is now observing you.', %client.name);
 
       // was the client observing a player before?
       if(%client.observeClient != -1)
-	messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+	      messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+
       %client.camera.getDataBlock().setMode(%client.camera, "observerFollow", %target.player);
       %client.setControlObject(%client.camera);
       %client.observeClient = %target;
    }
-  
+
    //clear the observer fly mode var...
    %client.observeFlyClient = -1;
    %client.observingFlag = true;

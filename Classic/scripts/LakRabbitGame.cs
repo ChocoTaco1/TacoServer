@@ -40,7 +40,6 @@
 //
 // v3.34 Febuary 2019
 // Armor::damageObject rework
-// Added SetNextMission support
 // Indoor Spawning support
 //
 // v3.33 January 2019
@@ -732,6 +731,7 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 		}
 		else if(%points >= 100)
 		{
+			blastFireworks();
 			messageAll('', '~wfx/Misc/Flair.wav');
 		}
 
@@ -1051,6 +1051,58 @@ function missileEveryone(%attacker)
 	if(Game.duelMode && %attacker.holdingFlag)
 		%attacker.client.duelSeconds += 15;
 }
+
+function blastFireworks(%deezFireworks)
+{
+	if(!ClientGroup.getCount())
+		return;
+
+	// find a random client.
+	%client = ClientGroup.getObject(getRandom(ClientGroup.getCount() - 1));
+
+	if(isObject(%client.player) && isObject(Game))
+	{
+		%distance = Sky.visibleDistance;
+		if(!%distance || %distance > 250)
+			%distance = 250;
+
+		%position = %client.player.position;
+		// Vary by half of the visible distance.
+		%neg = getRandom(0, 1) - 1;
+		%x = getWord(%position, 0) + ((%distance - getRandom(%distance / 2)) * %neg);
+		%neg = getRandom(0, 1) - 1; // Randomize it again.
+		%y = getWord(%position, 1) + ((%distance - getRandom(%distance / 2)) * %neg);
+		%z = getWord(%position, 2) + (%distance - getRandom(%distance / 2));
+
+		%random = getRandom(1, $fireworkDatablockCount);
+		deezFireworksExplode(%x SPC %y SPC %z, %random);
+	}
+
+	if(%deezFireworks <= 10)
+	{
+		%deezFireworks = %deezFireworks + 1;
+		$deezFireworksSchedule = schedule(getRandom(700), 0, "blastFireworks", %deezFireworks);
+	}
+}
+
+function deezFireworksExplode(%position, %id)
+{
+	%emitter = new ParticleEmissionDummy()
+	{
+		position = %position;
+		rotation = "1 0 0 0";
+		scale = "1 1 1";
+		datablock = "defaultEmissionDummy";
+		emitter = "FireworksEmitter" @ %id;
+		velocity = "1";
+	};
+
+	//echo(%emitter.position);
+	//serverPlay3d(dtFireworksSound, %emitter.position);
+	MissionCleanup.add(%emitter);
+	%emitter.schedule(1250, "delete");
+}
+
 function killEveryone(%ignore, %message)
 {
 	if(!%message)
@@ -1119,42 +1171,20 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 
 	if( %game.scheduleVote $= "" )
 	{
-		if(!%isAdmin)
+		if(!%isAdmin || (%isAdmin && %client.ForceVote))
 		{
 			if(!Game.duelMode)
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to enable Duel Mode' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Vote to disable Duel Mode' );
-
 			if(!Game.noSplashDamage)
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Vote to disable Splash Damage' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Vote to enable Splash Damage' );
-			// DeVast - PubPro votes
-			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
+			if(!Game.PubPro) // DeVast - PubPro votes
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode (Disc, Blaster, Plasma Only)', 'Vote to enable Pro Mode (Disc, Blaster, Plasma Only)' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
-		}
-		//Added so lak vote items are properly displayed in evo adminvotemenu
-		//A lot of changes were added to admin.ovl in evo
-		//see footnotes below
-		else if (%client.ForceVote > 0)
-		{
-			if(!Game.duelMode)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Vote to enable Duel Mode' );
-			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Vote to disable Duel Mode' );
-
-			if(!Game.noSplashDamage)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Vote to disable Splash Damage' );
-			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Vote to enable Splash Damage' );
-			// DeVast - PubPro votes
-			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Vote to enable Pro Mode' );
-			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Vote to disable Pro Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode (Disc, Blaster, Plasma Only)', 'Vote to disable Pro Mode (Disc, Blaster, Plasma Only)' );
 		}
 		else
 		{
@@ -1162,16 +1192,14 @@ function LakRabbitGame::sendGameVoteMenu( %game, %client, %key )
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Enable Duel Mode', 'Enable Duel Mode' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteDuelMode', 'Disable Duel Mode', 'Disable Duel Mode' );
-
 			if(!Game.noSplashDamage)
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Disable Splash Damage', 'Disable Splash Damage' );
 			else
 				messageClient( %client, 'MsgVoteItem', "", %key, 'VoteSplashDamage', 'Enable Splash Damage', 'Enable Splash Damage' );
-			// DeVast - PubPro votes
-			if(!Game.PubPro)
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode', 'Enable Pro Mode' );
+			if(!Game.PubPro) // DeVast - PubPro votes
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Enable Pro Mode (Disc, Blaster, Plasma Only)', 'Enable Pro Mode (Disc, Blaster, Plasma Only)' );
 			else
-				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode', 'Disable Pro Mode' );
+				messageClient( %client, 'MsgVoteItem', "", %key, 'VotePro', 'Disable Pro Mode (Disc, Blaster, Plasma Only)', 'Disable Pro Mode (Disc, Blaster, Plasma Only)' );
 		}
 	}
 }
@@ -2018,11 +2046,7 @@ function LakRabbitGame::gameOver(%game)
    //call the default
    DefaultGame::gameOver(%game);
 
-   //send the message
-   messageAll('MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
-
    cancel(%game.rabbitWaypointThread);
-   messageAll('MsgClearObjHud', "");
    for(%i = 0; %i < ClientGroup.getCount(); %i++)
    {
       %client = ClientGroup.getObject(%i);
@@ -2039,6 +2063,18 @@ function LakRabbitGame::gameOver(%game)
 
 	  %client.team = 0;
 	  %client.lastTeam = 0;
+
+	  if(!%client.isAIControlled())
+	  {
+		//This is not a great way to do this...but...everything will be correct in all clients menus if its a change to ctf...
+		messageAll('MsgClientDrop', "", %client.name, %client);
+		messageAll('MsgClientJoin', "",%client.name, %client, %client.target,%client.isAIControlled(),%client.isAdmin,%client.isSuperAdmin,%client.isSmurf,%client.sendGuid);
+		messageClient(%client, 'MsgClientJoinTeam', "", %client.name, %game.getTeamName(0), %client, %client.team );
+	  }
+
+   	  //send the message
+   	  messageClient(%client, 'MsgGameOver', "Match has ended.~wvoice/announcer/ann.gameover.wav" );
+      messageClient(%client, 'MsgClearObjHud', "");
    }
 
    // ilys -- cancel waypoint if not showing flag icon

@@ -60,9 +60,9 @@ $dtLoadingScreen::Delay = 0;
 $dtLoadingScreen::ShowFullScreen = 0;
 // Enable/Disable Images
 $dtLoadingScreen::ShowImages = 0;
-// Enable/Disable Server Logo 
-$dtLoadingScreen::ShowLogo = $Host::LoadScreenShowLogo; //$dtLoadingScreen::ShowLogo = 0;
-$dtLoadingScreen::LogoName = $Host::LoadScreenShowLogoName; //$dtLoadingScreen::LogoName = "dpub/DPUB_logo";
+// Enable/Disable Server Logo
+//$Host::LoadScreenShowLogo = 0;
+//$Host::LoadScreenShowLogoName = "dpub/DPUB_logo";
 
 
 // Color safetynet
@@ -234,11 +234,11 @@ function ALTsendModInfoToClient(%client)
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 		$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 	}
-	else if($dtLoadingScreen::ShowLogo)
+	else if($Host::LoadScreenShowLogo)
 	{
 		if(%client.dmpVersion $=$DMP::Version)
 		{
-			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<bitmap:" @ $dtLoadingScreen::LogoName @ ">";
+			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<bitmap:" @ $Host::LoadScreenShowLogoName @ ">";
 
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";
 			$dtLoadingScreen::LoadScreenMessage[$dmlP++] = " ";

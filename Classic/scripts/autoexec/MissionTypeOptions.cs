@@ -73,9 +73,6 @@ function loadMissionStage2()
 	//Map Change Center Print. Used to advertise upcoming events
 	if($Host::MapChangeMSG)
 		centerPrintAll($Host::MapChangeMSGContent, 12, 3);
-
-	//Set random seed
-	setRandomSeed(getrandom(1,200000));
 }
 
 };

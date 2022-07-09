@@ -198,10 +198,13 @@ function DefaultGame::sendGameVoteMenu(%game, %client, %key)
       //PUG Password
       if(%client.isAdmin && $Host::TournamentMode)
       {
-         if($Host::Password !$= "")
-            messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
-         else
-            messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');
+         if(!$Host::PUGpasswordAlwaysOn) //Password is already set
+         {
+            if($Host::Password !$= "")
+               messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Disable PUG Password', 'Disable PUG Password');
+            else
+               messageClient(%client, 'MsgVoteItem', "", %key, 'TogglePUGpassword', 'Enable PUG Password', 'Enable PUG Password');
+         }
       }
       //Locked Teams
       if(%client.isAdmin && $Host::TournamentMode)

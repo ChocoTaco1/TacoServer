@@ -15,30 +15,30 @@ $AntiPackIncludeShield = 0;
 
 
 // Called in GetCounts.cs
-function CheckAntiPack( %game )
+function CheckAntiPack(%game)
 {
 	//CTF only
-	if( $Host::AntiPackEnable )
+	if($Host::AntiPackEnable && $CurrentMissionType $= "DM" || $CurrentMissionType $= "CTF")
 	{
 		//echo("TotalTeamPlayerCount " @ $TotalTeamPlayerCount);
-		//echo("AntiPackPlayerCount " @ $AntiPackPlayerCount);
-	
-		if( $TotalTeamPlayerCount < $Host::AntiPackPlayerCount )
+		//echo("AntiPackPlayerCount " @ $Host::AntiPackPlayerCount);
+
+		if($TotalTeamPlayerCount < $Host::AntiPackPlayerCount)
 		{
-			if( $AntiPackStatus !$= "ACTIVEON" )
-			$AntiPackStatus = "ON";
+			if($AntiPackStatus !$= "ACTIVEON")
+				$AntiPackStatus = "ON";
 		}
 		//Off
 		else
 		{
-			if( $AntiPackStatus !$= "ACTIVEOFF" )
+			if($AntiPackStatus !$= "ACTIVEOFF")
 				$AntiPackStatus = "OFF";
 		}
 	}
 	//All other cases outside of CTF
 	else
 	{
-		if( $AntiPackStatus !$= "ACTIVEOFF" )
+		if($AntiPackStatus !$= "ACTIVEOFF")
 			$AntiPackStatus = "OFF";
 	}
 
@@ -66,9 +66,9 @@ function CheckAntiPack( %game )
 			if(isActivePackage(AntiPackShield))
 				deactivatePackage(AntiPackShield);
 			$AntiPackStatus = "ACTIVEOFF";
-		case ACTIVEON:				
+		case ACTIVEON:
 			//Do Nothing
-		case ACTIVEOFF:				
+		case ACTIVEOFF:
 			//Do Nothing
 	}
 }
@@ -80,12 +80,12 @@ package AntiPackCloak
 function CloakingPackImage::onActivate(%data, %obj, %slot)
 {
    if(%obj.reCloak !$= "")
-   {   
+   {
       Cancel(%obj.reCloak);
       %obj.reCloak = "";
    }
-   
-   if(%obj.client.armor $= "Light") 
+
+   if(%obj.client.armor $= "Light")
    {
       // can the player currently cloak (function returns "true" or reason for failure)?
       if(%obj.canCloak() $= "true")
@@ -94,7 +94,7 @@ function CloakingPackImage::onActivate(%data, %obj, %slot)
 			{
 			// cancel recloak thread
 			if(%obj.reCloak !$= "")
-			{   
+			{
 				Cancel(%obj.reCloak);
 				%obj.reCloak = "";
 			}
@@ -111,7 +111,7 @@ function CloakingPackImage::onActivate(%data, %obj, %slot)
          %obj.setImageTrigger(%slot, false);
       }
    }
-   else 
+   else
    {
       // hopefully avoid some loopholes
       messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloaking available for light armors only.');
@@ -146,7 +146,7 @@ function DefaultGame::gameOver(%game)
 {
 	Parent::gameOver(%game);
 
-	if( $Host::AntiPackEnable )
+	if($Host::AntiPackEnable)
 	{
 		if($InvBanList[CTF, "CloakingPack"])
 			$InvBanList[CTF, "CloakingPack"] = 0;

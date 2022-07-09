@@ -37,7 +37,7 @@ function loadMissionStage2()
 	if($CurrentMissionType $= "Lakrabbit")
 	{
 		//Set server mode to DISTANCE
-		$Host::HiVisibility = 1; //Lakrabbit or Other
+		$Host::HiVisibility = 1; //Lakrabbit
 	}
 	else //Set server mode to SPEED for CTF/SCTF/Anything Else
 		$Host::HiVisibility = 0;

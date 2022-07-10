@@ -2514,6 +2514,11 @@ package dtStatsGame{
       }
       parent::playerTouchOwnFlag(%game, %player, %flag);
    }
+   function CTFGame::awardScoreStalemateReturn(%game, %cl){
+      if($dtStats::Enable)
+         %cl.flagReturns++;
+      parent::awardScoreStalemateReturn(%game, %cl);
+   }
 /////////////////////////////////////////////////////////////////////////////
    function SCtFGame::playerDroppedFlag(%game, %player){
       if($dtStats::Enable){
@@ -2630,6 +2635,11 @@ package dtStatsGame{
          }
       }
       parent::playerTouchOwnFlag(%game, %player, %flag);
+   }
+   function SCtFGame::awardScoreStalemateReturn(%game, %cl){
+      if($dtStats::Enable)
+         %cl.flagReturns++;
+      parent::awardScoreStalemateReturn(%game, %cl);
    }
 };
 

@@ -1433,7 +1433,7 @@ function SCtFGame::awardScoreFlagTouch(%game, %cl, %flag)
    //tinman - needed to remove all game calls to "eval" for the PURE server...
    %game.schedule(%game.TOUCH_DELAY_MS, resetDontScoreTimer, %team);
    //schedule(%game.TOUCH_DELAY_MS, 0, eval, "$dontScoreTimer["@%team@"] = false;");
-   schedule(%game.TOUCH_DELAY_MS, 0, eval, "$dontScoreTimer["@%team@"] = false;");
+   //schedule(%game.TOUCH_DELAY_MS, 0, eval, "$dontScoreTimer["@%team@"] = false;");
    $TeamScore[%team] += %game.SCORE_PER_TEAM_FLAG_TOUCH;
    messageAll('MsgTeamScoreIs', "", %team, $TeamScore[%team]);
 

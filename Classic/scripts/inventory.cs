@@ -483,18 +483,31 @@ function ShapeBase::throwObject(%this,%obj)
       %this.flagTossWait = true;
       %this.schedule(1000, resetFlagTossWait);
       // ------------------------------------------------------------
+      // From AntiLou
+      // Delay on calculating stats
+      %this.flagStatsWait = true;
+   	%this.schedule(5000, resetFlagStatsWait);
+      // ------------------------------------------------------------
    }
 
-   //
+   // Do stuff
+   %obj.setCollisionTimeout(%this);
    %obj.setTransform(%pos);
    %obj.applyImpulse(%pos,%vec);
-   %obj.setCollisionTimeout(%this);
    %data = %obj.getDatablock();
 
    %data.onThrow(%obj,%this);
 
    //call the AI hook
    AIThrowObject(%obj);
+}
+
+// From AntiLou
+// Player::resetFlagStatsWait(%this)
+// Info: Delay on calculating the stats
+function Player::resetFlagStatsWait(%this)
+{
+   %this.flagStatsWait = false;
 }
 
 function ShapeBase::clearInventory(%this)

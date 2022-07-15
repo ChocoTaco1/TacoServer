@@ -1915,6 +1915,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
          setTargetAlwaysVisMask(%target, 0x7);
       }
       %flag.isHome = false;
+	  %flag.setVelocity("0 0 0");
       $flagStatus = %client.name;
 
 	  // borlak -- points for MA flag grabs

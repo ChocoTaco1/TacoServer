@@ -495,6 +495,7 @@ function CTFGame::playerTouchEnemyFlag(%game, %player, %flag)
    %flag.hide(true);
    %flag.startFade(0, 0, false);
    %flag.isHome = false;
+   %flag.setVelocity("0 0 0");
    if(%flag.stand)
       %flag.stand.getDataBlock().onFlagTaken(%flag.stand);//animate, if exterior stand
 

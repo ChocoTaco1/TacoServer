@@ -445,7 +445,7 @@ function ShapeBase::throwObject(%this,%obj)
    {
       %obj.static = false;
       // z0dd - ZOD - SquirrelOfDeath, 10/02/02. Hack for flag collision bug.
-      if(Game.Class $= CTFGame || Game.Class $= PracticeCTFGame)
+      if(Game.Class $= CTFGame || Game.Class $= PracticeCTFGame || Game.Class $= SCtFGame)
          %obj.searchSchedule = Game.schedule(10, "startFlagCollisionSearch", %obj);
    }
    //------------------------------------------------------------------

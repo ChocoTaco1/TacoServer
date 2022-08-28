@@ -55,3 +55,6 @@ function serverCmd(%client)
 
 //Show Linux Icon in server list
 //memPatch("5C9628","80CB05");
+
+//Bahke MPB stability fix
+memPatch("614120","9090");

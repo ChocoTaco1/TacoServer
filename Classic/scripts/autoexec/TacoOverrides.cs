@@ -339,3 +339,14 @@ function ShapeBase::throwWeapon(%this)
 // Prevent package from being activated if it is already
 if (!isActivePackage(TacoOverrides))
     activatePackage(TacoOverrides);
+
+//Flag explosion fix
+// function Item::applyImpulse(%this, %position, %impulseVec)
+// {
+//    %data = %this.getDatablock();
+//    %x = getWord(%impulseVec, 0) / %data.mass;
+//    %y = getWord(%impulseVec, 1) / %data.mass;
+//    %z = getWord(%impulseVec, 2) / %data.mass;
+//    %vel = %x SPC %y SPC %z;
+//    %this.setVelocity(vectorAdd(%this.getVelocity(), %vel));
+// }

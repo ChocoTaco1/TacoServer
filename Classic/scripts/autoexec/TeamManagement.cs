@@ -18,9 +18,9 @@ $GetCountsStatus = "UPDATE";
 package StartTeamCounts
 {
 
-function CreateServer( %mission, %missionType )
+function CreateServer(%mission, %missionType)
 {
-	parent::CreateServer( %mission, %missionType );
+	parent::CreateServer(%mission, %missionType);
 	//Call for a GetTeamCount update
 	GetTeamCounts(%game);
 
@@ -37,40 +37,36 @@ if (!isActivePackage(StartTeamCounts))
 
 function GetTeamCounts(%game)
 {
-	switch$($GetCountsStatus)
+	if($GetCountsStatus)
 	{
-		case UPDATE:
-			if($countdownStarted && $MatchStarted )
+		if($countdownStarted && $MatchStarted)
+		{
+			//Variables
+			$TotalTeamPlayerCount = $TeamRank[1, count] + $TeamRank[2, count];
+			$AllPlayerCount = $HostGamePlayerCount;
+
+			//Observers
+			$Observers = $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]);
+
+			//echo("$PlayerCount[0] " @  $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]));
+			//echo("$PlayerCount[1] " @  $TeamRank[1, count]);
+			//echo("$PlayerCount[2] " @  $TeamRank[2, count]);
+
+			if(!$Host::TournamentMode)
 			{
-				//Variables
-				$TotalTeamPlayerCount = $TeamRank[1, count] + $TeamRank[2, count];
-				$AllPlayerCount = $HostGamePlayerCount;
+				if($CurrentMissionType $= "CTF") //No SCtF
+					NBRStatusNotify(%game); //Base Rape
 
-				//Observers
-				$Observers = $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]);
+				if($CurrentMissionType $= "CTF" || $CurrentMissionType $= "DM")
+					CheckAntiPack(%game); //Limit certain packs with low numbers
 
-				//echo("$PlayerCount[0] " @  $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]));
-				//echo("$PlayerCount[1] " @  $TeamRank[1, count]);
-				//echo("$PlayerCount[2] " @  $TeamRank[2, count]);
-
-				if( !$Host::TournamentMode )
-				{
-					if($CurrentMissionType $= "CTF")
-					{
-						NBRStatusNotify(%game);
-						CheckAntiPack(%game);
-					}
-					else if($CurrentMissionType $= "DM")
-						CheckAntiPack(%game);
-
-					TeamBalanceNotify(%game); //Has check for # teams
-				}
-
-				//Set so counter wont run when it doesnt need to.
-				$GetCountsStatus = "IDLE";
+				if(Game.numTeams > 1)
+					TeamBalanceNotify(%game); //Team Balance
 			}
-		case IDLE:
-			//Do Nothing
+
+			//Set so counter wont run when it doesnt need to.
+			$GetCountsStatus = 0;
+		}
 	}
 
 	if(isEventPending($GetCountsSchedule))
@@ -80,12 +76,6 @@ function GetTeamCounts(%game)
 	$GetCountsSchedule = schedule(5000, 0, "GetTeamCounts");
 }
 
-
-// Triggers a Full run
-function ResetGetCountsStatus()
-{
-   $GetCountsStatus = "UPDATE";
-}
 
 // Proper Overrides
 // Events that determine a TeamGetCounts update
@@ -97,7 +87,7 @@ function DefaultGame::clientJoinTeam( %game, %client, %team, %respawn )
 	Parent::clientJoinTeam( %game, %client, %team, %respawn );
 
 	//Trigger GetCounts
-	ResetGetCountsStatus();
+	$GetCountsStatus = 1;
 }
 
 function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawned)
@@ -105,7 +95,7 @@ function DefaultGame::clientChangeTeam(%game, %client, %team, %fromObs, %respawn
    Parent::clientChangeTeam(%game, %client, %team, %fromObs, %respawned);
 
    //Trigger GetCounts
-   ResetGetCountsStatus();
+   $GetCountsStatus = 1;
 }
 
 function DefaultGame::assignClientTeam(%game, %client, %respawn )
@@ -113,7 +103,7 @@ function DefaultGame::assignClientTeam(%game, %client, %respawn )
 	Parent::assignClientTeam(%game, %client, %respawn );
 
 	//Trigger GetCounts
-	ResetGetCountsStatus();
+	$GetCountsStatus = 1;
 }
 
 function DefaultGame::onClientEnterObserverMode( %game, %client )
@@ -121,7 +111,7 @@ function DefaultGame::onClientEnterObserverMode( %game, %client )
 	Parent::onClientEnterObserverMode( %game, %client );
 
 	//Trigger GetCounts
-	ResetGetCountsStatus();
+	$GetCountsStatus = 1;
 }
 
 function DefaultGame::AIChangeTeam(%game, %client, %newTeam)
@@ -129,7 +119,7 @@ function DefaultGame::AIChangeTeam(%game, %client, %newTeam)
 	Parent::AIChangeTeam(%game, %client, %newTeam);
 
 	//Trigger GetCounts
-	ResetGetCountsStatus();
+	$GetCountsStatus = 1;
 }
 
 function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
@@ -137,7 +127,7 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 	Parent::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch);
 
 	//Reset GetCounts
-	ResetGetCountsStatus();
+	$GetCountsStatus = 1;
 }
 
 function DefaultGame::gameOver(%game)
@@ -145,7 +135,7 @@ function DefaultGame::gameOver(%game)
 	Parent::gameOver(%game);
 
 	//Reset GetCounts
-	ResetGetCountsStatus();
+	$GetCountsStatus = 1;
 }
 
 function GameConnection::onDrop(%client, %reason)
@@ -153,10 +143,17 @@ function GameConnection::onDrop(%client, %reason)
 	Parent::onDrop(%client, %reason);
 
 	//Reset GetCounts
-	ResetGetCountsStatus();
+	$GetCountsStatus = 1;
 }
 
 };
+
+//Reset GetCounts thru function
+function ResetGetCountsStatus()
+{
+	//Reset GetCounts
+	$GetCountsStatus = 1;
+}
 
 
 // Team Balance Notify Script
@@ -178,10 +175,9 @@ function TeamBalanceNotify(%game)
 	if(!$Host::EnableTeamBalanceNotify && !$Host::EnableAutobalance)
 		return;
 
-	if( Game.numTeams > 1 && $TotalTeamPlayerCount !$= 0 )
+	if($TotalTeamPlayerCount !$= 0)
 	{
-		//Uneven
-		if($TeamRank[1, count] !$= $TeamRank[2, count])
+		if($TeamRank[1, count] !$= $TeamRank[2, count])	//Uneven
 		{
 			%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
 			%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
@@ -198,8 +194,7 @@ function TeamBalanceNotify(%game)
 				//Man down. 6vs7, 4vs3 etc
 				$TBNStatus = "UNEVEN";
 		}
-		//Teams are even
-		else if($TeamRank[1, count] == $TeamRank[2, count] && $TBNStatus !$= "PLAYEDEVEN" )
+		else if($TeamRank[1, count] == $TeamRank[2, count] && $TBNStatus !$= "PLAYEDEVEN") //Teams are even
 			$TBNStatus = "EVEN";
 
 		switch$($TBNStatus)
@@ -226,7 +221,7 @@ function TeamBalanceNotify(%game)
 
 //Check to see if teams are still unbalanced
 //Fire AutoBalance in 30 sec if enabled
-function NotifyUnbalanced( %game )
+function NotifyUnbalanced(%game)
 {
 	if(isEventPending($NotifySchedule))
 		cancel($NotifySchedule);
@@ -234,23 +229,23 @@ function NotifyUnbalanced( %game )
 	if(!$Host::EnableTeamBalanceNotify && !$Host::EnableAutobalance)
 		return;
 
-	if( $TBNStatus !$= "NOTIFY" ) //If Status has changed to EVEN or anything else (GameOver reset).
+	if($TBNStatus !$= "NOTIFY") //If Status has changed to EVEN or anything else (GameOver reset).
 		return;
 
 	//Difference Variables
 	%team1difference = $TeamRank[1, count] - $TeamRank[2, count];
 	%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
 
-	if( %team1difference >= 2 || %team2difference >= 2 )
+	if(%team1difference >= 2 || %team2difference >= 2)
 	{
 		//Autobalance Warning
-		if( $Host::EnableAutobalance )
+		if($Host::EnableAutobalance)
 		{
 			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0Autobalance Initializing.~wgui/vote_nopass.wav');
 			$AutoBalanceSchedule = schedule(30000, 0, "Autobalance", %game );
 		}
 		//If Autobalance is disabled, message only.
-		else if( $Host::EnableTeamBalanceNotify )
+		else if($Host::EnableTeamBalanceNotify)
 		{
 			%observers = $HostGamePlayerCount - ($TeamRank[1, count] + $TeamRank[2, count]);
 			messageAll('MsgTeamBalanceNotify', '\c1Teams are unbalanced: \c0%1 vs %2 with %3 observers.~wgui/vote_nopass.wav', $TeamRank[1, count], $TeamRank[2, count], %observers );
@@ -296,20 +291,20 @@ if (!isActivePackage(ResetTBNGameOver))
 //
 
 // Called in GetTeamCounts.cs
-function NBRStatusNotify( %game )
+function NBRStatusNotify(%game)
 {
-	if( $Host::EnableNoBaseRapeNotify && $Host::NoBaseRapeEnabled )
+	if($Host::EnableNoBaseRapeNotify && $Host::NoBaseRapeEnabled)
 	{
 		//On
-		if( $Host::NoBaseRapePlayerCount > $TotalTeamPlayerCount )
+		if($Host::NoBaseRapePlayerCount > $TotalTeamPlayerCount)
 		{
-			if( $NBRStatus !$= "PLAYEDON" )
+			if($NBRStatus !$= "PLAYEDON")
 				$NBRStatus = "ON";
 		}
 		//Off
 		else
 		{
-			if( $NBRStatus !$= "PLAYEDOFF" )
+			if($NBRStatus !$= "PLAYEDOFF")
 				$NBRStatus = "OFF";
 		}
 
@@ -361,7 +356,7 @@ if (!isActivePackage(ResetNBRNotify))
 //
 
 // Run from TeamBalanceNotify via NotifyUnbalanced
-function Autobalance( %game )
+function Autobalance(%game)
 {
 	if(isEventPending($AutoBalanceSchedule))
 		cancel($AutoBalanceSchedule);
@@ -377,9 +372,9 @@ function Autobalance( %game )
 	%team2difference = $TeamRank[2, count] - $TeamRank[1, count];
 
 	//Determine BigTeam
-	if( %team1difference >= 2 )
+	if(%team1difference >= 2)
 		$BigTeam = 1;
-	else if( %team2difference >= 2 )
+	else if(%team2difference >= 2)
 		$BigTeam = 2;
 	else
 		return;

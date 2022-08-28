@@ -16,51 +16,53 @@
 // Message Content
 // $Host::MapChangeMSGContent = "<color:3cb4b4><font:Sui Generis:22>Pickup Night\n<color:3cb4b4><font:Univers:18>Saturday, March 5th\n<color:3cb4b4><font:Univers:16>Join discord for details";
 
+//exec("scripts/autoexec/missiontypeoptions.cs");
 package MissionTypeOptions
 {
 
 function loadMissionStage2()
 {
-	switch$($Host::PUGpasswordAlwaysOn)
+	//Disable Tournament Mode for Lak
+	if($CurrentMissionType $= "Lakrabbit" || $CurrentMissionType $= "DM" || $CurrentMissionType $= "PracticeCTF")
 	{
-		case 0:
-			if($CurrentMissionType !$= "LakRabbit")
-			{
-				if($Host::TournamentMode && $Host::PUGautoPassword)
-					$Host::Password = $Host::PUGPassword;
-
-				//Set server mode to SPEED
-				$Host::HiVisibility = 0;
-			}
-			else if($CurrentMissionType $= "LakRabbit")
-			{
-				if($Host::TournamentMode)
-					$Host::TournamentMode = 0;
-
-				//Set server mode to DISTANCE
-				$Host::HiVisibility = 1;
-			}
-		case 1:
-			$Host::Password = $Host::PUGPassword;
-			$Host::HiVisibility = 0; //always SPEED
+		if($Host::TournamentMode)
+			$Host::TournamentMode = 0;
 	}
 
+	//PUGpassword
+	if($Host::PUGpasswordAlwaysOn) //ON
+		$Host::Password = $Host::PUGPassword;
+
+	//Set Visibility
+	if($CurrentMissionType $= "Lakrabbit")
+	{
+		//Set server mode to DISTANCE
+		$Host::HiVisibility = 1; //Lakrabbit
+	}
+	else //Set server mode to SPEED for CTF/SCTF/Anything Else
+		$Host::HiVisibility = 0;
+
+	//Tournament Mode specifics
 	if($Host::TournamentMode)
 		$Host::TimeLimit = 30; //TimeLimit Always 30 minutes in Tourney Mode
 	else
 	{
-		//Disable everything
-		if($Host::Password !$= "")
-			$Host::Password = "";
+		//Disable if active
 		if($LockedTeams)
 			$LockedTeams = 0;
+		if(isActivePackage(LockedTeams) && !$LockedTeams)
+			deactivatePackage(LockedTeams);
+
+		//Disable if active
+		if($Host::Password !$= "" && !$Host::PUGpasswordAlwaysOn) //No Password
+			$Host::Password = "";
+
+		//Disable if active
 		if($RestrictedVoting)
 			$RestrictedVoting = 0;
 		if($Host::AllowAdmin2Admin)
 			$Host::AllowAdmin2Admin = 0;
 	}
-	if(isActivePackage(LockedTeams) && !$LockedTeams)
-		deactivatePackage(LockedTeams);
 
 	//Siege NoBaseRape Fix
 	if($CurrentMissionType $= "Siege")
@@ -75,7 +77,7 @@ function loadMissionStage2()
 		centerPrintAll($Host::MapChangeMSGContent, 12, 3);
 
 	//Set random seed
-	setRandomSeed(getrandom(1,200000));
+	setRandomSeed(getrandom(1,1000));
 }
 
 };

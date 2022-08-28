@@ -32,7 +32,6 @@ package flagFix{
 
    function CTFGame::startMatch(%game){
       parent::startMatch(%game);
-      %game.setupFlagTrig();
       if(!isEventPending(Game.flagLoop)){
          %game.atHomeFlagLoop();
       }
@@ -40,7 +39,6 @@ package flagFix{
 
    function SCtFGame::startMatch(%game){
       parent::startMatch(%game);
-      %game.setupFlagTrig();
       if(!isEventPending(Game.flagLoop)){
          %game.atHomeFlagLoop();
       }
@@ -49,7 +47,6 @@ package flagFix{
 
    function PracticeCTFGame::startMatch(%game){
       parent::startMatch(%game);
-      %game.setupFlagTrig();
        if(!isEventPending(Game.flagLoop)){
          %game.atHomeFlagLoop();
       }

@@ -17,8 +17,7 @@ $AntiPackIncludeShield = 0;
 // Called in GetCounts.cs
 function CheckAntiPack(%game)
 {
-	//CTF only
-	if($Host::AntiPackEnable && $CurrentMissionType $= "DM" || $CurrentMissionType $= "CTF")
+	if($Host::AntiPackEnable)
 	{
 		//echo("TotalTeamPlayerCount " @ $TotalTeamPlayerCount);
 		//echo("AntiPackPlayerCount " @ $Host::AntiPackPlayerCount);
@@ -35,7 +34,6 @@ function CheckAntiPack(%game)
 				$AntiPackStatus = "OFF";
 		}
 	}
-	//All other cases outside of CTF
 	else
 	{
 		if($AntiPackStatus !$= "ACTIVEOFF")
@@ -146,20 +144,17 @@ function DefaultGame::gameOver(%game)
 {
 	Parent::gameOver(%game);
 
-	if($Host::AntiPackEnable)
-	{
-		if($InvBanList[CTF, "CloakingPack"])
-			$InvBanList[CTF, "CloakingPack"] = 0;
-		if(isActivePackage(AntiPackCloak))
-			deactivatePackage(AntiPackCloak);
+	if($InvBanList[CTF, "CloakingPack"])
+		$InvBanList[CTF, "CloakingPack"] = 0;
+	if(isActivePackage(AntiPackCloak))
+		deactivatePackage(AntiPackCloak);
 
-		if($InvBanList[CTF, "ShieldPack"])
-			$InvBanList[CTF, "ShieldPack"] = 0;
-		if(isActivePackage(AntiPackShield))
-			deactivatePackage(AntiPackShield);
+	if($InvBanList[CTF, "ShieldPack"])
+		$InvBanList[CTF, "ShieldPack"] = 0;
+	if(isActivePackage(AntiPackShield))
+		deactivatePackage(AntiPackShield);
 
-		$AntiPackStatus = "OFF";
-	}
+	$AntiPackStatus = "OFF";
 }
 
 };

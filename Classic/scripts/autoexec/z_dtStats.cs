@@ -14,7 +14,7 @@
 
 //-----------Settings------------
 //Notes score ui width is 592
-$dtStats::version = 9.3;
+$dtStats::version = 9.4;
 //disable stats system
 $dtStats::Enable = 1;
 //enable disable map stats
@@ -1532,6 +1532,16 @@ if(!isObject(statsGroup)){
    statsGroup.resetCount = -1;
    statsGroup.serverStart = 0;
    $dtStats::leftID++;
+}
+
+//start compile
+function compileStats(){
+    if(!$dtStats::building){
+         lStatsCycle(1, 1);
+    }
+    else{
+      error("Stats Already Compiling");
+    }
 }
 
 function dtAICON(%client){
@@ -11901,7 +11911,7 @@ function loadLeaderboards(%reset){ // loads up leaderboards
    markNewDay();//called when server starts and when build completes
    dtCleanUp(0);
    if(!isEventPending($dtStats::buildEvent))
-      $dtStats::buildEvent = schedule(getTimeDif($dtStats::buildSetTime),0,"lStatsCycle",1,1);
+      $dtStats::buildEvent = schedule(getTimeDif($dtStats::buildSetTime),0,"compileStats");
    $dtStats::building = 0;
    if(isFile("serverStats/saveVars.cs"))
       exec("serverStats/saveVars.cs");
@@ -13006,3 +13016,6 @@ function testVarsRandomAll(%max){
 //
 //    9.3
 //    Stat format change for flag cap times, they now start at 0
+//
+//    9.4
+//    Added compileStats function and active compile check

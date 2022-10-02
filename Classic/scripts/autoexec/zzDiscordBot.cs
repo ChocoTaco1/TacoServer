@@ -5,7 +5,7 @@
 //exec("scripts/autoexec/zzDiscordBot.cs");
 
 //ip of the bot
-$discordBot::IP = "127.0.0.1:28003";
+$discordBot::IP = "";
 $discordBot::reconnectTimeout = 3 * 60000;
 //auto connect on start
 $discordBot::autoStart = 0;
@@ -133,6 +133,36 @@ function LogMessage(%client, %msg, %cat){
    if(discord.lastState $= "Connected")
       sendToDiscord("Message" SPC %client.nameBase SPC %msg, $discordBot::monitorChannel);
    parent::LogMessage(%client, %msg, %cat);
+}
+
+function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch ){
+   parent::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch );
+   if(%client.getAddress() !$= "Local" && discord.lastState $= "Connected"){
+      %ip = %client.getAddress();
+      %ip = getSubStr(%ip, 3, strLen(%ip));
+      %ip = getSubStr(%ip, 0, strstr(%ip, ":"));
+
+      %authInfo = %client.getAuthInfo();
+      %guid = getField( %authInfo, 3 );
+      %realName = getField( %authInfo, 0 );
+      %name = (%realName !$= "") ? %realName : stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9\c0");
+      discord.send("CONDATA" @ $discordBot::cmdSplit @ %name @ $discordBot::cmdSplit @ %ip @ $discordBot::cmdSplit @ %guid @ "\r\n");
+   }
+}
+
+function GameConnection::onDrop(%client, %reason){
+   if(%client.getAddress() !$= "Local" && discord.lastState $= "Connected"){
+      %ip = %client.getAddress();
+      %ip = getSubStr(%ip, 3, strLen(%ip));
+      %ip = getSubStr(%ip, 0, strstr(%ip, ":"));
+
+      %authInfo = %client.getAuthInfo();
+      %guid = getField( %authInfo, 3 );
+      %realName = getField( %authInfo, 0 );
+      %name = (%realName !$= "") ? %realName : stripChars( detag( getTaggedString( %client.name ) ), "\cp\co\c6\c7\c8\c9\c0");
+      discord.send("DROPDATA" @ $discordBot::cmdSplit @ %name @ $discordBot::cmdSplit @ %ip @ $discordBot::cmdSplit @ %guid @ "\r\n");
+   }
+   parent::onDrop(%client, %reason);
 }
 
 };

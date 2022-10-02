@@ -118,38 +118,41 @@ function Observer::onTrigger(%data,%obj,%trigger,%state)
          // Free-flying observer camera
          if (%trigger == 0)
          {
-            if( !$Host::TournamentMode && $MatchStarted )
+            if(!%client.waitRespawn && getSimTime() > %client.suicideRespawnTime)
             {
-               // reset observer params
-               clearBottomPrint(%client);
-               commandToClient(%client, 'setHudMode', 'Standard');
+               if( !$Host::TournamentMode && $MatchStarted )
+               {
+                  // reset observer params
+                  clearBottomPrint(%client);
+                  commandToClient(%client, 'setHudMode', 'Standard');
 
-               if( %client.lastTeam !$= "" && %client.lastTeam != 0 && Game.numTeams > 1)
-               {
-                  Game.clientJoinTeam( %client, %client.lastTeam, $MatchStarted );
-                  %client.camera.setFlyMode();
-                  %client.setControlObject( %client.player );
+                  if( %client.lastTeam !$= "" && %client.lastTeam != 0 && Game.numTeams > 1)
+                  {
+                     Game.clientJoinTeam( %client, %client.lastTeam, $MatchStarted );
+                     %client.camera.setFlyMode();
+                     %client.setControlObject( %client.player );
+                  }
+                  else
+                  {
+                     Game.assignClientTeam( %client );
+
+                     // Spawn the player:
+                     Game.spawnPlayer( %client, true );
+                     %client.camera.setFlyMode();
+                     %client.setControlObject( %client.player );
+                     ClearBottomPrint( %client );
+                  }
                }
-               else
+               else if( !$Host::TournamentMode )
                {
+                  clearBottomPrint(%client);
                   Game.assignClientTeam( %client );
 
                   // Spawn the player:
-                  Game.spawnPlayer( %client, true );
-                  %client.camera.setFlyMode();
-                  %client.setControlObject( %client.player );
-                  ClearBottomPrint( %client );
+                  Game.spawnPlayer( %client, false );
+                  %client.camera.getDataBlock().setMode( %client.camera, "pre-game", %client.player );
+                  %client.setControlObject( %client.camera );
                }
-            }
-            else if( !$Host::TournamentMode )
-            {
-               clearBottomPrint(%client);
-               Game.assignClientTeam( %client );
-
-               // Spawn the player:
-               Game.spawnPlayer( %client, false );
-               %client.camera.getDataBlock().setMode( %client.camera, "pre-game", %client.player );
-               %client.setControlObject( %client.camera );
             }
          }
          else if (%trigger == 3) //press JET

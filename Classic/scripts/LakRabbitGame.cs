@@ -1924,7 +1924,7 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 	  // borlak -- points for MA flag grabs
       %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
       %rayStart = %player.getWorldBoxCenter();
-      %rayEnd = getWord(%rayStart, 0) SPC getWord(%rayStart, 1) SPC getWord(%rayStart, 2) - 20;
+      %rayEnd = getWord(%rayStart, 0) SPC getWord(%rayStart, 1) SPC getWord(%rayStart, 2) - 15;
       %ground = ContainerRayCast(%rayStart, %rayEnd, %mask, 0);
       if(!%ground)
       {

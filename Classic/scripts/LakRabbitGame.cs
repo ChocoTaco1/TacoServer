@@ -576,9 +576,9 @@ function Armor::damageObject(%data, %targetObject, %sourceObject, %position, %am
 				%weapon = "MINE";
 			case $DamageType::ShockLance:
 				%height = getHeight(%sourceObject);
-				%heightBonus = (mPow(%height,1.20)/14)+1; //was 10
+				%heightBonus = (mPow(%height,1.20)/12)+1; //was 10
 				%velBonus /= 2;
-				%points = mFloor(%distance/2) + (%heightBonus/3); //Added /3 for height
+				%points = mFloor(%distance/2) + (%heightBonus/2); //Added /2 for height
 
 				%accuracy = " [Height:" @ %height @"m]";
 				// borlak -- check rear shocklance hit
@@ -1924,11 +1924,11 @@ function LakRabbitGame::playerTouchFlag(%game, %player, %flag)
 	  // borlak -- points for MA flag grabs
       %mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
       %rayStart = %player.getWorldBoxCenter();
-      %rayEnd = getWord(%rayStart, 0) SPC getWord(%rayStart, 1) SPC getWord(%rayStart, 2) - 15;
+      %rayEnd = getWord(%rayStart, 0) SPC getWord(%rayStart, 1) SPC getWord(%rayStart, 2) - 10;
       %ground = ContainerRayCast(%rayStart, %rayEnd, %mask, 0);
       if(!%ground)
       {
-         %points = mFloor((getSpeed(%player)/8.3) + (getHeight(%player)/2.3)); //was 5.3 - 2.3
+         %points = mFloor((getSpeed(%player)/6.3) + (getHeight(%player)/3.3)); //was 5.3 - 2.3
          %points = %points > 5 ? %points : 5;
          messageAll('MsgRabbitFlagTaken', '\c4%1 gets %2 points for a Mid-Air flag grab! [Speed:%3] [Height:%4]~wfx/misc/hunters_horde.wav', %player.client.name, %points, getSpeed(%player), getHeight(%player));
 		 %player.client.morepoints += %points;

@@ -285,7 +285,14 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 	switch$(%typeName)
 	{
 		case "VoteKickPlayer":
-			if(%client == %arg1) // client is trying to votekick himself
+			%curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
+         if(%curTimeLeftMS <= 120000)
+         {
+            messageClient(%client, "", "\c2Kick votes are restricted at this time.");
+				return;
+         }
+
+         if(%client == %arg1) // client is trying to votekick himself
 				return; // Use the leave button instead, pal.
 
 			if(%isAdmin) // Admin is trying to kick
@@ -370,7 +377,14 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			return; // stop the function in its tracks
 
 		case "VoteChangeMission":
-			// Vote-spoof prevention right here
+			%curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
+         if(%curTimeLeftMS <= 120000)
+         {
+            messageClient(%client, "", "\c2Change mission votes are restricted at this time.");
+				return;
+         }
+
+         // Vote-spoof prevention right here
 			%arg1 = $HostMissionFile[%arg3];
 			%arg2 = $HostTypeName[%arg4];
 			if(!checkMapExist(%arg1, %arg2))
@@ -697,6 +711,13 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			return;
 
 	   case "VoteNextMission":
+         %curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
+         if(%curTimeLeftMS <= 120000)
+         {
+            messageClient(%client, "", "\c2Set next mission votes are restricted at this time.");
+				return;
+         }
+
          if(!%client.isAdmin && $TotalTeamPlayerCount < 6)
          {
             messageClient( %client, '', "Need at least 6 players on teams to set the next map." );

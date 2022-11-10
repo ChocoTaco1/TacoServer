@@ -463,3 +463,31 @@ function sendLDATA(%month, %year, %game){
 function unlockStatGen(){
    $genStatsLockout = 0;
 }
+
+//Added Oct 11, 2022
+$discordBot::remoteLogCount = 0;
+$discordBot::remoteSendCount = 0;
+//if %type is 0 then log history is limited to 100 if 1 its unlimited
+function remoteLog(%logName, %data, %type){
+   if($discordBot::remoteLogCount < 5000){
+      $discordBot::remoteLog[$discordBot::remoteLogCount++] = %logName  @ $discordBot::cmdSplit @ %data  @ $discordBot::cmdSplit @ %type;
+      $discordBot::remoteSendCount++;
+      if(!isEventPending($discordBot::eventId)){
+         logFeed();      
+      }
+   }
+   else{
+      error("Remote Log Back Buffer Full" SPC %logName SPC %data SPC %type);
+   }
+}
+
+function logFeed(){
+   %feedRate = 64;
+   if(isObject(discord) && discord.lastState $= "Connected" && $discordBot::remoteSendCount){
+      %log  = $discordBot::remoteLog[($discordBot::remoteLogCount-$discordBot::remoteSendCount)+1];
+      discord.send("LOGDATA" @ $discordBot::cmdSplit @ %log @ "\r\n"); 
+      if($discordBot::remoteSendCount-- <= 0)
+         $discordBot::remoteLogCount = 0;       
+     $discordBot::eventId = schedule(%feedRate, 0, "logFeed"); 
+   }  
+}

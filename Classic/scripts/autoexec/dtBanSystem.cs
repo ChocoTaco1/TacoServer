@@ -55,7 +55,7 @@ function BanList::add(%guid, %ipAddress, %time){
          }
       }
       else if(%eIndex == -1){
-         %eIndex = %i;    
+         %eIndex = %i;
       }
    }
    if(!%found){
@@ -120,6 +120,14 @@ function banList_checkGUID(%guid){
       }
    }
    return 0;
+}
+
+function CreateServer(%mission, %missionType)
+{
+	parent::CreateServer(%mission, %missionType);
+
+   //Clean timed out bans at startup
+   schedule(10000,0,"banListClean",0);
 }
 
 };
@@ -271,6 +279,27 @@ function unbanold(%guid,%ip){
    if($dtBanList::IP[%ip] !$= ""){
      $dtBanList::IP[%ip] =  "";
      error("IP" SPC %ip SPC "UNBANNED");
+   }
+   saveBanList();
+}
+
+//Clean timed out bans at startup
+function banListClean(){
+   %found = 0;
+   for (%i = 0; %i <  100; %i++){
+      %fieldList = $dtBanList::NameList[%i];
+      if($dtBanList::NameList[%i] !$= ""){
+         %guid = getField($dtBanList::NameList[%i], 1);
+         %ip = getField($dtBanList::NameList[%i], 2);
+         %time = $dtBanList::GUID[%guid];
+         %delta =  getBanCount(getField(%time,0), getField(%time,1),getField(%time,2),getField(%time,3));
+         if (%delta > getField(%time,4)){
+           $dtBanList::NameList[%i] = "";
+           $dtBanList::GUID[%guid] = "";
+           $dtBanList::IP[%ip] =  "";
+            error("GUID" SPC %guid SPC "IP" SPC %ip SPC "UNBANNED");
+         }
+      }
    }
    saveBanList();
 }

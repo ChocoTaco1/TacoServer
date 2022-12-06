@@ -1091,6 +1091,11 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "plasmaDeathGround";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "blasterDeathGround";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "mineDeathGround";
 
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "skin";
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "sex";
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "race";
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "voice";
+
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "null";//rng number
 ////////////////////////////////////////////////////////////////////////////////
 //Unused vars that are not tracked but used for other things and need to be reset
@@ -3589,6 +3594,11 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
    else
      %dtStats = %client.dtStats;
 
+   %dtStats.skin = getTaggedString(%client.skin);
+   %dtStats.race = %client.race;
+   %dtStats.sex = %client.sex; 
+   %dtStats.voice = %client.voice; 
+   
    %dtStats.joinPCT = (isGameRun() == 1) ? %game.getGamePct() : 0;
    updateTeamTime(%dtStats, -1);
    %dtStats.team = %client.team;// should be 0
@@ -9515,3 +9525,4 @@ function testVarsRandomAll(%max){
 //    Removed all stat menus other then leaderboard stuff and server panel 
 //    Made Live Stats Admin only its useful for testing stats
 //    Changed stats compile speed to 64ms with map stats gone
+//    Extra stats for player model

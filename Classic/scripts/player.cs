@@ -2649,7 +2649,7 @@ function resetObserveFollow( %client, %dismount )
       for( %i = 0; %i < %client.observeCount; %i++ )
       {
          // z0dd - ZOD, 5/21/03. Make sure this client actually obs this client
-         if ( %client.observers[%i].clientObserve != %client )
+         if ( %client.observers[%i].observeClient != %client )
             continue;
 
          %client.observers[%i].camera.setOrbitMode( %client.player, %client.player.getTransform(), 0.5, 4.5, 4.5);
@@ -2670,7 +2670,7 @@ function resetObserveFollow( %client, %dismount )
       for( %i = 0; %i < %client.observeCount; %i++ )
       {
          // z0dd - ZOD, 5/21/03. Make sure this client actually obs this client
-         if ( %client.observers[%i].clientObserve != %client )
+         if ( %client.observers[%i].observeClient != %client )
             continue;
 
          %client.observers[%i].camera.setOrbitMode(%mount, %mount.getTransform(), getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));

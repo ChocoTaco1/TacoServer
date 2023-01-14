@@ -33,7 +33,7 @@ datablock AudioDescription(CloakLooping3d)
    isLooping= true;
 
    is3D     = true;
-   minDistance= 15.0; //Was 10
+   minDistance= 10.0;
    MaxDistance= 55.0; //Was 50
    type     = $EffectAudioType;
    environmentLevel = 1.0;
@@ -59,7 +59,7 @@ datablock ShapeBaseImageData(CloakingPackImage)
 
    stateName[0] = "Idle";
    stateTransitionOnTriggerDown[0] = "Activate";
-   
+
    stateName[1] = "Activate";
    stateScript[1] = "onActivate";
    stateSequence[1] = "fire";
@@ -105,12 +105,12 @@ function CloakingPackImage::onUnmount(%data, %obj, %node)
 function CloakingPackImage::onActivate(%data, %obj, %slot)
 {
    if(%obj.reCloak !$= "")
-   {   
+   {
       Cancel(%obj.reCloak);
       %obj.reCloak = "";
    }
-   
-   if(%obj.client.armor $= "Light") 
+
+   if(%obj.client.armor $= "Light")
    {
       // can the player currently cloak (function returns "true" or reason for failure)?
       if(%obj.canCloak() $= "true")
@@ -127,7 +127,7 @@ function CloakingPackImage::onActivate(%data, %obj, %slot)
          %obj.setImageTrigger(%slot, false);
       }
    }
-   else 
+   else
    {
       // hopefully avoid some loopholes
       messageClient(%obj.client, 'MsgCloakingPackInvalid', '\c2Cloaking available for light armors only.');
@@ -138,11 +138,11 @@ function CloakingPackImage::onActivate(%data, %obj, %slot)
 function CloakingPackImage::onDeactivate(%data, %obj, %slot)
 {
    if(%obj.reCloak !$= "")
-   {   
+   {
       Cancel(%obj.reCloak);
       %obj.reCloak = "";
    }
-   
+
    // if pack is not on then dont bother...
    if(%obj.getImageState($BackpackSlot) $= "activate")
       messageClient(%obj.client, 'MsgCloakingPackOff', '\c2Cloaking pack off.');
@@ -168,12 +168,12 @@ function Armor::onForceUncloak(%this, %obj, %reason)
    %pack = %obj.getMountedImage($BackpackSlot);
    if((%pack <= 0) || (%pack.item !$= "CloakingPack"))
       return;
-   
+
    if(%obj.getImageState($BackpackSlot) $= "activate")
    {
       // cancel recloak thread
       if(%obj.reCloak !$= "")
-      {   
+      {
          Cancel(%obj.reCloak);
          %obj.reCloak = "";
       }

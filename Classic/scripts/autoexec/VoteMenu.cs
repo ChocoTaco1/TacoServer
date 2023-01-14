@@ -286,7 +286,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 	{
 		case "VoteKickPlayer":
 			%curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
-         if(%curTimeLeftMS <= 120000)
+         if(%curTimeLeftMS <= 120000 && $countdownStarted && $MatchStarted && !%isAdmin)
          {
             messageClient(%client, "", "\c2Kick votes are restricted at this time.");
 				return;
@@ -378,7 +378,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 
 		case "VoteChangeMission":
 			%curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
-         if(%curTimeLeftMS <= 120000)
+         if(%curTimeLeftMS <= 120000 && $countdownStarted && $MatchStarted && !%isAdmin)
          {
             messageClient(%client, "", "\c2Change mission votes are restricted at this time.");
 				return;
@@ -712,7 +712,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 
 	   case "VoteNextMission":
          %curTimeLeftMS = ($Host::TimeLimit * 60 * 1000) + $missionStartTime - getSimTime();
-         if(%curTimeLeftMS <= 120000)
+         if(%curTimeLeftMS <= 120000 && $countdownStarted && $MatchStarted && !%isAdmin)
          {
             messageClient(%client, "", "\c2Set next mission votes are restricted at this time.");
 				return;

@@ -214,13 +214,13 @@ function ALTsendModInfoToClient(%client)
 		switch$(%randompics)
 		{
 			case 1:
-				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:twb/twb_lakedebris_01><Just:RIGHT><bitmap:twb/twb_waterdemise_03><Just:LEFT><bitmap:twb/twb_action_05>";
+				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><bitmap:twb/twb_waterdemise_03><bitmap:twb/twb_lakedebris_01><Just:LEFT><bitmap:twb/twb_action_05>";
 			case 2:
-				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:twb/twb_blowngen_01><Just:RIGHT><bitmap:twb/twb_action_03><Just:LEFT><bitmap:twb/twb_starwolf_shrike>";
+				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><bitmap:twb/twb_action_03><bitmap:twb/twb_blowngen_01><Just:LEFT><bitmap:twb/twb_starwolf_shrike>";
 			case 3:
-				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:twb/twb_TRIBES2><Just:RIGHT><bitmap:twb/twb_Harbingers><Just:LEFT><bitmap:twb/twb_action_10>";
+				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><bitmap:twb/twb_Harbingers><bitmap:twb/twb_TRIBES2><Just:LEFT><bitmap:twb/twb_action_10>";
 			case 4:
-				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:twb/twb_inferno_02><Just:RIGHT><bitmap:twb/twb_action_04><Just:LEFT><bitmap:twb/twb_action_06>";
+				$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<lmargin:24><bitmap:twb/twb_action_04><bitmap:twb/twb_inferno_02><Just:LEFT><bitmap:twb/twb_action_06>";
 		}
 		//$dtLoadingScreen::LoadScreenMessage[$dmlP++] = "<Just:CENTER><bitmap:Cred_logo5.png><bitmap:twb/twb_action_04><bitmap:twb/twb_action_06><Just:LEFT>";
 

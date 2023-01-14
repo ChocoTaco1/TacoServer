@@ -17,6 +17,33 @@
 
 package dtBan
 {
+
+//Keep track of gags (Disconnecting and Reconnecting)
+function GameConnection::onDrop(%client, %reason)
+{
+   %ip = %client.getAddress();
+   %ip = getSubStr(%ip, 3, strLen(%ip));
+   %ip = getSubStr(%ip, 0, strstr(%ip, ":"));
+   %ip = strReplace(%ip, ".", "_");
+
+   $chatGagged[%ip] =  $chatGagged[%client.guid] = (%client.isGagged == 1); //save status of this
+
+   parent::onDrop(%client, %reason);
+}
+
+//Reapply the gag
+function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch )
+{
+   parent::onConnect( %client, %name, %raceGender, %skin, %voice, %voicePitch );
+
+   %ip = %client.getAddress();
+   %ip = getSubStr(%ip, 3, strLen(%ip));
+   %ip = getSubStr(%ip, 0, strstr(%ip, ":"));
+   %ip = strReplace(%ip, ".", "_");
+
+   %client.isGagged = ($chatGagged[%ip]  || $chatGagged[%client.guid]); //restore status
+}
+
 function ClassicLoadBanlist()
 {
 	$ClassicPermaBans = 0;

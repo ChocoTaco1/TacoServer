@@ -33,7 +33,7 @@ datablock ShapeBaseImageData(SensorJammerPackImage)
 
    stateName[0] = "Idle";
    stateTransitionOnTriggerDown[0] = "Activate";
-   
+
    stateName[1] = "Activate";
    stateScript[1] = "onActivate";
    stateSequence[1] = "fire";
@@ -75,9 +75,9 @@ datablock SensorData(JammerSensorObjectPassive)		//v2 was commented out...
 	detectsFOVOnly = true;
 	detectFOVPercent = 1.3;
 	useObjectFOV = true;
-	
-	//detectscloaked = 1;			//v2
-	
+
+	detectscloaked = 1;			//v2
+
 	jams = true;
 	jamsOnlyGroup = true;
 	jamsUsingLOS = true;
@@ -95,13 +95,13 @@ datablock SensorData(JammerSensorObjectActive)
    detectsFOVOnly = true;
    detectFOVPercent = 1.3;
    useObjectFOV = true;
-   
+
    detectscloaked = 1;			//v2
-   
+
    jams = true;
    jamsOnlyGroup = true;
    jamsUsingLOS = true;
-   jamRadius = 30;
+   jamRadius = 45; //was 30
 };
 
 function SensorJammerPackImage::onMount(%data, %obj, %slot)
@@ -109,7 +109,7 @@ function SensorJammerPackImage::onMount(%data, %obj, %slot)
    setTargetSensorData(%obj.client.target, JammerSensorObjectPassive);		//v2
    %obj.setImageTrigger(%slot, false);
    commandToClient( %obj.client, 'setSenJamIconOff' );
-   //%obj.setJammerFX(false);
+   %obj.setJammerFX(false);
 }
 
 function deactivateJammer(%data, %obj, %slot)
@@ -128,7 +128,7 @@ function SensorJammerPackImage::onActivate(%data, %obj, %slot)
    messageClient(%obj.client, 'MsgSensorJammerPackOn', '\c2Sensor jammer pack on.');
    setTargetSensorData(%obj.client.target, JammerSensorObjectActive);
    commandToClient( %obj.client, 'setSenJamIconOn' );
-   //%obj.setJammerFX( true );
+   %obj.setJammerFX( true );
 }
 
 function SensorJammerPackImage::onDeactivate(%data, %obj, %slot)
@@ -138,7 +138,7 @@ function SensorJammerPackImage::onDeactivate(%data, %obj, %slot)
    %obj.setImageTrigger(%slot, false);
    setTargetSensorData(%obj.client.target, JammerSensorObjectPassive);		//v2 was PlayerSensor
    commandToClient( %obj.client, 'setSenJamIconOff' );
-   //%obj.setJammerFX( false );
+   %obj.setJammerFX( false );
 }
 
 function SensorJammerPack::onPickup(%this, %obj, %shape, %amount)

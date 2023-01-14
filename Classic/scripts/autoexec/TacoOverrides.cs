@@ -292,11 +292,11 @@ function VehicleData::createPositionMarker(%data, %obj)
 }
 
 //Conc Throw (Almost Normal Grenades) 1500 Normal
-function ConcussionGrenadeThrown::onThrow(%this, %gren)
-{
-   AIGrenadeThrown(%gren);
-   %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren); // Was 2000
-}
+// function ConcussionGrenadeThrown::onThrow(%this, %gren)
+// {
+//    AIGrenadeThrown(%gren);
+//    %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren); // Was 2000
+// }
 
 //Attack LOS Sky Fix
 function serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap)
@@ -332,6 +332,90 @@ function ShapeBase::throwWeapon(%this)
    }
 
    parent::throwWeapon(%this);
+}
+
+
+// Added object check
+function VehicleData::damageObject(%data, %targetObject, %sourceObject, %position, %amount, %damageType, %momVec, %theClient, %proj)
+{
+   if(%proj !$= "")
+   {
+      if(%amount > 0 && %targetObject.lastDamageProj !$= %proj)
+      {
+         %targetObject.lastDamageProj = %proj;
+         %targetObject.lastDamageAmount = %amount;
+      }
+      else if(%targetObject.lastDamageAmount < %amount)
+         %amount = %amount - %targetObject.lastDamageAmount;
+      else
+         return;
+   }
+
+   // check for team damage
+   //%sourceClient = %sourceObject ? %sourceObject.getOwnerClient() : 0;
+   %sourceClient = isObject(%sourceObject) ? %sourceObject.getOwnerClient() : 0; //Object Check
+   %targetTeam = getTargetSensorGroup(%targetObject.getTarget());
+
+   if(%sourceClient)
+      %sourceTeam = %sourceClient.getSensorGroup();
+   else if(isObject(%sourceObject) && %sourceObject.getClassName() $= "Turret")
+   {
+      %sourceTeam = getTargetSensorGroup(%sourceObject.getTarget());
+      %sourceClient = %sourceObject.getControllingClient(); // z0dd - ZOD, 6/10/02. Play a sound to client when they hit a vehicle with a controlled turret
+   }
+   else
+   {
+      %sourceTeam = %sourceObject ? getTargetSensorGroup(%sourceObject.getTarget()) : -1;
+      // Client is allready defined and this spams console - ZOD
+      //%sourceClient = %sourceObject.getControllingClient(); // z0dd - ZOD, 6/10/02. Play a sound to client when they hit a vehicle from a vehicle
+   }
+
+    // vehicles no longer obey team damage -JR
+    //    if(!$teamDamage && (%targetTeam == %sourceTeam) && %targetObject.getDamagePercent() > 0.5)
+    //       return;
+    //but we do want to track the destroyer
+    if(%sourceObject)
+    {
+        %targetObject.lastDamagedBy = %sourceObject;
+        %targetObject.lastDamageType = %damageType;
+    }
+    else
+        %targetObject.lastDamagedBy = 0;
+
+   // ----------------------------------------------------------------------------------
+   // z0dd - ZOD, 6/10/02. Play a sound to client when they hit a vehicle
+   if(%sourceClient && %sourceClient.vehicleHitSound)
+   {
+      if(%targetTeam != %sourceTeam)
+      {
+         if ((%damageType > 0  && %damageType < 11) ||
+             (%damageType == 13)                    ||
+             (%damageType > 15 && %damageType < 24) ||
+             (%damageType > 25 && %damageType < 32))
+         {
+            messageClient(%sourceClient, 'MsgClientHit', %sourceClient.vehicleHitWav);
+         }
+      }
+   }
+   // ----------------------------------------------------------------------------------
+
+   // Scale damage type & include shield calculations...
+   if (%data.isShielded)
+      %amount = %data.checkShields(%targetObject, %position, %amount, %damageType);
+
+
+   %damageScale = %data.damageScale[%damageType];
+   if(%damageScale !$= "")
+      %amount *= %damageScale;
+
+   if(%amount != 0)
+      %targetObject.applyDamage(%amount);
+
+   if(%targetObject.getDamageState() $= "Destroyed" )
+   {
+      if( %momVec !$= "")
+         %targetObject.setMomentumVector(%momVec);
+   }
 }
 
 };

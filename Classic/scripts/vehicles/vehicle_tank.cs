@@ -205,11 +205,11 @@ datablock HoverVehicleData(AssaultVehicle) : TankDamageProfile
    multipassenger = true;
    computeCRC = true;
    renderWhenDestroyed = false;
-                                                 
+
    weaponNode = 1;
    // z0dd - ZOD, 5/07/04. Attempt at squashing the UE bug
-   //debrisShapeName = "vehicle_land_assault_debris.dts";
-   debrisShapeName = "vehicle_land_mpbase_debris.dts";
+   debrisShapeName = "vehicle_land_assault_debris.dts";
+   //debrisShapeName = "vehicle_land_mpbase_debris.dts";
    debris = ShapeDebris;
 
    drag = 0.0;
@@ -235,7 +235,7 @@ datablock HoverVehicleData(AssaultVehicle) : TankDamageProfile
 
    isShielded = true;
    rechargeRate = 1.0;
-   energyPerDamagePoint = 135;
+   energyPerDamagePoint = 142; //was 135
    maxEnergy = 400;
    minJetEnergy = 15;
    jetEnergyDrain = 2.0;
@@ -300,18 +300,18 @@ datablock HoverVehicleData(AssaultVehicle) : TankDamageProfile
    wheelImpactSound = WheelImpactSound;
 
    forwardJetEmitter = TankJetEmitter;
-   
+
    //
-   softSplashSoundVelocity = 5.0; 
-   mediumSplashSoundVelocity = 10.0;   
-   hardSplashSoundVelocity = 15.0;   
+   softSplashSoundVelocity = 5.0;
+   mediumSplashSoundVelocity = 10.0;
+   hardSplashSoundVelocity = 15.0;
    exitSplashSoundVelocity = 10.0;
-   
+
    exitingWater      = VehicleExitWaterMediumSound;
    impactWaterEasy   = VehicleImpactWaterSoftSound;
    impactWaterMedium = VehicleImpactWaterMediumSound;
    impactWaterHard   = VehicleImpactWaterMediumSound;
-   waterWakeSound    = VehicleWakeMediumSplashSound; 
+   waterWakeSound    = VehicleWakeMediumSplashSound;
 
    minMountDist = 4;
 
@@ -334,8 +334,8 @@ datablock HoverVehicleData(AssaultVehicle) : TankDamageProfile
    targetNameTag = 'Beowulf';
    targetTypeTag = 'Assault Tank';
    sensorData = VehiclePulseSensor;
-   sensorRadius = VehiclePulseSensor.detectRadius; // z0dd - ZOD, 3/30/02. Allows sensor to be shown on CC   
-   
+   sensorRadius = VehiclePulseSensor.detectRadius; // z0dd - ZOD, 3/30/02. Allows sensor to be shown on CC
+
    checkRadius = 5.5535;
    observeParameters = "1 10 10";
    runningLight[0] = TankLight1;
@@ -418,7 +418,7 @@ datablock TurretData(AssaultPlasmaTurret) : TurretDamageProfile
    maxDamage               = AssaultVehicle.maxDamage;
    destroyedLevel          = AssaultVehicle.destroyedLevel;
    repairRate              = 0;
-   
+
    // capacitor
    maxCapacitorEnergy      = 250;
    capacitorRechargeRate   = 1.0;
@@ -675,6 +675,6 @@ datablock TurretImageData(AssaultTurretParam)
    thinkTimeMS       = 200;
    degPerSecTheta    = 500;
    degPerSecPhi      = 500;
-   
+
    attackRadius      = 1000;
-};              
+};

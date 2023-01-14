@@ -292,11 +292,11 @@ function VehicleData::createPositionMarker(%data, %obj)
 }
 
 //Conc Throw (Almost Normal Grenades) 1500 Normal
-function ConcussionGrenadeThrown::onThrow(%this, %gren)
-{
-   AIGrenadeThrown(%gren);
-   %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren); // Was 2000
-}
+// function ConcussionGrenadeThrown::onThrow(%this, %gren)
+// {
+//    AIGrenadeThrown(%gren);
+//    %gren.detThread = schedule(1800, %gren, "detonateGrenade", %gren); // Was 2000
+// }
 
 //Attack LOS Sky Fix
 function serverCmdSendTaskToClient(%client, %targetClient, %fromCmdMap)
@@ -379,7 +379,7 @@ function VehicleData::damageObject(%data, %targetObject, %sourceObject, %positio
         %targetObject.lastDamagedBy = %sourceObject;
         %targetObject.lastDamageType = %damageType;
     }
-    else 
+    else
         %targetObject.lastDamagedBy = 0;
 
    // ----------------------------------------------------------------------------------
@@ -407,10 +407,10 @@ function VehicleData::damageObject(%data, %targetObject, %sourceObject, %positio
    %damageScale = %data.damageScale[%damageType];
    if(%damageScale !$= "")
       %amount *= %damageScale;
-      
+
    if(%amount != 0)
       %targetObject.applyDamage(%amount);
-      
+
    if(%targetObject.getDamageState() $= "Destroyed" )
    {
       if( %momVec !$= "")

@@ -2891,8 +2891,8 @@ function Armor::applyConcussion( %this, %dist, %radius, %sourceObject, %targetOb
    }
    else
    {
-      %flagChance = 0.75;
-      %itemChance = 0.75;
+      %flagChance = 0.70;
+      %itemChance = 0.70;
    }
 
    %probabilityFlag = %flagChance * %percentage;

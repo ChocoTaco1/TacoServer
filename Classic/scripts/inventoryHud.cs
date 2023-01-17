@@ -2,7 +2,7 @@
 function setUpFavPrefs()
 {
    if($pref::FavCurrentSelect $= "")
-      $pref::FavCurrentSelect = 0;   
+      $pref::FavCurrentSelect = 0;
    for(%i = 0; %i < 10; %i++)
    {
       if($pref::FavNames[%i] $= "")
@@ -163,7 +163,7 @@ function InventoryScreen::setupHud( %this, %tag )
    %this.selId = $pref::FavCurrentSelect - %favListStart + 1;
 
    // Add the list menu:
-   $Hud[%tag].staticData[0, 0] = new ShellPopupMenu(INV_ListMenu) 
+   $Hud[%tag].staticData[0, 0] = new ShellPopupMenu(INV_ListMenu)
    {
       profile = "ShellPopupProfile";
       horizSizing = "right";
@@ -178,8 +178,8 @@ function InventoryScreen::setupHud( %this, %tag )
       maxPopupHeight = "220";
       text = "";
    };
-   
-   // Add favorite tabs:  
+
+   // Add favorite tabs:
    for( %i = 0; %i < 10; %i++ )
    {
       %yOffset = ( %i * 30 ) + 10;
@@ -198,17 +198,17 @@ function InventoryScreen::setupHud( %this, %tag )
          text = strupr( $pref::FavNames[%favListStart + %i] );
       };
       $Hud[%tag].staticData[0, %i + 1].setValue( ( %favListStart + %i ) == $pref::FavCurrentSelect );
-            
+
       $Hud[%tag].parent.add( $Hud[%tag].staticData[0, %i + 1] );
    }
- 
+
    %text = "Favorites " @ %favListStart + 1 SPC "-" SPC %favListStart + 10;
    $Hud[%tag].staticData[0, 0].onSelect( $pref::FavCurrentList, %text, true );
- 
+
    $Hud[%tag].parent.add( $Hud[%tag].staticData[0, 0] );
 
    // Add the SAVE button:
-   $Hud[%tag].staticData[1, 0] = new ShellBitmapButton() 
+   $Hud[%tag].staticData[1, 0] = new ShellBitmapButton()
    {
       profile = "ShellButtonProfile";
       horizSizing = "right";
@@ -222,10 +222,10 @@ function InventoryScreen::setupHud( %this, %tag )
       helpTag = "0";
       command = "saveFavorite();";
       text = "SAVE";
-   };      
-   
+   };
+
    // Add the name edit control:
-   $Hud[%tag].staticData[1, 1] = new ShellTextEditCtrl() 
+   $Hud[%tag].staticData[1, 1] = new ShellTextEditCtrl()
    {
       profile = "NewTextEditProfile";
       horizSizing = "right";
@@ -241,9 +241,9 @@ function InventoryScreen::setupHud( %this, %tag )
       historySize = "0";
       maxLength = "16";
    };
-   
+
    $Hud[%tag].staticData[1, 1].setValue( $pref::FavNames[$pref::FavCurrentSelect] );
-   
+
    $Hud[%tag].parent.add( $Hud[%tag].staticData[1, 0] );
    $Hud[%tag].parent.add( $Hud[%tag].staticData[1, 1] );
 }
@@ -255,7 +255,7 @@ function InventoryScreen::addLine( %this, %tag, %lineNum, %type, %count )
 
    // Add label:
    %yOffset = ( %lineNum * 30 ) + 28;
-   $Hud[%tag].data[%lineNum, 0] = new GuiTextCtrl() 
+   $Hud[%tag].data[%lineNum, 0] = new GuiTextCtrl()
    {
       profile = "ShellTextRightProfile";
       horizSizing = "right";
@@ -271,7 +271,7 @@ function InventoryScreen::addLine( %this, %tag, %lineNum, %type, %count )
    };
 
    // Add drop menu:
-   $Hud[%tag].data[%lineNum, 1] = new ShellPopupMenu(INV_Menu) 
+   $Hud[%tag].data[%lineNum, 1] = new ShellPopupMenu(INV_Menu)
    {
       profile = "ShellPopupProfile";
       horizSizing = "right";
@@ -290,7 +290,7 @@ function InventoryScreen::addLine( %this, %tag, %lineNum, %type, %count )
 
    return 2;
 }
-   
+
 //------------------------------------------------------------------------------
 function InventoryScreen::updateHud( %this, %client, %tag )
 {
@@ -308,7 +308,7 @@ function InventoryScreen::updateHud( %this, %client, %tag )
 //Create - ARMOR - List
    %armorList = %client.favorites[0];
    for ( %y = 0; $InvArmor[%y] !$= ""; %y++ )
-      if ( $InvArmor[%y] !$= %client.favorites[0] )  
+      if ( $InvArmor[%y] !$= %client.favorites[0] )
          %armorList = %armorList TAB $InvArmor[%y];
 
 //Create - WEAPON - List
@@ -318,7 +318,7 @@ function InventoryScreen::updateHud( %this, %client, %tag )
       for ( %i = 0; %i < getFieldCount( %client.weaponIndex ); %i++ )
       {
          %WInv = $NameToInv[$InvWeapon[%y]];
-         if ( ( $InvWeapon[%y] $= %client.favorites[getField( %client.weaponIndex,%i )] ) || !%armor.max[%WInv] )  
+         if ( ( $InvWeapon[%y] $= %client.favorites[getField( %client.weaponIndex,%i )] ) || !%armor.max[%WInv] )
          {
             %notFound = false;
             break;
@@ -326,9 +326,9 @@ function InventoryScreen::updateHud( %this, %client, %tag )
          else if ( "SniperRifle" $= $NameToInv[%client.favorites[getField( %client.weaponIndex,%i )]] )
          {
             %noSniperRifle = false;
-            %packList = "noSelect\tEnergy Pack\tEnergy Pack must be used when \tLaser Rifle is selected!";     
+            %packList = "noSelect\tEnergy Pack\tEnergy Pack must be used when \tLaser Rifle is selected!";
             %client.favorites[getField(%client.packIndex,0)] = "Energy Pack";
-         }   
+         }
       }
 
       if ( !($InvBanList[%cmt, %WInv]) )
@@ -353,11 +353,11 @@ function InventoryScreen::updateHud( %this, %client, %tag )
       for ( %y = 0; $InvPack[%y] !$= ""; %y++ )
       {
          %PInv = $NameToInv[$InvPack[%y]];
-         if ( ( $InvPack[%y] !$= %client.favorites[getField( %client.packIndex, 0 )]) && 
-         %armor.max[%PInv] && !($InvBanList[%cmt, %PInv]))  
+         if ( ( $InvPack[%y] !$= %client.favorites[getField( %client.packIndex, 0 )]) &&
+         %armor.max[%PInv] && !($InvBanList[%cmt, %PInv]))
             %packList = %packList TAB $Invpack[%y];
       }
-   }   
+   }
 //Create - GRENADE - List
    for ( %y = 0; $InvGrenade[%y] !$= ""; %y++ )
    {
@@ -365,14 +365,14 @@ function InventoryScreen::updateHud( %this, %client, %tag )
       for(%i = 0; %i < getFieldCount( %client.grenadeIndex ); %i++)
       {
          %GInv = $NameToInv[$InvGrenade[%y]];
-         if ( ( $InvGrenade[%y] $= %client.favorites[getField( %client.grenadeIndex, %i )] ) || !%armor.max[%GInv] )  
+         if ( ( $InvGrenade[%y] $= %client.favorites[getField( %client.grenadeIndex, %i )] ) || !%armor.max[%GInv] )
          {
             %notFound = false;
             break;
          }
       }
       if ( !($InvBanList[%cmt, %GInv]) )
-      { 
+      {
          if ( %notFound && %grenadeList $= "" )
             %grenadeList = $InvGrenade[%y];
          else if ( %notFound )
@@ -389,7 +389,7 @@ function InventoryScreen::updateHud( %this, %client, %tag )
       for(%i = 0; %i < getFieldCount( %client.mineIndex ); %i++)
       {
          %MInv = $NameToInv[$InvMine[%y]];
-         if ( ( $InvMine[%y] $= %client.favorites[getField( %client.mineIndex, %i )] ) || !%armor.max[%MInv] )  
+         if ( ( $InvMine[%y] $= %client.favorites[getField( %client.mineIndex, %i )] ) || !%armor.max[%MInv] )
          {
             %notFound = false;
             break;
@@ -418,7 +418,7 @@ function InventoryScreen::updateHud( %this, %client, %tag )
          {
             %client.favorites[%client.numFavs] = "INVALID";
             %client.weaponIndex = %client.weaponIndex TAB %client.numFavs;
-         }   
+         }
       }
       else
       {
@@ -434,7 +434,7 @@ function InventoryScreen::updateHud( %this, %client, %tag )
       messageClient( %client, 'SetLineHud', "", %tag, %x + %lineCount, "Weapon Slot " @ %x + 1 @ ": ", %list , weapon, %client.numFavsCount );
    }
    %lineCount = %lineCount + %armor.maxWeapons;
-   
+
    %client.numFavsCount++;
    if ( getField( %packList, 0 ) !$= empty && %noSniperRifle )
       %packList = %packList TAB "EMPTY";
@@ -447,7 +447,7 @@ function InventoryScreen::updateHud( %this, %client, %tag )
    }
    messageClient( %client, 'SetLineHud', "", %tag, %lineCount, "Pack:", %packText, pack, %client.numFavsCount, %packOverFlow );
    %lineCount++;
-   
+
    for( %x = 0; %x < %armor.maxGrenades; %x++ )
    {
       %client.numFavsCount++;
@@ -467,7 +467,7 @@ function InventoryScreen::updateHud( %this, %client, %tag )
          %client.grenadeIndex = %client.grenadeIndex TAB %client.numFavs;
          %client.numFavs++;
       }
-      
+
       if ( %list $= empty )
          %list = %list TAB %grenadeList;
       else
@@ -476,7 +476,7 @@ function InventoryScreen::updateHud( %this, %client, %tag )
       messageClient( %client, 'SetLineHud', "", %tag, %x + %lineCount, "Grenade:", %list, grenade, %client.numFavsCount );
    }
    %lineCount = %lineCount + %armor.maxGrenades;
-   
+
    for ( %x = 0; %x < %armor.maxMines; %x++ )
    {
       %client.numFavsCount++;
@@ -496,17 +496,17 @@ function InventoryScreen::updateHud( %this, %client, %tag )
          %client.mineIndex = %client.mineIndex TAB %client.numFavs;
          %client.numFavs++;
       }
-      
+
       if ( %list !$= Invalid )
       {
          if ( %list $= empty )
             %list = %list TAB %mineList;
          else if ( %mineList !$= "" )
             %list = %list TAB %mineList TAB "EMPTY";
-         else 
+         else
             %list = %list TAB "EMPTY";
       }
-         
+
       messageClient( %client, 'SetLineHud', "", %tag, %x + %lineCount, "Mine:", %list, mine, %client.numFavsCount );
    }
 
@@ -566,27 +566,30 @@ function buyFavorites(%client)
    for(%i = 0; %i < getFieldCount( %client.weaponIndex ); %i++)
    {
       %inv = $NameToInv[%client.favorites[getField( %client.weaponIndex, %i )]];
-      
-      if( %inv !$= "" )
-      {   
-         %weaponCount++;
-         %client.player.setInventory( %inv, 1 );
+      if(!($InvBanList[%cmt, %inv])){
+         if( %inv !$= "" )
+         {
+            %weaponCount++;
+            %client.player.setInventory( %inv, 1 );
+         }
+
+         // ----------------------------------------------------
+         // z0dd - ZOD, 4/24/02. Code optimization.
+         if ( %inv.image.ammo !$= "" )
+            %client.player.setInventory( %inv.image.ammo, 999 );
+         // ----------------------------------------------------
       }
-      
-      // ----------------------------------------------------
-      // z0dd - ZOD, 4/24/02. Code optimization.
-      if ( %inv.image.ammo !$= "" )
-         %client.player.setInventory( %inv.image.ammo, 999 );
-      // ----------------------------------------------------
    }
    %client.player.weaponCount = %weaponCount;
 
    // pack
    %pCh = $NameToInv[%client.favorites[%client.packIndex]];
-   if ( %pCh $= "" )
-      %client.clearBackpackIcon();
-   else
-      %client.player.setInventory( %pCh, 1 );
+   if(!($InvBanList[%cmt, %pCh])){
+      if ( %pCh $= "" )
+         %client.clearBackpackIcon();
+      else
+         %client.player.setInventory( %pCh, 1 );
+   }
 
    // if this pack is a deployable that has a team limit, warn the purchaser
 	// if it's a deployable turret, the limit depends on the number of players (deployables.cs)
@@ -665,11 +668,11 @@ function buyDeployableFavorites(%client)
    for ( %i = 0; %i < getFieldCount( %client.weaponIndex ); %i++ )
    {
       %inv = $NameToInv[%client.favorites[getField( %client.weaponIndex, %i )]];
-      if ( !($InvBanList[DeployInv, %inv]) )
+      if ( !($InvBanList[DeployInv, %inv]) &&  !$InvBanList[%cmt, %inv])
       {
          %player.setInventory( %inv, 1 );
 			// increment weapon count if current armor can hold this weapon
-         if(%player.getDatablock().max[%inv] > 0)      
+         if(%player.getDatablock().max[%inv] > 0)
 				%weapCount++;
       // ---------------------------------------------
       // z0dd - ZOD, 4/24/02. Code streamlining.
@@ -683,10 +686,10 @@ function buyDeployableFavorites(%client)
    %player.weaponCount = %weapCount;
    // give player the grenades and mines they chose, beacons, and a repair kit
    for ( %i = 0; %i < getFieldCount( %client.grenadeIndex ); %i++)
-   {   
+   {
       %GInv = $NameToInv[%client.favorites[getField( %client.grenadeIndex, %i )]];
       %client.player.lastGrenade = %GInv;
-      if ( !($InvBanList[DeployInv, %GInv]) )
+      if ( !($InvBanList[DeployInv, %GInv])  &&  !$InvBanList[%cmt, %GInv])
          %player.setInventory( %GInv, 30 );
    }
 
@@ -705,7 +708,7 @@ function buyDeployableFavorites(%client)
    for ( %i = 0; %i < getFieldCount( %client.mineIndex ); %i++ )
    {
       %MInv = $NameToInv[%client.favorites[getField( %client.mineIndex, %i )]];
-      if ( !($InvBanList[DeployInv, %MInv]) )
+      if ( !($InvBanList[DeployInv, %MInv]) &&  !$InvBanList[%cmt, %MInv])
          %player.setInventory( %MInv, 30 );
    }
    if ( !($InvBanList[DeployInv, Beacon]) && !($InvBanList[%cmt, Beacon]) )
@@ -717,7 +720,7 @@ function buyDeployableFavorites(%client)
 
    // players cannot buy deployable station packs from a deployable inventory station
    %packChoice = $NameToInv[%client.favorites[%client.packIndex]];
-   if ( !($InvBanList[DeployInv, %packChoice]) )
+   if ( !($InvBanList[DeployInv, %packChoice]) && !$InvBanList[%cmt, %packChoice])
       %player.setInventory( %packChoice, 1 );
 
    // if this pack is a deployable that has a team limit, warn the purchaser
@@ -778,7 +781,7 @@ function getAmmoStationLovin(%client)
    if(%grenType $= "")
    {
       %grenType = Grenade;
-   } 
+   }
    if ( !($InvBanList[%cmt, %grenType]) )
       %client.player.setInventory( %grenType, 30 );
 
@@ -826,7 +829,7 @@ function getAmmoStationLovin(%client)
 function invAmmoPackPass(%client)
 {
    // "normal" ammo stuff (everything but mines and grenades)
-   for ( %idx = 0; %idx < $numAmmoItems; %idx++ ) 
+   for ( %idx = 0; %idx < $numAmmoItems; %idx++ )
    {
       %ammo = $AmmoItem[%idx];
       %client.player.incInventory(%ammo, AmmoPack.max[%ammo]);
@@ -874,7 +877,7 @@ function loadFavorite( %index, %echo )
    if ( %echo )
       addMessageHudLine( "Inventory set \"" @ $pref::FavNames[%index] @ "\" selected." );
 
-   commandToServer( 'setClientFav', $pref::Favorite[%index] );   
+   commandToServer( 'setClientFav', $pref::Favorite[%index] );
 }
 
 //------------------------------------------------------------------------------
@@ -905,54 +908,54 @@ function saveFavorite()
 //------------------------------------------------------------------------------
 function addQuickPackFavorite( %pack, %item )
 {
-	// this has been such a success it has been changed to handle grenades 
-	// and other equipment as well as packs so everything seems to be called 'pack' 
+	// this has been such a success it has been changed to handle grenades
+	// and other equipment as well as packs so everything seems to be called 'pack'
 	// including the function itself. The default IS pack
 
 	if(%item $= "")
 		%item = "Pack";
 	%packFailMsg = "You cannot use that equipment with your selected loadout.";
-	if ( !isObject($Hud['inventoryScreen'].staticData[1, 1]) || $Hud['inventoryScreen'].staticData[1, 1].getValue() $= ""  ) 
+	if ( !isObject($Hud['inventoryScreen'].staticData[1, 1]) || $Hud['inventoryScreen'].staticData[1, 1].getValue() $= ""  )
 	{
 		//if the player hasnt brought up the inv screen we use his current fav
 		%currentFav = $pref::Favorite[$pref::FavCurrentSelect];
 		//echo(%currentFav);
 
-		for ( %i = 0; %i < getFieldCount( %currentFav ); %i++ ) 
+		for ( %i = 0; %i < getFieldCount( %currentFav ); %i++ )
 		{
 			%type = getField( %currentFav, %i );
 			%equipment = getField( %currentFav, %i++ );
-			
+
 			%invalidPack = checkPackValidity(%pack, %equipment, %item );
 			if(%invalidPack)
 			{
 				addMessageHudLine( %packFailMsg );
 				return;
-			
+
 			}
 		// Success--------------------------------------------------
 			if ( %type $= %item )
 				%favList = %favList @ %type TAB %pack @ "\t";
-			else 
-				%favList = %favList  @ %type TAB %equipment @ "\t";  
+			else
+				%favList = %favList  @ %type TAB %equipment @ "\t";
 		}
 		//echo(%favList);
 	}
-	else 
+	else
 	{
 		//otherwise we go with whats on the invScreen (even if its asleep)
 		%armor =  $Hud['inventoryScreen'].data[0, 1].getValue();
-		
+
 		// check pack validity with armor
 		%invalidPack = checkPackValidity(%pack, %armor, %item );
 		if(%invalidPack)
 		{
 			addMessageHudLine( %packFailMsg );
 			return;
-		
+
 		}
 	   %favList = $Hud['inventoryScreen'].data[0, 1].type TAB %armor;
-		for ( %i = 1; %i < $Hud['inventoryScreen'].count; %i++ ) 
+		for ( %i = 1; %i < $Hud['inventoryScreen'].count; %i++ )
 		{
 			//echo( $Hud['inventoryScreen'].Data[%i, 1].type);
 			%type = $Hud['inventoryScreen'].data[%i, 1].type;
@@ -960,14 +963,14 @@ function addQuickPackFavorite( %pack, %item )
 
 			if(%type $= %item)
 				%equipment = %pack;
-			
+
 		// Special Cases again------------------------------------------------
 			%invalidPack = checkPackValidity(%pack, %equipment, %item );
 			if(%invalidPack)
 			{
 				addMessageHudLine( %packFailMsg );
 				return;
-			
+
 			}
 
 			%favList = %favList TAB %type TAB %equipment;
@@ -983,15 +986,15 @@ function addQuickPackFavorite( %pack, %item )
 function checkPackValidity(%pack, %equipment, %item)
 {
 	//echo("validityChecking:" SPC %pack SPC %equipment);
-	
+
 	// this is mostly for ease of mod makers
 	// this is the base restrictions stuff
-	// for your mod just overwrite this function and 
+	// for your mod just overwrite this function and
 	// change the restrictions and onlyUses
 
 	// you must have #1 to use #2
 	//%restrict[#1, #2] = true;
-	
+
 	%restrict["Scout", "Inventory Station"] = true;
 	%restrict["Scout", "Landspike Turret"] = true;
 	%restrict["Scout", "Spider Clamp Turret"] = true;
@@ -1007,11 +1010,11 @@ function checkPackValidity(%pack, %equipment, %item)
 	//%require[#1] = #2 TAB #3;
 
 	%require["Laser Rifle"] = "Pack" TAB "Energy Pack";
-	
+
 
  	if(%restrict[%equipment, %pack] )
  		return true;
-	
+
 	else if(%require[%equipment] !$="" )
 	{
 		if(%item $= getField(%require[%equipment], 0) )
@@ -1038,12 +1041,12 @@ function checkInventory( %client, %text )
    for( %i = 3; %i < getFieldCount( %text ); %i = %i + 2 )
    {
       %inv = $NameToInv[getField(%text,%i)];
-      if ( (( %armor.max[%inv] && !($InvBanList[%cmt, %inv]) ) || 
-          getField( %text, %i ) $= Empty || getField( %text, %i ) $= Invalid) 
+      if ( (( %armor.max[%inv] && !($InvBanList[%cmt, %inv]) ) ||
+          getField( %text, %i ) $= Empty || getField( %text, %i ) $= Invalid)
           && (($InvTotalCount[getField( %text, %i - 1 )] - $BanCount[getField( %text, %i - 1 )]) > 0))
          %list = %list TAB getField( %text, %i - 1 ) TAB getField( %text, %i );
       else if( $InvBanList[%cmt, %inv] || %inv $= empty || %inv $= "")
-         %list = %list TAB getField( %text, %i - 1 ) TAB "INVALID";         
+         %list = %list TAB getField( %text, %i - 1 ) TAB "INVALID";
    }
    return %list;
 }
@@ -1082,7 +1085,7 @@ function InventoryScreen::onWake(%this)
 function InventoryScreen::onSleep()
 {
    hudMap.pop();
-   hudMap.delete();   
+   hudMap.delete();
    alxStop($HudHandle[inventoryScreen]);
    alxPlay(HudInventoryDeactivateSound, 0, 0, 0);
    $HudHandle[inventoryScreen] = "";
@@ -1112,7 +1115,7 @@ function createInvBanCount()
       if($InvBanList[$CurrentMissionType, $NameToInv[$InvArmor[%i]]])
          $BanCount["Armor"]++;
    $InvTotalCount["Armor"] = %i;
-   
+
    for(%i = 0; $InvWeapon[%i] !$= ""; %i++)
       if($InvBanList[$CurrentMissionType, $NameToInv[$InvWeapon[%i]]])
          $BanCount["Weapon"]++;

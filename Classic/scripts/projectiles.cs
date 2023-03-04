@@ -62,20 +62,21 @@ function ShapeBaseImageData::onFire(%data, %obj, %slot)
 {
    // ---------------------------------------------------------------------------
    // z0dd - ZOD, 9/3/02. Anti rapid fire mortar/missile fix.
-   if (%obj.cantFire !$= "")
-   {
-      return 0;
-   }
+   // if (%obj.cantFire !$= "")
+   // {
+   //    return 0;
+   // }
 
-   %wpnName = %data.getName();
-   if((%wpnName $= "MortarImage") || (%wpnName $= "MissileLauncherImage"))
-   {
-      %obj.cantFire = 1;
-      %preventTime = %data.stateTimeoutValue[4];
-      //%preventTime = (%data.stateTimeoutValue[4] + %data.stateTimeoutValue[3]) - 0.032;
-      %obj.reloadSchedule = schedule(%preventTime * 1000, %obj, resetFire, %obj);
-   }
+   // %wpnName = %data.getName();
+   // if((%wpnName $= "MortarImage") || (%wpnName $= "MissileLauncherImage"))
+   // {
+   //    %obj.cantFire = 1;
+   //    %preventTime = %data.stateTimeoutValue[4];
+   //    //%preventTime = (%data.stateTimeoutValue[4] + %data.stateTimeoutValue[3]) - 0.032;
+   //    %obj.reloadSchedule = schedule(%preventTime * 1000, %obj, resetFire, %obj);
+   // }
    // ---------------------------------------------------------------------------
+   %obj.lfireTime[%data.getName()] = getSimTime();
 
    %data.lightStart = getSimTime();
 
@@ -411,7 +412,6 @@ function ShockLanceImage::onFire(%this, %obj, %slot)
 
    %obj.cantfire = 1;
    %preventTime = %this.stateTimeoutValue[4];
-   //%preventTime = (%data.stateTimeoutValue[4] + %data.stateTimeoutValue[3]) - 0.032;
    %obj.reloadSchedule = schedule(%preventTime * 1000, %obj, resetFire, %obj);
 
    if( %obj.getEnergyLevel() < %this.minEnergy ) // z0dd - ZOD, 5/22/03. Check energy level first

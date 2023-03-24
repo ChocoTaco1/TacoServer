@@ -319,3 +319,7 @@ function TSStatic::onTrigger(%this, %triggerId, %on){
 function TSStatic::onTriggerTick(%this, %triggerId){
 //anti console spam
 }
+
+function SimObject::setPosition(%obj, %pos){
+     %obj.setTransform(%pos SPC getWords(%obj.getTransform(), 3, 6));
+}

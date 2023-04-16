@@ -1162,7 +1162,7 @@ function DefaultGame::forceObserver( %game, %client, %reason )
 		   %scheduleAutoKick = true;
    }
 
-   if(%scheduleAutoKick && !%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout)
+   if(%scheduleAutoKick && !%client.isAdmin && !%client.isWatchOnly && !$Host::TournamentMode && $Host::KickObserverTimeout)
    {
 	   if(isEventPending(%client.okschedule))
 		   cancel(%client.okschedule);
@@ -1204,11 +1204,21 @@ function DefaultGame::forceObserver( %game, %client, %reason )
 
 }
 
+
+function serverCmdWatchOnly(%client, %pass){
+   if($Host::ObserverOnlyPass $= ""){
+      $Host::ObserverOnlyPass = "ImaWatcher";// set a default one if not defined
+   }
+   if(%pass $= $Host::ObserverOnlyPass){
+      %client.isWatchOnly = 1;
+   }
+}
+
 // cmdAutoKickObserver(%client)
 // Info: Will kick the player if he/she is still in observer.
 function cmdAutoKickObserver(%client, %key) // Edit GG
 {
-   if (($Host::TournamentMode) || (!$MissionRunning) || (%client.isAdmin) || (%client.team != 0) || (!%client.okkey) || (%client.okkey != %key))
+   if (($Host::TournamentMode) || (!$MissionRunning) || (%client.isWatchOnly) || (%client.isAdmin) || (%client.team != 0) || (!%client.okkey) || (%client.okkey != %key))
       return;
 
    if(isEventPending(%client.okschedule))
@@ -1826,9 +1836,9 @@ function DefaultGame::clientMissionDropReady(%game, %client)
    for(%i = 1; %i <= 13; %i++)
       $stats::weapon_damage[%client, %i] = "";
 
-   if(%client.team $=0 && $Host::KickObserverStartOnJoin) //Observer only
+   if(%client.team $= 0 && $Host::KickObserverStartOnJoin) //Observer only
    {
-      if(!%client.isAdmin && !$Host::TournamentMode && $Host::KickObserverTimeout)
+      if(!%client.isAdmin && !%client.isWatchOnly && !$Host::TournamentMode && $Host::KickObserverTimeout)
       {
          if(isEventPending(%client.okschedule))
             cancel(%client.okschedule);
@@ -3423,7 +3433,7 @@ function DefaultGame::processGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4
       serverCmdObserveClient(%client, %targetClient);
       displayObserverHud(%client, %targetClient);
 
-      if (%targetClient != %prevObsClient)
+      if (%targetClient != %prevObsClient && !%client.isWatchOnly)
       {
          messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
          messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);

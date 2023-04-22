@@ -402,25 +402,27 @@ function Observer::setMode(%data, %obj, %mode, %targetObj)
          %obj.setTransform(%transform);
 
       case "observerFollow":
-         // Observer attached to a moving object (assume player for now...)
-         %transform = %targetObj.getTransform();
+         if(isObject(%targetObj)){
+               // Observer attached to a moving object (assume player for now...)
+               %transform = %targetObj.getTransform();
 
-         if( !%targetObj.isMounted() )
-         {
-            //z0dd - ZOD, 7/15/03. Use datablock of armor for observer params
-            %params = %targetObj.getDataBlock().observeParameters;
-            %obj.setOrbitMode(%targetObj, %transform, getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
-            //%obj.setOrbitMode(%targetObj, %transform, 0.5, 4.5, 4.5);
-         }
-         else
-         {
-            %mount = %targetObj.getObjectMount();
-            if( %mount.getDataBlock().observeParameters $= "" )
-               %params = %transform;
-            else
-               %params = %mount.getDataBlock().observeParameters;
+               if( !%targetObj.isMounted() )
+               {
+                  //z0dd - ZOD, 7/15/03. Use datablock of armor for observer params
+                  %params = %targetObj.getDataBlock().observeParameters;
+                  %obj.setOrbitMode(%targetObj, %transform, getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
+                  //%obj.setOrbitMode(%targetObj, %transform, 0.5, 4.5, 4.5);
+               }
+               else
+               {
+                  %mount = %targetObj.getObjectMount();
+                  if( %mount.getDataBlock().observeParameters $= "" )
+                     %params = %transform;
+                  else
+                     %params = %mount.getDataBlock().observeParameters;
 
-            %obj.setOrbitMode(%mount, %mount.getTransform(), getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
+                  %obj.setOrbitMode(%mount, %mount.getTransform(), getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
+               }
          }
 
       case "observerTimeout":

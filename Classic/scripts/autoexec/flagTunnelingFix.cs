@@ -5,7 +5,7 @@ $flagSimTime = 60;//note a higher the time, the larger the sweep scans will be
 $flagCheckRadius = 50;
 $playerBoxA = "-0.6 -0.6 0";
 $playerBoxB = "0.6 0.6 2.3";
-
+$flagStuckTime = 1000; 
 package flagFix{
    function CTFGame::startFlagCollisionSearch(%game, %flag){
       parent::startFlagCollisionSearch(%game, %flag);
@@ -35,6 +35,7 @@ package flagFix{
       if(!isEventPending(Game.flagLoop)){
          %game.atHomeFlagLoop();
       }
+      %game.fcs = getSimTime();
    }
 
    function SCtFGame::startMatch(%game){
@@ -56,6 +57,19 @@ package flagFix{
 activatePackage(flagFix);
 
 function DefaultGame::flagColTest(%game, %flag){
+   if( !%flag.isHome ){// keeps flags from getting stuck in ceilings 
+      %flag.stuckChkTimer += $flagSimTime;
+      if(%flag.stuckChkTimer  > $flagStuckTime){
+         %fpos = %flag.getPosition();
+         %upRay = containerRayCast(%fpos, vectorAdd(%fpos,"0 0 2.4"), $TypeMasks::InteriorObjectType | $TypeMasks::StaticObjectType | $TypeMasks::ForceFieldObjectType, %flag);
+         if(%upRay){
+            %dist = vectorDist(%fpos,getWords(%upRay,1,3));
+            //error(%dist);
+            %flag.setPosition(vectorSub(%fpos,"0 0" SPC (2.5 - %dist)));
+         }
+         %flag.stuckChkTimer  = 0;
+      }
+   }
    %Box2 = %flag.getWorldBox();
    InitContainerRadiusSearch( %flag.getWorldBoxCenter(), $flagCheckRadius, $TypeMasks::PlayerObjectType);
    while((%player = containerSearchNext()) != 0){

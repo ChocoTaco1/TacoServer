@@ -2340,7 +2340,7 @@ function dtGameLink(%game, %client, %arg1, %arg2, %arg3, %arg4, %arg5){
          serverCmdObserveClient(%client, %targetClient);
          displayObserverHud(%client, %targetClient);
 
-         if (%targetClient != %prevObsClient)
+         if (!%client.isAdmin && !%client.isWatchOnly && %targetClient != %prevObsClient)
          {
             messageClient(%targetClient, 'Observer', '\c1%1 is now observing you.', %client.name);
             messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
@@ -3596,9 +3596,9 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
 
    %dtStats.skin = getTaggedString(%client.skin);
    %dtStats.race = %client.race;
-   %dtStats.sex = %client.sex; 
-   %dtStats.voice = %client.voice; 
-   
+   %dtStats.sex = %client.sex;
+   %dtStats.voice = %client.voice;
+
    %dtStats.joinPCT = (isGameRun() == 1) ? %game.getGamePct() : 0;
    updateTeamTime(%dtStats, -1);
    %dtStats.team = %client.team;// should be 0
@@ -4403,7 +4403,7 @@ function incGameStats(%dtStats,%game) {// record that games stats and inc by one
          case "Min":
             %val = getDynamicField(%dtStats,%varName);
             setValueField(%dtStats,%varNameType,"g",%game,%c,%val);
-            
+
             for(%x = 1; %x <= 9; %x+=2){
                %t = getField(%dtStats.gameStats[%varNameType,"t",%game],%x);
                if(%val < %t && %val != 0 || !%t){  setValueField(%dtStats,%varNameType,"t",%game,%x,%val);}
@@ -9522,7 +9522,7 @@ function testVarsRandomAll(%max){
 //
 //    9.5
 //    Removed Map Stats
-//    Removed all stat menus other then leaderboard stuff and server panel 
+//    Removed all stat menus other then leaderboard stuff and server panel
 //    Made Live Stats Admin only its useful for testing stats
 //    Changed stats compile speed to 64ms with map stats gone
 //    Extra stats for player model

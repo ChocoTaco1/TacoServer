@@ -9,6 +9,9 @@
 // $Host::AntiPackPlayerCount = 6;
 //
 
+if(!$Host::AntiPackEnable)
+	return;
+
 // Choose which packs to limit
 $AntiPackIncludeCloak = 1;
 $AntiPackIncludeShield = 0;

@@ -86,7 +86,9 @@ function Observer::onTrigger(%data, %obj, %trigger, %state)
             if(%client.observeClient != -1)
             {
                observerFollowUpdate(%client, -1, false);
-               messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+               if(!%client.isAdmin && !%client.isWatchOnly){
+                  messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+               }
                %client.observeClient = -1;
             }
             %obj.mode = "observerFly";
@@ -219,7 +221,9 @@ function observeFlag(%client, %target, %type, %flagTeam)
       if(%client.observeClient != -1)
       {
       observerFollowUpdate(%client, -1, false);
-      messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+      if(!%client.isAdmin && !%client.isWatchOnly){
+         messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
+      }
       %client.observeClient = -1;
       }
    }
@@ -246,10 +250,12 @@ function observeFlag(%client, %target, %type, %flagTeam)
 
       observerFollowUpdate(%client, %target, true);
       displayObserverHud(%client, %target);
-      messageClient(%target, 'Observer', '\c1%1 is now observing you.', %client.name);
+      if(!%client.isAdmin && !%client.isWatchOnly){
+         messageClient(%target, 'Observer', '\c1%1 is now observing you.', %client.name);
+      }
 
       // was the client observing a player before?
-      if(%client.observeClient != -1)
+      if(%client.observeClient != -1 && !%client.isAdmin && !%client.isWatchOnly)
 	      messageClient(%client.observeClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
 
       %client.camera.getDataBlock().setMode(%client.camera, "observerFollow", %target.player);

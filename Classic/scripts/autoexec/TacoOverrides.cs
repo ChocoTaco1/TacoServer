@@ -324,15 +324,15 @@ function serverCmdScopeCommanderMap(%client, %scope)
 }
 
 //Mortar Throw Reload Fix
-function ShapeBase::throwWeapon(%this)
-{
-   if((%this.getMountedImage($WeaponSlot).getName() $= "MortarImage" || %this.getMountedImage($WeaponSlot).getName() $= "MissileLauncherImage" || %this.getMountedImage($WeaponSlot).getName() $= "ShockLanceImage") &&
-   (%this.getImageState($WeaponSlot) $= "Reload" || %this.getImageState($WeaponSlot) $= "Fire")){
-      return;
-   }
+// function ShapeBase::throwWeapon(%this)
+// {
+//    if((%this.getMountedImage($WeaponSlot).getName() $= "MortarImage" || %this.getMountedImage($WeaponSlot).getName() $= "MissileLauncherImage" || %this.getMountedImage($WeaponSlot).getName() $= "ShockLanceImage") &&
+//    (%this.getImageState($WeaponSlot) $= "Reload" || %this.getImageState($WeaponSlot) $= "Fire")){
+//       return;
+//    }
 
-   parent::throwWeapon(%this);
-}
+//    parent::throwWeapon(%this);
+// }
 
 
 // Added object check

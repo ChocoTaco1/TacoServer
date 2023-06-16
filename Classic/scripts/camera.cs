@@ -80,7 +80,7 @@ function Observer::onTrigger(%data,%obj,%trigger,%state)
                serverCmdObserveClient(%client, -1);
 
             displayObserverHud(%client, %client.observeClient);
-            if(!%client.isAdmin) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
+            if(!%client.isAdmin && !%client.isWatchOnly) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
                messageClient(%client.observeClient, 'Observer', '\c1%1 is now observing you.', %client.name);
          }
 
@@ -172,7 +172,7 @@ function Observer::onTrigger(%data,%obj,%trigger,%state)
 
             observerFollowUpdate( %client, %client.observeClient, false );
             displayObserverHud(%client, %client.observeClient);
-            if(!%client.isAdmin) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
+            if(!%client.isAdmin && !%client.isWatchOnly) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
                messageClient(%client.observeClient, 'Observer', '\c1%1 is now observing you.', %client.name);
          }
 
@@ -224,7 +224,7 @@ function Observer::onTrigger(%data,%obj,%trigger,%state)
             observerFollowUpdate( %client, %client.observeClient, false );
 
             displayObserverHud(%client, %client.observeClient);
-            if(!%client.isAdmin) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
+            if(!%client.isAdmin && !%client.isWatchOnly) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
                messageClient(%client.observeClient, 'Observer', '\c1%1 is now observing you.', %client.name);
          }
 
@@ -265,7 +265,7 @@ function Observer::onTrigger(%data,%obj,%trigger,%state)
 
                //send the message(s)
                displayObserverHud(%client, %nextClient);
-               if(!%client.isAdmin) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
+               if(!%client.isAdmin && !%client.isWatchOnly) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
                {
                   messageClient(%nextClient, 'Observer', '\c1%1 is now observing you.', %client.name);
                   messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
@@ -305,7 +305,7 @@ function Observer::onTrigger(%data,%obj,%trigger,%state)
                }
                //send the message(s)
                displayObserverHud(%client, %prevClient);
-               if(!%client.isAdmin) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
+               if(!%client.isAdmin && !%client.isWatchOnly) // z0dd - ZOD, 7/15/03. Only warn them if it isn't an admin watching.
                {
                   messageClient(%prevClient, 'Observer', '\c1%1 is now observing you.', %client.name);
                   messageClient(%prevObsClient, 'ObserverEnd', '\c1%1 is no longer observing you.', %client.name);
@@ -402,25 +402,27 @@ function Observer::setMode(%data, %obj, %mode, %targetObj)
          %obj.setTransform(%transform);
 
       case "observerFollow":
-         // Observer attached to a moving object (assume player for now...)
-         %transform = %targetObj.getTransform();
+         if(isObject(%targetObj)){
+               // Observer attached to a moving object (assume player for now...)
+               %transform = %targetObj.getTransform();
 
-         if( !%targetObj.isMounted() )
-         {
-            //z0dd - ZOD, 7/15/03. Use datablock of armor for observer params
-            %params = %targetObj.getDataBlock().observeParameters;
-            %obj.setOrbitMode(%targetObj, %transform, getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
-            //%obj.setOrbitMode(%targetObj, %transform, 0.5, 4.5, 4.5);
-         }
-         else
-         {
-            %mount = %targetObj.getObjectMount();
-            if( %mount.getDataBlock().observeParameters $= "" )
-               %params = %transform;
-            else
-               %params = %mount.getDataBlock().observeParameters;
+               if( !%targetObj.isMounted() )
+               {
+                  //z0dd - ZOD, 7/15/03. Use datablock of armor for observer params
+                  %params = %targetObj.getDataBlock().observeParameters;
+                  %obj.setOrbitMode(%targetObj, %transform, getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
+                  //%obj.setOrbitMode(%targetObj, %transform, 0.5, 4.5, 4.5);
+               }
+               else
+               {
+                  %mount = %targetObj.getObjectMount();
+                  if( %mount.getDataBlock().observeParameters $= "" )
+                     %params = %transform;
+                  else
+                     %params = %mount.getDataBlock().observeParameters;
 
-            %obj.setOrbitMode(%mount, %mount.getTransform(), getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
+                  %obj.setOrbitMode(%mount, %mount.getTransform(), getWord( %params, 0 ), getWord( %params, 1 ), getWord( %params, 2 ));
+               }
          }
 
       case "observerTimeout":

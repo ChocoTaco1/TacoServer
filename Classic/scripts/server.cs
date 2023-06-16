@@ -890,7 +890,7 @@ function GameConnection::onConnect( %client, %name, %raceGender, %skin, %voice, 
       //messageClient( %client, 'MsgClassic', 'Classic \c2V-Ramming Mod: \c3%1.', ($Host::ClassicLoadVRamChanges ? 'Enabled' : 'Disabled') );
 
       // z0dd - ZOD, 9/29/02. Removed T2 demo code from here
-      messageClient(%client, 'MsgClientJoin', 'Welcome to Tribes2 %1.',
+      messageClient(%client, 'MsgClientJoin', '\c2Welcome to Tribes2 %1.',
                     %client.name,
                     %client,
                     %client.target,

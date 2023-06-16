@@ -14,7 +14,7 @@
 //banList();in console
 //unbanIndex(%index) %index is the number next to the players name from listBans();
 //Example: unbanold(555555,"22.222.222.222"); put ip in quotes
-
+$dtBanList::save =1;
 package dtBan
 {
 
@@ -103,7 +103,7 @@ function banList_checkIP(%client){
    %ip = strReplace(%ip, ".", "_");
 
    %time = $dtBanList::IP[%ip];
-   if(%time $= "BAN")
+   if(getField(%time,4) $= "BAN")
       return 1;
    if (getFieldCount(%time) > 0){
       %delta =  getBanCount(getField(%time,0), getField(%time,1),getField(%time,2),getField(%time,3));
@@ -127,7 +127,7 @@ function banList_checkIP(%client){
 
 function banList_checkGUID(%guid){
    %time = $dtBanList::GUID[%guid];
-   if(%time $= "BAN")
+   if(getField(%time,4) $= "BAN")
       return 1;
    if (getFieldCount(%time) > 0){
       %delta =  getBanCount(getField(%time,0), getField(%time,1),getField(%time,2),getField(%time,3));
@@ -320,7 +320,7 @@ function banListClean(){
          %ip = getField($dtBanList::NameList[%i], 2);
          %time = $dtBanList::GUID[%guid];
          %delta =  getBanCount(getField(%time,0), getField(%time,1),getField(%time,2),getField(%time,3));
-         if (%delta > getField(%time,4)){
+         if (getField(%time,4) !$= "BAN" && %delta > getField(%time,4)){
            $dtBanList::NameList[%i] = "";
            $dtBanList::GUID[%guid] = "";
            $dtBanList::IP[%ip] =  "";

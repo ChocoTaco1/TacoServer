@@ -13,11 +13,11 @@ Discord: [Tribes 2 Discord](https://discord.gg/Y4muNvF)
  - Built Light-Weight
  - Team Autobalancing
  - Team-Balance and Base Rape Messages
- - Pack Restrictions base on Population
+ - Pack Restrictions based on Population
  - No Base Rape based on Population
  - Turret Activation based on Population
  - Loading screen customization
- - Low match Time warnings
+ - Low MatchTime warnings
  - Late Time Voting
  - Vote Reminders and Restrictions
  - Vote System Rework

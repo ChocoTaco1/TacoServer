@@ -57,19 +57,25 @@ package flagFix{
 activatePackage(flagFix);
 
 function DefaultGame::flagColTest(%game, %flag){
-   if( !%flag.isHome ){// keeps flags from getting stuck in ceilings 
+//flag ceiling check
+   if( !%flag.isHome ){
       %flag.stuckChkTimer += $flagSimTime;
-      if(%flag.stuckChkTimer  > $flagStuckTime){
-         %fpos = %flag.getPosition();
-         %upRay = containerRayCast(%fpos, vectorAdd(%fpos,"0 0 2.4"), $TypeMasks::InteriorObjectType | $TypeMasks::StaticObjectType | $TypeMasks::ForceFieldObjectType, %flag);
-         if(%upRay){
-            %dist = vectorDist(%fpos,getWords(%upRay,1,3));
-            //error(%dist);
-            %flag.setPosition(vectorSub(%fpos,"0 0" SPC (2.5 - %dist)));
+      if(%flag.stuckChkTimer  > $flagStuckTime){ // rate limit are checks
+         if(vectorLen(%flag.getVelocity()) < 2){ // only check if we are not at speed
+            %fpos = %flag.getPosition();
+            //0.1 offset any fp errors with the flag position being at ground level, 2.4 offset flag height offset + some extra 
+            %upRay = containerRayCast(vectorAdd(%fpos,"0 0 0.1"), vectorAdd(%fpos,"0 0 2.4"), $TypeMasks::InteriorObjectType | $TypeMasks::StaticTSObjectType | $TypeMasks::ForceFieldObjectType, %flag);
+            if(%upRay){
+               %dist = vectorDist(%fpos,getWords(%upRay,1,3));
+               //error(%dist);
+               %flag.setPosition(vectorSub(%fpos,"0 0" SPC (2.5 - %dist)));
+            }
          }
          %flag.stuckChkTimer  = 0;
       }
    }
+////////////////////////////////////////////////////////////////////////////////
+//flag collision check
    %Box2 = %flag.getWorldBox();
    InitContainerRadiusSearch( %flag.getWorldBoxCenter(), $flagCheckRadius, $TypeMasks::PlayerObjectType);
    while((%player = containerSearchNext()) != 0){

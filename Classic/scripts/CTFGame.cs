@@ -26,7 +26,7 @@ function CTFGame::initGameVars(%game)
    %game.SCORE_PER_TEAM_FLAG_CAP       = 100;
    %game.SCORE_PER_TEAM_FLAG_TOUCH     = 1;
    %game.SCORE_PER_ESCORT_ASSIST       = 5;
-   %game.SCORE_PER_HEADSHOT            = 1;
+   %game.SCORE_PER_HEADSHOT            = 69;
    %game.SCORE_PER_REARSHOT            = 1; // z0dd - ZOD, 8/25/02. Added Lance rear shot messages
    %game.SCORE_PER_MIDAIR          	   = 1; // Added Chocotaco. From sctf
 

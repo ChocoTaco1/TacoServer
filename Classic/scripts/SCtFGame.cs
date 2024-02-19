@@ -2459,7 +2459,7 @@ function deleteNonSCtFObjects()
    $TypeMasks::TurretObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::StaticShapeObjectType); //For FF: $TypeMasks::ForceFieldObjectType
    while ((%obj = containerSearchNext()) != 0)
    {
-      if(%obj.Datablock !$= "flag" && %obj.Datablock !$= "RepairKit" && %obj.Datablock !$= "RepairPatch") //Dont delete these...
+      if(%obj.Datablock !$= "flag" && %obj.Datablock !$= "RepairKit" && %obj.Datablock !$= "RepairPatch" && %obj.Datablock !$= "ExteriorFlagStand" && %obj.Datablock !$= "InteriorFlagStand") //Dont delete these...
       {
          %deleteList[%c] = %obj;
          %c++;

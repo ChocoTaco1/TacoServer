@@ -443,7 +443,7 @@ function serverCmdStartNewVote(%client, %typeName, %arg1, %arg2, %arg3, %arg4, %
 			}
 
          // 30 minutes Only in Tournament mode
-			if($Host::TournamentMode && %arg1 !$= "30")
+			if($Host::TournamentMode && %arg1 !$= "30" && !%client.isSuperAdmin)
 			{
 				messageClient(%client, "", "\c2Only 30 minute time limit allowed in tournament mode.");
 				return;

@@ -3318,13 +3318,34 @@ function serverCmdProcessGameLink(%client, %arg1, %arg2, %arg3, %arg4, %arg5)
 
 //-----------------------------------------------------------------------------------
 // z0dd - ZOD, 6/03/02. New function. Impact hit sounds settings from clientprefs.cs.
-function serverCmdSetHitSounds( %client, %playerHitsOn, %playerHitWav, %vehicleHitsOn, %vehicleHitWav )
-{
-   %client.playerHitSound = %playerHitsOn;
-   %client.playerHitWav = addtaggedString(%playerHitWav);
+// function serverCmdSetHitSounds( %client, %playerHitsOn, %playerHitWav, %vehicleHitsOn, %vehicleHitWav )
+// {
+//    %client.playerHitSound = %playerHitsOn;
+//    %client.playerHitWav = addtaggedString(%playerHitWav);
 
-   %client.vehicleHitSound = %vehicleHitsOn;
-   %client.vehicleHitWav = addtaggedString(%vehicleHitWav);
+//    %client.vehicleHitSound = %vehicleHitsOn;
+//    %client.vehicleHitWav = addtaggedString(%vehicleHitWav);
+// }
+//Rewritten to prevent overflows
+function serverCmdSetHitSounds( %client, %playerHitsOn, %playerHitWav, %vehicleHitsOn, %vehicleHitWav ){
+   if(%client.hitTagSoundCount < 15){// limit this to prevent string table overflow
+
+      %client.playerHitSound = %playerHitsOn;
+      %client.playerHitWav = addtaggedString(%playerHitWav);
+
+      if(!%client.hitTagSound[%client.playerHitWav]){
+         %client.hitTagSound[%client.playerHitWav] = 1;
+         %client.hitTagSoundCount++;
+      }
+
+      %client.vehicleHitSound = %vehicleHitsOn;
+      %client.vehicleHitWav = addtaggedString(%vehicleHitWav);
+
+      if(!%client.hitTagSound[%client.vehicleHitWav]){
+         %client.hitTagSound[%client.vehicleHitWav] = 1;
+         %client.hitTagSoundCount++;
+      }
+   }
 }
 
 //-----------------------------------------------------------------------------------

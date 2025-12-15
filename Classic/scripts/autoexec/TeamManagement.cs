@@ -42,7 +42,7 @@ function GetTeamCounts(%game)
 		if($countdownStarted && $MatchStarted)
 		{
 			//Variables
-			$TotalTeamPlayerCount = $TeamRank[1, count] + $TeamRank[2, count];
+			$TotalTeamPlayerCount = (Game.class $= "LakRabbitGame") ? $TeamRank[0, count] : ($TeamRank[1, count] + $TeamRank[2, count]);
 			$AllPlayerCount = $HostGamePlayerCount;
 
 			//Observers

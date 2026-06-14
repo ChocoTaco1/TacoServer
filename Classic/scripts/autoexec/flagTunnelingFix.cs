@@ -23,7 +23,7 @@ $flagOffset = 1;// how far to offset the flag  1m seems like it works 90% of the
 
 //expermental flag static fix
 //memPatch("60456c","11000018");//transform
-memPatch("6040ff","01"); //setVelocity
+//memPatch("6040ff","01"); //setVelocity
 $flagResetTime = 0;// 1000-5000 if you want this feature enabled, resets flag to stand in case of desync should not be needed
 
 //best to leave these values alone unless you understand what the code is doing

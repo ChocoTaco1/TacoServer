@@ -16,7 +16,7 @@
 // Note See bottom of file for full log
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-----------Settings-----------
-$dtStats::version = 10.60;
+$dtStats::version = 10.62;
 //disable stats system
 $dtStats::Enable = $Host::dtStatsEnable $= "" ? ($Host::dtStatsEnable = 1) : $Host::dtStatsEnable;
 if(!$dtStats::Enable){ return;}// so it disables with a restart
@@ -94,8 +94,8 @@ $dtStats::year = 0;//not
 $dtStats::custom = 12;//not used
 // you gain extra days based on time played extra days = gameCount * expireFactor;
 // example being 100 games * factor of 0.596 = will gain you 60 extra days but if its over the 90 day max it will be deleted
-$dtStats::expireMax = 90;
-$dtStats::expireMin = 15;
+$dtStats::expireMax = 21;
+$dtStats::expireMin = 7;
 $dtStats::expireFactor["CTFGame"] = 0.596;
 $dtStats::expireFactor["LakRabbitGame"] = 2;
 $dtStats::expireFactor["DMGame"] = 6;
@@ -2271,7 +2271,6 @@ if(!isObject(statsGroup)){
    RootGroup.add(statsGroup);
    statsGroup.resetCount = -1;
    statsGroup.serverStart = 0;
-   $dtStats::leftID++;
 }
 
 function dtAICON(%client){
@@ -2783,11 +2782,11 @@ package dtStats{
    }
    function DefaultGame::playerSpawned(%game, %player){
       parent::playerSpawned(%game, %player);
-      armorTimer(%player.client.dtStats, %player.getArmorSize(), 0);
+      armorTimer(%player.client.dtStats, %player.getArmorSize());
    }
    function Player::setArmor(%this,%size){//for game types that use spawn favs
       parent::setArmor(%this,%size);
-      armorTimer(%this.client.dtStats, %size, 0);
+      armorTimer(%this.client.dtStats, %size);
    }
    function Weapon::onPickup(%this, %obj, %shape, %amount){
 		parent::onPickup(%this, %obj, %shape, %amount);
@@ -5064,17 +5063,14 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
             %dtStats.clientLeft = 0;
             %dtStats.stat["clientQuit"] = 0;
             %dtStats.markForDelete = 0;
-            if(%dtStats.leftID == $dtStats::leftID){
-               $dtServer::mapReconnects[cleanMapName($CurrentMission),%game.class]++;
-            }
-            if(isGameRun() && %dtStats.leftID == $dtStats::leftID && %dtStats.stat["score"] != 0){// make sure game is running and we are on the same map
+            if(isGameRun() && %dtStats.misSeq == $missionSequence){
                resGameStats(%client,%game.class); // restore stats;
+               if(%dtStats.stat["score"] != 0){
+                  messageClient(%client, 'MsgClient', '\crWelcome back %1. Your score has been restored.~wfx/misc/rolechange.wav', %client.name);
+               }
             }
             else{
                resetDtStats(%dtStats,%game.class,1);
-            }
-            if(%client.stat["score"] != 0){
-               messageClient(%client, 'MsgClient', '\crWelcome back %1. Your score has been restored.~wfx/misc/rolechange.wav', %client.name);
             }
             break;
          }
@@ -5090,21 +5086,21 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          %dtStats.markForDelete = 0;
          %dtStats.name = %name;
          $dtStats::tbLookUP[%client.guid] = %dtStats;
+         resetDtStats(%dtStats,%game.class,1);
       }
    }
    else{
      %dtStats = %client.dtStats;
    }
-
+   %dtStats.misSeq = $missionSequence;
    %dtStats.joinPCT = (isGameRun() == 1) ? %game.getGamePct() : 0;
    updateTeamTime(%dtStats, -1);
    %dtStats.team = %client.team;// should be 0
-   if(isObject(%dtStats) && %dtStats.gameData[%game.class] != 1){ // game type change
+   if(isObject(%dtStats) && %dtStats.gameData[%game.class, $dtStats::tmMode] != 1){ // game type change
       %dtStats.gameStats["totalGames","g",%game.class] = 0;
       %dtStats.gameStats["statsOverWrite","g",%game.class] = -1;
       %dtStats.gameStats["fullSet","g",%game.class] = 0;
-      resetDtStats(%dtStats,%game.class,1);
-      %dtStats.gameData[%game.class] = 0;
+      %dtStats.gameData[%game.class, $dtStats::tmMode] = 0;
    }
    %dtStats.mapTime = getSimTime();
 }
@@ -5123,12 +5119,11 @@ function dtStatsClientLeaveGame(%client){
       %client.dtStats.isBot = (%client.isWatchOnly == 1);
       %dtStats.stat["clientQuit"] = isGameRun();
       %client.dtStats.leftTime = getSimTime();
-      %client.dtStats.leftID = $dtStats::leftID;
       if(isObject(Game)){
          %client.dtStats.leftPCT = Game.getGamePct();
          if(isGameRun() && %client.score != 0){
             updateTeamTime(%client.dtStats, %client.dtStats.team);
-            armorTimer(%client.dtStats, 0, 1);
+            armorTimer(%client.dtStats, -1);
          }
       }
       else{
@@ -5738,7 +5733,6 @@ function loadTBMap(%game){
 
 function dtSaveDone(){
    $dtStats::statsSave = 0;
-   $dtStats::leftID++;
    $dtStats::teamOneCapTimes = 0;
    $dtStats::teamTwoCapTimes = 0;
    $dtStats::teamOneCapCount = 0;
@@ -5752,6 +5746,9 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
    if($dtStats::debugEchos){error("postGameStats GUID = "  SPC %dtStats.guid);}
    if(!isObject(%dtStats))
       return;
+
+   armorTimer(%dtStats, -1);
+
    %dtStats.stat["tournamentMode"]  = $Host::TournamentMode;
 
    %dtStats.stat["null"] = getRandom(1,100);
@@ -6264,7 +6261,7 @@ function loadGameStats(%dtStats,%game){// called when client joins server.cs onC
             %var = getField(%line,0);
             %dtStats.gameStats[%var,"g",%game,$dtStats::tmMode] =  getFields(%line,1,getFieldCount(%line)-1);
          }
-         %dtStats.gameData[%game,$dtStats::tmMode]= 1;
+         %dtStats.gameData[%game, $dtStats::tmMode]= 1;
          %file.close();
          %file.delete();
       }
@@ -6975,7 +6972,7 @@ function buildVarList(){
 ////////////////////////////////////////////////////////////////////////////////
 //Stats Collecting
 ////////////////////////////////////////////////////////////////////////////////
-function armorTimer(%dtStats, %size, %death){
+function armorTimer(%dtStats, %size){
    if(%dtStats.lastArmor $= "Light" && %dtStats.ArmorTime[%dtStats.lastArmor] > 0){
       %dtStats.stat["lArmorTime"] += ((getSimTime() - %dtStats.ArmorTime[%dtStats.lastArmor])/1000)/60;
       %dtStats.ArmorTime[%dtStats.lastArmor] = 0;
@@ -6991,7 +6988,7 @@ function armorTimer(%dtStats, %size, %death){
       %dtStats.ArmorTime[%dtStats.lastArmor] = 0;
       %dtStats.lastArmor = 0;
    }
-   if(!%death){
+   if(%size == -1){
       %dtStats.ArmorTime[%size] = getSimTime();
       %dtStats.lastArmor = %size;
    }
@@ -7090,7 +7087,7 @@ function clientKillStats(%game,%clVictim, %clKiller, %damageType, %implement, %d
    %victimPlayer = isObject(%clVictim.player) ? %clVictim.player : %clVictim.lastPlayer;
    %killerPlayer = isObject(%clKiller.player) ? %clKiller.player : %clKiller.lastPlayer;
    %clVictim.lp = "";//last position for distMove
-   armorTimer(%victimDT, 0, 1);
+   armorTimer(%victimDT, -1);
 //------------------------------------------------------------------------------
    %victimDT.timeToLive += getSimTime() - %clVictim.spawnTime;
    %victimDT.stat["timeTL"] = mFloor(((%victimDT.timeToLive/(%clVictim.stat["deaths"]+%clVictim.stat["suicides"] ? %clVictim.stat["deaths"]+%clVictim.stat["suicides"] : 1))/1000)/60);
@@ -14004,7 +14001,7 @@ package dtBanSys{
             name = %name;
             guid = %guid;
             ip =  %bareip;
-            banDateTime = dtMarkDate(); 
+            banDateTime = dtMarkDate();
             banLengthMin = %time;
          };
          dtBanList.add(%banObj);
@@ -20539,7 +20536,7 @@ function mapCyleTest(){
 //    Misc arena things
 //    Added LCTF Naming
 //    serverPrefs Support
-//    bansystem rework doto new tribes next changes 
+//    bansystem rework doto new tribes next changes
 
 
 ////////////////////////////////////////////////////////////////////////////////

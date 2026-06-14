@@ -12,7 +12,7 @@ function serverCmdClientMakeObserver(%client)
 	//10 second cooldown on becoming an observer
 	%timeDif  = getSimTime() - %client.observerTimeout;
 	%timeDif1 = getSimTime() - %client.observerMsg;
-	if(%timeDif > 10000 || !%client.observerTimeout || %client.isAdmin)
+	if(%timeDif > 10000 || !%client.observerTimeout || %client.isSuperAdmin)
 	{
 		%client.observerProtectStart = getSimTime();
 		%client.observerTimeout = getSimTime();

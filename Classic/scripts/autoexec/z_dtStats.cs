@@ -16,7 +16,7 @@
 // Note See bottom of file for full log
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-----------Settings-----------
-$dtStats::version = 10.62;
+$dtStats::version = 10.63;
 //disable stats system
 $dtStats::Enable = $Host::dtStatsEnable $= "" ? ($Host::dtStatsEnable = 1) : $Host::dtStatsEnable;
 if(!$dtStats::Enable){ return;}// so it disables with a restart
@@ -6988,7 +6988,7 @@ function armorTimer(%dtStats, %size){
       %dtStats.ArmorTime[%dtStats.lastArmor] = 0;
       %dtStats.lastArmor = 0;
    }
-   if(%size == -1){
+   if(%size != -1){
       %dtStats.ArmorTime[%size] = getSimTime();
       %dtStats.lastArmor = %size;
    }

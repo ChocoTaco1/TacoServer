@@ -1543,8 +1543,8 @@ function nameTagChange(%client, %tag, %append)
 {
    if(isObject(%client) && !%client.isAiControlled())
    {
-		if(strLen(%tag) > 6){
-			messageClient(%client, 'MsgError', 'Clan tag too long, maximum length is 6 characters.');
+		if(strLen(%tag) > 8){
+			messageClient(%client, 'MsgError', 'Clan tag too long, maximum length is 8 characters.');
 			return;
 		}
 

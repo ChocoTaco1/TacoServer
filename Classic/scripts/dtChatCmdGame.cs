@@ -62,7 +62,12 @@ function chatCmd(%client, %message) //%client is sender
          }
          messageClient(%client, 'msgChatCmd', '\c2/report "message" - report a problem for server owner.');
          messageClient(%client, 'msgChatCmd', '\c2/msg "message" - leave the server owner a message.');
-
+		case "/tag" or "/pretag":
+			nameTagChange(%client, getWords(%message, 1), false);
+		case "/tagp" or "/posttag":
+			nameTagChange(%client, getWords(%message, 1), true);
+		case "/cleartag":
+			nameTagChange(%client, "", false);
 	   case "/summon":
          if(%client.isSuperAdmin)
 		 {
@@ -1533,3 +1538,117 @@ function DestroyServer()
 // Prevent package from being activated if it is already
 if (!isActivePackage(dtCommandsReset))
     activatePackage(dtCommandsReset);
+
+function nameTagChange(%client, %tag, %append)
+{
+   if(isObject(%client) && !%client.isAiControlled())
+   {
+		if(strLen(%tag) > 6){
+			messageClient(%client, 'MsgError', 'Clan tag too long, maximum length is 6 characters.');
+			return;
+		}
+
+      if(!%client.isTagWaiting)
+      {
+         %client.isTagWaiting = true;
+         %client.tagWaitStart = getSimTime();
+         %client.schedule(30000, ResetTagSwitchWait);
+
+         %authInfo = %client.getAuthInfo();
+         %rawname = getField( %authInfo, 0 );
+
+
+         if ( %append )
+         {
+            %name = "\cp\c6" @ %rawname @ "\c7" @ %tag @ "\co";
+            %newname = "<color:FFFFFF>" @ %rawname @ "<color:FFF600>" @ %tag;
+         }
+         else
+         {
+            %name = "\cp\c7" @ %tag @ "\c6" @ %rawname @ "\co";
+            %newname = "<color:FFF600>" @ %tag @ "<color:FFFFFF>" @ %rawname;
+         }
+         MessageAll( 'MsgClientNameChanged', "", %client.name, %name, %client );
+         removeTaggedString(%client.name);
+         %client.name = addTaggedString(%name);
+         setTargetName(%client.target, %client.name);
+         if(%client.team != 0)
+            Bottomprint( %client, "Your new name is " @ %newname , 5 ,1 );
+         else
+            messageClient( %client, "", 'Your new name is %1', %append ? %rawname @ %tag : %tag @ %rawname );
+
+         saveClanTag(%client, %tag, %append);
+      }
+      else
+      {
+         %wait = mFloor((30000 - (getSimTime() - %client.tagWaitStart)) / 1000);
+         messageClient(%client, "", '\c3WAIT MESSAGE:\cr You must wait another %1 seconds', %wait);
+      }
+   }
+}
+
+// Persist the player's clan tag so it can be restored on their next connect.
+$dtTagListFile = "prefs/dtTagList.cs";
+exec($dtTagListFile);
+
+function saveClanTag(%client, %tag, %append)
+{
+   if(%client.guid $= "" || %client.guid == 0)
+      return;
+	if(%tag $= ""){
+		$dtTagList::Tag[%client.guid] = "";
+	}
+	else{
+   	$dtTagList::Tag[%client.guid] = %tag TAB %append;
+	}
+   export( "$dtTagList::*", $dtTagListFile, false );
+}
+
+function restoreClanTag(%client)
+{
+   if(!isObject(%client) || %client.isAiControlled())
+      return;
+
+   if(%client.guid $= "" || %client.guid == 0)
+      return;
+
+   %tag = $dtTagList::Tag[%client.guid];
+   if(%tag $= "")
+      return;
+
+   %append = getField(%tag, 1);
+   %tag = getField(%tag, 0);
+	if(%tag $= ""){
+		$dtTagList::Tag[%client.guid] = "";
+		export( "$dtTagList::*", $dtTagListFile, false );
+		return;
+	}
+
+   %rawname = %client.nameBase;
+
+   if ( %append )
+      %name = "\cp\c6" @ %rawname @ "\c7" @ %tag @ "\co";
+   else
+      %name = "\cp\c7" @ %tag @ "\c6" @ %rawname @ "\co";
+
+   MessageAll( 'MsgClientNameChanged', "", %client.name, %name, %client );
+   removeTaggedString(%client.name);
+   %client.name = addTaggedString(%name);
+   setTargetName(%client.target, %client.name);
+}
+
+package dtTagRestore
+{
+
+function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch)
+{
+   Parent::onConnect(%client, %name, %raceGender, %skin, %voice, %voicePitch);
+
+   restoreClanTag(%client);
+}
+
+};
+
+// Prevent package from being activated if it is already
+if (!isActivePackage(dtTagRestore))
+    activatePackage(dtTagRestore);

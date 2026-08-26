@@ -16,7 +16,7 @@
 // Note See bottom of file for full log
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-----------Settings-----------
-$dtStats::version = 10.63;
+$dtStats::version = 10.64;
 //disable stats system
 $dtStats::Enable = $Host::dtStatsEnable $= "" ? ($Host::dtStatsEnable = 1) : $Host::dtStatsEnable;
 if(!$dtStats::Enable){ return;}// so it disables with a restart
@@ -798,6 +798,8 @@ $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVHitWep";
 $dtStats::FV[$dtStats::FC["TG"]++,"TG"] = "EVMAHit";
 
 $dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "tournamentMode";
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "clanTag";
+$dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "nameTag";
 $dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "startPCT";
 $dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "endPCT";
 $dtStats::FV[$dtStats::FC["Game"]++,"Game"] = "mapSkip";
@@ -2467,7 +2469,7 @@ package dtStats{
             else{
                %line = '<lmargin:0><color:c8c8c8><clip%%:40>%1</clip><color:3cb4b4><lmargin%%:20><clip%%:30> %2</clip><lmargin%%:37>%3<lmargin%%:49>%4<lmargin%%:61>%6<lmargin%%:73>%7<lmargin%%:85>%8';
             }
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(getTaggedString(%cl.name)), %game.getTeamName(%cl.team), %score, %kills , %deaths, cropFloat(%cl.dtStats.stat["kdr"],2), %cl.dtStats.stat["assist"], %cl.dtStats.stat["discMA"] );
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, %cl.name, %game.getTeamName(%cl.team), %score, %kills , %deaths, cropFloat(%cl.dtStats.stat["kdr"],2), %cl.dtStats.stat["assist"], %cl.dtStats.stat["discMA"] );
 
             %count[%highTeam]++;
             %notDone = false;
@@ -2509,7 +2511,7 @@ package dtStats{
                   else{
                      %line = '<lmargin:0><color:c8c8c8><clip%%:40>%1</clip><color:3cb4b4><lmargin%%:20><clip%%:30> %2</clip><lmargin%%:37>%3<lmargin%%:49>%4<lmargin%%:61>%6<lmargin%%:73>%7<lmargin%%:85>%8';
                   }
-                  messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(getTaggedString(%cl.name)), "", %score, %kills , %deaths, cropFloat(%cl.dtStats.stat["kdr"],2), %cl.dtStats.stat["assist"], %cl.dtStats.stat["discMA"] );
+                  messageClient( %client, 'MsgDebriefAddLine', "", %line, %cl.name, "", %score, %kills , %deaths, cropFloat(%cl.dtStats.stat["kdr"],2), %cl.dtStats.stat["assist"], %cl.dtStats.stat["discMA"] );
 
             }
          }
@@ -3410,11 +3412,11 @@ package dtStats{
 
             if(%client == %cl){
                messageClient( %client, 'MsgDebriefAddLine', "", '<color:ffff00><lmargin:0><clip%%:18> %1</clip><lmargin%%:23>%2<lmargin%%:34>%3<lmargin%%:44>%4<lmargin%%:52>%5<lmargin%%:62>%6<lmargin%%:70>%7<lmargin%%:80>%8%%<lmargin%%:90>%9',
-                  StripMLControlChars(getTaggedString(%cl.name)), %score, %kills, %mas, %avgSpeed, %avgDistance, %othertotdistance, %shockPercent, %shockhits);
+                  %cl.name, %score, %kills, %mas, %avgSpeed, %avgDistance, %othertotdistance, %shockPercent, %shockhits);
             }
             else{
                 messageClient( %client, 'MsgDebriefAddLine', "", '<color:c8c8c8><lmargin:0><clip%%:18> %1</clip><lmargin%%:23>%2<lmargin%%:34>%3<lmargin%%:44>%4<lmargin%%:52>%5<lmargin%%:62>%6<lmargin%%:70>%7<lmargin%%:80>%8%%<lmargin%%:90>%9',
-                  StripMLControlChars(getTaggedString(%cl.name)), %score, %kills, %mas, %avgSpeed, %avgDistance, %othertotdistance, %shockPercent, %shockhits);
+                  %cl.name, %score, %kills, %mas, %avgSpeed, %avgDistance, %othertotdistance, %shockPercent, %shockhits);
             }
 
             if(%score)		%totscore		+= %score;
@@ -3596,7 +3598,7 @@ function DefaultGame::sendCTFDebrif(%game,%client){
       }else{
          %line = '<lmargin:0>%9<clip%%:40>%1</clip><color:3cb4b4><lmargin%%:20><clip%%:30> %2</clip><lmargin%%:35>%3<lmargin%%:45>%4<lmargin%%:55>%5<lmargin%%:65>%6<lmargin%%:75>%7<lmargin%%:85>%8';
       }
-      messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(getTaggedString(%cl.name)), %game.getTeamName(%cl.team), %score, %kills, %cl.dtStats.stat["assist"], %cl.dtStats.stat["OffKills"], %cl.dtStats.stat["DefKills"], %cl.dtStats.stat["discMA"],%nameColor);
+      messageClient( %client, 'MsgDebriefAddLine', "", %line, %cl.name, %game.getTeamName(%cl.team), %score, %kills, %cl.dtStats.stat["assist"], %cl.dtStats.stat["OffKills"], %cl.dtStats.stat["DefKills"], %cl.dtStats.stat["discMA"],%nameColor);
 
       %count[%highTeam]++;
       %notDone = false;
@@ -3635,9 +3637,14 @@ function DefaultGame::sendCTFDebrif(%game,%client){
          else{
             %line = '<lmargin:0>%9<clip%%:40>%1</clip><color:3cb4b4><lmargin%%:20><clip%%:30> %2</clip><lmargin%%:35>%3<lmargin%%:45>%4<lmargin%%:55>%5<lmargin%%:65>%6<lmargin%%:75>%7<lmargin%%:85>%8';
          }
-         messageClient( %client, 'MsgDebriefAddLine', "", %line,StripMLControlChars(getTaggedString(%cl.name)), "", %score, %kills, %cl.dtStats.stat["assist"], %cl.dtStats.stat["OffKills"], %cl.dtStats.stat["DefKills"], %cl.dtStats.stat["discMA"],%nameColor );
+         messageClient( %client, 'MsgDebriefAddLine', "", %line, %cl.name, "", %score, %kills, %cl.dtStats.stat["assist"], %cl.dtStats.stat["OffKills"], %cl.dtStats.stat["DefKills"], %cl.dtStats.stat["discMA"],%nameColor );
       }
    }
+}
+
+
+function getStatName(%stat){
+   return hasValueS(dtGameStat.dtStats[%stat].nameTag,"NA");
 }
 
 function extendedDebrief(%game, %client){
@@ -3646,59 +3653,59 @@ function extendedDebrief(%game, %client){
          messageClient( %client, 'MsgDebriefAddLine', "", '<lmargin:0> ' );
          messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>FLAG STATS\tPLAYER\t' );
          if(dtGameStat.stat["heldTimeSec"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Fastest Cap\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2 Sec', StripMLControlChars(hasValueS(dtGameStat.name["heldTimeSec"],"NA")), dtGameStat.stat["heldTimeSec"],(%client == dtGameStat.client["heldTimeSec"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Fastest Cap\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2 Sec', getStatName("heldTimeSec"), dtGameStat.stat["heldTimeSec"],(%client == dtGameStat.dtStats["heldTimeSec"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["grabSpeed"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Flaming Ass\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2 Kmh', StripMLControlChars(hasValueS(dtGameStat.name["grabSpeed"],"NA")), dtGameStat.stat["grabSpeed"],(%client == dtGameStat.client["grabSpeed"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Flaming Ass\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2 Kmh', getStatName("grabSpeed"), dtGameStat.stat["grabSpeed"],(%client == dtGameStat.dtStats["grabSpeed"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["flagCaps"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Cap Mastah\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', StripMLControlChars(hasValueS(dtGameStat.name["flagCaps"],"NA")), dtGameStat.stat["flagCaps"],(%client == dtGameStat.client["flagCaps"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Cap Mastah\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', getStatName("flagCaps"), dtGameStat.stat["flagCaps"],(%client == dtGameStat.dtStats["flagCaps"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["flagGrabs"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Grabz0r\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', StripMLControlChars(hasValueS(dtGameStat.name["flagGrabs"],"NA")), dtGameStat.stat["flagGrabs"],(%client == dtGameStat.client["flagGrabs"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Grabz0r\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', getStatName("flagGrabs"), dtGameStat.stat["flagGrabs"],(%client == dtGameStat.dtStats["flagGrabs"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["carrierKills"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>FC killer\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', StripMLControlChars(hasValueS(dtGameStat.name["carrierKills"],"NA")), dtGameStat.stat["carrierKills"],(%client == dtGameStat.client["carrierKills"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>FC killer\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', getStatName("carrierKills"), dtGameStat.stat["carrierKills"],(%client == dtGameStat.dtStats["carrierKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["flagDefends"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Flag Guardian\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', StripMLControlChars(hasValueS(dtGameStat.name["flagDefends"],"NA")), dtGameStat.stat["flagDefends"],(%client == dtGameStat.client["flagDefends"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Flag Guardian\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', getStatName("flagDefends"), dtGameStat.stat["flagDefends"],(%client == dtGameStat.dtStats["flagDefends"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["escortAssists"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Flag Escort\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', StripMLControlChars(hasValueS(dtGameStat.name["escortAssists"],"NA")), dtGameStat.stat["escortAssists"],(%client == dtGameStat.client["escortAssists"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Flag Escort\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', getStatName("escortAssists"), dtGameStat.stat["escortAssists"],(%client == dtGameStat.dtStats["escortAssists"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["stalemateReturn"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Stalemate Breaker\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', StripMLControlChars(hasValueS(dtGameStat.name["stalemateReturn"],"NA")), dtGameStat.stat["stalemateReturn"],(%client == dtGameStat.client["stalemateReturn"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Stalemate Breaker\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', getStatName("stalemateReturn"), dtGameStat.stat["stalemateReturn"],(%client == dtGameStat.dtStats["stalemateReturn"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["flagReturns"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Flag Returns\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', StripMLControlChars(hasValueS(dtGameStat.name["flagReturns"],"NA")), dtGameStat.stat["flagReturns"],(%client == dtGameStat.client["flagReturns"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280><color:00dc00>Flag Returns\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2', getStatName("flagReturns"), dtGameStat.stat["flagReturns"],(%client == dtGameStat.dtStats["flagReturns"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
       }
       if(dtGameStat.gc["ma"] > 0){
          messageClient( %client, 'MsgDebriefAddLine', "", '<lmargin:0> ' );
          messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360,510><color:00dc00>\tPLAYER\tMA\tPLAYER\tDISTANCE');
          if(dtGameStat.stat["discMA"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Disc\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4m';
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["discMA"],"NA")), dtGameStat.stat["discMA"], StripMLControlChars(hasValueS(dtGameStat.name["discMAHitDist"],"NA")), mFormatFloat(dtGameStat.stat["discMAHitDist"], "%.2f"),(%client == dtGameStat.client["discMA"]) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.client["discMAHitDist"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("discMA"), dtGameStat.stat["discMA"], getStatName("discMAHitDist"), mFormatFloat(dtGameStat.stat["discMAHitDist"], "%.2f"),(%client == dtGameStat.dtStats["discMA"].client) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.dtStats["discMAHitDist"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          }
          if(dtGameStat.stat["plasmaMA"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Plasma\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4m';
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["plasmaMA"],"NA")), dtGameStat.stat["plasmaMA"], StripMLControlChars(hasValueS(dtGameStat.name["plasmaMAHitDist"],"NA")), mFormatFloat(dtGameStat.stat["plasmaMAHitDist"], "%.2f"),(%client == dtGameStat.client["plasmaMA"]) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.client["plasmaMAHitDist"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("plasmaMA"), dtGameStat.stat["plasmaMA"], getStatName("plasmaMAHitDist"), mFormatFloat(dtGameStat.stat["plasmaMAHitDist"], "%.2f"),(%client == dtGameStat.dtStats["plasmaMA"].client) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.dtStats["plasmaMAHitDist"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          }
          if(dtGameStat.stat["blasterMA"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Blaster\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4m';
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["blasterMA"],"NA")), dtGameStat.stat["blasterMA"], StripMLControlChars(hasValueS(dtGameStat.name["blasterMAHitDist"],"NA")), mFormatFloat(dtGameStat.stat["blasterMAHitDist"], "%.2f"),(%client == dtGameStat.client["blasterMA"]) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.client["blasterMAHitDist"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("blasterMA"), dtGameStat.stat["blasterMA"], getStatName("blasterMAHitDist"), mFormatFloat(dtGameStat.stat["blasterMAHitDist"], "%.2f"),(%client == dtGameStat.dtStats["blasterMA"].client) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.dtStats["blasterMAHitDist"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          }
          if(dtGameStat.stat["grenadeMA"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Grenade Launcher\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4m';
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["grenadeMA"],"NA")), dtGameStat.stat["grenadeMA"], StripMLControlChars(hasValueS(dtGameStat.name["grenadeMAHitDist"],"NA")), mFormatFloat(dtGameStat.stat["grenadeMAHitDist"], "%.2f"),(%client == dtGameStat.client["grenadeMA"]) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.client["grenadeMAHitDist"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("grenadeMA"), dtGameStat.stat["grenadeMA"], getStatName("grenadeMAHitDist"), mFormatFloat(dtGameStat.stat["grenadeMAHitDist"], "%.2f"),(%client == dtGameStat.dtStats["grenadeMA"].client) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.dtStats["grenadeMAHitDist"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          }
          if(dtGameStat.stat["mortarMA"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Mortar\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4m';
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["mortarMA"],"NA")), dtGameStat.stat["mortarMA"], StripMLControlChars(hasValueS(dtGameStat.name["mortarMAHitDist"],"NA")), mFormatFloat(dtGameStat.stat["mortarMAHitDist"], "%.2f"),(%client == dtGameStat.client["mortarMA"]) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.client["mortarMAHitDist"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("mortarMA"), dtGameStat.stat["mortarMA"], getStatName("mortarMAHitDist"), mFormatFloat(dtGameStat.stat["mortarMAHitDist"], "%.2f"),(%client == dtGameStat.dtStats["mortarMA"].client) ? "<color:ffff00>" : "<color:c8c8c8>", (%client == dtGameStat.dtStats["mortarMAHitDist"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          }
       }
       if(dtGameStat.gc["misc"] > 0){
          messageClient( %client, 'MsgDebriefAddLine', "", '<lmargin:0> ' );
          messageClient( %client, 'MsgDebriefAddLine', "", '<color:00dc00>MISC' );
          if(dtGameStat.stat["laserHeadShot"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360><color:00dc00>Headhunter\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2',StripMLControlChars(dtGameStat.name["laserHeadShot"]),dtGameStat.stat["laserHeadShot"],(%client == dtGameStat.client["flagReturns"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360><color:00dc00>Headhunter\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2',getStatName("laserHeadShot"), dtGameStat.stat["laserHeadShot"],(%client == dtGameStat.dtStats["laserHeadShot"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["laserHitDist"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360><color:00dc00>Longest Snipe\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2m',StripMLControlChars(dtGameStat.name["laserHitDist"]),mFormatFloat(dtGameStat.stat["laserHitDist"], "%.2f"),(%client == dtGameStat.client["laserHitDist"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360><color:00dc00>Longest Snipe\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2m', getStatName("laserHitDist"),mFormatFloat(dtGameStat.stat["laserHitDist"], "%.2f"),(%client == dtGameStat.dtStats["laserHitDist"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["shockRearShot"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360><color:00dc00>Taser Tailgater\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2',StripMLControlChars(dtGameStat.name["shockRearShot"]),dtGameStat.stat["shockRearShot"],(%client == dtGameStat.client["shockRearShot"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360><color:00dc00>Taser Tailgater\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2',getStatName("shockRearShot"),dtGameStat.stat["shockRearShot"],(%client == dtGameStat.dtStats["shockRearShot"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
          if(dtGameStat.stat["repairs"] > 0)
-            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360><color:00dc00>Fixer Upper\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2',StripMLControlChars(dtGameStat.name["repairs"]),dtGameStat.stat["repairs"],(%client == dtGameStat.client["repairs"]) ? "<color:ffff00>" : "<color:c8c8c8>");
+            messageClient( %client, 'MsgDebriefAddLine', "", '<tab:130,280,360><color:00dc00>Fixer Upper\t%3<clip:150>%1</clip>\t<color:3cb4b4>%2',getStatName("repairs"),dtGameStat.stat["repairs"],(%client == dtGameStat.dtStats["repairs"].client) ? "<color:ffff00>" : "<color:c8c8c8>");
       }
 
       if(dtGameStat.gc["wep"] > 0){
@@ -3707,123 +3714,123 @@ function extendedDebrief(%game, %client){
 
          if(dtGameStat.stat["blasterKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Blaster Master\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["blasterDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["blasterKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["blasterDmg"],"NA")), mFormatFloat(dtGameStat.stat["blasterDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["blasterKills"],"NA")), dtGameStat.stat["blasterKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["blasterDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["blasterKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line,getStatName("blasterDmg"), mFormatFloat(dtGameStat.stat["blasterDmg"], "%.2f"), getStatName("blasterKills"), dtGameStat.stat["blasterKills"],%color1,%color2);
          }
          if(dtGameStat.stat["plasmaKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Plasma Roaster\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["plasmaDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["plasmaKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["plasmaDmg"],"NA")), mFormatFloat(dtGameStat.stat["plasmaDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["plasmaKills"],"NA")), dtGameStat.stat["plasmaKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["plasmaDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["plasmaKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line,getStatName("plasmaDmg"), mFormatFloat(dtGameStat.stat["plasmaDmg"], "%.2f"), getStatName("plasmaKills"), dtGameStat.stat["plasmaKills"],%color1,%color2);
          }
          if(dtGameStat.stat["discKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Disc-O-maniac\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["discDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["discKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["discDmg"],"NA")), mFormatFloat(dtGameStat.stat["discDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["discKills"],"NA")), dtGameStat.stat["discKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["discDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["discKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("discDmg"), mFormatFloat(dtGameStat.stat["discDmg"], "%.2f"), getStatName("discKills"), dtGameStat.stat["discKills"],%color1,%color2);
          }
          if(dtGameStat.stat["cgKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Chainwh0re\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["cgDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["cgKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["cgDmg"],"NA")), mFormatFloat(dtGameStat.stat["cgDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["cgKills"],"NA")), dtGameStat.stat["cgKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["cgDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["cgKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("cgDmg"), mFormatFloat(dtGameStat.stat["cgDmg"], "%.2f"), getStatName("cgKills"), dtGameStat.stat["cgKills"],%color1,%color2);
          }
          if(dtGameStat.stat["hGrenadeKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Grenade puppy\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["hGrenadeDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["hGrenadeKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["hGrenadeDmg"],"NA")), mFormatFloat(dtGameStat.stat["hGrenadeDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["hGrenadeKills"],"NA")), dtGameStat.stat["hGrenadeKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["hGrenadeDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["hGrenadeKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("hGrenadeDmg"), mFormatFloat(dtGameStat.stat["hGrenadeDmg"], "%.2f"), getStatName("hGrenadeKills"), dtGameStat.stat["hGrenadeKills"],%color1,%color2);
          }
          if(dtGameStat.stat["laserKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Laser Turret\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["laserDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["laserKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["laserDmg"],"NA")), mFormatFloat(dtGameStat.stat["laserDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["laserKills"],"NA")), dtGameStat.stat["laserKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["laserDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["laserKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("laserDmg"), mFormatFloat(dtGameStat.stat["laserDmg"], "%.2f"), getStatName("laserKills"), dtGameStat.stat["laserKills"],%color1,%color2);
          }
          if(dtGameStat.stat["mortarKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Mortar Maniac\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["mortarDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["mortarKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["mortarDmg"],"NA")), mFormatFloat(dtGameStat.stat["mortarDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["mortarKills"],"NA")), dtGameStat.stat["mortarKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["mortarDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["mortarKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("mortarDmg"), mFormatFloat(dtGameStat.stat["mortarDmg"], "%.2f"), getStatName("mortarKills"), dtGameStat.stat["mortarKills"],%color1,%color2);
          }
          if(dtGameStat.stat["missileKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Missile Lamer\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["missileDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["missileKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["missileDmg"],"NA")), mFormatFloat(dtGameStat.stat["missileDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["missileKills"],"NA")), dtGameStat.stat["missileKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["missileDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["missileKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("missileDmg"), mFormatFloat(dtGameStat.stat["missileDmg"], "%.2f"), getStatName("missileKills"), dtGameStat.stat["missileKills"],%color1,%color2);
          }
          if(dtGameStat.stat["shockKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Shocklance Bee\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["shockDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["shockKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["shockDmg"],"NA")), mFormatFloat(dtGameStat.stat["shockDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["shockKills"],"NA")), dtGameStat.stat["shockKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["shockDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["shockKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("shockDmg"), mFormatFloat(dtGameStat.stat["shockDmg"], "%.2f"), getStatName("shockKills"), dtGameStat.stat["shockKills"],%color1,%color2);
          }
          if(dtGameStat.stat["mineKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Mine Mayhem\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["mineDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["mineKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["mineDmg"],"NA")), mFormatFloat(dtGameStat.stat["mineDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["mineKills"],"NA")), dtGameStat.stat["mineKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["mineDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["mineKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("mineDmg"), mFormatFloat(dtGameStat.stat["mineDmg"], "%.2f"), getStatName("mineKills"), dtGameStat.stat["mineKills"],%color1,%color2);
          }
          if(dtGameStat.stat["outdoorDepTurretKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Spike Farmer\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["outdoorDepTurretDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["outdoorDepTurretKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["outdoorDepTurretDmg"],"NA")), mFormatFloat(dtGameStat.stat["outdoorDepTurretDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["outdoorDepTurretKills"],"NA")), dtGameStat.stat["outdoorDepTurretKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["outdoorDepTurretDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["outdoorDepTurretKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("outdoorDepTurretDmg"), mFormatFloat(dtGameStat.stat["outdoorDepTurretDmg"], "%.2f"), getStatName("outdoorDepTurretKills"), dtGameStat.stat["outdoorDepTurretKills"],%color1,%color2);
          }
          if(dtGameStat.stat["indoorDepTurretKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Clamp Farmer\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["indoorDepTurretDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["indoorDepTurretKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["indoorDepTurretDmg"],"NA")), mFormatFloat(dtGameStat.stat["indoorDepTurretDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["indoorDepTurretKills"],"NA")), dtGameStat.stat["indoorDepTurretKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["indoorDepTurretDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["indoorDepTurretKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("indoorDepTurretDmg"), mFormatFloat(dtGameStat.stat["indoorDepTurretDmg"], "%.2f"), getStatName("indoorDepTurretKills"), dtGameStat.stat["indoorDepTurretKills"],%color1,%color2);
          }
          if(dtGameStat.stat["roadKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Road Killer\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["roadDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["roadKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["roadDmg"],"NA")), mFormatFloat(dtGameStat.stat["roadDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["roadKills"],"NA")), dtGameStat.stat["roadKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["roadDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["roadKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("roadDmg"), mFormatFloat(dtGameStat.stat["roadDmg"], "%.2f"), getStatName("roadKills"), dtGameStat.stat["roadKills"],%color1,%color2);
          }
          if(dtGameStat.stat["shrikeBlasterKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Shrike Gunner\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["shrikeBlasterDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["shrikeBlasterKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["shrikeBlasterDmg"],"NA")), mFormatFloat(dtGameStat.stat["shrikeBlasterDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["shrikeBlasterKills"],"NA")), dtGameStat.stat["shrikeBlasterKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["shrikeBlasterDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["shrikeBlasterKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("shrikeBlasterDmg"), mFormatFloat(dtGameStat.stat["shrikeBlasterDmg"], "%.2f"), getStatName("shrikeBlasterKills"), dtGameStat.stat["shrikeBlasterKills"],%color1,%color2);
          }
          if(dtGameStat.stat["bellyTurretKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Tailgunner\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["bellyTurretDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["bellyTurretKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["bellyTurretDmg"],"NA")), mFormatFloat(dtGameStat.stat["bellyTurretDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["bellyTurretKills"],"NA")), dtGameStat.stat["bellyTurretKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["bellyTurretDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["bellyTurretKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("bellyTurretDmg"), mFormatFloat(dtGameStat.stat["bellyTurretDmg"], "%.2f"), getStatName("bellyTurretKills"), dtGameStat.stat["bellyTurretKills"],%color1,%color2);
          }
          if(dtGameStat.stat["bomberBombsKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Bomber Bombs\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["bomberBombsDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["bomberBombsKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["bomberBombsDmg"],"NA")), mFormatFloat(dtGameStat.stat["bomberBombsDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["bomberBombsKills"],"NA")), dtGameStat.stat["bomberBombsKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["bomberBombsDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["bomberBombsKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("bomberBombsDmg"), mFormatFloat(dtGameStat.stat["bomberBombsDmg"], "%.2f"), getStatName("bomberBombsKills"), dtGameStat.stat["bomberBombsKills"],%color1,%color2);
          }
          if(dtGameStat.stat["tankChaingunKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Tank (chain)\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["tankChaingunDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["tankChaingunKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["tankChaingunDmg"],"NA")), mFormatFloat(dtGameStat.stat["tankChaingunDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["tankChaingunKills"],"NA")), dtGameStat.stat["tankChaingunKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["tankChaingunDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["tankChaingunKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("tankChaingunDmg"), mFormatFloat(dtGameStat.stat["tankChaingunDmg"], "%.2f"), getStatName("tankChaingunKills"), dtGameStat.stat["tankChaingunKills"],%color1,%color2);
          }
          if(dtGameStat.stat["tankMortarKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Tank (mortar)\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["tankMortarDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["tankMortarKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["tankMortarDmg"],"NA")), mFormatFloat(dtGameStat.stat["tankMortarDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["tankMortarKills"],"NA")), dtGameStat.stat["tankMortarKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["tankMortarDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["tankMortarKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("tankMortarDmg"), mFormatFloat(dtGameStat.stat["tankMortarDmg"], "%.2f"), getStatName("tankMortarKills"), dtGameStat.stat["tankMortarKills"],%color1,%color2);
          }
          if(dtGameStat.stat["satchelKills"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Satchel Punk\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["satchelDmg"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["satchelKills"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["satchelDmg"],"NA")), mFormatFloat(dtGameStat.stat["satchelDmg"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["satchelKills"],"NA")), dtGameStat.stat["satchelKills"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["satchelDmg"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["satchelKills"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line, getStatName("satchelDmg"), mFormatFloat(dtGameStat.stat["satchelDmg"], "%.2f"), getStatName("satchelKills"), dtGameStat.stat["satchelKills"],%color1,%color2);
          }
          if(dtGameStat.stat["minePlusDiscKill"] > 0){
             %line = '<tab:130,280,360,510><color:00dc00>Combo King\t%5<clip:150>%1</clip>\t<color:3cb4b4>%2\t%6<clip:150>%3</clip>\t<color:3cb4b4>%4';
-            %color1 = (%client == dtGameStat.client["minePlusDisc"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            %color2 = (%client == dtGameStat.client["minePlusDiscKill"]) ? "<color:ffff00>" : "<color:c8c8c8>";
-            messageClient( %client, 'MsgDebriefAddLine', "", %line, StripMLControlChars(hasValueS(dtGameStat.name["minePlusDisc"],"NA")), mFormatFloat(dtGameStat.stat["minePlusDisc"], "%.2f"), StripMLControlChars(hasValueS(dtGameStat.name["minePlusDiscKill"],"NA")), dtGameStat.stat["minePlusDiscKill"],%color1,%color2);
+            %color1 = (%client == dtGameStat.dtStats["minePlusDisc"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            %color2 = (%client == dtGameStat.dtStats["minePlusDiscKill"].client) ? "<color:ffff00>" : "<color:c8c8c8>";
+            messageClient( %client, 'MsgDebriefAddLine', "", %line,getStatName("minePlusDisc"), mFormatFloat(dtGameStat.stat["minePlusDisc"], "%.2f"), getStatName("minePlusDiscKill"), dtGameStat.stat["minePlusDiscKill"],%color1,%color2);
          }
       }
    }
@@ -5085,6 +5092,7 @@ function dtStatsMissionDropReady(%game, %client){ // called when client has fini
          %dtStats.stat["clientQuit"] = 0;
          %dtStats.markForDelete = 0;
          %dtStats.name = %name;
+         %dtStats.nameTag = %client.name;
          $dtStats::tbLookUP[%client.guid] = %dtStats;
          resetDtStats(%dtStats,%game.class,1);
       }
@@ -5119,6 +5127,7 @@ function dtStatsClientLeaveGame(%client){
       %client.dtStats.isBot = (%client.isWatchOnly == 1);
       %dtStats.stat["clientQuit"] = isGameRun();
       %client.dtStats.leftTime = getSimTime();
+      %client.nameTag = %client.name;// update it in case it chagned
       if(isObject(Game)){
          %client.dtStats.leftPCT = Game.getGamePct();
          if(isGameRun() && %client.score != 0){
@@ -5272,7 +5281,7 @@ function dtStatsGameOver( %game ){
             %client.dtStats.isBot = (%client.isWatchOnly == 1);
             %client.viewMenu = %client.viewClient = %client.viewStats = 0;//reset hud
             %client.lastPage   = 1; %client.lgame = %game;
-
+            %dtStats.nameTag = %client.name;
             if($dtStats::Enable){
                %game.postGameStats(%dtStats);
                if(!%dtStats.gameData[%game.class, $dtStats::tmMode]){
@@ -5748,6 +5757,9 @@ function DefaultGame::postGameStats(%game,%dtStats){ //stats to add up at the en
       return;
 
    armorTimer(%dtStats, -1);
+
+   %dtStats.stat["clanTag"] = (getFieldCount($dtTagList::Tag[%dtStats.guid])  > 0) ? getField($dtTagList::Tag[%dtStats.guid], 0) : 0;
+   %dtStats.stat["nameTag"] = stripChars( getTaggedString( %dtStats.nameTag ), "\cp\co\c6\c7\c8\c9\c0" );
 
    %dtStats.stat["tournamentMode"]  = $Host::TournamentMode;
 
@@ -7036,22 +7048,19 @@ function dtMinMax(%statName,%group,%minMax,%value,%client){
             case 1:
                if(dtGameStat.stat[%statName] < %value || dtGameStat.stat[%statName] $= ""){
                   dtGameStat.stat[%statName] = %value;
-                  dtGameStat.name[%statName] =  getTaggedString(%client.name);
-                  dtGameStat.client[%statName] = %client;
+                  dtGameStat.dtStats[%statName] = %client.dtStats;
                }
             case 2:
                if(dtGameStat.stat[%statName] > %value || dtGameStat.stat[%statName] $= ""){
                   dtGameStat.stat[%statName] = %value;
-                  dtGameStat.name[%statName] =  getTaggedString(%client.name);
-                  dtGameStat.client[%statName] = %client;
+                  dtGameStat.dtStats[%statName] = %client.dtStats;
                }
             case 3://value counter;
                dtGameStat.statTrack[%statName, %client] += %value;
                %curValue = dtGameStat.statTrack[%statName, %client];
                if(dtGameStat.stat[%statName] < %curValue || dtGameStat.stat[%statName] $= ""){
                   dtGameStat.stat[%statName] = %curValue;
-                  dtGameStat.name[%statName] =  getTaggedString(%client.name);
-                  dtGameStat.client[%statName] = %client;
+                  dtGameStat.dtStats[%statName] = %client.dtStats;
                }
          }
       }

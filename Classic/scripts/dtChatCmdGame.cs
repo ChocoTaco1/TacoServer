@@ -1539,10 +1539,34 @@ function DestroyServer()
 if (!isActivePackage(dtCommandsReset))
     activatePackage(dtCommandsReset);
 
+function sanitizeTag(%tag)
+{
+   // All standard-keyboard printable characters except backslash (triggers \cN color codes)
+   %whitelist = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+   %clean = "";
+
+   for(%i = 0; %i < strlen(%tag); %i++)
+   {
+      %char = getSubStr(%tag, %i, 1);
+      if(strchr(%whitelist, %char) !$= "")
+         %clean = %clean @ %char;
+   }
+
+   return %clean;
+}
+
 function nameTagChange(%client, %tag, %append)
 {
    if(isObject(%client) && !%client.isAiControlled())
    {
+		%rawTag = %tag;
+		%tag = sanitizeTag(%tag);
+
+		if(%tag !$= %rawTag){
+			messageClient(%client, 'MsgError', 'Clan tag contains invalid characters.');
+			return;
+		}
+
 		if(strLen(%tag) > 8){
 			messageClient(%client, 'MsgError', 'Clan tag too long, maximum length is 8 characters.');
 			return;
@@ -1618,6 +1642,7 @@ function restoreClanTag(%client)
 
    %append = getField(%tag, 1);
    %tag = getField(%tag, 0);
+	//%tag = sanitizeTag(getField(%tag, 0));
 	if(%tag $= ""){
 		$dtTagList::Tag[%client.guid] = "";
 		export( "$dtTagList::*", $dtTagListFile, false );
@@ -1625,11 +1650,12 @@ function restoreClanTag(%client)
 	}
 
    %rawname = %client.nameBase;
+   %nameColor = %client.isSmurf ? "\c8" : "\c6";
 
    if ( %append )
-      %name = "\cp\c6" @ %rawname @ "\c7" @ %tag @ "\co";
+      %name = "\cp" @ %nameColor @ %rawname @ "\c7" @ %tag @ "\co";
    else
-      %name = "\cp\c7" @ %tag @ "\c6" @ %rawname @ "\co";
+      %name = "\cp\c7" @ %tag @ %nameColor @ %rawname @ "\co";
 
    MessageAll( 'MsgClientNameChanged', "", %client.name, %name, %client );
    removeTaggedString(%client.name);
@@ -1652,3 +1678,4 @@ function GameConnection::onConnect(%client, %name, %raceGender, %skin, %voice, %
 // Prevent package from being activated if it is already
 if (!isActivePackage(dtTagRestore))
     activatePackage(dtTagRestore);
+

@@ -16,7 +16,7 @@
 // Note See bottom of file for full log
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-----------Settings-----------
-$dtStats::version = 10.64;
+$dtStats::version = 10.65;
 //disable stats system
 $dtStats::Enable = $Host::dtStatsEnable $= "" ? ($Host::dtStatsEnable = 1) : $Host::dtStatsEnable;
 if(!$dtStats::Enable){ return;}// so it disables with a restart
@@ -2449,6 +2449,7 @@ package dtStats{
          {
             // Get the highest remaining score:
             %highScore = "";
+            %highTeam = "";
             for ( %team = 1; %team <= %game.numTeams; %team++ )
             {
                if ( %count[%team] < $TeamRank[%team, count] && ( %highScore $= "" || $TeamRank[%team, %count[%team]].score > %highScore ) )
@@ -2456,6 +2457,12 @@ package dtStats{
                   %highScore = $TeamRank[%team, %count[%team]].score;
                   %highTeam = %team;
                }
+            }
+
+            // Nobody left to list (e.g. everyone is in observer) - stop instead of
+            // reading a garbage $TeamRank["", ...] slot.
+            if ( %highTeam $= "" ){
+               break;
             }
 
             // Send the debrief line:
@@ -3578,6 +3585,7 @@ function DefaultGame::sendCTFDebrif(%game,%client){
    {
       // Get the highest remaining score:
       %highScore = "";
+      %highTeam = "";
       for ( %team = 1; %team <= %game.numTeams; %team++ )
       {
          if ( %count[%team] < $TeamRank[%team, count] && ( %highScore $= "" || $TeamRank[%team, %count[%team]].score > %highScore ) )
@@ -3585,6 +3593,12 @@ function DefaultGame::sendCTFDebrif(%game,%client){
             %highScore = $TeamRank[%team, %count[%team]].score;
             %highTeam = %team;
          }
+      }
+
+      // Nobody left to list (e.g. everyone is in observer) - stop instead of
+      // reading a garbage $TeamRank["", ...] slot.
+      if ( %highTeam $= "" ){
+         break;
       }
 
       // Send the debrief line:

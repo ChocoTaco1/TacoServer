@@ -1562,6 +1562,11 @@ function nameTagChange(%client, %tag, %append)
 		%rawTag = %tag;
 		%tag = sanitizeTag(%tag);
 
+		// if($dtTagBlackList[%client.guid]){
+		// 	messageClient(%client, 'MsgError', 'This client is blacklisted from using a clan tag.');
+		// 	return;
+	  	// }
+
 		if(%tag !$= %rawTag){
 			messageClient(%client, 'MsgError', 'Clan tag contains invalid characters.');
 			return;
@@ -1572,77 +1577,95 @@ function nameTagChange(%client, %tag, %append)
 			return;
 		}
 
-      if(!%client.isTagWaiting)
-      {
-         %client.isTagWaiting = true;
-         %client.tagWaitStart = getSimTime();
-         %client.schedule(30000, ResetTagSwitchWait);
+		if(!%client.isTagWaiting)
+		{
+			%client.isTagWaiting = true;
+			%client.tagWaitStart = getSimTime();
+			%client.schedule(30000, ResetTagSwitchWait);
 
-         %authInfo = %client.getAuthInfo();
-         %rawname = getField( %authInfo, 0 );
+			%authInfo = %client.getAuthInfo();
+			%rawname = getField( %authInfo, 0 );
 
 
-         if ( %append )
-         {
-            %name = "\cp\c6" @ %rawname @ "\c7" @ %tag @ "\co";
-            %newname = "<color:FFFFFF>" @ %rawname @ "<color:FFF600>" @ %tag;
-         }
-         else
-         {
-            %name = "\cp\c7" @ %tag @ "\c6" @ %rawname @ "\co";
-            %newname = "<color:FFF600>" @ %tag @ "<color:FFFFFF>" @ %rawname;
-         }
-         MessageAll( 'MsgClientNameChanged', "", %client.name, %name, %client );
-         removeTaggedString(%client.name);
-         %client.name = addTaggedString(%name);
-         setTargetName(%client.target, %client.name);
-         if(%client.team != 0)
-            Bottomprint( %client, "Your new name is " @ %newname , 5 ,1 );
-         else
-            messageClient( %client, "", 'Your new name is %1', %append ? %rawname @ %tag : %tag @ %rawname );
+			if ( %append ) {
+				%name = "\cp\c6" @ %rawname @ "\c7" @ %tag @ "\co";
+				%newname = "<color:FFFFFF>" @ %rawname @ "<color:FFF600>" @ %tag;
+			}
+			else {
+				%name = "\cp\c7" @ %tag @ "\c6" @ %rawname @ "\co";
+				%newname = "<color:FFF600>" @ %tag @ "<color:FFFFFF>" @ %rawname;
+			}
 
-         saveClanTag(%client, %tag, %append);
-      }
-      else
-      {
-         %wait = mFloor((30000 - (getSimTime() - %client.tagWaitStart)) / 1000);
-         messageClient(%client, "", '\c3WAIT MESSAGE:\cr You must wait another %1 seconds', %wait);
-      }
+			MessageAll( 'MsgClientNameChanged', "", %client.name, %name, %client );
+			removeTaggedString(%client.name);
+			%client.name = addTaggedString(%name);
+			setTargetName(%client.target, %client.name);
+
+			if(%client.team != 0) {
+				Bottomprint( %client, "Your new name is " @ %newname , 5 ,1 );
+			}
+			else {
+				messageClient( %client, "", 'Your new name is %1', %append ? %rawname @ %tag : %tag @ %rawname );
+			}
+
+			saveClanTag(%client, %tag, %append);
+		}
+		else
+		{
+			%wait = mFloor((30000 - (getSimTime() - %client.tagWaitStart)) / 1000);
+			messageClient(%client, "", '\c3WAIT MESSAGE:\cr You must wait another %1 seconds', %wait);
+		}
    }
 }
 
 // Persist the player's clan tag so it can be restored on their next connect.
 $dtTagListFile = "prefs/dtTagList.cs";
-exec($dtTagListFile);
+$dtTagBlackList["123345"] = 1; // Example blacklisted GUID
+$dtTagBlackList["1233456"] = 1; // Example blacklisted GUID
+$dtTagBlackList["4120041"] = 1; // XZXZ 4120041
 
+exec($dtTagListFile);
 function saveClanTag(%client, %tag, %append)
 {
-   if(%client.guid $= "" || %client.guid == 0)
+	if(%client.guid $= "" || %client.guid == 0)
       return;
+
+	if($dtTagBlackList[%client.guid])
+		return;
+
+	if(%client.isSmurf)
+		return;
+
 	if(%tag $= ""){
 		$dtTagList::Tag[%client.guid] = "";
 	}
 	else{
-   	$dtTagList::Tag[%client.guid] = %tag TAB %append;
+   		$dtTagList::Tag[%client.guid] = %tag TAB %append;
 	}
    export( "$dtTagList::*", $dtTagListFile, false );
 }
 
 function restoreClanTag(%client)
 {
-   if(!isObject(%client) || %client.isAiControlled())
+	if(!isObject(%client) || %client.isAiControlled())
       return;
 
-   if(%client.guid $= "" || %client.guid == 0)
+	if(%client.guid $= "" || %client.guid == 0)
       return;
 
-   %tag = $dtTagList::Tag[%client.guid];
-   if(%tag $= "")
-      return;
+	if($dtTagBlackList[%client.guid])
+		return;
 
-   %append = getField(%tag, 1);
-   %tag = getField(%tag, 0);
-	//%tag = sanitizeTag(getField(%tag, 0));
+	%tag = $dtTagList::Tag[%client.guid];
+	if(%tag $= "")
+		return;
+
+	if(%client.isSmurf)
+		return;
+
+	%append = getField(%tag, 1);
+	%tag = getField(%tag, 0);
+	%tag = sanitizeTag(%tag);
 	if(%tag $= ""){
 		$dtTagList::Tag[%client.guid] = "";
 		export( "$dtTagList::*", $dtTagListFile, false );

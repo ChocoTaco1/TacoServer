@@ -1,5 +1,3 @@
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	Stats system for classic and base
 //	Script BY: DarkTiger
@@ -16,7 +14,7 @@
 // Note See bottom of file for full log
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-----------Settings-----------
-$dtStats::version = 10.65;
+$dtStats::version = 10.66;
 //disable stats system
 $dtStats::Enable = $Host::dtStatsEnable $= "" ? ($Host::dtStatsEnable = 1) : $Host::dtStatsEnable;
 if(!$dtStats::Enable){ return;}// so it disables with a restart
@@ -7644,10 +7642,17 @@ function clientDmgStats(%data, %position, %sourceObject, %targetObject, %damageT
                %targetClient.lastHitTime = getSimTime();
 
                if(%targetObject.isShielded && %damageType != $DamageType::Blaster){
-                  %amount = %data.checkShields(%targetObject, %position, %amount, %damageType);
-                  if(!%amount){
-                     %targetDT.stat["shieldPackDmg"] += %amount;
-                  }
+                  // what the shield takes, worked out without touching it. calling
+                  // checkShields here spent the energy a second time, so the real
+                  // damageObject after us found an empty shield and let the hit
+                  // through -- mine+disc went straight through a full shield pack
+                  %shieldScale = %data.shieldDamageScale[%damageType];
+                  if(%shieldScale $= "")
+                     %shieldScale = 1;
+                  %strength = %targetObject.getEnergyLevel() / %data.energyPerDamagePoint;
+                  %absorbed = (%amount * %shieldScale <= %strength) ? %amount : (%strength / %shieldScale);
+                  %targetDT.stat["shieldPackDmg"] += %absorbed;
+                  %amount -= %absorbed;// the weapon stats below count what landed
                }
 
 

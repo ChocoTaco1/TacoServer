@@ -1,5 +1,3 @@
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //	Stats system for classic and base
 //	Script BY: DarkTiger
@@ -16,7 +14,7 @@
 // Note See bottom of file for full log
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-----------Settings-----------
-$dtStats::version = 10.65;
+$dtStats::version = 10.65.1 ;//shield bug
 //disable stats system
 $dtStats::Enable = $Host::dtStatsEnable $= "" ? ($Host::dtStatsEnable = 1) : $Host::dtStatsEnable;
 if(!$dtStats::Enable){ return;}// so it disables with a restart
@@ -13994,6 +13992,8 @@ function binToDec2(%bin){
 package dtBanSys{
    //Keep track of gags (Disconnecting and Reconnecting)
    function GameConnection::onDrop(%client, %reason){
+      if(%client.dtBanKick)
+         return;   // never went through the base onConnect: nothing to undo
       %ip = getClientCleanIP(%client);
       $chatGagged[%ip] =  $chatGagged[%client.guid] = (%client.isGagged == 1); //save status of this
       parent::onDrop(%client, %reason);
@@ -14073,7 +14073,8 @@ function banList_checkClient(%client, %guid){// only one we care about in whitel
          pushFailJoin(%obj.name, %guid, 0, "Kick/Ban" SPC %obj.banLengthMin - %delta SPC "Minutes Left",1);
 
          %client.setDisconnectReason("You are not allowed to play on this server.");
-         %client.delete();
+         %client.dtBanKick = 1;
+         %client.schedule(32, "delete");
          return 1;
       }
       else{
@@ -14092,7 +14093,8 @@ function banList_checkClient(%client, %guid){// only one we care about in whitel
          pushFailJoin(%name, %guid, 0, "Not Whitelisted", 0);
          if($dtServerVars::WhiteListMode){
             %client.setDisconnectReason("Server is locked, please message admin or wait for approval");
-            %client.delete();
+            %client.dtBanKick = 1;
+            %client.schedule(32, "delete");
             return 1;
          }
       }
@@ -14101,7 +14103,8 @@ function banList_checkClient(%client, %guid){// only one we care about in whitel
       if($dtServerVars::IPBanListMode && $dtIPList[%ip] && !isObject($dtWhtList::WhiteList[%guid])){
          pushFailJoin(%name, %client.guid, %ip, "IP Ban List", 2);
          %client.setDisconnectReason("You are not allowed to play on this server.");
-         %client.delete();
+         %client.dtBanKick = 1;
+         %client.schedule(32, "delete");
          return 1;
       }
    }
